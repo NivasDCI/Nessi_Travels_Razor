@@ -1,0 +1,1107 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Common_FileUpload" xml:space="preserve">
+    <value>Please Upload File and Proceed</value>
+  </data>
+  <data name="Common_EnterValidEmailAddress" xml:space="preserve">
+    <value>Enter Valid Email Address</value>
+  </data>
+  <data name="Err_HSNMaster_CGST" xml:space="preserve">
+    <value>CGST is Required</value>
+  </data>
+  <data name="Err_HSNMaster_Description" xml:space="preserve">
+    <value>Description is Required</value>
+  </data>
+  <data name="Err_HSNMaster_HSNCode" xml:space="preserve">
+    <value>HSN Code is Required</value>
+  </data>
+  <data name="Err_HSNMaster_SGST" xml:space="preserve">
+    <value>SGST is Required</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_Author" xml:space="preserve">
+    <value>Select Author</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_Maker" xml:space="preserve">
+    <value>Select Maker</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_Category" xml:space="preserve">
+    <value>Select Category</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_ProductType" xml:space="preserve">
+    <value>Select Product Type</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_Store" xml:space="preserve">
+    <value>Select Warehouse</value>
+  </data>
+  <data name="Err_ProductMaster_ProductCode" xml:space="preserve">
+    <value>Product Code is Required</value>
+  </data>
+  <data name="ProductMaster_PleaseSelectHSN" xml:space="preserve">
+    <value>Please Select HSN</value>
+  </data>
+  <data name="ProductMaster_PleaseSelectPublication" xml:space="preserve">
+    <value>Please Select Publication</value>
+  </data>
+  <data name="ProductMaster_PleaseSelectSubCategory" xml:space="preserve">
+    <value>Please Select Sub Category </value>
+  </data>
+  <data name="Err_ProductMaster_Category" xml:space="preserve">
+    <value>Please Select Category</value>
+  </data>
+  <data name="Err_ProductMaster_CostPrice" xml:space="preserve">
+    <value>Please Enter Cost Price</value>
+  </data>
+  <data name="Err_ProductMaster_HSN" xml:space="preserve">
+    <value>Please Select HSN</value>
+  </data>
+  <data name="Err_ProductMaster_MRP" xml:space="preserve">
+    <value>Please Enter MRP</value>
+  </data>
+  <data name="Err_ProductMaster_PrintName" xml:space="preserve">
+    <value>Please Enter PrintName</value>
+  </data>
+  <data name="Err_ProductMaster_ProductType" xml:space="preserve">
+    <value>Please Select ProductType</value>
+  </data>
+  <data name="Err_ProductMaster_SellingPrice" xml:space="preserve">
+    <value>Please Enter Selling Price</value>
+  </data>
+  <data name="Err_ProductMaster_Rate" xml:space="preserve">
+    <value>Enter the Rate</value>
+  </data>
+  <data name="Err_ProductMaster_Store" xml:space="preserve">
+    <value>Please Select Store</value>
+  </data>
+  <data name="Err_SubCategoryMaster_EnterSubCategoryName" xml:space="preserve">
+    <value> Sub Category Name is Required</value>
+  </data>
+  <data name="Err_SubCategoryMaster_SelectCategory" xml:space="preserve">
+    <value>Please Select Category</value>
+  </data>
+  <data name="SubCategoryMaster_PleaseSelectSubCategory" xml:space="preserve">
+    <value>Please Select Sub Category</value>
+  </data>
+  <data name="Err_CustomerMaster_CustomerName" xml:space="preserve">
+    <value>Customer Name is Required</value>
+  </data>
+  <data name="Err_CustomerMaster_MobileNo" xml:space="preserve">
+    <value>Mobile No is Required</value>
+  </data>
+  <data name="Err_PublicationMaster_PublicationName" xml:space="preserve">
+    <value> Publication Name is Required</value>
+  </data>
+  <data name="Err_SupplierMaster_ContactPersonName" xml:space="preserve">
+    <value>Contact Person Name is Required</value>
+  </data>
+  <data name="Err_SupplierMaster_EmailID" xml:space="preserve">
+    <value>Email ID is Required</value>
+  </data>
+  <data name="Err_SupplierMaster_MobileNo" xml:space="preserve">
+    <value>Mobile No is Required</value>
+  </data>
+  <data name="Err_SupplierMaster_PhoneNo" xml:space="preserve">
+    <value>Phone No is Required</value>
+  </data>
+  <data name="Err_SupplierMaster_SupplierName" xml:space="preserve">
+    <value>Supplier Name is Required</value>
+  </data>
+  <data name="Common_Unabletochange" xml:space="preserve">
+    <value>Unable to change.</value>
+  </data>
+  <data name="Common_UnableToRemove" xml:space="preserve">
+    <value>Unable to remove.</value>
+  </data>
+  <data name="DefaultDetail_EnterDefaultOrder" xml:space="preserve">
+    <value>Order by is Required</value>
+  </data>
+  <data name="DefaultDetail_EnterDefaultText" xml:space="preserve">
+    <value>Default Text is Required</value>
+  </data>
+  <data name="DefaultDetail_EnterDefaultValue" xml:space="preserve">
+    <value>Default Value is Required</value>
+  </data>
+  <data name="DefaultMaster_PleaseSelectDefaultHeader" xml:space="preserve">
+    <value>Please Select Default Type</value>
+  </data>
+  <data name="DropDownListSelect_Status" xml:space="preserve">
+    <value>Select Status</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_ContractType" xml:space="preserve">
+    <value>Select Contract Type</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_DefaultType" xml:space="preserve">
+    <value>Select Default Type</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_LanguageType" xml:space="preserve">
+    <value>Select Language</value>
+  </data>
+  <data name="ErrPurchases_PurchaseDate" xml:space="preserve">
+    <value>Please Enter Purchase Date</value>
+  </data>
+  <data name="ErrPurchases_SupplierID" xml:space="preserve">
+    <value>Please Select Supplier</value>
+  </data>
+  <data name="ErrPurchases_StoreID" xml:space="preserve">
+    <value>Please Select Store</value>
+  </data>
+  <data name="ErrPurchases_OrderTax" xml:space="preserve">
+    <value>OrderTax</value>
+  </data>
+  <data name="ErrPurchases_PurchaseStatus" xml:space="preserve">
+    <value>Please select PurchaseS tatus</value>
+  </data>
+  <data name="ErrPrintSettingsMaster_Store" xml:space="preserve">
+    <value>Please select Store</value>
+  </data>
+  <data name="ErrPrintSettingsMaster_CompanyName" xml:space="preserve">
+    <value>Please Enter CompanyName</value>
+  </data>
+  <data name="ErrPrintSettingsMaster_MobileNumber" xml:space="preserve">
+    <value>Please Enter Mobile Number</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_City" xml:space="preserve">
+    <value>Select City</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_Country" xml:space="preserve">
+    <value>Select Country</value>
+  </data>
+  <data name="CustomerMaster_PleaseSelectCustomer" xml:space="preserve">
+    <value>Please Select Customer </value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_PurchaseStatus" xml:space="preserve">
+    <value>Select Purchase Status</value>
+  </data>
+  <data name="PurchaseMaster_PleaseSelectSupplier" xml:space="preserve">
+    <value>Select Supplier Name</value>
+  </data>
+  <data name="ErrPromotions_Name" xml:space="preserve">
+    <value>Please Enter PromotionName</value>
+  </data>
+  <data name="ErrPromotions_FromDate" xml:space="preserve">
+    <value>Please Select From Date</value>
+  </data>
+  <data name="ErrPromotions_ToDate" xml:space="preserve">
+    <value>Please Select To Date</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_PromotionsType" xml:space="preserve">
+    <value>Select Promotions Type</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_ProductTax" xml:space="preserve">
+    <value>Select Product Tax</value>
+  </data>
+  <data name="ErrCommon_StoreID" xml:space="preserve">
+    <value>Please select Store</value>
+  </data>
+  <data name="ErrStock_AdjustmentDate" xml:space="preserve">
+    <value>Please Enter Adjustment Date</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_OrderTax" xml:space="preserve">
+    <value>Select Order Tax</value>
+  </data>
+  <data name="Common_CancelSuccess" xml:space="preserve">
+    <value>{0} Cancelled Successfully</value>
+  </data>
+  <data name="Common_WantToCancel" xml:space="preserve">
+    <value>Are you sure you want to Cancel?</value>
+  </data>
+  <data name="Common_PRODUCTNOTAVAILABLE" xml:space="preserve">
+    <value>Product Not Available in this Store</value>
+  </data>
+  <data name="Err_ExpensesMaster_Amount" xml:space="preserve">
+    <value>Please Enter the Amount</value>
+  </data>
+  <data name="Err_ExpensesMaster_Date" xml:space="preserve">
+    <value>Please Enter the Date</value>
+  </data>
+  <data name="Err_ExpensesMaster_ExpensesType" xml:space="preserve">
+    <value>Please Enter the Expenses Type</value>
+  </data>
+  <data name="ErrPromotions_AddProductLevelDiscount" xml:space="preserve">
+    <value>Please add Product level discount</value>
+  </data>
+  <data name="ErrPromotions_AddVolumeLevelDiscount" xml:space="preserve">
+    <value>Please add Volumet level discount</value>
+  </data>
+  <data name="ErrPromotions_Discount" xml:space="preserve">
+    <value>Please Enter Discount/Amount</value>
+  </data>
+  <data name="ErrPromotions_VolumeDiscount" xml:space="preserve">
+    <value>Please Enter Volume Discount</value>
+  </data>
+  <data name="Common_PleaseSelectMonth" xml:space="preserve">
+    <value>Please Select Month</value>
+  </data>
+  <data name="Common_PleaseSelectYear" xml:space="preserve">
+    <value>Please Select Year</value>
+  </data>
+  <data name="ExpensesReport_EnterDate" xml:space="preserve">
+    <value>Enter Date</value>
+  </data>
+  <data name="ExpensesReport_EnterEndDate" xml:space="preserve">
+    <value>Enter End Date</value>
+  </data>
+  <data name="ExpensesReport_EnterStartDate" xml:space="preserve">
+    <value>Enter Start Date</value>
+  </data>
+  <data name="Report_PleaseSelectExportType" xml:space="preserve">
+    <value>Select Export Type</value>
+  </data>
+  <data name="ErrStock_AdjustmentNote" xml:space="preserve">
+    <value>Please Enter Adjustment Note</value>
+  </data>
+  <data name="ErrSales_SalesDate" xml:space="preserve">
+    <value>Please Enter Sales Date</value>
+  </data>
+  <data name="ErrSales_CustomerID" xml:space="preserve">
+    <value>Please Select Customer</value>
+  </data>
+  <data name="ErrSales_StoreID" xml:space="preserve">
+    <value>Please Select Store</value>
+  </data>
+  <data name="ErrSales_SalesStatus" xml:space="preserve">
+    <value>Please Select Sales Status</value>
+  </data>
+  <data name="ErrSales_SalesProduct" xml:space="preserve">
+    <value>Please Add Product</value>
+  </data>
+  <data name="Err_ProductPromotion" xml:space="preserve">
+    <value>Please select Store/Enter Product Discount  or Amount</value>
+  </data>
+  <data name="Err_VolumePromotion" xml:space="preserve">
+    <value>Enter the Volume Discount</value>
+  </data>
+  <data name="ErrPromotions_FromAmount" xml:space="preserve">
+    <value>Select From Amount</value>
+  </data>
+  <data name="ErrPromotions_ToAmount" xml:space="preserve">
+    <value>Select To Amount</value>
+  </data>
+  <data name="Err_UnPackMaster_PackSize" xml:space="preserve">
+    <value>Enter the Pack Size</value>
+  </data>
+  <data name="Err_UnPackMaster_Store" xml:space="preserve">
+    <value>Select the Store</value>
+  </data>
+  <data name="Err_UnPackMaster_UnPackMasterDate" xml:space="preserve">
+    <value>Enter  the UnPack Date</value>
+  </data>
+  <data name="Err_UnPackMaster_UnPackQuantity" xml:space="preserve">
+    <value>Enter the UnPack Quantity</value>
+  </data>
+  <data name="Common_Store" xml:space="preserve">
+    <value>Please Select Store</value>
+  </data>
+  <data name="ErrTransfers_TransferDate" xml:space="preserve">
+    <value>Please Enter Transfer Date</value>
+  </data>
+  <data name="ErrTransfers_TransferStatus" xml:space="preserve">
+    <value>Please Select Transfer Status</value>
+  </data>
+  <data name="Err_ProductMaster_SupplierCostPrice" xml:space="preserve">
+    <value>Enter  the Supplier Cost Price</value>
+  </data>
+  <data name="Err_ProductMaster_SupplierName" xml:space="preserve">
+    <value>Select Supplier name</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_TransferStatus" xml:space="preserve">
+    <value>Select Transfer Status</value>
+  </data>
+  <data name="err_UnPackNotPossible" xml:space="preserve">
+    <value>Product Quantity is not sufficient</value>
+  </data>
+  <data name="Err_ProductCodeDuplicate" xml:space="preserve">
+    <value>Product Code Already Exists.</value>
+  </data>
+  <data name="Err_SameStoreNotPossible" xml:space="preserve">
+    <value>Same Store Transfer Not Possible</value>
+  </data>
+  <data name="ErrPromotions_PromotionType" xml:space="preserve">
+    <value>Please Select Promotion Type</value>
+  </data>
+  <data name="Err_SameStoreSelect" xml:space="preserve">
+    <value>Please Select Same Store /Different Product for Discount</value>
+  </data>
+  <data name="MenuHeaderMaster_EnterMenuName" xml:space="preserve">
+    <value>Please Enter Menu Name</value>
+  </data>
+  <data name="MenuMasterDetail_EnterMenuName" xml:space="preserve">
+    <value>Enter Menu Name</value>
+  </data>
+  <data name="MenuMasterDetail_EnterPageURL" xml:space="preserve">
+    <value>Enter Page URL</value>
+  </data>
+  <data name="MenuMaster_PleaseSelectMenuMasterHeader" xml:space="preserve">
+    <value>Please Select Menu Master Header</value>
+  </data>
+  <data name="MenuHeaderMaster_EnterIcon" xml:space="preserve">
+    <value>Enter Menu Icon</value>
+  </data>
+  <data name="MenuMasterDetail_EnterOrderBy" xml:space="preserve">
+    <value>Enter Order By</value>
+  </data>
+  <data name="OrderFail" xml:space="preserve">
+    <value>Can't change order</value>
+  </data>
+  <data name="Common_DeleteSuccess" xml:space="preserve">
+    <value>Successfully Deleted</value>
+  </data>
+  <data name="Common_InsertFail" xml:space="preserve">
+    <value>Insertion Failed.</value>
+  </data>
+  <data name="Common_InsertSuccess" xml:space="preserve">
+    <value>Successfully Inserted</value>
+  </data>
+  <data name="Common_UpdateSuccess" xml:space="preserve">
+    <value>Successfully Updated</value>
+  </data>
+  <data name="ErrPromotions_ToAmountNull" xml:space="preserve">
+    <value>Please enter the To Amount &gt;0</value>
+  </data>
+  <data name="Err_SameProductNotPossible" xml:space="preserve">
+    <value>Same Product Not Possible</value>
+  </data>
+  <data name="Common_FromStore" xml:space="preserve">
+    <value>Please select From Store</value>
+  </data>
+  <data name="Common_ToStore" xml:space="preserve">
+    <value>Please select To Store</value>
+  </data>
+  <data name="ErrPrintSettingsMaster_Address1" xml:space="preserve">
+    <value>Please Enter Address1</value>
+  </data>
+  <data name="ErrPrintSettingsMaster_Address2" xml:space="preserve">
+    <value>Please Enter Address2</value>
+  </data>
+  <data name="ErrPrintSettingsMaster_Email" xml:space="preserve">
+    <value>Please Enter Email</value>
+  </data>
+  <data name="ErrPrintSettingsMaster_FooterMessage" xml:space="preserve">
+    <value>Please Enter Footer Message</value>
+  </data>
+  <data name="ErrPromotions_ToAmountGreaterThanFromAmount" xml:space="preserve">
+    <value>Volume Level - To Amount Should be Greater than from Amount</value>
+  </data>
+  <data name="Err_UnPackMaster_PackCodeName" xml:space="preserve">
+    <value>Please select Pack Product Name</value>
+  </data>
+  <data name="CustomerMaster_SelectCustomer" xml:space="preserve">
+    <value>Select Customer</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_SalesStatus" xml:space="preserve">
+    <value>Select Sales Status</value>
+  </data>
+  <data name="Attachment_AlreadyUploaded" xml:space="preserve">
+    <value>Attachment Already Uploaded</value>
+  </data>
+  <data name="Common_AddSuccess" xml:space="preserve">
+    <value>Added Successfully</value>
+  </data>
+  <data name="Common_AlreadyApproved" xml:space="preserve">
+    <value>Already Approved</value>
+  </data>
+  <data name="Common_DeleteFail" xml:space="preserve">
+    <value>Deletion Failed.</value>
+  </data>
+  <data name="Common_DuplicateFail" xml:space="preserve">
+    <value>Record already exists</value>
+  </data>
+  <data name="Common_NoRecord" xml:space="preserve">
+    <value>No Record</value>
+  </data>
+  <data name="Common_UnauthInsertUpdate" xml:space="preserve">
+    <value>Unauthorized Insert/Update</value>
+  </data>
+  <data name="Common_UpdateFail" xml:space="preserve">
+    <value>Updation Failed.</value>
+  </data>
+  <data name="DuplicateOrderFail" xml:space="preserve">
+    <value>Order already exists</value>
+  </data>
+  <data name="PleaseSelectMonth" xml:space="preserve">
+    <value>Please Select Month</value>
+  </data>
+  <data name="Common_WantToSave" xml:space="preserve">
+    <value>Are you sure you want to save?</value>
+  </data>
+  <data name="Err_SearchProductPromotion" xml:space="preserve">
+    <value>Please Search and Select Product and Proceed</value>
+  </data>
+  <data name="Common_WantToApprovalUpdate" xml:space="preserve">
+    <value>Do you want to {0}?</value>
+  </data>
+  <data name="Common_WantToContinueWithMarkZero" xml:space="preserve">
+    <value>Do you want to Continue with Student Mark 0 ?</value>
+  </data>
+  <data name="Common_WantToContinueWithMultiAnswer" xml:space="preserve">
+    <value>Do you want to continue with Multi answer Selected?</value>
+  </data>
+  <data name="Common_WantToDelete" xml:space="preserve">
+    <value>Are you sure you want to delete?</value>
+  </data>
+  <data name="Common_WantToInactivate" xml:space="preserve">
+    <value>Are you sure you want to Inactivate?</value>
+  </data>
+  <data name="Common_WantToUpdate" xml:space="preserve">
+    <value>Do you want to update?</value>
+  </data>
+  <data name="Common_WantToUpload" xml:space="preserve">
+    <value>Are you sure you want to upload?</value>
+  </data>
+  <data name="Index_ResetPasswordQuestion" xml:space="preserve">
+    <value>Do you want Reset Password?</value>
+  </data>
+  <data name="Common_Transferred" xml:space="preserve">
+    <value>Transferred</value>
+  </data>
+  <data name="Common_Approved" xml:space="preserve">
+    <value>Approved</value>
+  </data>
+  <data name="Drp_DefaultDetailMaster_PointsType" xml:space="preserve">
+    <value>Select Points Type</value>
+  </data>
+  <data name="Common_ApproveRejectFail" xml:space="preserve">
+    <value>Approve/Reject Failed</value>
+  </data>
+  <data name="Common_Rejected" xml:space="preserve">
+    <value>Rejected</value>
+  </data>
+  <data name="Err_SalesMaster_SelectPointType" xml:space="preserve">
+    <value>Select Point Type</value>
+  </data>
+  <data name="Err_SalesMaster_SelectStore" xml:space="preserve">
+    <value>Select Store</value>
+  </data>
+  <data name="ProductMaster_PleaseSelectBrand" xml:space="preserve">
+    <value> Select Brand</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_SalesType" xml:space="preserve">
+    <value>Select Sales Type</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_SupplierType" xml:space="preserve">
+    <value>Select Supplier type</value>
+  </data>
+  <data name="Err_BrandName" xml:space="preserve">
+    <value>Please Enter Brand Name</value>
+  </data>
+  <data name="Err_BrandSortOrder" xml:space="preserve">
+    <value>Please enter Brand Sort Order</value>
+  </data>
+  <data name="Err_Maker" xml:space="preserve">
+    <value>Please Select Maker</value>
+  </data>
+  <data name="DefaultDetailMaster_PayableAccountType" xml:space="preserve">
+    <value>Select Payable Type</value>
+  </data>
+  <data name="Err_AccountMaster_PayableAccountType" xml:space="preserve">
+    <value>Select  Payable Type</value>
+  </data>
+  <data name="Err_AccountMaster_Amount" xml:space="preserve">
+    <value>Enter the Amount</value>
+  </data>
+  <data name="Err_AccountMaster_Date" xml:space="preserve">
+    <value>Enter the Date</value>
+  </data>
+  <data name="Err_AccountMaster_Supplier" xml:space="preserve">
+    <value>Select Supplier</value>
+  </data>
+  <data name="Err_EqualtoIGST" xml:space="preserve">
+    <value>CGST and SGST values are must be Equal to IGST value</value>
+  </data>
+  <data name="Err_SupplierMaster_AccountHolderName" xml:space="preserve">
+    <value>Please Enter Account Holder Name</value>
+  </data>
+  <data name="Err_SupplierMaster_AccountNumber" xml:space="preserve">
+    <value>Please Enter Account Number</value>
+  </data>
+  <data name="Err_SupplierMaster_AccountType" xml:space="preserve">
+    <value>Please Select Account Type</value>
+  </data>
+  <data name="Err_SupplierMaster_BankName" xml:space="preserve">
+    <value>Please Enter Bank Name</value>
+  </data>
+  <data name="Err_SupplierMaster_BranchName" xml:space="preserve">
+    <value>Please Enter Branch Name</value>
+  </data>
+  <data name="Err_SupplierMaster_ContactTitle" xml:space="preserve">
+    <value>Please Enter Contract Title</value>
+  </data>
+  <data name="Err_SupplierMaster_IFSCCode" xml:space="preserve">
+    <value>Please Enter IFSC Code</value>
+  </data>
+  <data name="ErrPromotions_ToPointsNull" xml:space="preserve">
+    <value>Points must be &gt; 0</value>
+  </data>
+  <data name="AddressDuplicate" xml:space="preserve">
+    <value>Duplicate address not Allowed</value>
+  </data>
+  <data name="ErrStoreHasNoProduct" xml:space="preserve">
+    <value>Please add product for this Store and Proceed</value>
+  </data>
+  <data name="ErrSupplierNoProduct" xml:space="preserve">
+    <value>Please add supplier for this Product and Proceed</value>
+  </data>
+  <data name="SameDistributorSelect" xml:space="preserve">
+    <value>Please select different Transport</value>
+  </data>
+  <data name="Err_Common_Supplier" xml:space="preserve">
+    <value>Please Select Supplier</value>
+  </data>
+  <data name="err_StockAdjustNotPossible" xml:space="preserve">
+    <value>Stock Adjustment Not Possible</value>
+  </data>
+  <data name="err_TransferNotPossible" xml:space="preserve">
+    <value>Transfer Not Possible</value>
+  </data>
+  <data name="Homepage_SelectHomepage" xml:space="preserve">
+    <value>Select Home</value>
+  </data>
+  <data name="ErrPromotions_FromPoints" xml:space="preserve">
+    <value>Enter the From Points</value>
+  </data>
+  <data name="ErrPromotions_ToPoints" xml:space="preserve">
+    <value>Enter The To Points</value>
+  </data>
+  <data name="Err_SupplierMaster_SupplierCode" xml:space="preserve">
+    <value>Please Enter the Supplier Code</value>
+  </data>
+  <data name="Err_EmployeeAccountsMaster_Amount" xml:space="preserve">
+    <value>Please Enter Amount</value>
+  </data>
+  <data name="Err_EmployeeAccountsMaster_Date" xml:space="preserve">
+    <value>Please Enter Date</value>
+  </data>
+  <data name="Err_EmployeeAccountsMaster_Description" xml:space="preserve">
+    <value>Please Enter Description</value>
+  </data>
+  <data name="Err_EmployeeAccountsMaster_Type" xml:space="preserve">
+    <value>Select Type</value>
+  </data>
+  <data name="Common_SelectEmployee" xml:space="preserve">
+    <value>Select Employee</value>
+  </data>
+  <data name="Err_EmployeeAccountsMaster_PaymentMode" xml:space="preserve">
+    <value>Select PaymentMode</value>
+  </data>
+  <data name="PleaseSelectYear" xml:space="preserve">
+    <value>Please Select Year</value>
+  </data>
+  <data name="UserMaster_PleaseSelectMonth" xml:space="preserve">
+    <value>Select Month</value>
+  </data>
+  <data name="Err_AccountMaster_PaymentType" xml:space="preserve">
+    <value>Please Select the Payment Type</value>
+  </data>
+  <data name="Err_PublicationMaster_Address1" xml:space="preserve">
+    <value>Please Enter the Address1</value>
+  </data>
+  <data name="Err_PublicationMaster_Address2" xml:space="preserve">
+    <value>Please Enter the Address2</value>
+  </data>
+  <data name="Err_PublicationMaster_Address3" xml:space="preserve">
+    <value>Please Enter the Address3</value>
+  </data>
+  <data name="ErrPurchases_Amount" xml:space="preserve">
+    <value>Enter Amount</value>
+  </data>
+  <data name="ErrPurchases_PaymentDate" xml:space="preserve">
+    <value>Enter Payment Date</value>
+  </data>
+  <data name="Err_RedeemPoints" xml:space="preserve">
+    <value>Enter Redeem Points</value>
+  </data>
+  <data name="DefaultDetailID_AccountsMode" xml:space="preserve">
+    <value>Select Accounts Mode</value>
+  </data>
+  <data name="Err_AccountMaster_AccNO" xml:space="preserve">
+    <value>Enter the  Acc NO</value>
+  </data>
+  <data name="Err_AccountMaster_AccountName" xml:space="preserve">
+    <value>Enter the Account Name</value>
+  </data>
+  <data name="DefaultHeaderMaster_SalaryType" xml:space="preserve">
+    <value>Select  Type</value>
+  </data>
+  <data name="AccountsMaster_SelectCustomer" xml:space="preserve">
+    <value> Select Customer</value>
+  </data>
+  <data name="Err_AccountMaster_Customer" xml:space="preserve">
+    <value>Select the Customer</value>
+  </data>
+  <data name="Err_AccountMaster_AccountType" xml:space="preserve">
+    <value>Select Account Type</value>
+  </data>
+  <data name="Err_AccountMaster_StoreName" xml:space="preserve">
+    <value>Select Store</value>
+  </data>
+  <data name="Common_SelectAccountType" xml:space="preserve">
+    <value>Select Account Type</value>
+  </data>
+  <data name="Common_SelectAccountName" xml:space="preserve">
+    <value>Select Account Name</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_PaymentType" xml:space="preserve">
+    <value>Select Payment Type</value>
+  </data>
+  <data name="Err_AccountMaster_AmountValidate" xml:space="preserve">
+    <value>Amount   should be &lt;= Balance Amount</value>
+  </data>
+  <data name="Err_AccountMaster_PaymentStatus" xml:space="preserve">
+    <value>Select Payment Type</value>
+  </data>
+  <data name="BalanceLedgerReport_PleaseSelectSFinancialYear" xml:space="preserve">
+    <value>Please Select Financial Year</value>
+  </data>
+  <data name="DropDownListSelect_SalesPaymentStatus" xml:space="preserve">
+    <value>Select Sales Payment Status</value>
+  </data>
+  <data name="Err_EmployeeAccountsMaster_Month" xml:space="preserve">
+    <value>Select the Month</value>
+  </data>
+  <data name="Err_ExpensesMaster_PayableType" xml:space="preserve">
+    <value>Select the Payable Type</value>
+  </data>
+  <data name="DropDownListSelect_PurchasePaymentStatus" xml:space="preserve">
+    <value>Select Purchase Payment Status</value>
+  </data>
+  <data name="Err_AccountMaster_AmountPaidValidate" xml:space="preserve">
+    <value>Purchase Return Amount {0} should be &lt;=Paid Amount {1}</value>
+  </data>
+  <data name="DefaultHeaderMaster_ExpensesType" xml:space="preserve">
+    <value>Select Expenses Type</value>
+  </data>
+  <data name="Common_AlreadyTodaySalesClosed" xml:space="preserve">
+    <value>Today Sales Already Closed. Denominations Updated</value>
+  </data>
+  <data name="ExcelImport_ColumnMissing" xml:space="preserve">
+    <value>{0}  is missing</value>
+  </data>
+  <data name="ExcelImport_IsNotDate" xml:space="preserve">
+    <value>&lt;b style='Color:Red'&gt; {0} &lt;/b&gt; is not a date(Format[01-Jan-2000])&lt;br/&gt;</value>
+  </data>
+  <data name="ExcelImport_TemplateIsAlreadyExist" xml:space="preserve">
+    <value>&lt;b style='Color:Red'&gt; {0}  &lt;/b&gt; - Already Exist &lt;br/&gt;</value>
+  </data>
+  <data name="ExcelImport_TemplateIsNotVaid" xml:space="preserve">
+    <value>&lt;b style='Color:Red'&gt; {0}  :  {1} &lt;/b&gt; - is not valid &lt;br/&gt;</value>
+  </data>
+  <data name="ExcelImport_UploadFailed" xml:space="preserve">
+    <value>Upload Failed</value>
+  </data>
+  <data name="Excelmport_SuccessfullyUpload" xml:space="preserve">
+    <value>Successfully Uploaded</value>
+  </data>
+  <data name="ExcelUpload_DateLength" xml:space="preserve">
+    <value>&lt;b style='Color:Red'&gt;{0} &lt;/b&gt; length&lt;br/&gt;</value>
+  </data>
+  <data name="ExcelUpload_Duplicate" xml:space="preserve">
+    <value>{0}  Duplicate Data</value>
+  </data>
+  <data name="ExcelUpload_IsNotDecimal" xml:space="preserve">
+    <value>&lt;b style='Color:Red'&gt;{0} &lt;/b&gt; is not a decimal&lt;br/&gt;</value>
+  </data>
+  <data name="ExcelUpload_IsNotNumber" xml:space="preserve">
+    <value>&lt;b style='Color:Red'&gt;{0} &lt;/b&gt; is not a number&lt;br/&gt;</value>
+  </data>
+  <data name="ExcelUpload_IsRequired" xml:space="preserve">
+    <value>&lt;b style='Color:Red'&gt; {0} &lt;/b&gt; is Required&lt;br/&gt;</value>
+  </data>
+  <data name="Err_ProductMaster_ImportFile" xml:space="preserve">
+    <value>Please Select File </value>
+  </data>
+  <data name="Err_AccountMaster_ReturnAmountPaidValidate" xml:space="preserve">
+    <value>Return Payment is possible Once Purchase is returned</value>
+  </data>
+  <data name="Err_AccountMaster_SupplierAmountValidate" xml:space="preserve">
+    <value>Supplier Amount{0} should be &gt;= Payment{1}</value>
+  </data>
+  <data name="Err_Common_AmountValidate" xml:space="preserve">
+    <value>Amount{0}   should be &lt;= Balance Amount{1}</value>
+  </data>
+  <data name="PurchaseReturn_PaymentPending" xml:space="preserve">
+    <value>. Payment Pending</value>
+  </data>
+  <data name="ExcelImport_TemplateRowEmpty" xml:space="preserve">
+    <value>&lt;b style='Color:Red'&gt;Excel Empty Row&lt;/b&gt;  </value>
+  </data>
+  <data name="Err_SalesAmount_Validate" xml:space="preserve">
+    <value>Payable Amount {0} should be &lt;= Sales Amount {1}</value>
+  </data>
+  <data name="Err_SalesCustomerBalance_Validate" xml:space="preserve">
+    <value>Amount {0} should be &lt;= Customer Balance Amount {1}</value>
+  </data>
+  <data name="Err_SalesDebitAmount_Validate" xml:space="preserve">
+    <value>Payable Amount {0} should be &lt;= Sales Amount {1}</value>
+  </data>
+  <data name="Err_CustomerAccountBalance_Validate" xml:space="preserve">
+    <value>Sales Amount {0} should be &lt;= Customer Balance Amount {1}</value>
+  </data>
+  <data name="Err_SalesPaid_AmountValidate" xml:space="preserve">
+    <value>Sales Payment Amount {0} should be &lt;= Sales Payable Amount {1}</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_PaymentStatus" xml:space="preserve">
+    <value>Select Payment Status</value>
+  </data>
+  <data name="ErrPurchaseReturn_Amount" xml:space="preserve">
+    <value>Please Enter Return Amount</value>
+  </data>
+  <data name="Err_Common_PurchaseReturnAmountValidate" xml:space="preserve">
+    <value>Amount{0}   should be &lt;= Purchase Return Amount{1}</value>
+  </data>
+  <data name="Err_SalesReturnPaid_AmountValidate" xml:space="preserve">
+    <value>Sales Return Payment Amount {0} should be &lt;= Sales Payable Amount {1}</value>
+  </data>
+  <data name="Common_PayableType" xml:space="preserve">
+    <value>Select the Payable Type</value>
+  </data>
+  <data name="Common_SelectDate" xml:space="preserve">
+    <value>Please Select Date</value>
+  </data>
+  <data name="Err_UnPackMaster_UnPackCodeName" xml:space="preserve">
+    <value>Please Select UnPack ProductName</value>
+  </data>
+  <data name="Err_EntertheFinancialName" xml:space="preserve">
+    <value>Enter the Financial Name</value>
+  </data>
+  <data name="Err_SelecttheEndDate" xml:space="preserve">
+    <value>Select the End Date</value>
+  </data>
+  <data name="Err_SelecttheStartDate" xml:space="preserve">
+    <value>Select the Start Date</value>
+  </data>
+  <data name="Err_ProductMaster_MRPCostPrice" xml:space="preserve">
+    <value>MRP should be &gt;= Purchase Cost Price</value>
+  </data>
+  <data name="Err_ProductMaster_SellingCostPrice" xml:space="preserve">
+    <value>Selling Price should be &gt;= Purchase Cost Price</value>
+  </data>
+  <data name="Err_ProductMaster_BarCode" xml:space="preserve">
+    <value>Please Enter BarCode</value>
+  </data>
+  <data name="Err_CustomerMaster_GSTNumber" xml:space="preserve">
+    <value>GST Number is Required</value>
+  </data>
+  <data name="ErrStock_Adjustmentquantityzeronegativevaluenotallowed" xml:space="preserve">
+    <value>Adjustment quantity zero/negative value not allowed</value>
+  </data>
+  <data name="ErrStock_Pleaseselectsomeproductstostockadjustment" xml:space="preserve">
+    <value>Please select some products to stock adjustment</value>
+  </data>
+  <data name="ErrTransfers_PleaseenterNote" xml:space="preserve">
+    <value>Please  Enter Note</value>
+  </data>
+  <data name="ErrTransfers_PleaseselectFromstore" xml:space="preserve">
+    <value>Please select From store</value>
+  </data>
+  <data name="ErrTransfers_PleaseselectsomeproductstoTransfer" xml:space="preserve">
+    <value>Please select some products to Transfer</value>
+  </data>
+  <data name="ErrTransfers_PleaseselectTostore" xml:space="preserve">
+    <value>Please select To store</value>
+  </data>
+  <data name="ErrTransfers_Zeronegativevaluenotallowed" xml:space="preserve">
+    <value>Zero/negative value not allowed</value>
+  </data>
+  <data name="ErrSales_Pleaseenterquantity" xml:space="preserve">
+    <value>Please enter quantity</value>
+  </data>
+  <data name="err_SalesQtyNotAvailable" xml:space="preserve">
+    <value>No Stock available for this Product</value>
+  </data>
+  <data name="Err_SGSTEqualtoCGST" xml:space="preserve">
+    <value>SGST and CGST should be equal</value>
+  </data>
+  <data name="Err_ProductMaster_Supplier" xml:space="preserve">
+    <value>Please Select Supplier</value>
+  </data>
+  <data name="SameStoreSelect" xml:space="preserve">
+    <value>Please select different Store</value>
+  </data>
+  <data name="ErrSales_SelectAccount" xml:space="preserve">
+    <value>Select Account</value>
+  </data>
+  <data name="Common_ProductNotAvailableStore" xml:space="preserve">
+    <value>Product Not Available In this Store</value>
+  </data>
+  <data name="ERR_FreeStockNotAvailable" xml:space="preserve">
+    <value>Return Free Qty should be &lt;= Available free Qty</value>
+  </data>
+  <data name="ERR_StockNotAvailable" xml:space="preserve">
+    <value>Return Qty should be &lt;= Available Qty</value>
+  </data>
+  <data name="Err_BarCodeDuplicate" xml:space="preserve">
+    <value>Bar Code Already Exists.Do you want to generate Next Barcode?</value>
+  </data>
+  <data name="Err_PrintNameDuplicate" xml:space="preserve">
+    <value>Print Name Already Exists.</value>
+  </data>
+  <data name="Atleast1Active" xml:space="preserve">
+    <value>Atleast one Financial year should be active</value>
+  </data>
+  <data name="Message_Pleaseselectcustomer" xml:space="preserve">
+    <value>Please select customer</value>
+  </data>
+  <data name="Message_Pleaseaddproduct" xml:space="preserve">
+    <value>Please add product</value>
+  </data>
+  <data name="Message_PleaseaddPaymentdetailsandSubmit" xml:space="preserve">
+    <value>Please add Payment details and Submit</value>
+  </data>
+  <data name="Message_PleaseentersalesReferenceNumber" xml:space="preserve">
+    <value>Please enter sales Reference Number</value>
+  </data>
+  <data name="ErrStoreHasNoReferenceNo" xml:space="preserve">
+    <value>This store has no ReferenceNo / Already this Reference payment completed </value>
+  </data>
+  <data name="PurchaseReturnAdjust" xml:space="preserve">
+    <value>Purchase Return Adjustment from Purchase amount</value>
+  </data>
+  <data name="PurchasePaymentAdjust" xml:space="preserve">
+    <value>Purchase Payment Adjustment from supplier a/c</value>
+  </data>
+  <data name="Payment_AccountNote" xml:space="preserve">
+    <value>Purchase Payment from </value>
+  </data>
+  <data name="Err_AccountMaster_EndDate" xml:space="preserve">
+    <value>Select the  End Date</value>
+  </data>
+  <data name="Err_AccountMaster_StartDate" xml:space="preserve">
+    <value>Select the Start Date</value>
+  </data>
+  <data name="Err_DistributorMaster_DistributorCode" xml:space="preserve">
+    <value>Enter the Transport Code </value>
+  </data>
+  <data name="Err_DistributorMaster_DistributorName" xml:space="preserve">
+    <value>Enter the Transport Name</value>
+  </data>
+  <data name="Err_SupplierMaster_CompanyName" xml:space="preserve">
+    <value>Enter Company Name</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_CompanyType" xml:space="preserve">
+    <value>Select Company Type</value>
+  </data>
+  <data name="Err_CompanyMaster_CompanyCode" xml:space="preserve">
+    <value>Enter Company Code</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_DistributorType" xml:space="preserve">
+    <value>Select Transport Type</value>
+  </data>
+  <data name="BrandMaster_PleaseSelectBrand" xml:space="preserve">
+    <value>Please Select Brand</value>
+  </data>
+  <data name="Err_ProductMaster_Distributor" xml:space="preserve">
+    <value>Enter Transport</value>
+  </data>
+  <data name="CompanyMaster_PleaseSelectCompany" xml:space="preserve">
+    <value>Please Select Company</value>
+  </data>
+  <data name="Err_ProductMaster_Company" xml:space="preserve">
+    <value>Select Company</value>
+  </data>
+  <data name="SameCompanySelect" xml:space="preserve">
+    <value>Please select different Company</value>
+  </data>
+  <data name="Err_ProductMaster_DistributionPrice" xml:space="preserve">
+    <value>Please Enter Distribution Price</value>
+  </data>
+  <data name="Err_ProductMaster_RetailPrice" xml:space="preserve">
+    <value>Please Enter Retail Price</value>
+  </data>
+  <data name="SameWareHouseSelect" xml:space="preserve">
+    <value>Please select different Warehouse</value>
+  </data>
+  <data name="ErrPurchases_WarehouseID" xml:space="preserve">
+    <value>Please select Warehouse</value>
+  </data>
+  <data name="ErrBrandNoProduct" xml:space="preserve">
+    <value>Brand has no Product</value>
+  </data>
+  <data name="ErrPurchases_DistributorID" xml:space="preserve">
+    <value>Please select Transport</value>
+  </data>
+  <data name="ErrPurchases_Company" xml:space="preserve">
+    <value>Select Company</value>
+  </data>
+  <data name="ErrPurchases_Brand" xml:space="preserve">
+    <value>Please Select Brand</value>
+  </data>
+  <data name="ErrPurchases_Warehouse" xml:space="preserve">
+    <value>Select Warehouse</value>
+  </data>
+  <data name="DistributorMaster_PleaseSelectDistributor" xml:space="preserve">
+    <value>Please Select Transport</value>
+  </data>
+  <data name="ErrPurchases_BrandID" xml:space="preserve">
+    <value>Please Select Brand</value>
+  </data>
+  <data name="ErrPurchases_Distributor" xml:space="preserve">
+    <value>Select Transport</value>
+  </data>
+  <data name="DistributorMaster_PleaseSelectSuperStockist" xml:space="preserve">
+    <value>Super Stockist</value>
+  </data>
+  <data name="ErrPurchases_CompanyID" xml:space="preserve">
+    <value>Please Select Company</value>
+  </data>
+  <data name="ErrDistributorNoProduct" xml:space="preserve">
+    <value>Distribut or No Product</value>
+  </data>
+  <data name="ErrSales_Brand" xml:space="preserve">
+    <value>Please Select Brand</value>
+  </data>
+  <data name="ErrSales_DistributionArea" xml:space="preserve">
+    <value>Please Select Distribution Area</value>
+  </data>
+  <data name="ErrSales_WarehouseID" xml:space="preserve">
+    <value>Select Warehouse</value>
+  </data>
+  <data name="ErrWarehouseHasNoProduct" xml:space="preserve">
+    <value>Warehouse has No Product</value>
+  </data>
+  <data name="Err_AccountMaster_WarehouseName" xml:space="preserve">
+    <value>Select Warehouse</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_DistributorArea" xml:space="preserve">
+    <value>Select Transport Area</value>
+  </data>
+  <data name="DELIVEREDSUCCESS" xml:space="preserve">
+    <value>Goods Delivered Successfully</value>
+  </data>
+  <data name="PRODUCTMULTIRATES" xml:space="preserve">
+    <value>Product has Multi Rates.Choose the one</value>
+  </data>
+  <data name="Common_FromWarehouse" xml:space="preserve">
+    <value>From Warehouse</value>
+  </data>
+  <data name="ErrTransfers_PleaseselectFromWarehouse" xml:space="preserve">
+    <value>Please select From Warehouse</value>
+  </data>
+  <data name="ErrTransfers_PleaseselectToWarehouse" xml:space="preserve">
+    <value>Please select To Warehouse</value>
+  </data>
+  <data name="Err_ProductMaster_DistributorMargin" xml:space="preserve">
+    <value>Enter the Transport Margin</value>
+  </data>
+  <data name="Common_DuplicateBarcodeFail" xml:space="preserve">
+    <value>Barcode already exists</value>
+  </data>
+  <data name="PurchaseMaster_PleaseSelectProduct" xml:space="preserve">
+    <value>Please Select Product</value>
+  </data>
+</root>

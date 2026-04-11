@@ -1,0 +1,1797 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Common_CreatedBy" xml:space="preserve">
+    <value>உருவாக்கியது</value>
+  </data>
+  <data name="Common_CreatedDate" xml:space="preserve">
+    <value>உருவாக்கப்பட்ட தேதி</value>
+  </data>
+  <data name="Common_ModifiedBy" xml:space="preserve">
+    <value>திருத்தியவர்</value>
+  </data>
+  <data name="Common_ModifiedDate" xml:space="preserve">
+    <value>மாற்றிய தேதி</value>
+  </data>
+  <data name="Common_Status" xml:space="preserve">
+    <value>நிலை</value>
+  </data>
+  <data name="DefaultDetail_DefaultText" xml:space="preserve">
+    <value>இயல்பு உரை</value>
+  </data>
+  <data name="DefaultDetail_OrderBy" xml:space="preserve">
+    <value>உத்தரவின் படி</value>
+  </data>
+  <data name="DefaultMaster_DisplayOrder" xml:space="preserve">
+    <value>காட்சி ஆணை</value>
+  </data>
+  <data name="ToolTip_DefaultText" xml:space="preserve">
+    <value>இயல்பு உரை புலத்தை உள்ளிடவும்</value>
+  </data>
+  <data name="ToolTip_OrderBy" xml:space="preserve">
+    <value>மூலம் ஆர்டரை உள்ளிடவும்</value>
+  </data>
+  <data name="RoleMatrix_AvailableAccess" xml:space="preserve">
+    <value>கிடைக்கும் அணுகல்</value>
+  </data>
+  <data name="RoleMatrix_EnabledAccess" xml:space="preserve">
+    <value>அணுகல் இயக்கப்பட்டது</value>
+  </data>
+  <data name="RoleMatrix_MenuAccess" xml:space="preserve">
+    <value>மெனு அணுகல்</value>
+  </data>
+  <data name="RoleMatrix_MenuName" xml:space="preserve">
+    <value>மெனு பெயர்</value>
+  </data>
+  <data name="RoleMatrix_PageAccess" xml:space="preserve">
+    <value>பக்க அணுகல்</value>
+  </data>
+  <data name="RoleMatrix_PageAccessView" xml:space="preserve">
+    <value>பக்க அணுகல் பார்வை</value>
+  </data>
+  <data name="RoleSetUp_Role" xml:space="preserve">
+    <value>பங்கு</value>
+  </data>
+  <data name="HSN_CGST" xml:space="preserve">
+    <value>CGST</value>
+  </data>
+  <data name="HSN_Code" xml:space="preserve">
+    <value>குறியீடு</value>
+  </data>
+  <data name="HSN_Description" xml:space="preserve">
+    <value>விளக்கம்</value>
+  </data>
+  <data name="HSN_SGST" xml:space="preserve">
+    <value>எஸ்ஜிஎஸ்டி</value>
+  </data>
+  <data name="HSN_Status" xml:space="preserve">
+    <value>நிலை</value>
+  </data>
+  <data name="Product_Code" xml:space="preserve">
+    <value>தயாரிப்பு குறியீடு</value>
+  </data>
+  <data name="Product_StoreName" xml:space="preserve">
+    <value>கடையின் பெயர்</value>
+  </data>
+  <data name="Product_Type" xml:space="preserve">
+    <value>உற்பத்தி பொருள் வகை</value>
+  </data>
+  <data name="Product_AlertQty" xml:space="preserve">
+    <value>எச்சரிக்கை அளவு</value>
+  </data>
+  <data name="Product_Author" xml:space="preserve">
+    <value>நூலாசிரியர்</value>
+  </data>
+  <data name="Product_BrandName" xml:space="preserve">
+    <value>பிராண்ட் பெயர்</value>
+  </data>
+  <data name="Product_CategoryName" xml:space="preserve">
+    <value>வகை பெயர்</value>
+  </data>
+  <data name="Product_CostPrice" xml:space="preserve">
+    <value>செலவு விலை</value>
+  </data>
+  <data name="Product_Edition" xml:space="preserve">
+    <value>பதிப்பு</value>
+  </data>
+  <data name="Product_HSNName" xml:space="preserve">
+    <value>HSN பெயர்</value>
+  </data>
+  <data name="Product_Image" xml:space="preserve">
+    <value>தயாரிப்பு படம்</value>
+  </data>
+  <data name="Product_LongName" xml:space="preserve">
+    <value>நீண்ட பெயர்</value>
+  </data>
+  <data name="Product_MRP" xml:space="preserve">
+    <value>எம்ஆர்பி</value>
+  </data>
+  <data name="Product_PrintName" xml:space="preserve">
+    <value>பெயரை அச்சிடு</value>
+  </data>
+  <data name="Product_Publication" xml:space="preserve">
+    <value>வெளியீடு</value>
+  </data>
+  <data name="Product_ReleaseYear" xml:space="preserve">
+    <value>வெளியான ஆண்டு</value>
+  </data>
+  <data name="Product_SellingPrice" xml:space="preserve">
+    <value>விற்பனை விலை</value>
+  </data>
+  <data name="Product_SubCategoryName" xml:space="preserve">
+    <value>துணைப்பிரிவின் பெயர்</value>
+  </data>
+  <data name="Product_Volume" xml:space="preserve">
+    <value>தொகுதி</value>
+  </data>
+  <data name="SubCategory_Category" xml:space="preserve">
+    <value>வகை</value>
+  </data>
+  <data name="SubCategory_Description" xml:space="preserve">
+    <value>துணை வகை விளக்கம்</value>
+  </data>
+  <data name="SubCategory_SortOrder" xml:space="preserve">
+    <value>வரிசையை வரிசைப்படுத்து</value>
+  </data>
+  <data name="CustomerMaster_AddressLine1" xml:space="preserve">
+    <value>முகவரி வரி 1</value>
+  </data>
+  <data name="CustomerMaster_AddressLine2" xml:space="preserve">
+    <value>முகவரி வரி 2</value>
+  </data>
+  <data name="CustomerMaster_AddressLine3" xml:space="preserve">
+    <value>முகவரி வரி 3</value>
+  </data>
+  <data name="CustomerMaster_ContactPersonName" xml:space="preserve">
+    <value>தொடர்பு நபரின் பெயர்</value>
+  </data>
+  <data name="CustomerMaster_CustomerName" xml:space="preserve">
+    <value>வாடிக்கையாளர் பெயர்</value>
+  </data>
+  <data name="CustomerMaster_EmailID" xml:space="preserve">
+    <value>மின்னஞ்சல் முகவரி</value>
+  </data>
+  <data name="CustomerMaster_MobileNo" xml:space="preserve">
+    <value>அலைபேசி எண்</value>
+  </data>
+  <data name="CustomerMaster_PhoneNo" xml:space="preserve">
+    <value>தொலைபேசி எண்</value>
+  </data>
+  <data name="CustomerMaster_Status" xml:space="preserve">
+    <value>நிலை</value>
+  </data>
+  <data name="SupplierMaster_AddressLine1" xml:space="preserve">
+    <value>முகவரி வரி 1</value>
+  </data>
+  <data name="SupplierMaster_AddressLine2" xml:space="preserve">
+    <value>முகவரி வரி 2</value>
+  </data>
+  <data name="SupplierMaster_AddressLine3" xml:space="preserve">
+    <value>முகவரி வரி 3</value>
+  </data>
+  <data name="SupplierMaster_ContactPersonName" xml:space="preserve">
+    <value>தொடர்பு நபரின் பெயர்</value>
+  </data>
+  <data name="SupplierMaster_EmailID" xml:space="preserve">
+    <value>மின்னஞ்சல் முகவரி</value>
+  </data>
+  <data name="SupplierMaster_MobileNo" xml:space="preserve">
+    <value>அலைபேசி எண்</value>
+  </data>
+  <data name="SupplierMaster_PhoneNo" xml:space="preserve">
+    <value>தொலைபேசி எண்</value>
+  </data>
+  <data name="SupplierMaster_Status" xml:space="preserve">
+    <value>நிலை</value>
+  </data>
+  <data name="SupplierMaster_SupplierName" xml:space="preserve">
+    <value>விற்பனையாளர் பெயர்</value>
+  </data>
+  <data name="CustomerMaster_SearchCustomerName" xml:space="preserve">
+    <value>வாடிக்கையாளர் பெயர் மூலம் தேடுங்கள்</value>
+  </data>
+  <data name="PublicationMaster_AddressLine1" xml:space="preserve">
+    <value>முகவரி வரி 1</value>
+  </data>
+  <data name="PublicationMaster_AddressLine2" xml:space="preserve">
+    <value>முகவரி வரி 2</value>
+  </data>
+  <data name="PublicationMaster_AddressLine3" xml:space="preserve">
+    <value>முகவரி வரி 3</value>
+  </data>
+  <data name="PublicationMaster_PublicationName" xml:space="preserve">
+    <value>வெளியீட்டு பெயர்</value>
+  </data>
+  <data name="PublicationMaster_SearchPublicationName" xml:space="preserve">
+    <value>வெளியீட்டு பெயரால் தேடவும்</value>
+  </data>
+  <data name="PublicationMaster_Status" xml:space="preserve">
+    <value>நிலை</value>
+  </data>
+  <data name="SupplierMaster_SearchSupplierName" xml:space="preserve">
+    <value>சப்ளையர் பெயரால் தேடவும்</value>
+  </data>
+  <data name="Common_Browse" xml:space="preserve">
+    <value>உலாவுக</value>
+  </data>
+  <data name="BankDetail_BankName" xml:space="preserve">
+    <value>வங்கி பெயர்</value>
+  </data>
+  <data name="ProjectSetupDetail_ConfigurationName" xml:space="preserve">
+    <value>உள்ளமைவு பெயர்</value>
+  </data>
+  <data name="ProjectSetupDetail_Text" xml:space="preserve">
+    <value>உள்ளமைவு மதிப்பு</value>
+  </data>
+  <data name="Purchases_ReferenceNO" xml:space="preserve">
+    <value>குறிப்பு எண்</value>
+  </data>
+  <data name="Purchases_PurchaseDate" xml:space="preserve">
+    <value>கொள்முதல் தேதி</value>
+  </data>
+  <data name="Purchases_Supplier" xml:space="preserve">
+    <value>சப்ளையர்</value>
+  </data>
+  <data name="Purchases_PaymentStatus" xml:space="preserve">
+    <value>பணம் செலுத்தும் நிலை</value>
+  </data>
+  <data name="Purchases_PurchaseStatus" xml:space="preserve">
+    <value>கொள்முதல் நிலை</value>
+  </data>
+  <data name="Purchases_GrandTotal" xml:space="preserve">
+    <value>கிராண்ட் டோட்டல்</value>
+  </data>
+  <data name="Purchases_Balance" xml:space="preserve">
+    <value>இருப்பு</value>
+  </data>
+  <data name="Purchases_Paid" xml:space="preserve">
+    <value>பணம் செலுத்தப்பட்டது</value>
+  </data>
+  <data name="Purchases_StoreID" xml:space="preserve">
+    <value>கடை</value>
+  </data>
+  <data name="Purchases_OrderTax" xml:space="preserve">
+    <value>ஆர்டர் டாக்ஸ்</value>
+  </data>
+  <data name="Purchases_Shipping" xml:space="preserve">
+    <value>கப்பல் கட்டணம்</value>
+  </data>
+  <data name="Purchases_PaymentTerm" xml:space="preserve">
+    <value>நாட்களில் பணம் செலுத்தும் காலம்</value>
+  </data>
+  <data name="Purchases_ReferenceAttachment" xml:space="preserve">
+    <value>குறிப்பு இணைப்பு</value>
+  </data>
+  <data name="PrintSettingsMaster_CompanyName" xml:space="preserve">
+    <value>நிறுவனத்தின் பெயர்</value>
+  </data>
+  <data name="PrintSettingsMaster_StoreID" xml:space="preserve">
+    <value>கடை</value>
+  </data>
+  <data name="PrintSettingsMaster_Address1" xml:space="preserve">
+    <value>முகவரி 1</value>
+  </data>
+  <data name="PrintSettingsMaster_Address2" xml:space="preserve">
+    <value>முகவரி 2</value>
+  </data>
+  <data name="PrintSettingsMaster_CityName" xml:space="preserve">
+    <value>நகரின் பெயர்</value>
+  </data>
+  <data name="PrintSettingsMaster_PinCode" xml:space="preserve">
+    <value>அஞ்சல் குறியீடு</value>
+  </data>
+  <data name="PrintSettingsMaster_PhoneNumber" xml:space="preserve">
+    <value>தொலைபேசி எண்</value>
+  </data>
+  <data name="PrintSettingsMaster_MobileNumber" xml:space="preserve">
+    <value>கைபேசி எண்</value>
+  </data>
+  <data name="PrintSettingsMaster_FaxNo" xml:space="preserve">
+    <value>தொலைநகல் எண்</value>
+  </data>
+  <data name="PrintSettingsMaster_Website" xml:space="preserve">
+    <value>இணையதளம்</value>
+  </data>
+  <data name="PrintSettingsMaster_RegistrationNumber" xml:space="preserve">
+    <value>பதிவு எண்</value>
+  </data>
+  <data name="PrintSettingsMaster_PANNumber" xml:space="preserve">
+    <value>PAN எண்</value>
+  </data>
+  <data name="PrintSettingsMaster_FooterMessage" xml:space="preserve">
+    <value>அடிக்குறிப்பு செய்தி</value>
+  </data>
+  <data name="PrintSettingsMaster_Email" xml:space="preserve">
+    <value>மின்னஞ்சல்</value>
+  </data>
+  <data name="Purchases_Product" xml:space="preserve">
+    <value>தயாரிப்பு</value>
+  </data>
+  <data name="PurchaseMaster_ProductName" xml:space="preserve">
+    <value>பொருளின் பெயர்</value>
+  </data>
+  <data name="PurchaseMaster_ProductTax" xml:space="preserve">
+    <value>தயாரிப்பு வரி</value>
+  </data>
+  <data name="PurchaseMaster_Quantity" xml:space="preserve">
+    <value>அளவு</value>
+  </data>
+  <data name="PurchaseMaster_SubTotal" xml:space="preserve">
+    <value>தொகை</value>
+  </data>
+  <data name="PurchaseMaster_UnitCost" xml:space="preserve">
+    <value>அலகு விலை</value>
+  </data>
+  <data name="Purchases_Discount" xml:space="preserve">
+    <value>தள்ளுபடி</value>
+  </data>
+  <data name="Purchases_Quantity" xml:space="preserve">
+    <value>அளவு</value>
+  </data>
+  <data name="Common_Note" xml:space="preserve">
+    <value>குறிப்பு</value>
+  </data>
+  <data name="Common_Store" xml:space="preserve">
+    <value>கடை</value>
+  </data>
+  <data name="Stock_AdjustmentDate" xml:space="preserve">
+    <value>பங்கு சரிசெய்தல் தேதி</value>
+  </data>
+  <data name="Common_GrandTotal" xml:space="preserve">
+    <value>கிராண்ட் டோட்டல்</value>
+  </data>
+  <data name="Common_Items" xml:space="preserve">
+    <value>பொருட்களை</value>
+  </data>
+  <data name="Common_OrderDiscount" xml:space="preserve">
+    <value>ஆர்டர் தள்ளுபடி</value>
+  </data>
+  <data name="Common_OrderTax" xml:space="preserve">
+    <value>வரி வரிசை</value>
+  </data>
+  <data name="Common_Shipping" xml:space="preserve">
+    <value>கப்பல்</value>
+  </data>
+  <data name="Common_Total" xml:space="preserve">
+    <value>மொத்தம்</value>
+  </data>
+  <data name="Promotions_Name" xml:space="preserve">
+    <value>விளம்பர பெயர்</value>
+  </data>
+  <data name="Promotions_Type" xml:space="preserve">
+    <value>விளம்பர வகை</value>
+  </data>
+  <data name="Promotions_FromDate" xml:space="preserve">
+    <value>தேதியிலிருந்து</value>
+  </data>
+  <data name="Promotions_ToDate" xml:space="preserve">
+    <value>இன்றுவரை</value>
+  </data>
+  <data name="Promotions_Category" xml:space="preserve">
+    <value>வகை</value>
+  </data>
+  <data name="Promotions_Discount" xml:space="preserve">
+    <value>தள்ளுபடி</value>
+  </data>
+  <data name="Promotions_FromAmount" xml:space="preserve">
+    <value>தொகையிலிருந்து</value>
+  </data>
+  <data name="Promotions_SubCategory" xml:space="preserve">
+    <value>துணை வகை</value>
+  </data>
+  <data name="Promotions_Supplier" xml:space="preserve">
+    <value>சப்ளையர்</value>
+  </data>
+  <data name="Promotions_ToAmount" xml:space="preserve">
+    <value>தொகைக்கு</value>
+  </data>
+  <data name="PackMaster_AfterUnPack" xml:space="preserve">
+    <value>அன் பேக்கிற்குப் பிறகு</value>
+  </data>
+  <data name="PackMaster_CurrentStock" xml:space="preserve">
+    <value>தற்போதைய பங்கு</value>
+  </data>
+  <data name="PackMaster_PackProductCode" xml:space="preserve">
+    <value>பேக் தயாரிப்பு குறியீடு</value>
+  </data>
+  <data name="PackMaster_PackProductName" xml:space="preserve">
+    <value>பேக் தயாரிப்பு பெயர்</value>
+  </data>
+  <data name="UnPackMaster_AfterUnPack" xml:space="preserve">
+    <value>அன் பேக்கிற்குப் பிறகு</value>
+  </data>
+  <data name="UnPackMaster_CurrentStock" xml:space="preserve">
+    <value>தற்போதைய பங்கு</value>
+  </data>
+  <data name="UnPackMaster_PackSize" xml:space="preserve">
+    <value>பேக் சைஸ்</value>
+  </data>
+  <data name="UnPackMaster_ReferenceNO" xml:space="preserve">
+    <value>குறிப்பு எண்</value>
+  </data>
+  <data name="UnPackMaster_UnPackProductCode" xml:space="preserve">
+    <value>அன் பேக் தயாரிப்பு குறியீடு</value>
+  </data>
+  <data name="UnPackMaster_UnPackProductName" xml:space="preserve">
+    <value>அன் பேக் தயாரிப்பு பெயர்</value>
+  </data>
+  <data name="UnPackMaster_UnPackQuantity" xml:space="preserve">
+    <value>அன் பேக் அளவு</value>
+  </data>
+  <data name="Promotions_Product" xml:space="preserve">
+    <value>பொருளின் பெயர்</value>
+  </data>
+  <data name="UnPackMaster_Date" xml:space="preserve">
+    <value>அன் பேக் தேதி</value>
+  </data>
+  <data name="UnPackMaster_Month" xml:space="preserve">
+    <value>அன் பேக் மாதம்</value>
+  </data>
+  <data name="UnPackMaster_Year" xml:space="preserve">
+    <value>அன் பேக் ஆண்டு</value>
+  </data>
+  <data name="ExpensesDetail_Amount" xml:space="preserve">
+    <value>தொகை</value>
+  </data>
+  <data name="ExpensesDetail_Date" xml:space="preserve">
+    <value>தேதி</value>
+  </data>
+  <data name="ExpensesDetail_ExpensesType" xml:space="preserve">
+    <value>செலவுகள் வகை</value>
+  </data>
+  <data name="ExpensesDetail_Paidby" xml:space="preserve">
+    <value>மூலம் கணக்கு</value>
+  </data>
+  <data name="Common_FileName" xml:space="preserve">
+    <value>கோப்பு பெயர்</value>
+  </data>
+  <data name="Common_FileSize" xml:space="preserve">
+    <value>கோப்பின் அளவு</value>
+  </data>
+  <data name="Common_FileType" xml:space="preserve">
+    <value>கோப்பு வகை</value>
+  </data>
+  <data name="Purchases_EndDate" xml:space="preserve">
+    <value>கடைசி தேதி</value>
+  </data>
+  <data name="Purchases_StartDate" xml:space="preserve">
+    <value>தொடக்க தேதி</value>
+  </data>
+  <data name="Purchases_Store" xml:space="preserve">
+    <value>கடை</value>
+  </data>
+  <data name="Common_AdjustQuantity" xml:space="preserve">
+    <value>சரிசெய்தல் அளவு</value>
+  </data>
+  <data name="Common_ProductQuantity" xml:space="preserve">
+    <value>தயாரிப்பு (Qty)</value>
+  </data>
+  <data name="Common_ReferenceNo" xml:space="preserve">
+    <value>குறிப்பு எண்</value>
+  </data>
+  <data name="Stock_Month" xml:space="preserve">
+    <value>பங்கு மாதம்</value>
+  </data>
+  <data name="Stock_ReferenceNo" xml:space="preserve">
+    <value>குறிப்பு எண்</value>
+  </data>
+  <data name="Stock_Year" xml:space="preserve">
+    <value>பங்கு ஆண்டு</value>
+  </data>
+  <data name="ExpensesReport_EnterDate" xml:space="preserve">
+    <value>தேதியை உள்ளிடவும்</value>
+  </data>
+  <data name="ExpensesReport_EnterEndDate" xml:space="preserve">
+    <value>இறுதி தேதியை உள்ளிடவும்</value>
+  </data>
+  <data name="ExpensesReport_EnterStartDate" xml:space="preserve">
+    <value>தொடக்க தேதியை உள்ளிடவும்</value>
+  </data>
+  <data name="ExpensesDetail_Description" xml:space="preserve">
+    <value>விளக்கம்</value>
+  </data>
+  <data name="Sales_SalesDate" xml:space="preserve">
+    <value>விற்பனை தேதி</value>
+  </data>
+  <data name="Sales_ReferenceNO" xml:space="preserve">
+    <value>பில் எண்</value>
+  </data>
+  <data name="Sales_StoreID" xml:space="preserve">
+    <value>கடை</value>
+  </data>
+  <data name="Sales_SalesStatus" xml:space="preserve">
+    <value>விற்பனை நிலை</value>
+  </data>
+  <data name="Sales_Customer" xml:space="preserve">
+    <value>வாடிக்கையாளர்</value>
+  </data>
+  <data name="Purchases_PurchaseReturnDate" xml:space="preserve">
+    <value>திரும்ப வாங்கிய தேதி</value>
+  </data>
+  <data name="Purchases_PurchaseReturnStatus" xml:space="preserve">
+    <value>வாங்குதல் திரும்பும் நிலை</value>
+  </data>
+  <data name="Purchases_QuantityReturned" xml:space="preserve">
+    <value>அளவு திரும்பியது</value>
+  </data>
+  <data name="Common_Return" xml:space="preserve">
+    <value>திரும்ப</value>
+  </data>
+  <data name="Common_Supplier" xml:space="preserve">
+    <value>சப்ளையர்</value>
+  </data>
+  <data name="Product_ProductID" xml:space="preserve">
+    <value>தயாரிப்பு ஐடி</value>
+  </data>
+  <data name="Product_SupplierCostPrice" xml:space="preserve">
+    <value>செலவு விலை</value>
+  </data>
+  <data name="Product_SupplierID" xml:space="preserve">
+    <value>சப்ளையர் ஐடி</value>
+  </data>
+  <data name="Product_SupplierName" xml:space="preserve">
+    <value>விற்பனையாளர் பெயர்</value>
+  </data>
+  <data name="Sales_PaymentStatus" xml:space="preserve">
+    <value>பணம் செலுத்தும் நிலை</value>
+  </data>
+  <data name="CustomerMaster_DefaultSales" xml:space="preserve">
+    <value>இயல்புநிலை விற்பனை</value>
+  </data>
+  <data name="TransferMaster_ProductName" xml:space="preserve">
+    <value>பொருளின் பெயர்</value>
+  </data>
+  <data name="TransferMaster_Quantity" xml:space="preserve">
+    <value>அளவு</value>
+  </data>
+  <data name="TransferMaster_SubTotal" xml:space="preserve">
+    <value>மாஸ்டர் துணைத்தொகையை மாற்றவும்</value>
+  </data>
+  <data name="TransferMaster_UnitCost" xml:space="preserve">
+    <value>அலகு விலை</value>
+  </data>
+  <data name="Transfers_Quantity" xml:space="preserve">
+    <value>அளவு</value>
+  </data>
+  <data name="Transfers_ReferenceNO" xml:space="preserve">
+    <value>குறிப்பு எண்</value>
+  </data>
+  <data name="Transfers_TransferDate" xml:space="preserve">
+    <value>இடமாற்ற தேதி</value>
+  </data>
+  <data name="Transfers_TransferStatus" xml:space="preserve">
+    <value>பரிமாற்ற நிலை</value>
+  </data>
+  <data name="Common_FromStore" xml:space="preserve">
+    <value>கடையில் இருந்து</value>
+  </data>
+  <data name="Common_ToStore" xml:space="preserve">
+    <value>சேமிக்க</value>
+  </data>
+  <data name="Common_Transfer" xml:space="preserve">
+    <value>இடமாற்றம்</value>
+  </data>
+  <data name="TransferMaster_TransferQuantity" xml:space="preserve">
+    <value>பரிமாற்ற அளவு</value>
+  </data>
+  <data name="Product_HSNCode" xml:space="preserve">
+    <value>HSN குறியீடு</value>
+  </data>
+  <data name="ProductReport_Brand" xml:space="preserve">
+    <value>பிராண்ட்</value>
+  </data>
+  <data name="ProductReport_Category" xml:space="preserve">
+    <value>வகை</value>
+  </data>
+  <data name="ProductReport_EndDate" xml:space="preserve">
+    <value>கடைசி தேதி</value>
+  </data>
+  <data name="ProductReport_Product" xml:space="preserve">
+    <value>பொருளின் பெயர்</value>
+  </data>
+  <data name="ProductReport_StartDate" xml:space="preserve">
+    <value>தொடக்க தேதி</value>
+  </data>
+  <data name="ProductReport_SubCategory" xml:space="preserve">
+    <value>துணை வகை</value>
+  </data>
+  <data name="Product_HSN" xml:space="preserve">
+    <value>HSN</value>
+  </data>
+  <data name="Common_DiscountAmount" xml:space="preserve">
+    <value>தொகை</value>
+  </data>
+  <data name="Common_DiscountPer" xml:space="preserve">
+    <value>%</value>
+  </data>
+  <data name="Promotions_DiscountType" xml:space="preserve">
+    <value>தள்ளுபடி வகை</value>
+  </data>
+  <data name="MenuMasterDetail_IconCls" xml:space="preserve">
+    <value>சின்னங்கள்</value>
+  </data>
+  <data name="MenuMasterDetail_MenuName" xml:space="preserve">
+    <value>மெனு பெயர்</value>
+  </data>
+  <data name="MenuMasterDetail_OrderByTab" xml:space="preserve">
+    <value>தாவல் மூலம் உத்தரவு</value>
+  </data>
+  <data name="MenuMasterDetail_PageUrl" xml:space="preserve">
+    <value>பக்கம் Url</value>
+  </data>
+  <data name="MenuMasterHeader_IconCls" xml:space="preserve">
+    <value>சின்னங்கள்</value>
+  </data>
+  <data name="MenuMasterHeader_MenuName" xml:space="preserve">
+    <value>மெனு பெயர்</value>
+  </data>
+  <data name="MenuMasterHeader_OrderByTab" xml:space="preserve">
+    <value>தாவல் மூலம் உத்தரவு</value>
+  </data>
+  <data name="MenuMasterHeader_PageUrl" xml:space="preserve">
+    <value>பக்கம் Url</value>
+  </data>
+  <data name="ToolTip_EnterIconCls" xml:space="preserve">
+    <value>ஐகான் Cls ஐ உள்ளிடவும்</value>
+  </data>
+  <data name="ToolTip_EnterOrderby" xml:space="preserve">
+    <value>மூலம் ஆர்டரை உள்ளிடவும்</value>
+  </data>
+  <data name="ToolTip_EnterPageUrl" xml:space="preserve">
+    <value>பக்கம் URL ஐ உள்ளிடவும்</value>
+  </data>
+  <data name="ToolTip_HeaderMenuName" xml:space="preserve">
+    <value>மெனு பெயரால் தேடவும்</value>
+  </data>
+  <data name="MenuMasterHeader_AvailableAccess" xml:space="preserve">
+    <value>கிடைக்கும் அணுகல்</value>
+  </data>
+  <data name="MenuMasterHeader_EnabledAccess" xml:space="preserve">
+    <value>அணுகல் இயக்கப்பட்டது</value>
+  </data>
+  <data name="MenuMasterHeader_IsPageAccess" xml:space="preserve">
+    <value>பக்க அணுகல்</value>
+  </data>
+  <data name="Common_Disabled" xml:space="preserve">
+    <value>முடக்கப்பட்டது</value>
+  </data>
+  <data name="Common_StoreName" xml:space="preserve">
+    <value>கடையின் பெயர்</value>
+  </data>
+  <data name="Report_ProductCode" xml:space="preserve">
+    <value>தயாரிப்பு குறியீடு</value>
+  </data>
+  <data name="Report_ProductName" xml:space="preserve">
+    <value>பொருளின் பெயர்</value>
+  </data>
+  <data name="Report_Purchased" xml:space="preserve">
+    <value>கொள்முதல்</value>
+  </data>
+  <data name="Report_Sales" xml:space="preserve">
+    <value>விற்பனை</value>
+  </data>
+  <data name="Report_Stock" xml:space="preserve">
+    <value>பங்கு</value>
+  </data>
+  <data name="Common_ProductCode" xml:space="preserve">
+    <value>தயாரிப்பு குறியீடு</value>
+  </data>
+  <data name="Common_ProductName" xml:space="preserve">
+    <value>பொருளின் பெயர்</value>
+  </data>
+  <data name="Common_ProductNameQuantity" xml:space="preserve">
+    <value>தயாரிப்பு (Qty)</value>
+  </data>
+  <data name="Common_ProfitLoss" xml:space="preserve">
+    <value>லாப இழப்பு</value>
+  </data>
+  <data name="Common_Purchased" xml:space="preserve">
+    <value>வாங்கப்பட்டது</value>
+  </data>
+  <data name="Common_Sold" xml:space="preserve">
+    <value>விற்கப்பட்டது</value>
+  </data>
+  <data name="Common_StockAmount" xml:space="preserve">
+    <value>பங்கு தொகை</value>
+  </data>
+  <data name="Sales_Balance" xml:space="preserve">
+    <value>இருப்பு</value>
+  </data>
+  <data name="Sales_Biller" xml:space="preserve">
+    <value>பில்லர்</value>
+  </data>
+  <data name="Sales_EndDate" xml:space="preserve">
+    <value>கடைசி தேதி</value>
+  </data>
+  <data name="Sales_GrandTotal" xml:space="preserve">
+    <value>கிராண்ட் டோட்டல்</value>
+  </data>
+  <data name="Sales_Paid" xml:space="preserve">
+    <value>பணம் செலுத்தப்பட்டது</value>
+  </data>
+  <data name="Sales_Product" xml:space="preserve">
+    <value>தயாரிப்பு</value>
+  </data>
+  <data name="Sales_StartDate" xml:space="preserve">
+    <value>தொடக்க தேதி</value>
+  </data>
+  <data name="Sales_Store" xml:space="preserve">
+    <value>கடை</value>
+  </data>
+  <data name="Common_Status_Active" xml:space="preserve">
+    <value>செயலில்</value>
+  </data>
+  <data name="Common_Status_Inactive" xml:space="preserve">
+    <value>செயலற்றது</value>
+  </data>
+  <data name="Report_AlertQuantity" xml:space="preserve">
+    <value>மறுவரிசை நிலை</value>
+  </data>
+  <data name="Report_CurrentQuantity" xml:space="preserve">
+    <value>தற்போதைய அளவு</value>
+  </data>
+  <data name="Common_ApprovalStatus" xml:space="preserve">
+    <value>ஒப்புதல் நிலை</value>
+  </data>
+  <data name="CustomerMaster_IsPoints" xml:space="preserve">
+    <value>புள்ளிகள்</value>
+  </data>
+  <data name="SalesPointsMaster_FromPoints" xml:space="preserve">
+    <value>புள்ளிகளிலிருந்து</value>
+  </data>
+  <data name="SalesPointsMaster_Points" xml:space="preserve">
+    <value>புள்ளிகள்</value>
+  </data>
+  <data name="SalesPointsMaster_StoreName" xml:space="preserve">
+    <value>கடையின் பெயர்</value>
+  </data>
+  <data name="Sales_CustomerName" xml:space="preserve">
+    <value>வாடிக்கையாளர் பெயர்</value>
+  </data>
+  <data name="Sales_PaidAmount" xml:space="preserve">
+    <value>செலுத்திய தொகை</value>
+  </data>
+  <data name="Sales_QuantityReturned" xml:space="preserve">
+    <value>அளவு திரும்பியது</value>
+  </data>
+  <data name="Sales_ReturnedDate" xml:space="preserve">
+    <value>திரும்பிய தேதி</value>
+  </data>
+  <data name="Sales_TotalAmount" xml:space="preserve">
+    <value>மொத்த தொகை</value>
+  </data>
+  <data name="SalesPointsMaster_PointsType" xml:space="preserve">
+    <value>புள்ளிகள் வகை</value>
+  </data>
+  <data name="SalesPointsMaster_ToPoints" xml:space="preserve">
+    <value>புள்ளிகளுக்கு</value>
+  </data>
+  <data name="Product_MakerName" xml:space="preserve">
+    <value>தயாரிப்பாளர் பெயர்</value>
+  </data>
+  <data name="PurchaseMaster_MRP" xml:space="preserve">
+    <value>எம்ஆர்பி</value>
+  </data>
+  <data name="PurchaseMaster_QuantityReceived" xml:space="preserve">
+    <value>பெறப்பட்ட அளவு</value>
+  </data>
+  <data name="PurchaseMaster_SellingPrice" xml:space="preserve">
+    <value>விற்பனை விலை</value>
+  </data>
+  <data name="Purchases_SupplierInvoice" xml:space="preserve">
+    <value>சப்ளையர் விலைப்பட்டியல்</value>
+  </data>
+  <data name="Sub_SubCategory_Category" xml:space="preserve">
+    <value>வகை</value>
+  </data>
+  <data name="Sub_SubCategory_Description" xml:space="preserve">
+    <value>துணை - துணை வகை விளக்கம்</value>
+  </data>
+  <data name="Sub_SubCategory_SubCategory" xml:space="preserve">
+    <value>துணை வகை</value>
+  </data>
+  <data name="SupplierContactDetail_Title" xml:space="preserve">
+    <value>தலைப்பு</value>
+  </data>
+  <data name="SupplierContactDetail_ContactPersonName" xml:space="preserve">
+    <value>தொடர்பு நபரின் பெயர்</value>
+  </data>
+  <data name="SupplierContactDetail_ContactMobileNo" xml:space="preserve">
+    <value>அலைபேசி எண்</value>
+  </data>
+  <data name="SupplierContactDetail_ContactEmailID" xml:space="preserve">
+    <value>மின்னஞ்சல் முகவரி</value>
+  </data>
+  <data name="SupplierContactDetail_AddressLine1" xml:space="preserve">
+    <value>முகவரி வரி 1</value>
+  </data>
+  <data name="SupplierContactDetail_AddressLine2" xml:space="preserve">
+    <value>முகவரி வரி 2</value>
+  </data>
+  <data name="SupplierContactDetail_AddressLine3" xml:space="preserve">
+    <value>முகவரி வரி 3</value>
+  </data>
+  <data name="BankDetails_AccountHolderName" xml:space="preserve">
+    <value>வைத்திருப்பவரின் பெயர்</value>
+  </data>
+  <data name="BankDetails_AccountNumber" xml:space="preserve">
+    <value>கணக்கு எண்</value>
+  </data>
+  <data name="BankDetails_BankName" xml:space="preserve">
+    <value>வங்கி பெயர்</value>
+  </data>
+  <data name="BankDetails_BranchName" xml:space="preserve">
+    <value>கிளை பெயர்</value>
+  </data>
+  <data name="BankDetails_IFSCCode" xml:space="preserve">
+    <value>IFSC குறியீடு</value>
+  </data>
+  <data name="BankDetails_BankAccountType" xml:space="preserve">
+    <value>கணக்கு வகை</value>
+  </data>
+  <data name="Common_address1" xml:space="preserve">
+    <value>முகவரி 1</value>
+  </data>
+  <data name="Common_address2" xml:space="preserve">
+    <value>முகவரி 2</value>
+  </data>
+  <data name="Common_address3" xml:space="preserve">
+    <value>முகவரி 3</value>
+  </data>
+  <data name="BrandMaster_Maker" xml:space="preserve">
+    <value>தயாரிப்பாளர்</value>
+  </data>
+  <data name="BrandMaster_BrandName" xml:space="preserve">
+    <value>பிராண்ட் பெயர்</value>
+  </data>
+  <data name="BrandMaster_BrandImage" xml:space="preserve">
+    <value>பிராண்ட் படம்</value>
+  </data>
+  <data name="Product_SupplierMRPPrice" xml:space="preserve">
+    <value>எம்ஆர்பி</value>
+  </data>
+  <data name="Product_SupplierQuantity" xml:space="preserve">
+    <value>சப்ளையர் அளவு</value>
+  </data>
+  <data name="Product_SupplierSellingPrice" xml:space="preserve">
+    <value>விற்பனை விலை</value>
+  </data>
+  <data name="Accounts_PayableAccountType" xml:space="preserve">
+    <value>கணக்கு வகை</value>
+  </data>
+  <data name="Accounts_PayableAccountName" xml:space="preserve">
+    <value>கணக்கின் பெயர்</value>
+  </data>
+  <data name="Accounts_Amount" xml:space="preserve">
+    <value>தொகை</value>
+  </data>
+  <data name="Accounts_Date" xml:space="preserve">
+    <value>தேதி</value>
+  </data>
+  <data name="Accounts_Description" xml:space="preserve">
+    <value>விளக்கம்</value>
+  </data>
+  <data name="Accounts_Supplier" xml:space="preserve">
+    <value>விற்பனையாளர் பெயர்</value>
+  </data>
+  <data name="HSN_IGST" xml:space="preserve">
+    <value>IGST</value>
+  </data>
+  <data name="Brand_Status" xml:space="preserve">
+    <value>பிராண்ட் நிலை</value>
+  </data>
+  <data name="Accounts_Accountby" xml:space="preserve">
+    <value>மூலம் கணக்கு</value>
+  </data>
+  <data name="Common_PageStatus" xml:space="preserve">
+    <value>பக்க நிலை</value>
+  </data>
+  <data name="Purchases_RequestDate" xml:space="preserve">
+    <value>கோரிக்கை தேதி</value>
+  </data>
+  <data name="Dashboard_Expenses" xml:space="preserve">
+    <value>செலவுகள்</value>
+  </data>
+  <data name="Dashboard_Sales" xml:space="preserve">
+    <value>விற்பனை</value>
+  </data>
+  <data name="Dashboard_SalesReturn" xml:space="preserve">
+    <value>விற்பனை திரும்பும்</value>
+  </data>
+  <data name="Dashboard_SalesVoid" xml:space="preserve">
+    <value>விற்பனை வெற்றிடம்</value>
+  </data>
+  <data name="Product" xml:space="preserve">
+    <value>தயாரிப்பு</value>
+  </data>
+  <data name="Store" xml:space="preserve">
+    <value>கடை</value>
+  </data>
+  <data name="TodaySales" xml:space="preserve">
+    <value>இன்று விற்பனை</value>
+  </data>
+  <data name="Common_Employee" xml:space="preserve">
+    <value>பணியாளர்</value>
+  </data>
+  <data name="EmployeeAccounts_Amount" xml:space="preserve">
+    <value>தொகை</value>
+  </data>
+  <data name="EmployeeAccounts_Date" xml:space="preserve">
+    <value>தேதி</value>
+  </data>
+  <data name="EmployeeAccounts_Description" xml:space="preserve">
+    <value>விளக்கம்</value>
+  </data>
+  <data name="EmployeeAccounts_Type" xml:space="preserve">
+    <value>வகை</value>
+  </data>
+  <data name="EmployeeAccounts_Month" xml:space="preserve">
+    <value>மாதம்</value>
+  </data>
+  <data name="Employee_Type" xml:space="preserve">
+    <value>வகை</value>
+  </data>
+  <data name="AccountType" xml:space="preserve">
+    <value>கணக்கு வகை</value>
+  </data>
+  <data name="Common_Month" xml:space="preserve">
+    <value>மாதம்</value>
+  </data>
+  <data name="Common_Year" xml:space="preserve">
+    <value>ஆண்டு</value>
+  </data>
+  <data name="CreditAmount" xml:space="preserve">
+    <value>கடன் தொகை</value>
+  </data>
+  <data name="DebitAmount" xml:space="preserve">
+    <value>பற்று தொகை</value>
+  </data>
+  <data name="Employee" xml:space="preserve">
+    <value>பணியாளர்</value>
+  </data>
+  <data name="SalesPointsMaster_RedeemPoints" xml:space="preserve">
+    <value>புள்ளிகளை மீட்டெடுக்கவும்</value>
+  </data>
+  <data name="Payment_Amount" xml:space="preserve">
+    <value>தொகை</value>
+  </data>
+  <data name="Payment_Balance" xml:space="preserve">
+    <value>இருப்பு</value>
+  </data>
+  <data name="Payment_Mode" xml:space="preserve">
+    <value>பணம் செலுத்தும் முறை</value>
+  </data>
+  <data name="Payment_Note" xml:space="preserve">
+    <value>கட்டண குறிப்பு</value>
+  </data>
+  <data name="Payment_SupplierBalance" xml:space="preserve">
+    <value>சப்ளையர் கடன் இருப்பு தொகை:</value>
+  </data>
+  <data name="Payment_TotalItems" xml:space="preserve">
+    <value>மொத்த பொருட்கள்</value>
+  </data>
+  <data name="Payment_TotalPayable" xml:space="preserve">
+    <value>செலுத்த வேண்டிய மொத்த தொகை</value>
+  </data>
+  <data name="Payment_TotalPaying" xml:space="preserve">
+    <value>மொத்த செலுத்துதல்</value>
+  </data>
+  <data name="Payment_CustomerBalance" xml:space="preserve">
+    <value>வாடிக்கையாளர் இருப்பு</value>
+  </data>
+  <data name="Accounts_PayableType" xml:space="preserve">
+    <value>செலுத்த வேண்டிய வகை</value>
+  </data>
+  <data name="Account_AccNO" xml:space="preserve">
+    <value>கணக்கு எண்</value>
+  </data>
+  <data name="Account_AccountName" xml:space="preserve">
+    <value>கணக்கின் பெயர்</value>
+  </data>
+  <data name="Account_AccountsType" xml:space="preserve">
+    <value>கணக்குகளின் வகை</value>
+  </data>
+  <data name="Accounts_Balance" xml:space="preserve">
+    <value>கணக்கு இருப்பு</value>
+  </data>
+  <data name="Accounts_Customer" xml:space="preserve">
+    <value>வாடிக்கையாளர்</value>
+  </data>
+  <data name="Accounts_PaymentType" xml:space="preserve">
+    <value>கட்டணம் வகை</value>
+  </data>
+  <data name="Accounts_AccountName" xml:space="preserve">
+    <value>கணக்கின் பெயர்</value>
+  </data>
+  <data name="Accounts_AccountNo" xml:space="preserve">
+    <value>கணக்கு எண்</value>
+  </data>
+  <data name="Accounts_Paidby" xml:space="preserve">
+    <value>மூலம் கணக்கு</value>
+  </data>
+  <data name="Account_BalanceAmount" xml:space="preserve">
+    <value>மீதம் உள்ள தொகை</value>
+  </data>
+  <data name="Account_TotalCredit" xml:space="preserve">
+    <value>மொத்த கடன் தொகை</value>
+  </data>
+  <data name="Account_TotalDebit" xml:space="preserve">
+    <value>மொத்த டெபிட் தொகை</value>
+  </data>
+  <data name="Common_CreditAmount" xml:space="preserve">
+    <value>கடன் தொகை</value>
+  </data>
+  <data name="Common_Date" xml:space="preserve">
+    <value>தேதி</value>
+  </data>
+  <data name="Common_DebitAmount" xml:space="preserve">
+    <value>பற்று தொகை</value>
+  </data>
+  <data name="Common_Amount" xml:space="preserve">
+    <value>தொகை</value>
+  </data>
+  <data name="Common_Description" xml:space="preserve">
+    <value>விளக்கம்</value>
+  </data>
+  <data name="Title_OpenRegisterAccounts_View" xml:space="preserve">
+    <value>பதிவு கணக்குகளைத் திறக்கவும் - காண்க</value>
+  </data>
+  <data name="BalanceLedger_EndDate" xml:space="preserve">
+    <value>கடைசி தேதி</value>
+  </data>
+  <data name="BalanceLedger_FinancialYear" xml:space="preserve">
+    <value>நிதி ஆண்டு</value>
+  </data>
+  <data name="BalanceLedger_StartDate" xml:space="preserve">
+    <value>தொடக்க தேதி</value>
+  </data>
+  <data name="Sales_PaymentType" xml:space="preserve">
+    <value>கட்டணம் வகை</value>
+  </data>
+  <data name="Common_PaymentType" xml:space="preserve">
+    <value>கட்டணம் வகை</value>
+  </data>
+  <data name="Report_Purchase_Return" xml:space="preserve">
+    <value>வாங்குதல் வருமானம்</value>
+  </data>
+  <data name="Common_AmountDetails" xml:space="preserve">
+    <value>தொகை விவரங்கள்</value>
+  </data>
+  <data name="Common_PurchasedAmount" xml:space="preserve">
+    <value>கொள்முதல் - ஆம்டி</value>
+  </data>
+  <data name="Common_PurchasedQty" xml:space="preserve">
+    <value>கொள்முதல் - Qty</value>
+  </data>
+  <data name="Common_PurchasedReturnedAmount" xml:space="preserve">
+    <value>புர்ச். திரும்ப - ஏம்டி</value>
+  </data>
+  <data name="Common_PurchaseReturnedQty" xml:space="preserve">
+    <value>புர்ச். திரும்ப - Qty</value>
+  </data>
+  <data name="Common_SalesReturnedAmount" xml:space="preserve">
+    <value>விற்பனை வருமானம் - ஏஎம்டி</value>
+  </data>
+  <data name="Common_SalesReturnedQty" xml:space="preserve">
+    <value>விற்பனை வருமானம் - Qty</value>
+  </data>
+  <data name="Common_SoldAmount" xml:space="preserve">
+    <value>விற்கப்பட்ட தொகை</value>
+  </data>
+  <data name="Common_SoldQty" xml:space="preserve">
+    <value>விற்கப்பட்டது</value>
+  </data>
+  <data name="Report_SalesReturn" xml:space="preserve">
+    <value>விற்பனை வருமானம்</value>
+  </data>
+  <data name="Payment_Return" xml:space="preserve">
+    <value>பணம் திரும்பப் பெறுதல்</value>
+  </data>
+  <data name="Accounts_PaymentMode" xml:space="preserve">
+    <value>பணம் செலுத்தும் முறை</value>
+  </data>
+  <data name="Accounts_BillNo" xml:space="preserve">
+    <value>பில் எண்</value>
+  </data>
+  <data name="Purchases_Return" xml:space="preserve">
+    <value>வாங்குதல் வருமானம்</value>
+  </data>
+  <data name="SalesMode" xml:space="preserve">
+    <value>விற்பனை முறை</value>
+  </data>
+  <data name="Purchase_Mode" xml:space="preserve">
+    <value>கொள்முதல் முறை</value>
+  </data>
+  <data name="Purchase_PurchaseDate" xml:space="preserve">
+    <value>கொள்முதல் தேதி</value>
+  </data>
+  <data name="Accounts_AccountMode" xml:space="preserve">
+    <value>கணக்கு முறை</value>
+  </data>
+  <data name="Accounts_BillPONo" xml:space="preserve">
+    <value>பில்/பிஓ எண்.</value>
+  </data>
+  <data name="Accounts_PONo" xml:space="preserve">
+    <value>PO.No</value>
+  </data>
+  <data name="PurchaseOrder_Paid" xml:space="preserve">
+    <value>வாங்கிய தொகை</value>
+  </data>
+  <data name="PurchaseMode" xml:space="preserve">
+    <value>கொள்முதல் முறை</value>
+  </data>
+  <data name="Supplier_PurchaseMode" xml:space="preserve">
+    <value>கொள்முதல் முறை</value>
+  </data>
+  <data name="PurchaseOrder_Amount" xml:space="preserve">
+    <value>ஆர்டர் தொகை வாங்கவும்</value>
+  </data>
+  <data name="SalesPaid_Amount" xml:space="preserve">
+    <value>விற்பனை செலுத்திய தொகை</value>
+  </data>
+  <data name="Sales_Amount" xml:space="preserve">
+    <value>விற்பணை தொகை</value>
+  </data>
+  <data name="String" xml:space="preserve">
+    <value>பர்சேஸ் ஆர்டர்_பெய்ட்</value>
+  </data>
+  <data name="Purchase_Return" xml:space="preserve">
+    <value>வாங்குதல் வருமானம்</value>
+  </data>
+  <data name="Sales_Return" xml:space="preserve">
+    <value>விற்பனை வருமானம்</value>
+  </data>
+  <data name="Product_BarCode" xml:space="preserve">
+    <value>பார் கோட்</value>
+  </data>
+  <data name="Product_SupplierCode" xml:space="preserve">
+    <value>விநியோகிப்பாளர் குறியீடு</value>
+  </data>
+  <data name="ExpensesDetail_AccountType" xml:space="preserve">
+    <value>கணக்கு வகை</value>
+  </data>
+  <data name="ExpensesDetail_CreditAmount" xml:space="preserve">
+    <value>கடன் தொகை</value>
+  </data>
+  <data name="ExpensesDetail_DebitAmount" xml:space="preserve">
+    <value>பற்று தொகை</value>
+  </data>
+  <data name="ExpensesDetail_PayableType" xml:space="preserve">
+    <value>செலுத்த வேண்டிய வகை</value>
+  </data>
+  <data name="FinacialYearAccounts_FinancialName" xml:space="preserve">
+    <value>நிதி பெயர்</value>
+  </data>
+  <data name="FinancialAccounts_EndDate" xml:space="preserve">
+    <value>கடைசி தேதி</value>
+  </data>
+  <data name="FinancialAccounts_StartDate" xml:space="preserve">
+    <value>தொடக்க தேதி</value>
+  </data>
+  <data name="Today_Employee" xml:space="preserve">
+    <value>பணியாளர்</value>
+  </data>
+  <data name="Admin_Balance" xml:space="preserve">
+    <value>இருப்பு</value>
+  </data>
+  <data name="Admin_Biller" xml:space="preserve">
+    <value>பில்லர்</value>
+  </data>
+  <data name="Admin_Customer" xml:space="preserve">
+    <value>வாடிக்கையாளர்</value>
+  </data>
+  <data name="Admin_GrandTotal" xml:space="preserve">
+    <value>கிராண்ட் டோட்டல்</value>
+  </data>
+  <data name="Admin_Paid" xml:space="preserve">
+    <value>பணம் செலுத்தப்பட்டது</value>
+  </data>
+  <data name="Product_ModeType" xml:space="preserve">
+    <value>முறை வகை</value>
+  </data>
+  <data name="PublicationMaster_Alias1" xml:space="preserve">
+    <value>மாற்றுப்பெயர் 1</value>
+  </data>
+  <data name="Transfers_FromStoreName" xml:space="preserve">
+    <value>ஸ்டோர் பெயரிலிருந்து</value>
+  </data>
+  <data name="Transfers_ToStore" xml:space="preserve">
+    <value>சேமிக்க</value>
+  </data>
+  <data name="BrandMaster_MakerName" xml:space="preserve">
+    <value>தயாரிப்பாளர் பெயர்</value>
+  </data>
+  <data name="BrandMaster_SortOrder" xml:space="preserve">
+    <value>வரிசையை வரிசைப்படுத்து</value>
+  </data>
+  <data name="DefaultMaster_MasterText" xml:space="preserve">
+    <value>முதன்மை உரை</value>
+  </data>
+  <data name="DefaultMaster_MasterType" xml:space="preserve">
+    <value>முதன்மை வகை</value>
+  </data>
+  <data name="ProductImport_ErrorMessage" xml:space="preserve">
+    <value>பிழை செய்தி</value>
+  </data>
+  <data name="ProductImport_ErrorType" xml:space="preserve">
+    <value>பிழை வகை</value>
+  </data>
+  <data name="ProductImport_ExcelRowNumber" xml:space="preserve">
+    <value>எக்செல் வரிசை எண்</value>
+  </data>
+  <data name="Product_Quantity" xml:space="preserve">
+    <value>அளவு</value>
+  </data>
+  <data name="Purchases_OrderItems" xml:space="preserve">
+    <value>ஆர்டர் பொருட்கள்</value>
+  </data>
+  <data name="Purchases_PONO" xml:space="preserve">
+    <value>அஞ்சல் எண்.</value>
+  </data>
+  <data name="Purchase_ModeType" xml:space="preserve">
+    <value>முறை வகை</value>
+  </data>
+  <data name="SupplierMaster_GSTNumber" xml:space="preserve">
+    <value>ஜிஎஸ்டி எண்</value>
+  </data>
+  <data name="SupplierMaster_PANNumber" xml:space="preserve">
+    <value>PAN எண்</value>
+  </data>
+  <data name="SupplierMaster_PersonName" xml:space="preserve">
+    <value>நபர் பெயர்</value>
+  </data>
+  <data name="SupplierMaster_SupplierCode" xml:space="preserve">
+    <value>விநியோகிப்பாளர் குறியீடு</value>
+  </data>
+  <data name="SupplierMaster_SupplierType" xml:space="preserve">
+    <value>சப்ளையர் வகை</value>
+  </data>
+  <data name="Supplier_AccountName" xml:space="preserve">
+    <value>கணக்கின் பெயர்</value>
+  </data>
+  <data name="Supplier_AccountNumber" xml:space="preserve">
+    <value>கணக்கு எண்</value>
+  </data>
+  <data name="Supplier_AccountType" xml:space="preserve">
+    <value>கணக்கு வகை</value>
+  </data>
+  <data name="Supplier_BankName" xml:space="preserve">
+    <value>வங்கி பெயர்</value>
+  </data>
+  <data name="Supplier_BranchName" xml:space="preserve">
+    <value>கிளை பெயர்</value>
+  </data>
+  <data name="Supplier_IFSCCode" xml:space="preserve">
+    <value>IFSC குறியீடு</value>
+  </data>
+  <data name="Purchases_PaymentReturn" xml:space="preserve">
+    <value>பணம் திரும்பப் பெறுதல்</value>
+  </data>
+  <data name="Customer_CustomerName" xml:space="preserve">
+    <value>வாடிக்கையாளர் பெயர்</value>
+  </data>
+  <data name="Expenses_ExpensesType" xml:space="preserve">
+    <value>செலவுகள் வகை</value>
+  </data>
+  <data name="Purchases_AccountsMode" xml:space="preserve">
+    <value>கணக்கு முறை</value>
+  </data>
+  <data name="Purchase_Amount" xml:space="preserve">
+    <value>தொகை</value>
+  </data>
+  <data name="Purchase_Payingby" xml:space="preserve">
+    <value>மூலம் செலுத்துதல்</value>
+  </data>
+  <data name="Purchase_PaymentDate" xml:space="preserve">
+    <value>கட்டணம் தேதி</value>
+  </data>
+  <data name="Purchase_PaymentNote" xml:space="preserve">
+    <value>கட்டண குறிப்பு</value>
+  </data>
+  <data name="Supplier_SupplierName" xml:space="preserve">
+    <value>விற்பனையாளர் பெயர்</value>
+  </data>
+  <data name="Common_Option" xml:space="preserve">
+    <value>விருப்பம்</value>
+  </data>
+  <data name="Common_PaidBy" xml:space="preserve">
+    <value>மூலம் செலுத்தப்பட்டது</value>
+  </data>
+  <data name="PurchaseMaster_ReturnQuantity" xml:space="preserve">
+    <value>திரும்பும் அளவு</value>
+  </data>
+  <data name="Purchases_PaymentMode" xml:space="preserve">
+    <value>பணம் செலுத்தும் முறை</value>
+  </data>
+  <data name="Purchases_TodayClosedAmount" xml:space="preserve">
+    <value>இன்று மூடப்பட்ட தொகை</value>
+  </data>
+  <data name="SalesPointsMaster_FromAmount" xml:space="preserve">
+    <value>தொகையிலிருந்து</value>
+  </data>
+  <data name="SalesPointsMaster_ToAmount" xml:space="preserve">
+    <value>தொகைக்கு</value>
+  </data>
+  <data name="Sales_BillNo" xml:space="preserve">
+    <value>பில் எண்</value>
+  </data>
+  <data name="Sales_GrantTotal" xml:space="preserve">
+    <value>மொத்த மானியம்</value>
+  </data>
+  <data name="Sales_Payingby" xml:space="preserve">
+    <value>மூலம் செலுத்துதல்</value>
+  </data>
+  <data name="Sales_PaymentReturn" xml:space="preserve">
+    <value>பணம் திரும்பப் பெறுதல்</value>
+  </data>
+  <data name="Sales_ProductLevelAmount" xml:space="preserve">
+    <value>தயாரிப்பு நிலை அளவு</value>
+  </data>
+  <data name="Sales_SalesReferenceNumber" xml:space="preserve">
+    <value>விற்பனை குறிப்பு எண்</value>
+  </data>
+  <data name="Sales_SalesReturn" xml:space="preserve">
+    <value>விற்பனை வருமானம்</value>
+  </data>
+  <data name="Sales_TodayClosedAmount" xml:space="preserve">
+    <value>இன்று மூடப்பட்ட தொகை</value>
+  </data>
+  <data name="Sales_VolumeLevelAmount" xml:space="preserve">
+    <value>தொகுதி அளவு தொகை</value>
+  </data>
+  <data name="Purchase_OrderItems" xml:space="preserve">
+    <value>ஆர்டர் பொருட்கள்</value>
+  </data>
+  <data name="Purchase_PONO" xml:space="preserve">
+    <value>அஞ்சல் எண்.</value>
+  </data>
+  <data name="BrandMaster_OrderBy" xml:space="preserve">
+    <value>உத்தரவின் படி</value>
+  </data>
+  <data name="SupplierMaster_Website" xml:space="preserve">
+    <value>இணையதளம்</value>
+  </data>
+  <data name="Common_GSTNumber" xml:space="preserve">
+    <value>ஜிஎஸ்டி எண்</value>
+  </data>
+  <data name="Sales_AvailableSalesPoints" xml:space="preserve">
+    <value>கிடைக்கும் விற்பனை புள்ளிகள்</value>
+  </data>
+  <data name="Sales_TotalSalesPoints" xml:space="preserve">
+    <value>மொத்த விற்பனை புள்ளிகள்</value>
+  </data>
+  <data name="Common_HSNInternational" xml:space="preserve">
+    <value>சர்வதேச</value>
+  </data>
+  <data name="Common_HSNLocal" xml:space="preserve">
+    <value>உள்ளூர்</value>
+  </data>
+  <data name="HSN_Local" xml:space="preserve">
+    <value>HSN வகை</value>
+  </data>
+  <data name="ExpensesDetail_ReferenceNo" xml:space="preserve">
+    <value>குறிப்பு எண் (பில்/போ)</value>
+  </data>
+  <data name="PurchaseMaster_DiscountAmt" xml:space="preserve">
+    <value>தள்ளுபடி</value>
+  </data>
+  <data name="PurchaseMaster_DiscountPer" xml:space="preserve">
+    <value>தள்ளுபடி</value>
+  </data>
+  <data name="PurchaseMaster_FreeQuantity" xml:space="preserve">
+    <value>இலவச அளவு</value>
+  </data>
+  <data name="Sales_OverallDiscount" xml:space="preserve">
+    <value>மொத்த தள்ளுபடி (தொகை)</value>
+  </data>
+  <data name="ErrTransfers_PleaseselectsomeproductstoTransfer" xml:space="preserve">
+    <value>மாற்ற சில தயாரிப்புகளைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="ErrTransfers_Zeronegativevaluenotallowed" xml:space="preserve">
+    <value>மாற்ற சில தயாரிப்புகளைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Product_ProductCode" xml:space="preserve">
+    <value>தயாரிப்பு குறியீடு</value>
+  </data>
+  <data name="TodayClosedSalesAmount" xml:space="preserve">
+    <value>இன்று மூடப்பட்ட விற்பனை தொகை</value>
+  </data>
+  <data name="Common_OrderItems" xml:space="preserve">
+    <value>ஆர்டர் பொருட்கள்</value>
+  </data>
+  <data name="PrintSettingsMaster_GSTNumber" xml:space="preserve">
+    <value>ஜிஎஸ்டி எண்</value>
+  </data>
+  <data name="Sales_OverallDiscountPer" xml:space="preserve">
+    <value>ஒட்டுமொத்த தள்ளுபடி % (அனைத்து தயாரிப்புகளும்)</value>
+  </data>
+  <data name="Purchases_FreeQuantity" xml:space="preserve">
+    <value>இலவச அளவு</value>
+  </data>
+  <data name="PrintSettingsMaster_CountryName" xml:space="preserve">
+    <value>நாட்டின் பெயர்</value>
+  </data>
+  <data name="String1" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Purchases_NetTotal" xml:space="preserve">
+    <value>நிகர மொத்த</value>
+  </data>
+  <data name="Sales_BillDate" xml:space="preserve">
+    <value>பில் தேதி</value>
+  </data>
+  <data name="Sales_CurrentBillNo" xml:space="preserve">
+    <value>தற்போதைய பில் எண்</value>
+  </data>
+  <data name="Sales_SalesTax" xml:space="preserve">
+    <value>விற்பனை வரி</value>
+  </data>
+  <data name="Sales_Scanbarcode" xml:space="preserve">
+    <value>பார்கோடு ஸ்கேன் செய்யவும்</value>
+  </data>
+  <data name="Product_Dis" xml:space="preserve">
+    <value>டிஸ்%</value>
+  </data>
+  <data name="Product_DisAmt" xml:space="preserve">
+    <value>டிஸ் (அம்ட்)</value>
+  </data>
+  <data name="Product_Price" xml:space="preserve">
+    <value>விலை</value>
+  </data>
+  <data name="Sales_Brands" xml:space="preserve">
+    <value>பிராண்டுகள்</value>
+  </data>
+  <data name="Sales_BrandsList" xml:space="preserve">
+    <value>பிராண்டுகளின் பட்டியல்</value>
+  </data>
+  <data name="Sales_Categories" xml:space="preserve">
+    <value>வகைகள்</value>
+  </data>
+  <data name="Sales_SubCategories" xml:space="preserve">
+    <value>துணைப்பிரிவுகள்</value>
+  </data>
+  <data name="PublicationMaster_PublicationAddressDetails" xml:space="preserve">
+    <value>வெளியீட்டு முகவரி விவரங்கள்</value>
+  </data>
+  <data name="Index_Logoutnow" xml:space="preserve">
+    <value>இப்போது வெளியேறு</value>
+  </data>
+  <data name="Index_Ok" xml:space="preserve">
+    <value>சரி</value>
+  </data>
+  <data name="Index_secondsDoyouwanttoextendthesession" xml:space="preserve">
+    <value>அமர்வை நீட்டிக்க வேண்டுமா?</value>
+  </data>
+  <data name="Index_SessionExpireWarning" xml:space="preserve">
+    <value>அமர்வு காலாவதி எச்சரிக்கை!</value>
+  </data>
+  <data name="Index_Yoursessionwillexpirein" xml:space="preserve">
+    <value>உங்கள் அமர்வு காலாவதியாகும்</value>
+  </data>
+  <data name="Admin_BestSellingProduct" xml:space="preserve">
+    <value>அதிகம் விற்பனையாகும் தயாரிப்பு!</value>
+  </data>
+  <data name="Admin_TopSellingStores" xml:space="preserve">
+    <value>அதிகம் விற்பனையாகும் கடைகள்!</value>
+  </data>
+  <data name="Common_Title" xml:space="preserve">
+    <value>தலைப்பு</value>
+  </data>
+  <data name="Purchases_Placesometexthere" xml:space="preserve">
+    <value>சில உரையை இங்கே வைக்கவும்</value>
+  </data>
+  <data name="Purchase_pleaseaddproducttoorderlist" xml:space="preserve">
+    <value>தயவுசெய்து பொருளை ஆர்டர் பட்டியலில் சேர்க்கவும்</value>
+  </data>
+  <data name="Purchase_ReturnItems" xml:space="preserve">
+    <value>கொள்முதல் - திரும்பப் பெறும் பொருட்கள்</value>
+  </data>
+  <data name="Title_AddProductdetails" xml:space="preserve">
+    <value>தயாரிப்பு விவரங்களைச் சேர்க்கவும்</value>
+  </data>
+  <data name="Title_AddSupplierdetails" xml:space="preserve">
+    <value>கூடுதல் வழங்கல் விவரங்கள்</value>
+  </data>
+  <data name="Title_ProductSearch" xml:space="preserve">
+    <value>தயாரிப்பு தேடல்</value>
+  </data>
+  <data name="Title_SupplierSearch" xml:space="preserve">
+    <value>சப்ளையர் தேடல்</value>
+  </data>
+  <data name="UserMaster_AadharNumber" xml:space="preserve">
+    <value>ஆதார் எண்</value>
+  </data>
+  <data name="UserMaster_Address1" xml:space="preserve">
+    <value>முகவரி 1</value>
+  </data>
+  <data name="UserMaster_Address2" xml:space="preserve">
+    <value>முகவரி 2</value>
+  </data>
+  <data name="UserMaster_Address3" xml:space="preserve">
+    <value>முகவரி 3</value>
+  </data>
+  <data name="UserMaster_BasicSalary" xml:space="preserve">
+    <value>அடிப்படை சம்பளம்</value>
+  </data>
+  <data name="UserMaster_DateOfJoining" xml:space="preserve">
+    <value>இணைந்த தேதி</value>
+  </data>
+  <data name="UserMaster_EmployeeCode" xml:space="preserve">
+    <value>பணியாளர் குறியீடு</value>
+  </data>
+  <data name="UserMaster_FoodAllowances" xml:space="preserve">
+    <value>உணவு கொடுப்பனவுகள்</value>
+  </data>
+  <data name="UserMaster_OTAmount" xml:space="preserve">
+    <value>OT தொகை</value>
+  </data>
+  <data name="UserMaster_PanNumber" xml:space="preserve">
+    <value>பான் எண்</value>
+  </data>
+  <data name="UserMaster_TravelAllowances" xml:space="preserve">
+    <value>பயணக் கொடுப்பனவுகள்</value>
+  </data>
+  <data name="Accounts_AccountBalanceSearch" xml:space="preserve">
+    <value>கணக்கு இருப்பு தேடல்</value>
+  </data>
+  <data name="Common_Balance" xml:space="preserve">
+    <value>இருப்பு</value>
+  </data>
+  <data name="Common_TotalCredit" xml:space="preserve">
+    <value>மொத்த கடன்</value>
+  </data>
+  <data name="Common_TotalDebit" xml:space="preserve">
+    <value>மொத்த பற்று</value>
+  </data>
+  <data name="PurchaseMaster_DiscountAmount" xml:space="preserve">
+    <value>தள்ளுபடி தொகை</value>
+  </data>
+  <data name="PurchaseMaster_DiscountPercent" xml:space="preserve">
+    <value>தள்ளுபடி சதவீதம்</value>
+  </data>
+  <data name="Sales_ReturnItems" xml:space="preserve">
+    <value>திரும்பப் பெறும் பொருட்கள்</value>
+  </data>
+  <data name="Sales_SalesReturnDate" xml:space="preserve">
+    <value>விற்பனை திரும்பும் தேதி</value>
+  </data>
+  <data name="Sales_SalesReturnStatus" xml:space="preserve">
+    <value>விற்பனை வருவாய் நிலை</value>
+  </data>
+  <data name="Sales_MyPoints" xml:space="preserve">
+    <value>என் புள்ளிகள்</value>
+  </data>
+  <data name="Sales_POINTS" xml:space="preserve">
+    <value>புள்ளிகள்</value>
+  </data>
+  <data name="Purchases_HOLD" xml:space="preserve">
+    <value>பிடி</value>
+  </data>
+  <data name="Purchases_NEW" xml:space="preserve">
+    <value>புதிய</value>
+  </data>
+  <data name="Purchases_PAYMENT" xml:space="preserve">
+    <value>பணம் செலுத்துதல்</value>
+  </data>
+  <data name="Sales_Bills" xml:space="preserve">
+    <value>பில்கள்</value>
+  </data>
+  <data name="Common_Print" xml:space="preserve">
+    <value>அச்சிடு</value>
+  </data>
+  <data name="Common_TodaysClosedSale" xml:space="preserve">
+    <value>இன்றைய மூடப்பட்ட விற்பனை</value>
+  </data>
+  <data name="Sales_SalesNote" xml:space="preserve">
+    <value>விற்பனை குறிப்பு</value>
+  </data>
+  <data name="Sales_StaffNote" xml:space="preserve">
+    <value>பணியாளர் குறிப்பு</value>
+  </data>
+  <data name="Sales_Submit" xml:space="preserve">
+    <value>சமர்ப்பிக்கவும்</value>
+  </data>
+  <data name="Common_Clear" xml:space="preserve">
+    <value>தெளிவான</value>
+  </data>
+  <data name="Common_TotalExpenses" xml:space="preserve">
+    <value>மொத்த செலவுகள்</value>
+  </data>
+  <data name="Common_TotalSales" xml:space="preserve">
+    <value>மொத்த விற்பனை</value>
+  </data>
+  <data name="Index_Allrightsreserved" xml:space="preserve">
+    <value>அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை</value>
+  </data>
+  <data name="Index_ChangePassword" xml:space="preserve">
+    <value>கடவுச்சொல்லை மாற்று</value>
+  </data>
+  <data name="Index_Copyright" xml:space="preserve">
+    <value>பதிப்புரிமை</value>
+  </data>
+  <data name="Index_EnglishLanguage" xml:space="preserve">
+    <value>ஆங்கில மொழி</value>
+  </data>
+  <data name="Index_Index" xml:space="preserve">
+    <value>அட்டவணை</value>
+  </data>
+  <data name="Index_IndexPOS" xml:space="preserve">
+    <value>குறியீட்டு பிஓஎஸ்</value>
+  </data>
+  <data name="Index_Logout" xml:space="preserve">
+    <value>வெளியேறு</value>
+  </data>
+  <data name="Index_POS" xml:space="preserve">
+    <value>POS</value>
+  </data>
+  <data name="Index_TamilLanguage" xml:space="preserve">
+    <value>தமிழ் மொழி</value>
+  </data>
+  <data name="Purchases_BILLS" xml:space="preserve">
+    <value>பில்கள்</value>
+  </data>
+  <data name="Purchases_CreditAmount" xml:space="preserve">
+    <value>கடன் தொகை</value>
+  </data>
+  <data name="Purchases_DebitAmount" xml:space="preserve">
+    <value>பற்று தொகை</value>
+  </data>
+  <data name="Purchases_Description" xml:space="preserve">
+    <value>விளக்கம்</value>
+  </data>
+  <data name="Sales_BalanceAmount" xml:space="preserve">
+    <value>மீதம் உள்ள தொகை</value>
+  </data>
+  <data name="Sales_PurchaseTotalAmount" xml:space="preserve">
+    <value>மொத்த கொள்முதல்</value>
+  </data>
+  <data name="Sales_Redeem" xml:space="preserve">
+    <value>மீட்கவும்</value>
+  </data>
+  <data name="Sales_TotalPaidAmount" xml:space="preserve">
+    <value>செலுத்தப்பட்ட மொத்த தொகை</value>
+  </data>
+  <data name="Sales_Youhave" xml:space="preserve">
+    <value>உங்களிடம் உள்ளது</value>
+  </data>
+  <data name="String2" xml:space="preserve">
+    <value>தொலைபேசி எண்</value>
+  </data>
+  <data name="Sales_SalesReturnPayment" xml:space="preserve">
+    <value>விற்பனை வருமானம் - கட்டணம்</value>
+  </data>
+  <data name="Accounts_BalanceAmt" xml:space="preserve">
+    <value>மீதம் உள்ள தொகை</value>
+  </data>
+  <data name="Accounts_InvoiceAmt" xml:space="preserve">
+    <value>விலைப்பட்டியல் தொகை</value>
+  </data>
+  <data name="Accounts_TotalPaidAmt" xml:space="preserve">
+    <value>செலுத்தப்பட்ட மொத்த தொகை</value>
+  </data>
+  <data name="Common_Image" xml:space="preserve">
+    <value>படம்</value>
+  </data>
+  <data name="PurchaseMaster_FreeQuantityReturned" xml:space="preserve">
+    <value>இலவச அளவு திரும்பப் பெறப்பட்டது</value>
+  </data>
+  <data name="PurchaseMaster_QuantityReturned" xml:space="preserve">
+    <value>அளவு திரும்பியது</value>
+  </data>
+</root>

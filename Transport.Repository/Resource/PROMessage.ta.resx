@@ -1,0 +1,957 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Common_FileUpload" xml:space="preserve">
+    <value>தயவுசெய்து கோப்பைப் பதிவேற்றி தொடரவும்</value>
+  </data>
+  <data name="Common_EnterValidEmailAddress" xml:space="preserve">
+    <value>செல்லுபடியாகும் மின்னஞ்சல் முகவரியை உள்ளிடவும்</value>
+  </data>
+  <data name="Err_HSNMaster_CGST" xml:space="preserve">
+    <value>CGST தேவை</value>
+  </data>
+  <data name="Err_HSNMaster_Description" xml:space="preserve">
+    <value>விளக்கம் தேவை</value>
+  </data>
+  <data name="Err_HSNMaster_HSNCode" xml:space="preserve">
+    <value>HSN குறியீடு தேவை</value>
+  </data>
+  <data name="Err_HSNMaster_SGST" xml:space="preserve">
+    <value>SGST தேவை</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_Author" xml:space="preserve">
+    <value>ஆசிரியரைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_Maker" xml:space="preserve">
+    <value>தயாரிப்பாளரைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_Category" xml:space="preserve">
+    <value>பிரிவை தேர்வு செய்க</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_ProductType" xml:space="preserve">
+    <value>தயாரிப்பு வகையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_Store" xml:space="preserve">
+    <value>கடையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Err_ProductMaster_ProductCode" xml:space="preserve">
+    <value>தயாரிப்பு குறியீடு தேவை</value>
+  </data>
+  <data name="ProductMaster_PleaseSelectHSN" xml:space="preserve">
+    <value>தயவுசெய்து HSN ஐ தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="ProductMaster_PleaseSelectPublication" xml:space="preserve">
+    <value>தயவுசெய்து வெளியீட்டைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="ProductMaster_PleaseSelectSubCategory" xml:space="preserve">
+    <value>தயவுசெய்து துணை வகையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Err_ProductMaster_Category" xml:space="preserve">
+    <value>தயவுசெய்து வகையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Err_ProductMaster_CostPrice" xml:space="preserve">
+    <value>தயவுசெய்து செலவு விலையை உள்ளிடவும்</value>
+  </data>
+  <data name="Err_ProductMaster_HSN" xml:space="preserve">
+    <value>தயவுசெய்து HSN ஐ தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Err_ProductMaster_MRP" xml:space="preserve">
+    <value>தயவுசெய்து MRP ஐ உள்ளிடவும்</value>
+  </data>
+  <data name="Err_ProductMaster_PrintName" xml:space="preserve">
+    <value>தயவுசெய்து PrintName ஐ உள்ளிடவும்</value>
+  </data>
+  <data name="Err_ProductMaster_ProductType" xml:space="preserve">
+    <value>தயவுசெய்து ProductType ஐ தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Err_ProductMaster_SellingPrice" xml:space="preserve">
+    <value>தயவுசெய்து விற்பனை விலையை உள்ளிடவும்</value>
+  </data>
+  <data name="Err_ProductMaster_Store" xml:space="preserve">
+    <value>தயவுசெய்து கடையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Err_SubCategoryMaster_EnterSubCategoryName" xml:space="preserve">
+    <value>துணைப்பிரிவின் பெயர் தேவை</value>
+  </data>
+  <data name="Err_SubCategoryMaster_SelectCategory" xml:space="preserve">
+    <value>தயவுசெய்து வகையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="SubCategoryMaster_PleaseSelectSubCategory" xml:space="preserve">
+    <value>தயவுசெய்து துணை வகையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Err_CustomerMaster_CustomerName" xml:space="preserve">
+    <value>வாடிக்கையாளர் பெயர் தேவை</value>
+  </data>
+  <data name="Err_CustomerMaster_MobileNo" xml:space="preserve">
+    <value>மொபைல் எண் அவசியம்</value>
+  </data>
+  <data name="Err_PublicationMaster_PublicationName" xml:space="preserve">
+    <value>வெளியீட்டு பெயர் தேவை</value>
+  </data>
+  <data name="Err_SupplierMaster_ContactPersonName" xml:space="preserve">
+    <value>தொடர்பு நபரின் பெயர் தேவை</value>
+  </data>
+  <data name="Err_SupplierMaster_EmailID" xml:space="preserve">
+    <value>மின்னஞ்சல் ஐடி அவசியம்</value>
+  </data>
+  <data name="Err_SupplierMaster_MobileNo" xml:space="preserve">
+    <value>மொபைல் எண் அவசியம்</value>
+  </data>
+  <data name="Err_SupplierMaster_PhoneNo" xml:space="preserve">
+    <value>தொலைபேசி எண் தேவை</value>
+  </data>
+  <data name="Err_SupplierMaster_SupplierName" xml:space="preserve">
+    <value>சப்ளையர் பெயர் தேவை</value>
+  </data>
+  <data name="Common_Unabletochange" xml:space="preserve">
+    <value>மாற்ற முடியவில்லை.</value>
+  </data>
+  <data name="Common_UnableToRemove" xml:space="preserve">
+    <value>அகற்ற முடியவில்லை.</value>
+  </data>
+  <data name="DefaultDetail_EnterDefaultOrder" xml:space="preserve">
+    <value>மூலம் உத்தரவு தேவை</value>
+  </data>
+  <data name="DefaultDetail_EnterDefaultText" xml:space="preserve">
+    <value>இயல்புநிலை உரை தேவை</value>
+  </data>
+  <data name="DefaultDetail_EnterDefaultValue" xml:space="preserve">
+    <value>இயல்புநிலை மதிப்பு தேவை</value>
+  </data>
+  <data name="DefaultMaster_PleaseSelectDefaultHeader" xml:space="preserve">
+    <value>தயவுசெய்து இயல்பு வகையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="DropDownListSelect_Status" xml:space="preserve">
+    <value>நிலையை தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_ContractType" xml:space="preserve">
+    <value>ஒப்பந்த வகையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_DefaultType" xml:space="preserve">
+    <value>இயல்பு வகையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_LanguageType" xml:space="preserve">
+    <value>மொழியை தேர்ந்தெடுங்கள்</value>
+  </data>
+  <data name="ErrPurchases_PurchaseDate" xml:space="preserve">
+    <value>வாங்கும் தேதியை உள்ளிடவும்</value>
+  </data>
+  <data name="ErrPurchases_SupplierID" xml:space="preserve">
+    <value>தயவுசெய்து சப்ளையரைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="ErrPurchases_StoreID" xml:space="preserve">
+    <value>தயவுசெய்து கடையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="ErrPurchases_OrderTax" xml:space="preserve">
+    <value>ஆர்டர் டாக்ஸ்</value>
+  </data>
+  <data name="ErrPurchases_PurchaseStatus" xml:space="preserve">
+    <value>பர்சேஸ் எஸ் டேட்டஸைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="ErrPrintSettingsMaster_Store" xml:space="preserve">
+    <value>ஸ்டோரைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="ErrPrintSettingsMaster_CompanyName" xml:space="preserve">
+    <value>தயவுசெய்து நிறுவனத்தின் பெயரை உள்ளிடவும்</value>
+  </data>
+  <data name="ErrPrintSettingsMaster_MobileNumber" xml:space="preserve">
+    <value>தயவுசெய்து மொபைல் எண்ணை உள்ளிடவும்</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_City" xml:space="preserve">
+    <value>நகரத்தைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_Country" xml:space="preserve">
+    <value>நாட்டினை தேர்வுசெய்</value>
+  </data>
+  <data name="CustomerMaster_PleaseSelectCustomer" xml:space="preserve">
+    <value>தயவுசெய்து வாடிக்கையாளரைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_PurchaseStatus" xml:space="preserve">
+    <value>கொள்முதல் நிலையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="PurchaseMaster_PleaseSelectSupplier" xml:space="preserve">
+    <value>சப்ளையர் பெயரைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="ErrPromotions_Name" xml:space="preserve">
+    <value>தயவுசெய்து விளம்பரப் பெயரை உள்ளிடவும்</value>
+  </data>
+  <data name="ErrPromotions_FromDate" xml:space="preserve">
+    <value>தயவுசெய்து தேதியிலிருந்து தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="ErrPromotions_ToDate" xml:space="preserve">
+    <value>தயவுசெய்து தேதியைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_PromotionsType" xml:space="preserve">
+    <value>விளம்பர வகையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_ProductTax" xml:space="preserve">
+    <value>தயாரிப்பு வரியைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="ErrCommon_StoreID" xml:space="preserve">
+    <value>ஸ்டோரைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="ErrStock_AdjustmentDate" xml:space="preserve">
+    <value>சரிசெய்தல் தேதியை உள்ளிடவும்</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_OrderTax" xml:space="preserve">
+    <value>ஆர்டர் வரியைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Common_CancelSuccess" xml:space="preserve">
+    <value>{0} வெற்றிகரமாக ரத்து செய்யப்பட்டது</value>
+  </data>
+  <data name="Common_WantToCancel" xml:space="preserve">
+    <value>நீங்கள் நிச்சயமாக ரத்து செய்ய விரும்புகிறீர்களா?</value>
+  </data>
+  <data name="Common_PRODUCTNOTAVAILABLE" xml:space="preserve">
+    <value>தயாரிப்பு கிடைக்கவில்லை</value>
+  </data>
+  <data name="Err_ExpensesMaster_Amount" xml:space="preserve">
+    <value>தயவுசெய்து தொகையை உள்ளிடவும்</value>
+  </data>
+  <data name="Err_ExpensesMaster_Date" xml:space="preserve">
+    <value>தயவுசெய்து தேதியை உள்ளிடவும்</value>
+  </data>
+  <data name="Err_ExpensesMaster_ExpensesType" xml:space="preserve">
+    <value>தயவுசெய்து செலவு வகையை உள்ளிடவும்</value>
+  </data>
+  <data name="ErrPromotions_AddProductLevelDiscount" xml:space="preserve">
+    <value>தயவுசெய்து தயாரிப்பு நிலை தள்ளுபடியைச் சேர்க்கவும்</value>
+  </data>
+  <data name="ErrPromotions_AddVolumeLevelDiscount" xml:space="preserve">
+    <value>வால்யூமெட் நிலை தள்ளுபடியைச் சேர்க்கவும்</value>
+  </data>
+  <data name="ErrPromotions_Discount" xml:space="preserve">
+    <value>தள்ளுபடி/தொகையை உள்ளிடவும்</value>
+  </data>
+  <data name="ErrPromotions_VolumeDiscount" xml:space="preserve">
+    <value>தொகுதி தள்ளுபடியை உள்ளிடவும்</value>
+  </data>
+  <data name="Common_PleaseSelectMonth" xml:space="preserve">
+    <value>தயவுசெய்து மாதத்தைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Common_PleaseSelectYear" xml:space="preserve">
+    <value>தயவுசெய்து ஆண்டைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="ExpensesReport_EnterDate" xml:space="preserve">
+    <value>தேதியை உள்ளிடவும்</value>
+  </data>
+  <data name="ExpensesReport_EnterEndDate" xml:space="preserve">
+    <value>இறுதி தேதியை உள்ளிடவும்</value>
+  </data>
+  <data name="ExpensesReport_EnterStartDate" xml:space="preserve">
+    <value>தொடக்க தேதியை உள்ளிடவும்</value>
+  </data>
+  <data name="Report_PleaseSelectExportType" xml:space="preserve">
+    <value>ஏற்றுமதி வகையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="ErrStock_AdjustmentNote" xml:space="preserve">
+    <value>சரிசெய்தல் குறிப்பை உள்ளிடவும்</value>
+  </data>
+  <data name="ErrSales_SalesDate" xml:space="preserve">
+    <value>தயவுசெய்து விற்பனை தேதியை உள்ளிடவும்</value>
+  </data>
+  <data name="ErrSales_CustomerID" xml:space="preserve">
+    <value>தயவுசெய்து வாடிக்கையாளரைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="ErrSales_StoreID" xml:space="preserve">
+    <value>தயவுசெய்து கடையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="ErrSales_SalesStatus" xml:space="preserve">
+    <value>விற்பனை நிலையை தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="ErrSales_SalesProduct" xml:space="preserve">
+    <value>தயவுசெய்து தயாரிப்பைச் சேர்க்கவும்</value>
+  </data>
+  <data name="Err_ProductPromotion" xml:space="preserve">
+    <value>தயவுசெய்து ஸ்டோர் தேர்வு செய்யவும்/தயாரிப்பு தள்ளுபடி அல்லது தொகையை உள்ளிடவும்</value>
+  </data>
+  <data name="Err_VolumePromotion" xml:space="preserve">
+    <value>தொகுதி தள்ளுபடியை உள்ளிடவும்</value>
+  </data>
+  <data name="ErrPromotions_FromAmount" xml:space="preserve">
+    <value>தொகையிலிருந்து தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="ErrPromotions_ToAmount" xml:space="preserve">
+    <value>தொகைக்குத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Err_UnPackMaster_PackSize" xml:space="preserve">
+    <value>பேக் அளவை உள்ளிடவும்</value>
+  </data>
+  <data name="Err_UnPackMaster_Store" xml:space="preserve">
+    <value>கடையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Err_UnPackMaster_UnPackMasterDate" xml:space="preserve">
+    <value>அன் பேக் தேதியை உள்ளிடவும்</value>
+  </data>
+  <data name="Err_UnPackMaster_UnPackQuantity" xml:space="preserve">
+    <value>அன் பேக் அளவை உள்ளிடவும்</value>
+  </data>
+  <data name="Common_Store" xml:space="preserve">
+    <value>தயவுசெய்து கடையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="ErrTransfers_TransferDate" xml:space="preserve">
+    <value>பரிமாற்ற தேதியை உள்ளிடவும்</value>
+  </data>
+  <data name="ErrTransfers_TransferStatus" xml:space="preserve">
+    <value>பரிமாற்ற நிலையை தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Err_ProductMaster_SupplierCostPrice" xml:space="preserve">
+    <value>சப்ளையர் விலை விலையை உள்ளிடவும்</value>
+  </data>
+  <data name="Err_ProductMaster_SupplierName" xml:space="preserve">
+    <value>சப்ளையர் பெயரைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_TransferStatus" xml:space="preserve">
+    <value>பரிமாற்ற நிலையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="err_UnPackNotPossible" xml:space="preserve">
+    <value>தயாரிப்பு அளவு போதுமானதாக இல்லை</value>
+  </data>
+  <data name="Err_ProductCodeDuplicate" xml:space="preserve">
+    <value>தயாரிப்பு குறியீடு ஏற்கனவே உள்ளது.</value>
+  </data>
+  <data name="Err_SameStoreNotPossible" xml:space="preserve">
+    <value>அதே கடையில் இடமாற்றம் சாத்தியமில்லை</value>
+  </data>
+  <data name="ErrPromotions_PromotionType" xml:space="preserve">
+    <value>தயவுசெய்து விளம்பர வகையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Err_SameStoreSelect" xml:space="preserve">
+    <value>தயவுசெய்து தள்ளுபடிக்கு ஒரே கடை /வெவ்வேறு தயாரிப்புகளைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="MenuHeaderMaster_EnterMenuName" xml:space="preserve">
+    <value>தயவுசெய்து மெனு பெயரை உள்ளிடவும்</value>
+  </data>
+  <data name="MenuMasterDetail_EnterMenuName" xml:space="preserve">
+    <value>மெனு பெயரை உள்ளிடவும்</value>
+  </data>
+  <data name="MenuMasterDetail_EnterPageURL" xml:space="preserve">
+    <value>பக்க URL ஐ உள்ளிடவும்</value>
+  </data>
+  <data name="MenuMaster_PleaseSelectMenuMasterHeader" xml:space="preserve">
+    <value>தயவுசெய்து மெனு மாஸ்டர் தலைப்பைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="MenuHeaderMaster_EnterIcon" xml:space="preserve">
+    <value>மெனு ஐகானை உள்ளிடவும்</value>
+  </data>
+  <data name="MenuMasterDetail_EnterOrderBy" xml:space="preserve">
+    <value>ஆணை உள்ளிடவும்</value>
+  </data>
+  <data name="OrderFail" xml:space="preserve">
+    <value>ஒழுங்கை மாற்ற முடியாது</value>
+  </data>
+  <data name="Common_DeleteSuccess" xml:space="preserve">
+    <value>வெற்றிகரமாக நீக்கப்பட்டது</value>
+  </data>
+  <data name="Common_InsertFail" xml:space="preserve">
+    <value>செருகுவதில் தோல்வி.</value>
+  </data>
+  <data name="Common_InsertSuccess" xml:space="preserve">
+    <value>வெற்றிகரமாக செருகப்பட்டது</value>
+  </data>
+  <data name="Common_UpdateSuccess" xml:space="preserve">
+    <value>வெற்றிகரமாக புதுப்பிக்கப்பட்டது</value>
+  </data>
+  <data name="ErrPromotions_ToAmountNull" xml:space="preserve">
+    <value>தொகை&gt; 0 ஐ உள்ளிடவும்</value>
+  </data>
+  <data name="Err_SameProductNotPossible" xml:space="preserve">
+    <value>அதே தயாரிப்பு சாத்தியமில்லை</value>
+  </data>
+  <data name="Common_FromStore" xml:space="preserve">
+    <value>ஸ்டோரிலிருந்து தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Common_ToStore" xml:space="preserve">
+    <value>சேமிப்பதற்குத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="ErrPrintSettingsMaster_Address1" xml:space="preserve">
+    <value>முகவரி 1 ஐ உள்ளிடவும்</value>
+  </data>
+  <data name="ErrPrintSettingsMaster_Address2" xml:space="preserve">
+    <value>முகவரி 2 ஐ உள்ளிடவும்</value>
+  </data>
+  <data name="ErrPrintSettingsMaster_Email" xml:space="preserve">
+    <value>தயவுசெய்து மின்னஞ்சலை உள்ளிடவும்</value>
+  </data>
+  <data name="ErrPrintSettingsMaster_FooterMessage" xml:space="preserve">
+    <value>அடிக்குறிப்பு செய்தியை உள்ளிடவும்</value>
+  </data>
+  <data name="ErrPromotions_ToAmountGreaterThanFromAmount" xml:space="preserve">
+    <value>தொகுதி அளவு - தொகையானது தொகையை விட அதிகமாக இருக்க வேண்டும்</value>
+  </data>
+  <data name="Err_UnPackMaster_PackCodeName" xml:space="preserve">
+    <value>தயவுசெய்து பேக் தயாரிப்பு பெயரைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="CustomerMaster_SelectCustomer" xml:space="preserve">
+    <value>வாடிக்கையாளரைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_SalesStatus" xml:space="preserve">
+    <value>விற்பனை நிலையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Attachment_AlreadyUploaded" xml:space="preserve">
+    <value>இணைப்பு ஏற்கனவே பதிவேற்றப்பட்டது</value>
+  </data>
+  <data name="Common_AddSuccess" xml:space="preserve">
+    <value>வெற்றிகரமாக சேர்க்கப்பட்டது</value>
+  </data>
+  <data name="Common_AlreadyApproved" xml:space="preserve">
+    <value>ஏற்கெனவே அங்கீகரிக்கப்பட்டுள்ளது</value>
+  </data>
+  <data name="Common_DeleteFail" xml:space="preserve">
+    <value>நீக்குதல் தோல்வியடைந்தது.</value>
+  </data>
+  <data name="Common_DuplicateFail" xml:space="preserve">
+    <value>பதிவு ஏற்கனவே உள்ளது</value>
+  </data>
+  <data name="Common_NoRecord" xml:space="preserve">
+    <value>விவரம் இல்லை</value>
+  </data>
+  <data name="Common_UnauthInsertUpdate" xml:space="preserve">
+    <value>அங்கீகரிக்கப்படாத செருகல்/புதுப்பிப்பு</value>
+  </data>
+  <data name="Common_UpdateFail" xml:space="preserve">
+    <value>புதுப்பிப்பு தோல்வியடைந்தது.</value>
+  </data>
+  <data name="DuplicateOrderFail" xml:space="preserve">
+    <value>ஆர்டர் ஏற்கனவே உள்ளது</value>
+  </data>
+  <data name="PleaseSelectMonth" xml:space="preserve">
+    <value>தயவுசெய்து மாதத்தைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Common_WantToSave" xml:space="preserve">
+    <value>நீங்கள் நிச்சயமாக சேமிக்க விரும்புகிறீர்களா?</value>
+  </data>
+  <data name="Err_SearchProductPromotion" xml:space="preserve">
+    <value>தயவுசெய்து தேடவும் மற்றும் தயாரிப்பைத் தேர்ந்தெடுத்து தொடரவும்</value>
+  </data>
+  <data name="Common_WantToApprovalUpdate" xml:space="preserve">
+    <value>உங்களுக்கு {0} வேண்டுமா?</value>
+  </data>
+  <data name="Common_WantToContinueWithMarkZero" xml:space="preserve">
+    <value>மாணவர் மார்க் 0 உடன் தொடர விரும்புகிறீர்களா?</value>
+  </data>
+  <data name="Common_WantToContinueWithMultiAnswer" xml:space="preserve">
+    <value>தேர்ந்தெடுக்கப்பட்ட பல விடைகளுடன் தொடர விரும்புகிறீர்களா?</value>
+  </data>
+  <data name="Common_WantToDelete" xml:space="preserve">
+    <value>இதை நீக்க வேண்டும் என்பதில் உறுதியாக இருக்கிறீர்களா?</value>
+  </data>
+  <data name="Common_WantToInactivate" xml:space="preserve">
+    <value>நீங்கள் நிச்சயமாக செயலிழக்க விரும்புகிறீர்களா?</value>
+  </data>
+  <data name="Common_WantToUpdate" xml:space="preserve">
+    <value>நீங்கள் புதுப்பிக்க வேண்டுமா?</value>
+  </data>
+  <data name="Common_WantToUpload" xml:space="preserve">
+    <value>நீங்கள் நிச்சயமாக பதிவேற்ற விரும்புகிறீர்களா?</value>
+  </data>
+  <data name="Index_ResetPasswordQuestion" xml:space="preserve">
+    <value>கடவுச்சொல்லை மீட்டமைக்க வேண்டுமா?</value>
+  </data>
+  <data name="Common_Transferred" xml:space="preserve">
+    <value>இடமாற்றம் செய்யப்பட்டது</value>
+  </data>
+  <data name="Common_Approved" xml:space="preserve">
+    <value>அங்கீகரிக்கப்பட்டது</value>
+  </data>
+  <data name="Drp_DefaultDetailMaster_PointsType" xml:space="preserve">
+    <value>புள்ளிகள் வகையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Common_ApproveRejectFail" xml:space="preserve">
+    <value>ஒப்புதல்/நிராகரிப்பு தோல்வி</value>
+  </data>
+  <data name="Common_Rejected" xml:space="preserve">
+    <value>நிராகரிக்கப்பட்டது</value>
+  </data>
+  <data name="Err_SalesMaster_SelectPointType" xml:space="preserve">
+    <value>புள்ளி வகையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Err_SalesMaster_SelectStore" xml:space="preserve">
+    <value>கடையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="ProductMaster_PleaseSelectBrand" xml:space="preserve">
+    <value>பிராண்டைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_SalesType" xml:space="preserve">
+    <value>விற்பனை வகையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_SupplierType" xml:space="preserve">
+    <value>சப்ளையர் வகையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Err_BrandName" xml:space="preserve">
+    <value>தயவுசெய்து பிராண்ட் பெயரை உள்ளிடவும்</value>
+  </data>
+  <data name="Err_BrandSortOrder" xml:space="preserve">
+    <value>பிராண்ட் வரிசை வரிசையை உள்ளிடவும்</value>
+  </data>
+  <data name="Err_Maker" xml:space="preserve">
+    <value>தயவுசெய்து தயாரிப்பாளரைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="DefaultDetailMaster_PayableAccountType" xml:space="preserve">
+    <value>செலுத்த வேண்டிய வகையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Err_AccountMaster_PayableAccountType" xml:space="preserve">
+    <value>செலுத்த வேண்டிய வகையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Err_AccountMaster_Amount" xml:space="preserve">
+    <value>தொகையை உள்ளிடவும்</value>
+  </data>
+  <data name="Err_AccountMaster_Date" xml:space="preserve">
+    <value>தேதியை உள்ளிடவும்</value>
+  </data>
+  <data name="Err_AccountMaster_Supplier" xml:space="preserve">
+    <value>சப்ளையரைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Err_EqualtoIGST" xml:space="preserve">
+    <value>CGST மற்றும் SGST மதிப்புகள் IGST மதிப்புக்கு சமமாக இருக்க வேண்டும்</value>
+  </data>
+  <data name="Err_SupplierMaster_AccountHolderName" xml:space="preserve">
+    <value>கணக்கு வைத்திருப்பவரின் பெயரை உள்ளிடவும்</value>
+  </data>
+  <data name="Err_SupplierMaster_AccountNumber" xml:space="preserve">
+    <value>கணக்கு எண்ணை உள்ளிடவும்</value>
+  </data>
+  <data name="Err_SupplierMaster_AccountType" xml:space="preserve">
+    <value>கணக்கு வகையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Err_SupplierMaster_BankName" xml:space="preserve">
+    <value>வங்கி பெயரை உள்ளிடவும்</value>
+  </data>
+  <data name="Err_SupplierMaster_BranchName" xml:space="preserve">
+    <value>கிளை பெயரை உள்ளிடவும்</value>
+  </data>
+  <data name="Err_SupplierMaster_ContactTitle" xml:space="preserve">
+    <value>ஒப்பந்த தலைப்பை உள்ளிடவும்</value>
+  </data>
+  <data name="Err_SupplierMaster_IFSCCode" xml:space="preserve">
+    <value>தயவுசெய்து IFSC குறியீட்டை உள்ளிடவும்</value>
+  </data>
+  <data name="ErrPromotions_ToPointsNull" xml:space="preserve">
+    <value>தொகுதி தள்ளுபடியை உள்ளிடவும்</value>
+  </data>
+  <data name="AddressDuplicate" xml:space="preserve">
+    <value>நகல் முகவரி அனுமதிக்கப்படவில்லை</value>
+  </data>
+  <data name="ErrStoreHasNoProduct" xml:space="preserve">
+    <value>இந்த ஸ்டோருக்கான தயாரிப்பைச் சேர்த்து தொடரவும்</value>
+  </data>
+  <data name="ErrSupplierNoProduct" xml:space="preserve">
+    <value>தயவுசெய்து இந்த தயாரிப்புக்கு சப்ளையரைச் சேர்த்து தொடரவும்</value>
+  </data>
+  <data name="SameSupplierSelect" xml:space="preserve">
+    <value>தயவுசெய்து வெவ்வேறு சப்ளையரைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Err_Common_Supplier" xml:space="preserve">
+    <value>தயவுசெய்து சப்ளையரைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="err_StockAdjustNotPossible" xml:space="preserve">
+    <value>பங்கு சரிசெய்தல் சாத்தியமில்லை</value>
+  </data>
+  <data name="err_TransferNotPossible" xml:space="preserve">
+    <value>இடமாற்றம் சாத்தியமில்லை</value>
+  </data>
+  <data name="Homepage_SelectHomepage" xml:space="preserve">
+    <value>முகப்பு என்பதைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="ErrPromotions_FromPoints" xml:space="preserve">
+    <value>புள்ளிகளிலிருந்து உள்ளிடவும்</value>
+  </data>
+  <data name="ErrPromotions_ToPoints" xml:space="preserve">
+    <value>புள்ளிகளுக்கு உள்ளிடவும்</value>
+  </data>
+  <data name="Err_SupplierMaster_SupplierCode" xml:space="preserve">
+    <value>தயவுசெய்து சப்ளையர் குறியீட்டை உள்ளிடவும்</value>
+  </data>
+  <data name="Err_EmployeeAccountsMaster_Amount" xml:space="preserve">
+    <value>தயவுசெய்து தொகையை உள்ளிடவும்</value>
+  </data>
+  <data name="Err_EmployeeAccountsMaster_Date" xml:space="preserve">
+    <value>தயவுசெய்து தேதியை உள்ளிடவும்</value>
+  </data>
+  <data name="Err_EmployeeAccountsMaster_Description" xml:space="preserve">
+    <value>தயவுசெய்து விளக்கத்தை உள்ளிடவும்</value>
+  </data>
+  <data name="Err_EmployeeAccountsMaster_Type" xml:space="preserve">
+    <value>வகையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Common_SelectEmployee" xml:space="preserve">
+    <value>பணியாளரைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Err_EmployeeAccountsMaster_PaymentMode" xml:space="preserve">
+    <value>PaymentMode ஐத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="PleaseSelectYear" xml:space="preserve">
+    <value>தயவுசெய்து ஆண்டைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="UserMaster_PleaseSelectMonth" xml:space="preserve">
+    <value>மாதத்தைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Err_AccountMaster_PaymentType" xml:space="preserve">
+    <value>கட்டண வகையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Err_PublicationMaster_Address1" xml:space="preserve">
+    <value>முகவரி 1 ஐ உள்ளிடவும்</value>
+  </data>
+  <data name="Err_PublicationMaster_Address2" xml:space="preserve">
+    <value>முகவரி 2 ஐ உள்ளிடவும்</value>
+  </data>
+  <data name="Err_PublicationMaster_Address3" xml:space="preserve">
+    <value>முகவரி 3 ஐ உள்ளிடவும்</value>
+  </data>
+  <data name="ErrPurchases_Amount" xml:space="preserve">
+    <value>தொகையை உள்ளிடவும்</value>
+  </data>
+  <data name="ErrPurchases_PaymentDate" xml:space="preserve">
+    <value>பணம் செலுத்தும் தேதியை உள்ளிடவும்</value>
+  </data>
+  <data name="Err_RedeemPoints" xml:space="preserve">
+    <value>மீட்டெடுக்கும் புள்ளிகளை உள்ளிடவும்</value>
+  </data>
+  <data name="DefaultDetailID_AccountsMode" xml:space="preserve">
+    <value>கணக்கு முறையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Err_AccountMaster_AccNO" xml:space="preserve">
+    <value>Acc NO ஐ உள்ளிடவும்</value>
+  </data>
+  <data name="Err_AccountMaster_AccountName" xml:space="preserve">
+    <value>கணக்கு பெயரை உள்ளிடவும்</value>
+  </data>
+  <data name="DefaultHeaderMaster_SalaryType" xml:space="preserve">
+    <value>வகையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="AccountsMaster_SelectCustomer" xml:space="preserve">
+    <value>வாடிக்கையாளரைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Err_AccountMaster_Customer" xml:space="preserve">
+    <value>வாடிக்கையாளரைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Err_AccountMaster_AccountType" xml:space="preserve">
+    <value>கணக்கு வகையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Err_AccountMaster_StoreName" xml:space="preserve">
+    <value>கடையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Common_SelectAccountType" xml:space="preserve">
+    <value>கணக்கு வகையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Common_SelectAccountName" xml:space="preserve">
+    <value>கணக்கு பெயரைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_PaymentType" xml:space="preserve">
+    <value>கட்டண வகையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Err_AccountMaster_AmountValidate" xml:space="preserve">
+    <value>தொகை &lt;= இருப்பு தொகை இருக்க வேண்டும்</value>
+  </data>
+  <data name="Err_AccountMaster_PaymentStatus" xml:space="preserve">
+    <value>கட்டண வகையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="BalanceLedgerReport_PleaseSelectSFinancialYear" xml:space="preserve">
+    <value>நிதி ஆண்டைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="DropDownListSelect_SalesPaymentStatus" xml:space="preserve">
+    <value>விற்பனை கட்டண நிலையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Err_EmployeeAccountsMaster_Month" xml:space="preserve">
+    <value>மாதத்தைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Err_ExpensesMaster_PayableType" xml:space="preserve">
+    <value>செலுத்த வேண்டிய வகையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="DropDownListSelect_PurchasePaymentStatus" xml:space="preserve">
+    <value>கொள்முதல் கட்டண நிலையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Err_AccountMaster_AmountPaidValidate" xml:space="preserve">
+    <value>வாங்குதல் திரும்ப தொகை {0} இருக்க வேண்டும் &lt;= செலுத்தப்பட்ட தொகை {1}</value>
+  </data>
+  <data name="DefaultHeaderMaster_ExpensesType" xml:space="preserve">
+    <value>செலவின வகையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Common_AlreadyTodaySalesClosed" xml:space="preserve">
+    <value>இன்று விற்பனை ஏற்கனவே மூடப்பட்டுள்ளது</value>
+  </data>
+  <data name="ExcelImport_ColumnMissing" xml:space="preserve">
+    <value>{0} காணவில்லை</value>
+  </data>
+  <data name="ExcelImport_IsNotDate" xml:space="preserve">
+    <value>&lt;b style = 'Color: Red'&gt; {0} &lt;/b&gt; தேதி அல்ல (வடிவம் [01-Jan-2000]) &lt;br/&gt;</value>
+  </data>
+  <data name="ExcelImport_TemplateIsAlreadyExist" xml:space="preserve">
+    <value>&lt;b style = 'Color: Red'&gt; {0} &lt;/b&gt; - ஏற்கனவே உள்ளது &lt;br/&gt;</value>
+  </data>
+  <data name="ExcelImport_TemplateIsNotVaid" xml:space="preserve">
+    <value>&lt;b style = 'Color: Red'&gt; {0}: {1} &lt;/b&gt; - செல்லுபடியாகாது &lt;br/&gt;</value>
+  </data>
+  <data name="ExcelImport_UploadFailed" xml:space="preserve">
+    <value>பதிவேற்றம் தோல்வியுற்றது</value>
+  </data>
+  <data name="Excelmport_SuccessfullyUpload" xml:space="preserve">
+    <value>வெற்றிகரமாக பதிவேற்றம் செய்யப்பட்டது</value>
+  </data>
+  <data name="ExcelUpload_DateLength" xml:space="preserve">
+    <value>&lt;b style = 'நிறம்: சிவப்பு'&gt; {0} &lt;/b&gt; நீளம் &lt;br/&gt;</value>
+  </data>
+  <data name="ExcelUpload_Duplicate" xml:space="preserve">
+    <value>{0} நகல் தரவு</value>
+  </data>
+  <data name="ExcelUpload_IsNotDecimal" xml:space="preserve">
+    <value>&lt;b style = 'நிறம்: சிவப்பு'&gt; {0} &lt;/b&gt; தசமம் அல்ல &lt;br/&gt;</value>
+  </data>
+  <data name="ExcelUpload_IsNotNumber" xml:space="preserve">
+    <value>&lt;b style = 'Color: Red'&gt; {0} &lt;/b&gt; என்பது ஒரு எண் அல்ல &lt;br/&gt;</value>
+  </data>
+  <data name="ExcelUpload_IsRequired" xml:space="preserve">
+    <value>&lt;b style = 'Color: Red'&gt; {0} &lt;/b&gt; தேவை &lt;/b&gt;</value>
+  </data>
+  <data name="Err_ProductMaster_ImportFile" xml:space="preserve">
+    <value>தயவுசெய்து கோப்பைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Err_AccountMaster_ReturnAmountPaidValidate" xml:space="preserve">
+    <value>வாங்குதல் திரும்பியவுடன் திரும்பக் கட்டணம் செலுத்த முடியும்</value>
+  </data>
+  <data name="Err_AccountMaster_SupplierAmountValidate" xml:space="preserve">
+    <value>சப்ளையர் தொகை {0} இருக்க வேண்டும்&gt; = கட்டணம் {1}</value>
+  </data>
+  <data name="Err_Common_AmountValidate" xml:space="preserve">
+    <value>தொகை {0} இருக்க வேண்டும் &lt;= இருப்பு தொகை {1}</value>
+  </data>
+  <data name="PurchaseReturn_PaymentPending" xml:space="preserve">
+    <value>பணம் நிலுவையில் உள்ளது</value>
+  </data>
+  <data name="ExcelImport_TemplateRowEmpty" xml:space="preserve">
+    <value>&lt;b style = 'நிறம்: சிவப்பு'&gt; எக்செல் வெற்று வரிசை &lt;/b&gt;</value>
+  </data>
+  <data name="Err_SalesAmount_Validate" xml:space="preserve">
+    <value>செலுத்த வேண்டிய தொகை {0} இருக்க வேண்டும் &lt;= விற்பனை தொகை {1}</value>
+  </data>
+  <data name="Err_SalesCustomerBalance_Validate" xml:space="preserve">
+    <value>தொகை {0} இருக்க வேண்டும் &lt;= வாடிக்கையாளர் இருப்பு தொகை {1}</value>
+  </data>
+  <data name="Err_SalesDebitAmount_Validate" xml:space="preserve">
+    <value>செலுத்த வேண்டிய தொகை {0} இருக்க வேண்டும் &lt;= விற்பனை தொகை {1}</value>
+  </data>
+  <data name="Err_CustomerAccountBalance_Validate" xml:space="preserve">
+    <value>விற்பனை தொகை {0} இருக்க வேண்டும் &lt;= வாடிக்கையாளர் இருப்பு தொகை {1}</value>
+  </data>
+  <data name="Err_SalesPaid_AmountValidate" xml:space="preserve">
+    <value>விற்பனை செலுத்தும் தொகை {0} இருக்க வேண்டும் &lt;= விற்பனை செலுத்த வேண்டிய தொகை {1}</value>
+  </data>
+  <data name="Drp_DefaultHeaderMaster_PaymentStatus" xml:space="preserve">
+    <value>கட்டண நிலையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="ErrPurchaseReturn_Amount" xml:space="preserve">
+    <value>ரிட்டர்ன் தொகையை உள்ளிடவும்</value>
+  </data>
+  <data name="Err_Common_PurchaseReturnAmountValidate" xml:space="preserve">
+    <value>தொகை {0} இருக்க வேண்டும் &lt;= வாங்குதல் திரும்ப தொகை {1}</value>
+  </data>
+  <data name="Err_SalesReturnPaid_AmountValidate" xml:space="preserve">
+    <value>விற்பனை வருமானம் செலுத்தும் தொகை {0} இருக்க வேண்டும் &lt;= விற்பனை செலுத்த வேண்டிய தொகை {1}</value>
+  </data>
+  <data name="Common_PayableType" xml:space="preserve">
+    <value>செலுத்த வேண்டிய வகையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Common_SelectDate" xml:space="preserve">
+    <value>தயவுசெய்து தேதியை தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Err_UnPackMaster_UnPackCodeName" xml:space="preserve">
+    <value>தயவுசெய்து UnPack ProductName ஐ தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Err_EntertheFinancialName" xml:space="preserve">
+    <value>நிதி பெயரை உள்ளிடவும்</value>
+  </data>
+  <data name="Err_SelecttheEndDate" xml:space="preserve">
+    <value>முடிவு தேதியை தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Err_SelecttheStartDate" xml:space="preserve">
+    <value>தொடக்க தேதியைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Err_ProductMaster_MRPCostPrice" xml:space="preserve">
+    <value>எம்ஆர்பி இருக்க வேண்டும்&gt; = கொள்முதல் விலை</value>
+  </data>
+  <data name="Err_ProductMaster_SellingCostPrice" xml:space="preserve">
+    <value>விற்பனை விலை&gt;&gt; கொள்முதல் விலை விலை இருக்க வேண்டும்</value>
+  </data>
+  <data name="Err_ProductMaster_BarCode" xml:space="preserve">
+    <value>பார்கோடு உள்ளிடவும்</value>
+  </data>
+  <data name="Err_CustomerMaster_GSTNumber" xml:space="preserve">
+    <value>ஜிஎஸ்டி எண் தேவை</value>
+  </data>
+  <data name="ErrStock_Adjustmentquantityzeronegativevaluenotallowed" xml:space="preserve">
+    <value>சரிசெய்தல் அளவு பூஜ்யம்/எதிர்மறை மதிப்பு அனுமதிக்கப்படவில்லை</value>
+  </data>
+  <data name="ErrStock_Pleaseselectsomeproductstostockadjustment" xml:space="preserve">
+    <value>பங்குச் சரிசெய்தலுக்கு சில தயாரிப்புகளைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="ErrTransfers_PleaseenterNote" xml:space="preserve">
+    <value>தயவுசெய்து குறிப்பை உள்ளிடவும்</value>
+  </data>
+  <data name="ErrTransfers_PleaseselectFromstore" xml:space="preserve">
+    <value>கடையில் இருந்து தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="ErrTransfers_PleaseselectsomeproductstoTransfer" xml:space="preserve">
+    <value>மாற்ற சில தயாரிப்புகளைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="ErrTransfers_PleaseselectTostore" xml:space="preserve">
+    <value>சேமிப்பதற்குத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="ErrTransfers_Zeronegativevaluenotallowed" xml:space="preserve">
+    <value>பூஜ்ஜியம்/எதிர்மறை மதிப்பு அனுமதிக்கப்படவில்லை</value>
+  </data>
+  <data name="ErrSales_Pleaseenterquantity" xml:space="preserve">
+    <value>தயவுசெய்து அளவை உள்ளிடவும்</value>
+  </data>
+  <data name="err_SalesQtyNotAvailable" xml:space="preserve">
+    <value>இந்த தயாரிப்புக்கு கையிருப்பு இல்லை</value>
+  </data>
+  <data name="Err_SGSTEqualtoCGST" xml:space="preserve">
+    <value>SGST மற்றும் CGST சமமாக இருக்க வேண்டும்</value>
+  </data>
+  <data name="Err_ProductMaster_Supplier" xml:space="preserve">
+    <value>தயவுசெய்து சப்ளையரைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="SameStoreSelect" xml:space="preserve">
+    <value>தயவுசெய்து வேறு கடையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Atleast1Active" xml:space="preserve">
+    <value>குறைந்தபட்சம் ஒரு நிதி ஆண்டு செயல்பட வேண்டும்</value>
+  </data>
+  <data name="Message_Pleaseselectcustomer" xml:space="preserve">
+    <value>தயவுசெய்து வாடிக்கையாளரைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Message_PleaseaddPaymentdetailsandSubmit" xml:space="preserve">
+    <value>தயவுசெய்து கட்டண விவரங்களைச் சேர்த்து சமர்ப்பிக்கவும்</value>
+  </data>
+  <data name="Message_Pleaseaddproduct" xml:space="preserve">
+    <value>தயவுசெய்து தயாரிப்பைச் சேர்க்கவும்</value>
+  </data>
+  <data name="Message_PleaseentersalesReferenceNumber" xml:space="preserve">
+    <value>விற்பனை குறிப்பு எண்ணை உள்ளிடவும்</value>
+  </data>
+  <data name="Common_DefaultYear" xml:space="preserve">
+    <value>இயல்புநிலை ஆண்டு</value>
+  </data>
+  <data name="Err_AccountMaster_EndDate" xml:space="preserve">
+    <value>முடிவு தேதியை தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="Err_AccountMaster_StartDate" xml:space="preserve">
+    <value>தொடக்க தேதியைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+</root>

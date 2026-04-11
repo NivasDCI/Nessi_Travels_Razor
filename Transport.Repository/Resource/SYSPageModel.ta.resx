@@ -1,0 +1,330 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Role_Description" xml:space="preserve">
+    <value>விளக்கம்</value>
+  </data>
+  <data name="Role_RoleDescription" xml:space="preserve">
+    <value>பாத்திர விளக்கம்</value>
+  </data>
+  <data name="Role_RoleName" xml:space="preserve">
+    <value>பாத்திர பெயர்</value>
+  </data>
+  <data name="UserMaster_LoginName" xml:space="preserve">
+    <value>உள்நுழைவு பெயர்</value>
+  </data>
+  <data name="UserMaster_Password" xml:space="preserve">
+    <value>கடவுச்சொல்</value>
+  </data>
+  <data name="UserMaster_DisplayName" xml:space="preserve">
+    <value>காட்சி பெயர்</value>
+  </data>
+  <data name="UserMaster_Email" xml:space="preserve">
+    <value>மின்னஞ்சல்</value>
+  </data>
+  <data name="UserMaster_FirstName" xml:space="preserve">
+    <value>முதல் பெயர்</value>
+  </data>
+  <data name="UserMaster_LastName" xml:space="preserve">
+    <value>கடைசி பெயர்</value>
+  </data>
+  <data name="UserMaster_MobileNumber" xml:space="preserve">
+    <value>கைபேசி எண்</value>
+  </data>
+  <data name="UserMaster_RoleName" xml:space="preserve">
+    <value>பாத்திர பெயர்</value>
+  </data>
+  <data name="DefaultMaster_DisplayOrder" xml:space="preserve">
+    <value>காட்சி ஆணை</value>
+  </data>
+  <data name="DefaultDetail_DefaultText" xml:space="preserve">
+    <value>இயல்பு உரை</value>
+  </data>
+  <data name="DefaultDetail_OrderBy" xml:space="preserve">
+    <value>உத்தரவின் படி</value>
+  </data>
+  <data name="ChangePassword_ConfirmNewPassword" xml:space="preserve">
+    <value>புதிய கடவு சொல்லை உறுதி செய்</value>
+  </data>
+  <data name="ChangePassword_NewPassword" xml:space="preserve">
+    <value>புதிய கடவுச்சொல்</value>
+  </data>
+  <data name="ChangePassword_OldPassword" xml:space="preserve">
+    <value>பழைய கடவுச்சொல்</value>
+  </data>
+  <data name="ProjectSetupDetail_ConfigurationName" xml:space="preserve">
+    <value>உள்ளமைவு பெயர்</value>
+  </data>
+  <data name="ProjectSetupDetail_Text" xml:space="preserve">
+    <value>உள்ளமைவு மதிப்பு</value>
+  </data>
+  <data name="RoleMatrix_AvailableAccess" xml:space="preserve">
+    <value>கிடைக்கும் அணுகல்</value>
+  </data>
+  <data name="RoleMatrix_EnabledAccess" xml:space="preserve">
+    <value>அணுகல் இயக்கப்பட்டது</value>
+  </data>
+  <data name="Tooltip_DisplayName" xml:space="preserve">
+    <value>காட்சி பெயரால் தேடு ...</value>
+  </data>
+  <data name="ToolTip_EnterEmailID" xml:space="preserve">
+    <value>மின்னஞ்சல் ஐடியை உள்ளிடவும்</value>
+  </data>
+  <data name="ToolTip_EnterMobileNumber" xml:space="preserve">
+    <value>மொபைல் எண்ணை உள்ளிடவும்</value>
+  </data>
+  <data name="Tooltip_LoginName" xml:space="preserve">
+    <value>உள்நுழைவு பெயர் மூலம் தேடுங்கள் ...</value>
+  </data>
+  <data name="Tooltip_RoleName" xml:space="preserve">
+    <value>பாத்திரப் பெயரால் தேடுங்கள்</value>
+  </data>
+  <data name="ToolTip_DefaultText" xml:space="preserve">
+    <value>இயல்பு உரை புலத்தை உள்ளிடவும்</value>
+  </data>
+  <data name="ToolTip_OrderBy" xml:space="preserve">
+    <value>மூலம் ஆர்டரை உள்ளிடவும்</value>
+  </data>
+  <data name="Tooltip_ConfirmNewPassword" xml:space="preserve">
+    <value>புதிய கடவு சொல்லை உறுதி செய்</value>
+  </data>
+  <data name="Tooltip_NewPassword" xml:space="preserve">
+    <value>புதிய கடவுச்சொல்</value>
+  </data>
+  <data name="Tooltip_OldPassword" xml:space="preserve">
+    <value>பழைய கடவுச்சொல்</value>
+  </data>
+  <data name="RoleMatrix_MenuAccess" xml:space="preserve">
+    <value>மெனு அணுகல்</value>
+  </data>
+  <data name="RoleMatrix_MenuName" xml:space="preserve">
+    <value>மெனு பெயர்</value>
+  </data>
+  <data name="RoleMatrix_PageAccess" xml:space="preserve">
+    <value>பக்க அணுகல்</value>
+  </data>
+  <data name="RoleMatrix_PageAccessView" xml:space="preserve">
+    <value>பக்க அணுகல் பார்வை</value>
+  </data>
+  <data name="RoleSetUp_Role" xml:space="preserve">
+    <value>பங்கு</value>
+  </data>
+  <data name="RoleMatrix_SelectRole" xml:space="preserve">
+    <value>பாத்திரத்தைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="ToolTip_LoginPassword" xml:space="preserve">
+    <value>கடவுச்சொல்</value>
+  </data>
+  <data name="ToolTip_LoginUserName" xml:space="preserve">
+    <value>பயனர் பெயர்</value>
+  </data>
+  <data name="Common_Status" xml:space="preserve">
+    <value>நிலை</value>
+  </data>
+  <data name="Common_CreatedBy" xml:space="preserve">
+    <value>உருவாக்கியது</value>
+  </data>
+  <data name="Common_CreatedDate" xml:space="preserve">
+    <value>உருவாக்கப்பட்ட தேதி</value>
+  </data>
+  <data name="Common_ModifiedBy" xml:space="preserve">
+    <value>திருத்தியவர்</value>
+  </data>
+  <data name="Common_ModifiedDate" xml:space="preserve">
+    <value>மாற்றிய தேதி</value>
+  </data>
+  <data name="Index_Home" xml:space="preserve">
+    <value>வீடு</value>
+  </data>
+  <data name="Index_PasswordReset" xml:space="preserve">
+    <value>உள்நுழைந்த கணக்கு விவரங்கள்</value>
+  </data>
+  <data name="Index_UserDetails" xml:space="preserve">
+    <value>பயனர் விவரங்கள்</value>
+  </data>
+  <data name="Index_CompanyDetails" xml:space="preserve">
+    <value>நிறுவனத்தின் விவரங்கள்</value>
+  </data>
+  <data name="Index_DashBoard" xml:space="preserve">
+    <value>டாஷ்போர்டு</value>
+  </data>
+  <data name="Index_EmployeeDetails" xml:space="preserve">
+    <value>பணியாளர் விவரங்கள்</value>
+  </data>
+  <data name="Index_RoleDetails" xml:space="preserve">
+    <value>பங்கு விவரங்கள்</value>
+  </data>
+  <data name="Role_IsPOS" xml:space="preserve">
+    <value>பிஓஎஸ் ஆகும்</value>
+  </data>
+  <data name="SalesPointsMaster_StoreName" xml:space="preserve">
+    <value>கடையின் பெயர்</value>
+  </data>
+  <data name="Index_SalesCount" xml:space="preserve">
+    <value>விற்பனை எண்ணிக்கை</value>
+  </data>
+  <data name="Index_SalesReturnCount" xml:space="preserve">
+    <value>விற்பனை வருவாய் எண்ணிக்கை</value>
+  </data>
+  <data name="Index_SalesVoidCount" xml:space="preserve">
+    <value>விற்பனை வெற்றிட எண்ணிக்கை</value>
+  </data>
+  <data name="Index_ExpensesCount" xml:space="preserve">
+    <value>செலவுகளின் எண்ணிக்கை</value>
+  </data>
+  <data name="Common_Home" xml:space="preserve">
+    <value>வீடு</value>
+  </data>
+  <data name="Common_Hint" xml:space="preserve">
+    <value>தயவுசெய்து கீழே உள்ள தகவலை நிரப்பவும். * குறிக்கப்பட்ட புல லேபிள்கள் உள்ளீட்டு புலங்கள் தேவை.</value>
+  </data>
+  <data name="UserMaster_AadharNumber" xml:space="preserve">
+    <value>ஆதார் எண்</value>
+  </data>
+  <data name="UserMaster_Address1" xml:space="preserve">
+    <value>முகவரி 1</value>
+  </data>
+  <data name="UserMaster_Address2" xml:space="preserve">
+    <value>முகவரி 2</value>
+  </data>
+  <data name="UserMaster_Address3" xml:space="preserve">
+    <value>முகவரி 3</value>
+  </data>
+  <data name="UserMaster_BasicSalary" xml:space="preserve">
+    <value>அடிப்படை சம்பளம்</value>
+  </data>
+  <data name="UserMaster_DateOfJoining" xml:space="preserve">
+    <value>இணைந்த தேதி</value>
+  </data>
+  <data name="UserMaster_EmployeeCode" xml:space="preserve">
+    <value>பணியாளர் குறியீடு</value>
+  </data>
+  <data name="UserMaster_FoodAllowances" xml:space="preserve">
+    <value>உணவு கொடுப்பனவுகள்</value>
+  </data>
+  <data name="UserMaster_OTAmount" xml:space="preserve">
+    <value>OT தொகை</value>
+  </data>
+  <data name="UserMaster_PanNumber" xml:space="preserve">
+    <value>பான் எண்</value>
+  </data>
+  <data name="UserMaster_TravelAllowances" xml:space="preserve">
+    <value>பயணக் கொடுப்பனவுகள்</value>
+  </data>
+</root>

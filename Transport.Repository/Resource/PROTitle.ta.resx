@@ -1,0 +1,582 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Title_RoleMaster" xml:space="preserve">
+    <value>பங்கு மாஸ்டர் - [சேர்/திருத்து]</value>
+  </data>
+  <data name="Title_Master_Setup_Search" xml:space="preserve">
+    <value>முதன்மை அமைப்பு - தேடல்</value>
+  </data>
+  <data name="Title_Master_Setup_View" xml:space="preserve">
+    <value>முதன்மை அமைப்பு - காண்க</value>
+  </data>
+  <data name="Title_UserRoleMatrix_Search" xml:space="preserve">
+    <value>பங்கு மேட்ரிக்ஸ்- தேடல்</value>
+  </data>
+  <data name="Title_UserRoleMatrix_View" xml:space="preserve">
+    <value>பங்கு மேட்ரிக்ஸ்-பார்வை</value>
+  </data>
+  <data name="Title_RoleMatrix_EditAccess" xml:space="preserve">
+    <value>பங்கு மேட்ரிக்ஸ் திருத்த அணுகல்</value>
+  </data>
+  <data name="Title_EmployeeMaster_Detail_Search" xml:space="preserve">
+    <value>ஊழியர் மாஸ்டர் - தேடல்</value>
+  </data>
+  <data name="Title_EmployeeMaster_Detail_View" xml:space="preserve">
+    <value>ஊழியர் மாஸ்டர் - காண்க</value>
+  </data>
+  <data name="Title_Employee_Master_Add_Edit" xml:space="preserve">
+    <value>ஊழியர் மாஸ்டர் - [சேர்/திருத்து]</value>
+  </data>
+  <data name="Title_Project_Setup" xml:space="preserve">
+    <value>திட்ட அமைப்பு</value>
+  </data>
+  <data name="Title_HSNMaster_AddEdit" xml:space="preserve">
+    <value>HSN மாஸ்டர் - [சேர்/திருத்து]</value>
+  </data>
+  <data name="Title_HSNMaster_Search" xml:space="preserve">
+    <value>HSN மாஸ்டர் - தேடல்</value>
+  </data>
+  <data name="Title_HSNMaster_View" xml:space="preserve">
+    <value>HSN மாஸ்டர் - காண்க</value>
+  </data>
+  <data name="Title_ProductMaster_Search" xml:space="preserve">
+    <value>தயாரிப்பு மாஸ்டர் - தேடல்</value>
+  </data>
+  <data name="Title_ProductMaster_View" xml:space="preserve">
+    <value>தயாரிப்பு மாஸ்டர் - காண்க</value>
+  </data>
+  <data name="Title_ProductMaster_AddEdit" xml:space="preserve">
+    <value>தயாரிப்பு மாஸ்டர் - [சேர்/திருத்து]</value>
+  </data>
+  <data name="Title_SubCategoryMaster_AddEdit" xml:space="preserve">
+    <value>துணை வகை மாஸ்டர் [சேர்/திருத்து]</value>
+  </data>
+  <data name="Title_SubCategoryMaster_Search" xml:space="preserve">
+    <value>துணை வகை மாஸ்டர் - தேடல்</value>
+  </data>
+  <data name="Title_SubCategoryMaster_View" xml:space="preserve">
+    <value>துணை வகை மாஸ்டர் - காண்க</value>
+  </data>
+  <data name="Title_CustomerMaster" xml:space="preserve">
+    <value>வாடிக்கையாளர் மாஸ்டர் - [சேர்/திருத்து]</value>
+  </data>
+  <data name="Title_CustomerMaster_CustomerMasterSearch" xml:space="preserve">
+    <value>வாடிக்கையாளர் மாஸ்டர் - தேடல்</value>
+  </data>
+  <data name="Title_CustomerMaster_CustomerMasterView" xml:space="preserve">
+    <value>வாடிக்கையாளர் மாஸ்டர் - காண்க</value>
+  </data>
+  <data name="Title_SupplierMaster" xml:space="preserve">
+    <value>சப்ளையர் மாஸ்டர் - [சேர்/திருத்து]</value>
+  </data>
+  <data name="Title_CustomerMaster_SupplierNameMasterSearch" xml:space="preserve">
+    <value>சப்ளையர் மாஸ்டர் - தேடல்</value>
+  </data>
+  <data name="Title_PublicationMaster" xml:space="preserve">
+    <value>பப்ளிகேஷன் மாஸ்டர் - [சேர்/திருத்து]</value>
+  </data>
+  <data name="Title_PublicationMaster_PublicationMasterSearch" xml:space="preserve">
+    <value>பப்ளிகேஷன் மாஸ்டர் - தேடல்</value>
+  </data>
+  <data name="Title_PublicationMaster_PublicationMasterView" xml:space="preserve">
+    <value>பப்ளிகேஷன் மாஸ்டர் - காண்க</value>
+  </data>
+  <data name="Title_CustomerMaster_SupplierNameMasterView" xml:space="preserve">
+    <value>சப்ளையர் மாஸ்டர் - காண்க</value>
+  </data>
+  <data name="Title_PurchaseMaster_View" xml:space="preserve">
+    <value>கொள்முதல் - காண்க</value>
+  </data>
+  <data name="Title_PurchaseMaster_AddEdit" xml:space="preserve">
+    <value>கொள்முதல் - [சேர்/திருத்து]</value>
+  </data>
+  <data name="Title_Calculate_UnitCost" xml:space="preserve">
+    <value>அலகு செலவைக் கணக்கிடுங்கள்</value>
+  </data>
+  <data name="Title_Product_Detail_Add" xml:space="preserve">
+    <value>தயாரிப்பு விவரம் சேர்</value>
+  </data>
+  <data name="Title_Product_Detail_Edit" xml:space="preserve">
+    <value>தயாரிப்பு விவரம் திருத்து</value>
+  </data>
+  <data name="Title_StkAdjustmentMaster_AddEdit" xml:space="preserve">
+    <value>பங்கு சரிசெய்தல் - [சேர்/திருத்து]</value>
+  </data>
+  <data name="Title_StkAdjustmentMaster_View" xml:space="preserve">
+    <value>பங்கு சரிசெய்தல் - காண்க</value>
+  </data>
+  <data name="Title_PrintSettingsMaster" xml:space="preserve">
+    <value>அச்சுப்பொறி அமைப்புகள்</value>
+  </data>
+  <data name="Title_Promotions" xml:space="preserve">
+    <value>விளம்பர மாஸ்டர் - தேடல்</value>
+  </data>
+  <data name="Title_PromotionsMaster_AddEdit" xml:space="preserve">
+    <value>விளம்பர மாஸ்டர் - [சேர்/திருத்து]</value>
+  </data>
+  <data name="Title_PromotionsMaster_ProductLevel" xml:space="preserve">
+    <value>தயாரிப்பு நிலை</value>
+  </data>
+  <data name="Title_PromotionsMaster_VolumeLevel" xml:space="preserve">
+    <value>தொகுதி நிலை</value>
+  </data>
+  <data name="Title_UnPackMaster_AddEdit" xml:space="preserve">
+    <value>புதுப்புது தயாரிப்புகள் - [சேர்/திருத்து]</value>
+  </data>
+  <data name="Title_UnPackMaster_View" xml:space="preserve">
+    <value>மீண்டும் புதிய தயாரிப்புகள் - காண்க</value>
+  </data>
+  <data name="ExpensesDetail_AddEdit" xml:space="preserve">
+    <value>பணியாளர் கணக்குகள் விவரம் - தேடல்</value>
+  </data>
+  <data name="ExpensesDetail_ExpensesDetail_Search" xml:space="preserve">
+    <value>செலவுக் கணக்குகள் - தேடல்</value>
+  </data>
+  <data name="Title_FileUpload" xml:space="preserve">
+    <value>கோப்பு பதிவேற்றம்</value>
+  </data>
+  <data name="PROTitle_Expense_Details_Search" xml:space="preserve">
+    <value>செலவு விவரங்கள் - தேடல்</value>
+  </data>
+  <data name="PROTitle_Expense_Details_View" xml:space="preserve">
+    <value>செலவு விவரங்கள் - காண்க</value>
+  </data>
+  <data name="Title_SalesMaster_AddEdit" xml:space="preserve">
+    <value>விற்பனை விவரம் - [சேர்/திருத்து]</value>
+  </data>
+  <data name="Title_SalesMaster_View" xml:space="preserve">
+    <value>விற்பனை மாஸ்டர் - காண்க</value>
+  </data>
+  <data name="Title_PurchaseReturnMaster_AddEdit" xml:space="preserve">
+    <value>வாங்குதல் வருமானம் - [சேர்/திருத்து]</value>
+  </data>
+  <data name="Title_PurchaseReturnMaster_View" xml:space="preserve">
+    <value>வாங்குதல் வருமானம் - காண்க</value>
+  </data>
+  <data name="Title_ProductSupplier_Add" xml:space="preserve">
+    <value>தயாரிப்பு சப்ளையர் விவரங்கள்</value>
+  </data>
+  <data name="Title_ImageMaster_Setup_Search" xml:space="preserve">
+    <value>பட மாஸ்டர் - தேடல்</value>
+  </data>
+  <data name="Title_ImageMaster_Setup_View" xml:space="preserve">
+    <value>பட மாஸ்டர் - காண்க</value>
+  </data>
+  <data name="Title_SalesMaster_Return" xml:space="preserve">
+    <value>விற்பனை விவரம் - [திரும்ப]</value>
+  </data>
+  <data name="Title_SalesMaster_Void" xml:space="preserve">
+    <value>விற்பனை விவரம் - [வெற்றிடம்]</value>
+  </data>
+  <data name="Title_TransferMaster_View" xml:space="preserve">
+    <value>பரிமாற்றம் - காண்க</value>
+  </data>
+  <data name="Title_Transfer_AddEdit" xml:space="preserve">
+    <value>பரிமாற்றம் - [சேர்/திருத்து]</value>
+  </data>
+  <data name="Title_SalesMaster_Edit" xml:space="preserve">
+    <value>விற்பனை விவரம் - [தொகு]</value>
+  </data>
+  <data name="Title_PurchaseReport_View" xml:space="preserve">
+    <value>கொள்முதல் அறிக்கை</value>
+  </data>
+  <data name="Title_MenuMaster_Detail_Add" xml:space="preserve">
+    <value>மெனு மாஸ்டர் விவரம் சேர்</value>
+  </data>
+  <data name="Title_MenuMaster_Detail_Edit" xml:space="preserve">
+    <value>மெனு மாஸ்டர் விவரம் திருத்து</value>
+  </data>
+  <data name="Title_MenuMaster_Detail_Search" xml:space="preserve">
+    <value>மெனு மாஸ்டர் விவரம் - தேடல்</value>
+  </data>
+  <data name="Title_MenuMaster_Detail_View" xml:space="preserve">
+    <value>மெனு மாஸ்டர் விவரம் - காண்க</value>
+  </data>
+  <data name="Title_MenuMaster_Header_Add" xml:space="preserve">
+    <value>மெனு முதன்மை தலைப்பு சேர்</value>
+  </data>
+  <data name="Title_MenuMaster_Header_Edit" xml:space="preserve">
+    <value>மெனு முதன்மை தலைப்பு திருத்து</value>
+  </data>
+  <data name="Title_MenuMaster_Header_Search" xml:space="preserve">
+    <value>மெனு முதன்மை தலைப்பு - தேடல்</value>
+  </data>
+  <data name="Title_MenuMaster_Header_View" xml:space="preserve">
+    <value>மெனு முதன்மை தலைப்பு - காண்க</value>
+  </data>
+  <data name="Title_ProductProfitLoss_View" xml:space="preserve">
+    <value>லாபம் மற்றும் இழப்பு அறிக்கை</value>
+  </data>
+  <data name="Title_ProductStock_View" xml:space="preserve">
+    <value>தயாரிப்பு பங்கு அறிக்கை</value>
+  </data>
+  <data name="Title_PurchaseMaster_Report" xml:space="preserve">
+    <value>கொள்முதல் அறிக்கை</value>
+  </data>
+  <data name="Title_SalesMaster_Report" xml:space="preserve">
+    <value>விற்பனை அறிக்கை</value>
+  </data>
+  <data name="Title_UserMasterDetail" xml:space="preserve">
+    <value>பயனர் முதன்மை விவரம்</value>
+  </data>
+  <data name="Title_AlertMessageQuantity" xml:space="preserve">
+    <value>மறு ஆர்டர் நிலை</value>
+  </data>
+  <data name="Title_PromotionApproval" xml:space="preserve">
+    <value>பதவி உயர்வு ஒப்புதல்</value>
+  </data>
+  <data name="Title_SalesPointsMaster" xml:space="preserve">
+    <value>விற்பனை புள்ளிகள் மாஸ்டர் - [சேர்/திருத்து]</value>
+  </data>
+  <data name="Title_SalesPointsMaster_SalesPointsMasterView" xml:space="preserve">
+    <value>விற்பனை புள்ளிகள் மாஸ்டர் பார்வை</value>
+  </data>
+  <data name="Title_TodaySales" xml:space="preserve">
+    <value>இன்று விற்பனை</value>
+  </data>
+  <data name="Title_Sub_SubCategoryMaster_AddEdit" xml:space="preserve">
+    <value>துணை - துணை வகை மாஸ்டர் [சேர்/திருத்து]</value>
+  </data>
+  <data name="Title_Sub_SubCategoryMaster_View" xml:space="preserve">
+    <value>துணை - துணை வகை மாஸ்டர் - காண்க</value>
+  </data>
+  <data name="Title_BrandMaster_AddEdit" xml:space="preserve">
+    <value>பிராண்ட் மாஸ்டர் - [சேர்/திருத்து]</value>
+  </data>
+  <data name="Title_AccountsMaster_AddEdit" xml:space="preserve">
+    <value>கணக்கு மாஸ்டர் - [சேர்/திருத்து]</value>
+  </data>
+  <data name="Title_AccountsMaster_View" xml:space="preserve">
+    <value>கணக்கு மாஸ்டர் - காண்க</value>
+  </data>
+  <data name="Title_SupplierBankDetails" xml:space="preserve">
+    <value>வங்கி விவரங்கள்</value>
+  </data>
+  <data name="Title_SupplierContactDetails" xml:space="preserve">
+    <value>தொடர்பு விபரங்கள்</value>
+  </data>
+  <data name="Title_SubSubCategoryMaster_View" xml:space="preserve">
+    <value>துணை -துணை வகை மாஸ்டர் - காண்க</value>
+  </data>
+  <data name="Title_MemberShipPointsMaster" xml:space="preserve">
+    <value>மெம்பர்ஷிப் பாயிண்ட்ஸ் மாஸ்டர் - [சேர்/திருத்து]</value>
+  </data>
+  <data name="Title_SalesPointsMaster_MemberShipPointsMaster" xml:space="preserve">
+    <value>மெம்பர்ஷிப் பாயிண்ட்ஸ் மாஸ்டர் - காண்க</value>
+  </data>
+  <data name="Title_PurchaseRequest_AddEdit" xml:space="preserve">
+    <value>கொள்முதல் கோரிக்கை - [சேர்/திருத்து]</value>
+  </data>
+  <data name="Title_PurchaseRequest_View" xml:space="preserve">
+    <value>கொள்முதல் கோரிக்கை - காண்க</value>
+  </data>
+  <data name="TitleRedeemPointsMaster_AddEdit" xml:space="preserve">
+    <value>பாயிண்ட்ஸ் மாஸ்டரை மீட்டெடுக்கவும் - [சேர்/திருத்து]</value>
+  </data>
+  <data name="Title_RedeemPointsMaster_View" xml:space="preserve">
+    <value>பாயிண்ட்ஸ் மாஸ்டரை மீட்டெடுக்கவும் - காண்க</value>
+  </data>
+  <data name="Title_MenuMaster_View" xml:space="preserve">
+    <value>மெனு மாஸ்டர்</value>
+  </data>
+  <data name="EmployeeAccountsDetail_AddEdit" xml:space="preserve">
+    <value>ஊழியர் கணக்கு விவரம் - [சேர்/திருத்து]</value>
+  </data>
+  <data name="EmployeeAccountsDetail_Search" xml:space="preserve">
+    <value>செலவுக் கணக்குகள் - தேடல்</value>
+  </data>
+  <data name="Title_BalanceLedgerAccounts_View" xml:space="preserve">
+    <value>இருப்பு பேரேடு - காண்க</value>
+  </data>
+  <data name="Title_BalanceLedgerAccount_AddEdit" xml:space="preserve">
+    <value>இருப்பு பேரேடு - [சேர்/திருத்து]</value>
+  </data>
+  <data name="Title_FiancialYear_AddEdit" xml:space="preserve">
+    <value>நிதி ஆண்டு - [சேர்/திருத்து]</value>
+  </data>
+  <data name="Title_FiancialYear_View" xml:space="preserve">
+    <value>நிதி ஆண்டு - காண்க</value>
+  </data>
+  <data name="Title_SupplierAccountsMaster_AddEdit" xml:space="preserve">
+    <value>சப்ளையர் கணக்குகள் - [சேர்/திருத்து]</value>
+  </data>
+  <data name="Title_SupplierAccountsMaster_View" xml:space="preserve">
+    <value>சப்ளையர் கணக்குகள் - காண்க</value>
+  </data>
+  <data name="Title_CustomerAccountsMaster_AddEdit" xml:space="preserve">
+    <value>வாடிக்கையாளர் கணக்கு - [சேர்/திருத்து]</value>
+  </data>
+  <data name="Title_CustomerAccountsMaster_View" xml:space="preserve">
+    <value>வாடிக்கையாளர் கணக்கு - காண்க</value>
+  </data>
+  <data name="Title_OpenRegisterAccounts_AddEdit" xml:space="preserve">
+    <value>இன்று திறந்த பதிவு- [சேர்/திருத்து]</value>
+  </data>
+  <data name="Title_OpenRegisterAccounts_View" xml:space="preserve">
+    <value>இன்று திறந்த பதிவு - காண்க</value>
+  </data>
+  <data name="Title_BalanceLedgerReport_Report" xml:space="preserve">
+    <value>இருப்பு பேரேடு  அறிக்கை</value>
+  </data>
+  <data name="Title_CustomerLedger_Report" xml:space="preserve">
+    <value>விற்பனை லெட்ஜர் அறிக்கை</value>
+  </data>
+  <data name="Title_Expenses_Report" xml:space="preserve">
+    <value>செலவின அறிக்கை</value>
+  </data>
+  <data name="Title_SupplierLedger_Report" xml:space="preserve">
+    <value>கொள்முதல் லெட்ஜர் அறிக்கை</value>
+  </data>
+  <data name="Title_Employee_Report" xml:space="preserve">
+    <value>பணியாளர் அறிக்கை</value>
+  </data>
+  <data name="Title_ProductMaster_Import" xml:space="preserve">
+    <value>இறக்குமதி பொருட்கள்</value>
+  </data>
+  <data name="Title_TodayClosedSales" xml:space="preserve">
+    <value>இன்று மூடப்பட்ட விற்பனை</value>
+  </data>
+  <data name="Title_SupplierStock_View" xml:space="preserve">
+    <value>சப்ளையர் பங்கு அறிக்கை</value>
+  </data>
+  <data name="r" xml:space="preserve">
+    <value>வாடிக்கையாளர்கள்</value>
+  </data>
+  <data name="Admin_Expenses" xml:space="preserve">
+    <value>செலவுகள்</value>
+  </data>
+  <data name="Admin_HSN" xml:space="preserve">
+    <value>HSN</value>
+  </data>
+  <data name="Admin_Master" xml:space="preserve">
+    <value>குரு</value>
+  </data>
+  <data name="Admin_PaymentStatus" xml:space="preserve">
+    <value>பணம் செலுத்தும் நிலை</value>
+  </data>
+  <data name="Admin_Products" xml:space="preserve">
+    <value>தயாரிப்புகள்</value>
+  </data>
+  <data name="Admin_Promos" xml:space="preserve">
+    <value>விளம்பரங்கள்</value>
+  </data>
+  <data name="Admin_Purchases" xml:space="preserve">
+    <value>கொள்முதல்</value>
+  </data>
+  <data name="Admin_QuickLinks" xml:space="preserve">
+    <value>விரைவு இணைப்புகள்</value>
+  </data>
+  <data name="Admin_ReFresh" xml:space="preserve">
+    <value>புதுப்பிப்பு</value>
+  </data>
+  <data name="Admin_Sales" xml:space="preserve">
+    <value>விற்பனை</value>
+  </data>
+  <data name="Admin_SalesStatus" xml:space="preserve">
+    <value>விற்பனை நிலை</value>
+  </data>
+  <data name="Admin_Settings" xml:space="preserve">
+    <value>அமைப்புகள்</value>
+  </data>
+  <data name="Admin_Suppliers" xml:space="preserve">
+    <value>சப்ளையர்கள்</value>
+  </data>
+  <data name="Admin_Transfers" xml:space="preserve">
+    <value>இடமாற்றங்கள்</value>
+  </data>
+  <data name="Admin_LatestFive" xml:space="preserve">
+    <value>சமீபத்திய ஐந்து</value>
+  </data>
+  <data name="Admin_PurchaseOrder" xml:space="preserve">
+    <value>கொள்முதல் ஆணை</value>
+  </data>
+  <data name="Admin_StockAlert" xml:space="preserve">
+    <value>பங்கு எச்சரிக்கை</value>
+  </data>
+  <data name="Admin_Tranfer" xml:space="preserve">
+    <value>இடமாற்றம்</value>
+  </data>
+  <data name="Title_BrandMasterView" xml:space="preserve">
+    <value>பிராண்ட் மாஸ்டர் பார்வை</value>
+  </data>
+  <data name="Title_AddCustomerdetails" xml:space="preserve">
+    <value>வாடிக்கையாளர் விவரங்களைச் சேர்க்கவும்</value>
+  </data>
+  <data name="Title_AddProductdetails" xml:space="preserve">
+    <value>தயாரிப்பு விவரங்களைச் சேர்க்கவும்</value>
+  </data>
+  <data name="Title_AddSupplierdetails" xml:space="preserve">
+    <value>கூடுதல் வழங்கல் விவரங்கள்</value>
+  </data>
+  <data name="Title_CustomerSearch" xml:space="preserve">
+    <value>வாடிக்கையாளர் தேடல்</value>
+  </data>
+  <data name="Title_ProductSearch" xml:space="preserve">
+    <value>தயாரிப்பு தேடல்</value>
+  </data>
+  <data name="Title_SupplierSearch" xml:space="preserve">
+    <value>சப்ளையர் தேடல்</value>
+  </data>
+  <data name="Title_Holding" xml:space="preserve">
+    <value>வைத்திருத்தல்</value>
+  </data>
+  <data name="Title_TotalItems" xml:space="preserve">
+    <value>மொத்த பொருட்கள்</value>
+  </data>
+  <data name="Title_SalesReturnMaster_View" xml:space="preserve">
+    <value>விற்பனை வருமானம் - காண்க</value>
+  </data>
+  <data name="Title_BacktoDashboard" xml:space="preserve">
+    <value>டாஷ்போர்டுக்குத் திரும்பு</value>
+  </data>
+  <data name="Title_ChangePassword" xml:space="preserve">
+    <value>கடவுச்சொல்லை மாற்று</value>
+  </data>
+  <data name="Title_Discount" xml:space="preserve">
+    <value>தள்ளுபடி</value>
+  </data>
+  <data name="Title_FinalizeSale" xml:space="preserve">
+    <value>இறுதி விற்பனை</value>
+  </data>
+  <data name="Title_Hold" xml:space="preserve">
+    <value>பிடி</value>
+  </data>
+  <data name="Title_Logout" xml:space="preserve">
+    <value>வெளியேறு</value>
+  </data>
+  <data name="Title_TotalPayable" xml:space="preserve">
+    <value>மொத்தம் செலுத்தக்கூடியது</value>
+  </data>
+  <data name="Title_TotalPaying" xml:space="preserve">
+    <value>மொத்தம் செலுத்துதல்</value>
+  </data>
+  <data name="Title_WelcomeAdmin" xml:space="preserve">
+    <value>வெல்காம் நிர்வாகி</value>
+  </data>
+  <data name="Title_CategoryMaster" xml:space="preserve">
+    <value>வகை மாஸ்டர்</value>
+  </data>
+  <data name="Title_ReOrderlevel_View" xml:space="preserve">
+    <value>மறு உத்தரவு நிலை அறிக்கை</value>
+  </data>
+  <data name="Admin_Customers" xml:space="preserve">
+    <value>வாடிக்கையாளர்கள்</value>
+  </data>
+</root>
