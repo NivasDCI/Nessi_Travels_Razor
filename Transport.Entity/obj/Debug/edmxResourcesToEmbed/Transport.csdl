@@ -1,0 +1,463 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="TransportModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityContainer Name="TransportEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="JobStatus" EntityType="TransportModel.JobStatu" />
+    <EntitySet Name="JobVendors" EntityType="TransportModel.JobVendor" />
+    <EntitySet Name="ServiceTypes" EntityType="TransportModel.ServiceType" />
+    <EntitySet Name="TblDefaultMasterDetails" EntityType="TransportModel.TblDefaultMasterDetail" />
+    <EntitySet Name="TblDefaultMasterHeaders" EntityType="TransportModel.TblDefaultMasterHeader" />
+    <EntitySet Name="TblHomePages" EntityType="TransportModel.TblHomePage" />
+    <EntitySet Name="TblMenuMasterDetails" EntityType="TransportModel.TblMenuMasterDetail" />
+    <EntitySet Name="TblMenuMasterHeaders" EntityType="TransportModel.TblMenuMasterHeader" />
+    <EntitySet Name="TblMenuRoleMatrixAccesses" EntityType="TransportModel.TblMenuRoleMatrixAccess" />
+    <EntitySet Name="TblRoleMasters" EntityType="TransportModel.TblRoleMaster" />
+    <EntitySet Name="TblUserMasters" EntityType="TransportModel.TblUserMaster" />
+    <EntitySet Name="Vehicles" EntityType="TransportModel.Vehicle" />
+    <FunctionImport Name="sp_frm_Clear_Trxns" />
+    <FunctionImport Name="sp_frm_get_CashInHand_Report" ReturnType="Collection(TransportModel.sp_frm_get_CashInHand_Report_Result)">
+      <Parameter Name="TransactionFrom" Mode="In" Type="DateTime" />
+      <Parameter Name="TransactionTo" Mode="In" Type="DateTime" />
+    </FunctionImport>
+    <FunctionImport Name="sp_frm_get_Credit_Report" ReturnType="Collection(TransportModel.sp_frm_get_Credit_Report_Result)">
+      <Parameter Name="TransactionFrom" Mode="In" Type="DateTime" />
+      <Parameter Name="TransactionTo" Mode="In" Type="DateTime" />
+    </FunctionImport>
+    <FunctionImport Name="sp_frm_get_CreditCustomers_Report" ReturnType="Collection(TransportModel.sp_frm_get_CreditCustomers_Report_Result)">
+      <Parameter Name="TransactionFrom" Mode="In" Type="DateTime" />
+      <Parameter Name="TransactionTo" Mode="In" Type="DateTime" />
+    </FunctionImport>
+    <FunctionImport Name="sp_frm_get_Dashboard_Daily" ReturnType="Collection(TransportModel.sp_frm_get_Dashboard_Daily_Result)">
+      <Parameter Name="CustomerId" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="sp_frm_get_Dashboard_Report">
+      <Parameter Name="CustomerId" Mode="In" Type="Int32" />
+      <Parameter Name="TransactionFrom" Mode="In" Type="DateTime" />
+      <Parameter Name="TransactionTo" Mode="In" Type="DateTime" />
+    </FunctionImport>
+    <FunctionImport Name="sp_frm_get_Total_Report" ReturnType="Collection(TransportModel.sp_frm_get_Total_Report_Result)">
+      <Parameter Name="TransactionFrom" Mode="In" Type="DateTime" />
+      <Parameter Name="TransactionTo" Mode="In" Type="DateTime" />
+    </FunctionImport>
+    <FunctionImport Name="sp_frm_get_Vehicle_Expense_Report" ReturnType="Collection(TransportModel.sp_frm_get_Vehicle_Expense_Report_Result)">
+      <Parameter Name="TransactionFrom" Mode="In" Type="DateTime" />
+      <Parameter Name="TransactionTo" Mode="In" Type="DateTime" />
+      <Parameter Name="VehicleCode" Mode="In" Type="Int64" />
+    </FunctionImport>
+    <FunctionImport Name="sp_frm_get_Vehicle_Report" ReturnType="Collection(TransportModel.sp_frm_get_Vehicle_Report_Result)">
+      <Parameter Name="TransactionFrom" Mode="In" Type="DateTime" />
+      <Parameter Name="TransactionTo" Mode="In" Type="DateTime" />
+    </FunctionImport>
+    <FunctionImport Name="sp_frm_get_Vehicle_Total_Report" ReturnType="Collection(TransportModel.sp_frm_get_Vehicle_Total_Report_Result)">
+      <Parameter Name="TransactionFrom" Mode="In" Type="DateTime" />
+      <Parameter Name="TransactionTo" Mode="In" Type="DateTime" />
+      <Parameter Name="VehicleCode" Mode="In" Type="Int64" />
+    </FunctionImport>
+    <EntitySet Name="JobRequests" EntityType="TransportModel.JobRequest" />
+    <FunctionImport Name="sp_frm_get_Jobs" ReturnType="Collection(TransportModel.sp_frm_get_Jobs_Result)">
+      <Parameter Name="VehicleCode" Mode="In" Type="Int64" />
+      <Parameter Name="JobVendorCode" Mode="In" Type="Int64" />
+      <Parameter Name="CustomerName" Mode="In" Type="String" />
+      <Parameter Name="ContactNo" Mode="In" Type="String" />
+      <Parameter Name="DrivingBy" Mode="In" Type="Int32" />
+      <Parameter Name="CashInHand" Mode="In" Type="Int32" />
+      <Parameter Name="TransactionFrom" Mode="In" Type="DateTime" />
+      <Parameter Name="TransactionTo" Mode="In" Type="DateTime" />
+    </FunctionImport>
+    <FunctionImport Name="sp_frm_get_Jobs_Report" ReturnType="Collection(TransportModel.sp_frm_get_Jobs_Report_Result)">
+      <Parameter Name="VehicleCode" Mode="In" Type="Int64" />
+      <Parameter Name="JobVendorCode" Mode="In" Type="Int64" />
+      <Parameter Name="CustomerName" Mode="In" Type="String" />
+      <Parameter Name="ContactNo" Mode="In" Type="String" />
+      <Parameter Name="DrivingBy" Mode="In" Type="Int32" />
+      <Parameter Name="CashInHand" Mode="In" Type="Int32" />
+      <Parameter Name="TransactionFrom" Mode="In" Type="DateTime" />
+      <Parameter Name="TransactionTo" Mode="In" Type="DateTime" />
+    </FunctionImport>
+    <EntitySet Name="Jobs" EntityType="TransportModel.Job" />
+    <FunctionImport Name="sp_frm_get_OutSourceJobs_Report" ReturnType="Collection(TransportModel.sp_frm_get_OutSourceJobs_Report_Result)">
+      <Parameter Name="VehicleCode" Mode="In" Type="Int64" />
+      <Parameter Name="JobVendorCode" Mode="In" Type="Int64" />
+      <Parameter Name="CustomerName" Mode="In" Type="String" />
+      <Parameter Name="ContactNo" Mode="In" Type="String" />
+      <Parameter Name="DrivingBy" Mode="In" Type="Int32" />
+      <Parameter Name="CashInHand" Mode="In" Type="Int32" />
+      <Parameter Name="TransactionFrom" Mode="In" Type="DateTime" />
+      <Parameter Name="TransactionTo" Mode="In" Type="DateTime" />
+    </FunctionImport>
+    <EntitySet Name="SupplierTypes" EntityType="TransportModel.SupplierType" />
+    <EntitySet Name="Expenses" EntityType="TransportModel.Expense" />
+  </EntityContainer>
+  <EntityType Name="JobStatu">
+    <Key>
+      <PropertyRef Name="JobStatusCode" />
+    </Key>
+    <Property Name="JobStatusCode" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="JobCode" Type="Int64" Nullable="false" />
+    <Property Name="JobStatus" Type="String" Nullable="false" MaxLength="130" FixedLength="false" Unicode="true" />
+    <Property Name="UpdatedBy" Type="Int32" />
+    <Property Name="UpdatedDate" Type="DateTime" Precision="3" />
+  </EntityType>
+  <EntityType Name="JobVendor">
+    <Key>
+      <PropertyRef Name="JobVendorCode" />
+    </Key>
+    <Property Name="JobVendorCode" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="JobVendorName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Name="Address1" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="Address2" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="Address3" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="ContactNo" Type="String" MaxLength="30" FixedLength="false" Unicode="true" />
+    <Property Name="Status" Type="Boolean" />
+  </EntityType>
+  <EntityType Name="ServiceType">
+    <Key>
+      <PropertyRef Name="ServiceTypeCode" />
+    </Key>
+    <Property Name="ServiceTypeCode" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="ServiceTypeName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Name="Status" Type="Boolean" />
+  </EntityType>
+  <EntityType Name="TblDefaultMasterDetail">
+    <Key>
+      <PropertyRef Name="DefaultDetailID" />
+    </Key>
+    <Property Name="DefaultDetailID" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="DefaultHeaderID" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="DefaultTextField" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="DefaultValueField" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Image" Type="Binary" MaxLength="Max" FixedLength="false" />
+    <Property Name="DefaultOrder" Type="Int32" />
+    <Property Name="IsSearch" Type="Boolean" />
+    <Property Name="IsPage" Type="Boolean" />
+    <Property Name="Status" Type="Boolean" />
+    <Property Name="CreatedBy" Type="Int32" />
+    <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+    <Property Name="LastModifiedBy" Type="Int32" />
+    <Property Name="LastModifiedDate" Type="DateTime" Precision="3" />
+  </EntityType>
+  <EntityType Name="TblDefaultMasterHeader">
+    <Key>
+      <PropertyRef Name="DefaultHeaderID" />
+    </Key>
+    <Property Name="DefaultHeaderID" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="DefaultHeaderName" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="IsTextValue" Type="Boolean" />
+    <Property Name="SystemType" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="IsImage" Type="Boolean" />
+    <Property Name="DefaultOrder" Type="Int32" />
+    <Property Name="Status" Type="Boolean" />
+    <Property Name="CreatedBy" Type="Int32" />
+    <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+    <Property Name="LastModifiedBy" Type="Int32" />
+    <Property Name="LastModifiedDate" Type="DateTime" Precision="3" />
+  </EntityType>
+  <EntityType Name="TblHomePage">
+    <Key>
+      <PropertyRef Name="HomePageViewID" />
+    </Key>
+    <Property Name="HomePageViewID" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+    <Property Name="HomePageName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="ControllerName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="ActionName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="Status" Type="Boolean" />
+    <Property Name="CreatedBy" Type="Int32" />
+    <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+    <Property Name="LastModifiedBy" Type="Int32" />
+    <Property Name="LastModifiedDate" Type="DateTime" Precision="3" />
+  </EntityType>
+  <EntityType Name="TblMenuMasterDetail">
+    <Key>
+      <PropertyRef Name="DetailViewID" />
+    </Key>
+    <Property Name="DetailViewID" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="HeaderViewID" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+    <Property Name="MenuName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="PageUrl" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Name="IconCls" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Name="Disabled" Type="Boolean" />
+    <Property Name="OrderByTab" Type="Int32" />
+    <Property Name="IsPageAccess" Type="Boolean" />
+    <Property Name="CreatedBy" Type="Int32" />
+    <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+    <Property Name="LastModifiedBy" Type="Int32" />
+    <Property Name="LastModifiedDate" Type="DateTime" Precision="3" />
+  </EntityType>
+  <EntityType Name="TblMenuMasterHeader">
+    <Key>
+      <PropertyRef Name="HeaderViewID" />
+    </Key>
+    <Property Name="HeaderViewID" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="true" />
+    <Property Name="MenuName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="Disabled" Type="Boolean" />
+    <Property Name="OrderByTab" Type="Int32" />
+    <Property Name="IconCls" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="CreatedBy" Type="Int32" />
+    <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+    <Property Name="LastModifiedBy" Type="Int32" />
+    <Property Name="LastModifiedDate" Type="DateTime" Precision="3" />
+  </EntityType>
+  <EntityType Name="TblMenuRoleMatrixAccess">
+    <Key>
+      <PropertyRef Name="RoleMatrixAccessID" />
+    </Key>
+    <Property Name="RoleMatrixAccessID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="RoleID" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="HeaderViewID" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="DetailViewID" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="DisplayOrder" Type="Int32" />
+    <Property Name="IsPageAccess" Type="Boolean" />
+    <Property Name="Status" Type="Boolean" />
+    <Property Name="CreatedBy" Type="Int32" />
+    <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+    <Property Name="LastModifiedBy" Type="Int32" />
+    <Property Name="LastModifiedDate" Type="DateTime" Precision="3" />
+  </EntityType>
+  <EntityType Name="TblRoleMaster">
+    <Key>
+      <PropertyRef Name="RoleID" />
+    </Key>
+    <Property Name="RoleID" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+    <Property Name="RoleName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Name="Description" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="HomePageViewID" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+    <Property Name="IsPOS" Type="Boolean" />
+    <Property Name="status" Type="Boolean" />
+    <Property Name="CreatedBy" Type="Int32" />
+    <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+    <Property Name="LastModifiedBy" Type="Int32" />
+    <Property Name="LastModifiedDate" Type="DateTime" Precision="3" />
+  </EntityType>
+  <EntityType Name="TblUserMaster">
+    <Key>
+      <PropertyRef Name="UserID" />
+    </Key>
+    <Property Name="UserID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="LoginName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="FirstName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Name="LastName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Name="Password" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Name="EmailID" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="MobileNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="PasswordAttemptCount" Type="Int32" Nullable="false" />
+    <Property Name="RoleID" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="Status" Type="Boolean" />
+    <Property Name="CreatedBy" Type="Int32" />
+    <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+    <Property Name="LastModifiedBy" Type="Int32" />
+    <Property Name="LastModifiedDate" Type="DateTime" Precision="3" />
+  </EntityType>
+  <EntityType Name="Vehicle">
+    <Key>
+      <PropertyRef Name="VehicleCode" />
+    </Key>
+    <Property Name="VehicleCode" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="VehicleName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Name="Status" Type="Boolean" />
+  </EntityType>
+  <ComplexType Name="sp_frm_get_CashInHand_Report_Result">
+    <Property Type="Decimal" Name="CashOrder" Nullable="false" Precision="38" Scale="2" />
+    <Property Type="Decimal" Name="CreditJob" Nullable="false" Precision="38" Scale="2" />
+    <Property Type="Decimal" Name="TotalOrder" Nullable="true" Precision="38" Scale="2" />
+    <Property Type="String" Name="CashInHand" Nullable="false" MaxLength="100" />
+  </ComplexType>
+  <ComplexType Name="sp_frm_get_Credit_Report_Result">
+    <Property Type="Decimal" Name="CreditJob" Nullable="false" Precision="38" Scale="2" />
+    <Property Type="String" Name="JobVendorName" Nullable="false" MaxLength="100" />
+    <Property Type="Int64" Name="JobVendorCode" Nullable="true" />
+  </ComplexType>
+  <ComplexType Name="sp_frm_get_CreditCustomers_Report_Result">
+    <Property Type="Decimal" Name="CreditJob" Nullable="false" Precision="38" Scale="2" />
+    <Property Type="String" Name="Customerame" Nullable="false" MaxLength="100" />
+  </ComplexType>
+  <ComplexType Name="sp_frm_get_Dashboard_Daily_Result">
+    <Property Type="Int32" Name="Requests" Nullable="true" />
+    <Property Type="Int32" Name="PendingJobs" Nullable="true" />
+    <Property Type="Int32" Name="OnGoingJobs" Nullable="true" />
+    <Property Type="Int32" Name="CompletedJobs" Nullable="true" />
+    <Property Type="Double" Name="TotalCredit" Nullable="true" />
+    <Property Type="Double" Name="TotalCash" Nullable="true" />
+  </ComplexType>
+  <ComplexType Name="sp_frm_get_Total_Report_Result">
+    <Property Type="Decimal" Name="CashOrder" Nullable="false" Precision="38" Scale="2" />
+    <Property Type="Decimal" Name="CreditJob" Nullable="false" Precision="38" Scale="2" />
+    <Property Type="Decimal" Name="TotalOrder" Nullable="true" Precision="38" Scale="2" />
+  </ComplexType>
+  <ComplexType Name="sp_frm_get_Vehicle_Expense_Report_Result">
+    <Property Type="String" Name="VehicleName" Nullable="true" MaxLength="100" />
+    <Property Type="String" Name="ServiceTypeName" Nullable="true" MaxLength="100" />
+    <Property Type="Decimal" Name="Charge" Nullable="false" Precision="18" Scale="2" />
+  </ComplexType>
+  <ComplexType Name="sp_frm_get_Vehicle_Report_Result">
+    <Property Type="Decimal" Name="CashOrder" Nullable="false" Precision="38" Scale="2" />
+    <Property Type="Decimal" Name="CreditJob" Nullable="false" Precision="38" Scale="2" />
+    <Property Type="Decimal" Name="TotalOrder" Nullable="true" Precision="38" Scale="2" />
+    <Property Type="String" Name="VehicleName" Nullable="false" MaxLength="100" />
+    <Property Type="Int64" Name="VehicleCode" Nullable="true" />
+  </ComplexType>
+  <ComplexType Name="sp_frm_get_Vehicle_Total_Report_Result">
+    <Property Type="Decimal" Name="CashOrder" Nullable="false" Precision="38" Scale="2" />
+    <Property Type="Decimal" Name="CreditJob" Nullable="false" Precision="38" Scale="2" />
+    <Property Type="Decimal" Name="TotalOrder" Nullable="true" Precision="38" Scale="2" />
+    <Property Type="String" Name="VehicleName" Nullable="false" MaxLength="100" />
+    <Property Type="Int64" Name="VehicleCode" Nullable="true" />
+  </ComplexType>
+  <EntityType Name="JobRequest">
+    <Key>
+      <PropertyRef Name="JobRequestCode" />
+    </Key>
+    <Property Name="JobRequestCode" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="JobRequestDate" Type="DateTime" Nullable="false" Precision="0" />
+    <Property Name="JobRequestTime" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="true" />
+    <Property Name="JobRequestFrom" Type="String" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Name="JobRequestTo" Type="String" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Name="CustomerName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Name="ContactNo" Type="String" MaxLength="30" FixedLength="false" Unicode="true" />
+    <Property Name="Cost" Type="Decimal" Precision="18" Scale="2" />
+    <Property Name="NoOfPaxs" Type="Int32" />
+    <Property Name="NoOfBags" Type="Int32" />
+    <Property Name="JobRequestStatus" Type="String" MaxLength="130" FixedLength="false" Unicode="true" />
+    <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+  </EntityType>
+  <ComplexType Name="sp_frm_get_Jobs_Result">
+    <Property Type="Int64" Name="JobCode" Nullable="false" />
+    <Property Type="DateTime" Name="JobDate" Nullable="false" />
+    <Property Type="String" Name="JobTime" Nullable="false" MaxLength="20" />
+    <Property Type="String" Name="VehicleName" Nullable="true" MaxLength="100" />
+    <Property Type="String" Name="JobFrom" Nullable="true" MaxLength="300" />
+    <Property Type="String" Name="JobTo" Nullable="true" MaxLength="300" />
+    <Property Type="String" Name="JobGivenBy" Nullable="true" MaxLength="100" />
+    <Property Type="String" Name="DrivingBy" Nullable="true" MaxLength="201" />
+    <Property Type="String" Name="OutSource" Nullable="true" MaxLength="100" />
+    <Property Type="Decimal" Name="OutsourceAmount" Nullable="true" Precision="18" Scale="2" />
+    <Property Type="String" Name="CustomerName" Nullable="true" MaxLength="100" />
+    <Property Type="String" Name="ContactNo" Nullable="true" MaxLength="30" />
+    <Property Type="Decimal" Name="Cost" Nullable="true" Precision="18" Scale="2" />
+    <Property Type="Decimal" Name="Credit" Nullable="true" Precision="18" Scale="2" />
+    <Property Type="Decimal" Name="Cash" Nullable="true" Precision="18" Scale="2" />
+    <Property Type="String" Name="CashInHandName" Nullable="true" MaxLength="201" />
+    <Property Type="String" Name="JobStatus" Nullable="true" MaxLength="130" />
+    <Property Type="String" Name="Remarks" Nullable="true" MaxLength="200" />
+    <Property Type="String" Name="CreatedBy" Nullable="true" MaxLength="201" />
+    <Property Type="String" Name="UpdatedBy" Nullable="true" MaxLength="201" />
+    <Property Type="DateTime" Name="CreatedDate" Nullable="true" Precision="23" />
+    <Property Type="DateTime" Name="UpdatedDate" Nullable="true" Precision="23" />
+    <Property Type="String" Name="SubmissionDate" Nullable="false" MaxLength="25" />
+    <Property Type="Int32" Name="CashInHand" Nullable="true" />
+    <Property Type="Int32" Name="NoOfPaxs" Nullable="true" />
+    <Property Type="Int32" Name="NoOfBags" Nullable="true" />
+  </ComplexType>
+  <ComplexType Name="sp_frm_get_Jobs_Report_Result">
+    <Property Type="Int64" Name="JobCode" Nullable="false" />
+    <Property Type="DateTime" Name="JobDate" Nullable="false" />
+    <Property Type="String" Name="JobTime" Nullable="false" MaxLength="20" />
+    <Property Type="String" Name="VehicleName" Nullable="true" MaxLength="100" />
+    <Property Type="String" Name="JobFrom" Nullable="true" MaxLength="300" />
+    <Property Type="String" Name="JobTo" Nullable="true" MaxLength="300" />
+    <Property Type="String" Name="JobGivenBy" Nullable="true" MaxLength="100" />
+    <Property Type="String" Name="DrivingBy" Nullable="true" MaxLength="201" />
+    <Property Type="String" Name="OutSource" Nullable="true" MaxLength="100" />
+    <Property Type="Decimal" Name="OutSourceAmount" Nullable="true" Precision="18" Scale="2" />
+    <Property Type="String" Name="CustomerName" Nullable="true" MaxLength="100" />
+    <Property Type="String" Name="ContactNo" Nullable="true" MaxLength="30" />
+    <Property Type="Decimal" Name="Cost" Nullable="true" Precision="18" Scale="2" />
+    <Property Type="Decimal" Name="Credit" Nullable="true" Precision="18" Scale="2" />
+    <Property Type="Decimal" Name="Cash" Nullable="true" Precision="18" Scale="2" />
+    <Property Type="String" Name="CashInHandName" Nullable="true" MaxLength="201" />
+    <Property Type="String" Name="JobStatus" Nullable="true" MaxLength="130" />
+    <Property Type="String" Name="Remarks" Nullable="true" MaxLength="200" />
+    <Property Type="String" Name="CreatedBy" Nullable="true" MaxLength="201" />
+    <Property Type="String" Name="UpdatedBy" Nullable="true" MaxLength="201" />
+    <Property Type="DateTime" Name="CreatedDate" Nullable="true" Precision="23" />
+    <Property Type="DateTime" Name="UpdatedDate" Nullable="true" Precision="23" />
+    <Property Type="String" Name="SubmissionDate" Nullable="false" MaxLength="25" />
+    <Property Type="Int32" Name="CashInHand" Nullable="true" />
+    <Property Type="Int32" Name="NoOfPaxs" Nullable="true" />
+    <Property Type="Int32" Name="NoOfBags" Nullable="true" />
+  </ComplexType>
+  <EntityType Name="Job">
+    <Key>
+      <PropertyRef Name="JobCode" />
+    </Key>
+    <Property Name="JobCode" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="JobDate" Type="DateTime" Nullable="false" Precision="0" />
+    <Property Name="JobTime" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="true" />
+    <Property Name="JobFrom" Type="String" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Name="JobTo" Type="String" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Name="JobVendorCode" Type="Int64" />
+    <Property Name="VehicleCode" Type="Int64" />
+    <Property Name="DrivingBy" Type="Int32" />
+    <Property Name="OutSource" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Name="OutSourceAmount" Type="Decimal" Precision="18" Scale="2" />
+    <Property Name="CustomerName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Name="ContactNo" Type="String" MaxLength="30" FixedLength="false" Unicode="true" />
+    <Property Name="JobStatus" Type="String" MaxLength="130" FixedLength="false" Unicode="true" />
+    <Property Name="Cost" Type="Decimal" Precision="18" Scale="2" />
+    <Property Name="Credit" Type="Decimal" Precision="18" Scale="2" />
+    <Property Name="Cash" Type="Decimal" Precision="18" Scale="2" />
+    <Property Name="CashInHand" Type="Int32" />
+    <Property Name="JobRequestCode" Type="Int64" />
+    <Property Name="Remarks" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="CreatedBy" Type="Int32" />
+    <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+    <Property Name="UpdatedBy" Type="Int32" />
+    <Property Name="UpdatedDate" Type="DateTime" Precision="3" />
+    <Property Name="OutSourceAmountGiven" Type="Decimal" Precision="18" Scale="2" />
+  </EntityType>
+  <ComplexType Name="sp_frm_get_OutSourceJobs_Report_Result">
+    <Property Type="Int64" Name="JobCode" Nullable="false" />
+    <Property Type="DateTime" Name="JobDate" Nullable="false" />
+    <Property Type="String" Name="JobTime" Nullable="false" MaxLength="20" />
+    <Property Type="String" Name="VehicleName" Nullable="true" MaxLength="100" />
+    <Property Type="String" Name="JobFrom" Nullable="true" MaxLength="300" />
+    <Property Type="String" Name="JobTo" Nullable="true" MaxLength="300" />
+    <Property Type="String" Name="JobGivenBy" Nullable="true" MaxLength="100" />
+    <Property Type="String" Name="DrivingBy" Nullable="true" MaxLength="201" />
+    <Property Type="String" Name="OutSource" Nullable="true" MaxLength="100" />
+    <Property Type="Decimal" Name="OutSourceAmount" Nullable="true" Precision="18" Scale="2" />
+    <Property Type="Decimal" Name="OutSourceAmountGiven" Nullable="true" Precision="18" Scale="2" />
+    <Property Type="String" Name="CustomerName" Nullable="true" MaxLength="100" />
+    <Property Type="String" Name="ContactNo" Nullable="true" MaxLength="30" />
+    <Property Type="Decimal" Name="Cost" Nullable="true" Precision="18" Scale="2" />
+    <Property Type="Decimal" Name="Credit" Nullable="true" Precision="18" Scale="2" />
+    <Property Type="Decimal" Name="Cash" Nullable="true" Precision="18" Scale="2" />
+    <Property Type="String" Name="CashInHandName" Nullable="true" MaxLength="201" />
+    <Property Type="String" Name="JobStatus" Nullable="true" MaxLength="130" />
+    <Property Type="String" Name="Remarks" Nullable="true" MaxLength="200" />
+    <Property Type="String" Name="CreatedBy" Nullable="true" MaxLength="201" />
+    <Property Type="String" Name="UpdatedBy" Nullable="true" MaxLength="201" />
+    <Property Type="DateTime" Name="CreatedDate" Nullable="true" Precision="23" />
+    <Property Type="DateTime" Name="UpdatedDate" Nullable="true" Precision="23" />
+    <Property Type="String" Name="SubmissionDate" Nullable="false" MaxLength="25" />
+    <Property Type="Int32" Name="CashInHand" Nullable="true" />
+    <Property Type="Int32" Name="NoOfPaxs" Nullable="true" />
+    <Property Type="Int32" Name="NoOfBags" Nullable="true" />
+  </ComplexType>
+  <EntityType Name="SupplierType">
+    <Key>
+      <PropertyRef Name="SupplierTypeCode" />
+    </Key>
+    <Property Name="SupplierTypeCode" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="SupplierTypeName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Name="PricePerLr" Type="Decimal" Precision="18" Scale="2" />
+    <Property Name="Status" Type="Boolean" />
+  </EntityType>
+  <EntityType Name="Expense">
+    <Key>
+      <PropertyRef Name="ExpenseCode" />
+    </Key>
+    <Property Name="ExpenseCode" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="VehicleCode" Type="Int64" />
+    <Property Name="ServiceTypeCode" Type="Int64" />
+    <Property Name="SupplierTypeCode" Type="Int64" />
+    <Property Name="Qty" Type="Int32" />
+    <Property Name="Charge" Type="Decimal" Precision="18" Scale="2" />
+    <Property Name="Remarks" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
+    <Property Name="ExpenseDate" Type="DateTime" Precision="0" />
+    <Property Name="PaymentBy" Type="Int32" />
+    <Property Name="PaidTo" Type="Int32" />
+    <Property Name="CreatedBy" Type="Int32" />
+    <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+    <Property Name="UpdatedBy" Type="Int32" />
+    <Property Name="UpdatedDate" Type="DateTime" Precision="3" />
+  </EntityType>
+</Schema>

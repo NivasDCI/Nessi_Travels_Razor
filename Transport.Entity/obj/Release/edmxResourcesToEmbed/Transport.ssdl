@@ -1,0 +1,334 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="TransportModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityType Name="Expense">
+    <Key>
+      <PropertyRef Name="ExpenseCode" />
+    </Key>
+    <Property Name="ExpenseCode" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="VehicleCode" Type="bigint" />
+    <Property Name="ServiceTypeCode" Type="bigint" />
+    <Property Name="SupplierTypeCode" Type="bigint" />
+    <Property Name="Qty" Type="int" />
+    <Property Name="Charge" Type="decimal" Precision="18" Scale="2" />
+    <Property Name="Remarks" Type="nvarchar" MaxLength="256" />
+    <Property Name="ExpenseDate" Type="date" />
+    <Property Name="PaymentBy" Type="int" />
+    <Property Name="PaidTo" Type="int" />
+    <Property Name="CreatedBy" Type="int" />
+    <Property Name="CreatedDate" Type="datetime" />
+    <Property Name="UpdatedBy" Type="int" />
+    <Property Name="UpdatedDate" Type="datetime" />
+  </EntityType>
+  <EntityType Name="JobRequests">
+    <Key>
+      <PropertyRef Name="JobRequestCode" />
+    </Key>
+    <Property Name="JobRequestCode" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="JobRequestDate" Type="date" Nullable="false" />
+    <Property Name="JobRequestTime" Type="nvarchar" MaxLength="20" Nullable="false" />
+    <Property Name="JobRequestFrom" Type="nvarchar" MaxLength="300" />
+    <Property Name="JobRequestTo" Type="nvarchar" MaxLength="300" />
+    <Property Name="CustomerName" Type="nvarchar" MaxLength="100" />
+    <Property Name="ContactNo" Type="nvarchar" MaxLength="30" />
+    <Property Name="Cost" Type="decimal" Precision="18" Scale="2" />
+    <Property Name="NoOfPaxs" Type="int" />
+    <Property Name="NoOfBags" Type="int" />
+    <Property Name="JobRequestStatus" Type="nvarchar" MaxLength="130" />
+    <Property Name="CreatedDate" Type="datetime" />
+  </EntityType>
+  <EntityType Name="Jobs">
+    <Key>
+      <PropertyRef Name="JobCode" />
+    </Key>
+    <Property Name="JobCode" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="JobDate" Type="date" Nullable="false" />
+    <Property Name="JobTime" Type="nvarchar" MaxLength="20" Nullable="false" />
+    <Property Name="JobFrom" Type="nvarchar" MaxLength="300" />
+    <Property Name="JobTo" Type="nvarchar" MaxLength="300" />
+    <Property Name="JobVendorCode" Type="bigint" />
+    <Property Name="VehicleCode" Type="bigint" />
+    <Property Name="DrivingBy" Type="int" />
+    <Property Name="OutSource" Type="nvarchar" MaxLength="100" />
+    <Property Name="OutSourceAmount" Type="decimal" Precision="18" Scale="2" />
+    <Property Name="CustomerName" Type="nvarchar" MaxLength="100" />
+    <Property Name="ContactNo" Type="nvarchar" MaxLength="30" />
+    <Property Name="JobStatus" Type="nvarchar" MaxLength="130" />
+    <Property Name="Cost" Type="decimal" Precision="18" Scale="2" />
+    <Property Name="Credit" Type="decimal" Precision="18" Scale="2" />
+    <Property Name="Cash" Type="decimal" Precision="18" Scale="2" />
+    <Property Name="CashInHand" Type="int" />
+    <Property Name="JobRequestCode" Type="bigint" />
+    <Property Name="Remarks" Type="nvarchar" MaxLength="200" />
+    <Property Name="CreatedBy" Type="int" />
+    <Property Name="CreatedDate" Type="datetime" />
+    <Property Name="UpdatedBy" Type="int" />
+    <Property Name="UpdatedDate" Type="datetime" />
+    <Property Name="OutSourceAmountGiven" Type="decimal" Precision="18" Scale="2" />
+  </EntityType>
+  <EntityType Name="JobStatus">
+    <Key>
+      <PropertyRef Name="JobStatusCode" />
+    </Key>
+    <Property Name="JobStatusCode" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="JobCode" Type="bigint" Nullable="false" />
+    <Property Name="JobStatus" Type="nvarchar" MaxLength="130" Nullable="false" />
+    <Property Name="UpdatedBy" Type="int" />
+    <Property Name="UpdatedDate" Type="datetime" />
+  </EntityType>
+  <EntityType Name="JobVendors">
+    <Key>
+      <PropertyRef Name="JobVendorCode" />
+    </Key>
+    <Property Name="JobVendorCode" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="JobVendorName" Type="nvarchar" MaxLength="100" />
+    <Property Name="Address1" Type="nvarchar" MaxLength="500" />
+    <Property Name="Address2" Type="nvarchar" MaxLength="500" />
+    <Property Name="Address3" Type="nvarchar" MaxLength="500" />
+    <Property Name="ContactNo" Type="nvarchar" MaxLength="30" />
+    <Property Name="Status" Type="bit" />
+  </EntityType>
+  <EntityType Name="ServiceTypes">
+    <Key>
+      <PropertyRef Name="ServiceTypeCode" />
+    </Key>
+    <Property Name="ServiceTypeCode" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="ServiceTypeName" Type="nvarchar" MaxLength="100" />
+    <Property Name="Status" Type="bit" />
+  </EntityType>
+  <EntityType Name="SupplierTypes">
+    <Key>
+      <PropertyRef Name="SupplierTypeCode" />
+    </Key>
+    <Property Name="SupplierTypeCode" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="SupplierTypeName" Type="nvarchar" MaxLength="100" />
+    <Property Name="PricePerLr" Type="decimal" Precision="18" Scale="2" />
+    <Property Name="Status" Type="bit" />
+  </EntityType>
+  <EntityType Name="TblDefaultMasterDetail">
+    <Key>
+      <PropertyRef Name="DefaultDetailID" />
+    </Key>
+    <Property Name="DefaultDetailID" Type="nvarchar" MaxLength="50" Nullable="false" />
+    <Property Name="DefaultHeaderID" Type="nvarchar" MaxLength="50" Nullable="false" />
+    <Property Name="DefaultTextField" Type="nvarchar" MaxLength="200" />
+    <Property Name="DefaultValueField" Type="nvarchar" MaxLength="200" />
+    <Property Name="Image" Type="image" />
+    <Property Name="DefaultOrder" Type="int" />
+    <Property Name="IsSearch" Type="bit" />
+    <Property Name="IsPage" Type="bit" />
+    <Property Name="Status" Type="bit" />
+    <Property Name="CreatedBy" Type="int" />
+    <Property Name="CreatedDate" Type="datetime" />
+    <Property Name="LastModifiedBy" Type="int" />
+    <Property Name="LastModifiedDate" Type="datetime" />
+  </EntityType>
+  <EntityType Name="TblDefaultMasterHeader">
+    <Key>
+      <PropertyRef Name="DefaultHeaderID" />
+    </Key>
+    <Property Name="DefaultHeaderID" Type="nvarchar" MaxLength="50" Nullable="false" />
+    <Property Name="DefaultHeaderName" Type="nvarchar" MaxLength="200" Nullable="false" />
+    <Property Name="IsTextValue" Type="bit" />
+    <Property Name="SystemType" Type="nvarchar" MaxLength="50" />
+    <Property Name="IsImage" Type="bit" />
+    <Property Name="DefaultOrder" Type="int" />
+    <Property Name="Status" Type="bit" />
+    <Property Name="CreatedBy" Type="int" />
+    <Property Name="CreatedDate" Type="datetime" />
+    <Property Name="LastModifiedBy" Type="int" />
+    <Property Name="LastModifiedDate" Type="datetime" />
+  </EntityType>
+  <EntityType Name="TblHomePage">
+    <Key>
+      <PropertyRef Name="HomePageViewID" />
+    </Key>
+    <Property Name="HomePageViewID" Type="varchar" MaxLength="20" Nullable="false" />
+    <Property Name="HomePageName" Type="varchar" MaxLength="100" />
+    <Property Name="ControllerName" Type="varchar" MaxLength="50" />
+    <Property Name="ActionName" Type="varchar" MaxLength="50" />
+    <Property Name="Status" Type="bit" />
+    <Property Name="CreatedBy" Type="int" />
+    <Property Name="CreatedDate" Type="datetime" />
+    <Property Name="LastModifiedBy" Type="int" />
+    <Property Name="LastModifiedDate" Type="datetime" />
+  </EntityType>
+  <EntityType Name="TblMenuMasterDetail">
+    <Key>
+      <PropertyRef Name="DetailViewID" />
+    </Key>
+    <Property Name="DetailViewID" Type="nvarchar" MaxLength="50" Nullable="false" />
+    <Property Name="HeaderViewID" Type="nvarchar" MaxLength="20" />
+    <Property Name="MenuName" Type="nvarchar" MaxLength="50" />
+    <Property Name="PageUrl" Type="nvarchar" MaxLength="100" />
+    <Property Name="IconCls" Type="nvarchar" MaxLength="100" />
+    <Property Name="Disabled" Type="bit" />
+    <Property Name="OrderByTab" Type="int" />
+    <Property Name="IsPageAccess" Type="bit" />
+    <Property Name="CreatedBy" Type="int" />
+    <Property Name="CreatedDate" Type="datetime" />
+    <Property Name="LastModifiedBy" Type="int" />
+    <Property Name="LastModifiedDate" Type="datetime" />
+  </EntityType>
+  <EntityType Name="TblMenuMasterHeader">
+    <Key>
+      <PropertyRef Name="HeaderViewID" />
+    </Key>
+    <Property Name="HeaderViewID" Type="nvarchar" MaxLength="20" Nullable="false" />
+    <Property Name="MenuName" Type="nvarchar" MaxLength="50" />
+    <Property Name="Disabled" Type="bit" />
+    <Property Name="OrderByTab" Type="int" />
+    <Property Name="IconCls" Type="nvarchar" MaxLength="200" />
+    <Property Name="CreatedBy" Type="int" />
+    <Property Name="CreatedDate" Type="datetime" />
+    <Property Name="LastModifiedBy" Type="int" />
+    <Property Name="LastModifiedDate" Type="datetime" />
+  </EntityType>
+  <EntityType Name="TblMenuRoleMatrixAccess">
+    <Key>
+      <PropertyRef Name="RoleMatrixAccessID" />
+    </Key>
+    <Property Name="RoleMatrixAccessID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="RoleID" Type="nvarchar" MaxLength="50" Nullable="false" />
+    <Property Name="HeaderViewID" Type="nvarchar" MaxLength="50" Nullable="false" />
+    <Property Name="DetailViewID" Type="nvarchar" MaxLength="50" />
+    <Property Name="DisplayOrder" Type="int" />
+    <Property Name="IsPageAccess" Type="bit" />
+    <Property Name="Status" Type="bit" />
+    <Property Name="CreatedBy" Type="int" />
+    <Property Name="CreatedDate" Type="datetime" />
+    <Property Name="LastModifiedBy" Type="int" />
+    <Property Name="LastModifiedDate" Type="datetime" />
+  </EntityType>
+  <EntityType Name="TblRoleMaster">
+    <Key>
+      <PropertyRef Name="RoleID" />
+    </Key>
+    <Property Name="RoleID" Type="varchar" MaxLength="20" Nullable="false" />
+    <Property Name="RoleName" Type="nvarchar" MaxLength="100" />
+    <Property Name="Description" Type="nvarchar" MaxLength="500" />
+    <Property Name="HomePageViewID" Type="nvarchar" MaxLength="20" />
+    <Property Name="IsPOS" Type="bit" />
+    <Property Name="status" Type="bit" />
+    <Property Name="CreatedBy" Type="int" />
+    <Property Name="CreatedDate" Type="datetime" />
+    <Property Name="LastModifiedBy" Type="int" />
+    <Property Name="LastModifiedDate" Type="datetime" />
+  </EntityType>
+  <EntityType Name="TblUserMaster">
+    <Key>
+      <PropertyRef Name="UserID" />
+    </Key>
+    <Property Name="UserID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="LoginName" Type="nvarchar" MaxLength="50" />
+    <Property Name="FirstName" Type="nvarchar" MaxLength="100" />
+    <Property Name="LastName" Type="nvarchar" MaxLength="100" />
+    <Property Name="Password" Type="nvarchar" MaxLength="100" />
+    <Property Name="EmailID" Type="nvarchar" MaxLength="200" />
+    <Property Name="MobileNumber" Type="nvarchar" MaxLength="50" />
+    <Property Name="PasswordAttemptCount" Type="int" Nullable="false" />
+    <Property Name="RoleID" Type="nvarchar" MaxLength="50" />
+    <Property Name="Status" Type="bit" />
+    <Property Name="CreatedBy" Type="int" />
+    <Property Name="CreatedDate" Type="datetime" />
+    <Property Name="LastModifiedBy" Type="int" />
+    <Property Name="LastModifiedDate" Type="datetime" />
+  </EntityType>
+  <EntityType Name="Vehicles">
+    <Key>
+      <PropertyRef Name="VehicleCode" />
+    </Key>
+    <Property Name="VehicleCode" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="VehicleName" Type="nvarchar" MaxLength="100" />
+    <Property Name="Status" Type="bit" />
+  </EntityType>
+  <Function Name="sp_frm_Clear_Trxns" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+  <Function Name="sp_frm_get_CashInHand_Report" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="TransactionFrom" Type="datetime" Mode="In" />
+    <Parameter Name="TransactionTo" Type="datetime" Mode="In" />
+  </Function>
+  <Function Name="sp_frm_get_Credit_Report" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="TransactionFrom" Type="datetime" Mode="In" />
+    <Parameter Name="TransactionTo" Type="datetime" Mode="In" />
+  </Function>
+  <Function Name="sp_frm_get_CreditCustomers_Report" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="TransactionFrom" Type="datetime" Mode="In" />
+    <Parameter Name="TransactionTo" Type="datetime" Mode="In" />
+  </Function>
+  <Function Name="sp_frm_get_Dashboard_Daily" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="CustomerId" Type="int" Mode="In" />
+  </Function>
+  <Function Name="sp_frm_get_Dashboard_Report" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="CustomerId" Type="int" Mode="In" />
+    <Parameter Name="TransactionFrom" Type="datetime" Mode="In" />
+    <Parameter Name="TransactionTo" Type="datetime" Mode="In" />
+  </Function>
+  <Function Name="sp_frm_get_Jobs" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="VehicleCode" Type="bigint" Mode="In" />
+    <Parameter Name="JobVendorCode" Type="bigint" Mode="In" />
+    <Parameter Name="CustomerName" Type="varchar" Mode="In" />
+    <Parameter Name="ContactNo" Type="nvarchar" Mode="In" />
+    <Parameter Name="DrivingBy" Type="int" Mode="In" />
+    <Parameter Name="CashInHand" Type="int" Mode="In" />
+    <Parameter Name="TransactionFrom" Type="date" Mode="In" />
+    <Parameter Name="TransactionTo" Type="date" Mode="In" />
+  </Function>
+  <Function Name="sp_frm_get_Jobs_Report" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="VehicleCode" Type="bigint" Mode="In" />
+    <Parameter Name="JobVendorCode" Type="bigint" Mode="In" />
+    <Parameter Name="CustomerName" Type="varchar" Mode="In" />
+    <Parameter Name="ContactNo" Type="nvarchar" Mode="In" />
+    <Parameter Name="DrivingBy" Type="int" Mode="In" />
+    <Parameter Name="CashInHand" Type="int" Mode="In" />
+    <Parameter Name="TransactionFrom" Type="date" Mode="In" />
+    <Parameter Name="TransactionTo" Type="date" Mode="In" />
+  </Function>
+  <Function Name="sp_frm_get_OutSourceJobs_Report" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="VehicleCode" Type="bigint" Mode="In" />
+    <Parameter Name="JobVendorCode" Type="bigint" Mode="In" />
+    <Parameter Name="CustomerName" Type="varchar" Mode="In" />
+    <Parameter Name="ContactNo" Type="nvarchar" Mode="In" />
+    <Parameter Name="DrivingBy" Type="int" Mode="In" />
+    <Parameter Name="CashInHand" Type="int" Mode="In" />
+    <Parameter Name="TransactionFrom" Type="date" Mode="In" />
+    <Parameter Name="TransactionTo" Type="date" Mode="In" />
+  </Function>
+  <Function Name="sp_frm_get_Total_Report" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="TransactionFrom" Type="datetime" Mode="In" />
+    <Parameter Name="TransactionTo" Type="datetime" Mode="In" />
+  </Function>
+  <Function Name="sp_frm_get_Vehicle_Expense_Report" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="TransactionFrom" Type="datetime" Mode="In" />
+    <Parameter Name="TransactionTo" Type="datetime" Mode="In" />
+    <Parameter Name="VehicleCode" Type="bigint" Mode="In" />
+  </Function>
+  <Function Name="sp_frm_get_Vehicle_Report" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="TransactionFrom" Type="datetime" Mode="In" />
+    <Parameter Name="TransactionTo" Type="datetime" Mode="In" />
+  </Function>
+  <Function Name="sp_frm_get_Vehicle_Total_Report" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="TransactionFrom" Type="datetime" Mode="In" />
+    <Parameter Name="TransactionTo" Type="datetime" Mode="In" />
+    <Parameter Name="VehicleCode" Type="bigint" Mode="In" />
+  </Function>
+  <Function Name="tfn_CoalesceConcatPaymentMode" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="true" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" ReturnType="nvarchar(max)">
+    <Parameter Name="salesID" Type="bigint" Mode="In" />
+  </Function>
+  <EntityContainer Name="TransportModelStoreContainer">
+    <EntitySet Name="Expense" EntityType="Self.Expense" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="JobRequests" EntityType="Self.JobRequests" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Jobs" EntityType="Self.Jobs" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="JobStatus" EntityType="Self.JobStatus" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="JobVendors" EntityType="Self.JobVendors" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="ServiceTypes" EntityType="Self.ServiceTypes" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="SupplierTypes" EntityType="Self.SupplierTypes" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="TblDefaultMasterDetail" EntityType="Self.TblDefaultMasterDetail" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="TblDefaultMasterHeader" EntityType="Self.TblDefaultMasterHeader" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="TblHomePage" EntityType="Self.TblHomePage" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="TblMenuMasterDetail" EntityType="Self.TblMenuMasterDetail" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="TblMenuMasterHeader" EntityType="Self.TblMenuMasterHeader" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="TblMenuRoleMatrixAccess" EntityType="Self.TblMenuRoleMatrixAccess" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="TblRoleMaster" EntityType="Self.TblRoleMaster" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="TblUserMaster" EntityType="Self.TblUserMaster" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Vehicles" EntityType="Self.Vehicles" Schema="dbo" store:Type="Tables" />
+  </EntityContainer>
+</Schema>

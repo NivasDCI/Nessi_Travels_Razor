@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="73630b361b7d4ad3bc35a6f714dfe47f" Name="Diagram1" ZoomLevel="68">
+        <EntityTypeShape EntityType="TransportModel.JobStatu" Width="1.5" PointX="4.75" PointY="0.75" />
+        <EntityTypeShape EntityType="TransportModel.JobVendor" Width="1.5" PointX="4.75" PointY="3.75" />
+        <EntityTypeShape EntityType="TransportModel.ServiceType" Width="1.5" PointX="6.75" PointY="0.75" />
+        <EntityTypeShape EntityType="TransportModel.TblDefaultMasterDetail" Width="1.5" PointX="0.75" PointY="6.75" />
+        <EntityTypeShape EntityType="TransportModel.TblDefaultMasterHeader" Width="1.5" PointX="6.75" PointY="3.75" />
+        <EntityTypeShape EntityType="TransportModel.TblHomePage" Width="1.5" PointX="2.75" PointY="7.75" />
+        <EntityTypeShape EntityType="TransportModel.TblMenuMasterDetail" Width="1.5" PointX="4.75" PointY="7.75" />
+        <EntityTypeShape EntityType="TransportModel.TblMenuMasterHeader" Width="1.5" PointX="6.75" PointY="7.75" />
+        <EntityTypeShape EntityType="TransportModel.TblMenuRoleMatrixAccess" Width="1.5" PointX="8.75" PointY="0.75" />
+        <EntityTypeShape EntityType="TransportModel.TblRoleMaster" Width="1.5" PointX="8.75" PointY="4.75" />
+        <EntityTypeShape EntityType="TransportModel.TblUserMaster" Width="1.5" PointX="8.75" PointY="8.75" />
+        <EntityTypeShape EntityType="TransportModel.Vehicle" Width="1.5" PointX="10.75" PointY="4.75" />
+        <EntityTypeShape EntityType="TransportModel.JobRequest" Width="1.5" PointX="0.75" PointY="0.75" />
+        <EntityTypeShape EntityType="TransportModel.Job" Width="1.5" PointX="0.75" PointY="11.75" />
+        <EntityTypeShape EntityType="TransportModel.SupplierType" Width="1.5" PointX="5.375" PointY="12.75" />
+        <EntityTypeShape EntityType="TransportModel.Expense" Width="1.5" PointX="11.375" PointY="7.75" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

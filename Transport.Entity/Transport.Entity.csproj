@@ -1,0 +1,208 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{33882671-806D-4BA4-9D96-FC9F4BDDBB72}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Transport.Entity</RootNamespace>
+    <AssemblyName>Transport.Entity</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework">
+      <HintPath>..\..\SparePro\SparePro.Entity\bin\Debug\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer">
+      <HintPath>..\..\SparePro\SparePro.Entity\bin\Debug\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="JWT, Version=1.3.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\JWT.1.3.4\lib\3.5\JWT.dll</HintPath>
+    </Reference>
+    <Reference Include="MiniExcel, Version=1.31.3.0, Culture=neutral, PublicKeyToken=e7310002a53eac39, processorArchitecture=MSIL">
+      <HintPath>..\packages\MiniExcel.1.31.3\lib\net45\MiniExcel.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Twilio, Version=7.0.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Twilio.7.0.5\lib\net35\Twilio.dll</HintPath>
+    </Reference>
+    <Reference Include="WhatsAppApi, Version=1.0.2.1, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Whatsapp.NET.1.2.2\lib\WhatsAppApi.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Expense.cs">
+      <DependentUpon>Transport.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Job.cs">
+      <DependentUpon>Transport.tt</DependentUpon>
+    </Compile>
+    <Compile Include="JobRequest.cs">
+      <DependentUpon>Transport.tt</DependentUpon>
+    </Compile>
+    <Compile Include="JobStatu.cs">
+      <DependentUpon>Transport.tt</DependentUpon>
+    </Compile>
+    <Compile Include="JobVendor.cs">
+      <DependentUpon>Transport.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServiceType.cs">
+      <DependentUpon>Transport.tt</DependentUpon>
+    </Compile>
+    <Compile Include="sp_frm_get_CashInHand_Report_Result.cs">
+      <DependentUpon>Transport.tt</DependentUpon>
+    </Compile>
+    <Compile Include="sp_frm_get_CreditCustomers_Report_Result.cs">
+      <DependentUpon>Transport.tt</DependentUpon>
+    </Compile>
+    <Compile Include="sp_frm_get_Credit_Report_Result.cs">
+      <DependentUpon>Transport.tt</DependentUpon>
+    </Compile>
+    <Compile Include="sp_frm_get_Dashboard_Daily_Result.cs">
+      <DependentUpon>Transport.tt</DependentUpon>
+    </Compile>
+    <Compile Include="sp_frm_get_Jobs_Report_Result.cs">
+      <DependentUpon>Transport.tt</DependentUpon>
+    </Compile>
+    <Compile Include="sp_frm_get_Jobs_Result.cs">
+      <DependentUpon>Transport.tt</DependentUpon>
+    </Compile>
+    <Compile Include="sp_frm_get_OutSourceJobs_Report_Result.cs">
+      <DependentUpon>Transport.tt</DependentUpon>
+    </Compile>
+    <Compile Include="sp_frm_get_Total_Report_Result.cs">
+      <DependentUpon>Transport.tt</DependentUpon>
+    </Compile>
+    <Compile Include="sp_frm_get_Vehicle_Expense_Report_Result.cs">
+      <DependentUpon>Transport.tt</DependentUpon>
+    </Compile>
+    <Compile Include="sp_frm_get_Vehicle_Report_Result.cs">
+      <DependentUpon>Transport.tt</DependentUpon>
+    </Compile>
+    <Compile Include="sp_frm_get_Vehicle_Total_Report_Result.cs">
+      <DependentUpon>Transport.tt</DependentUpon>
+    </Compile>
+    <Compile Include="SupplierType.cs">
+      <DependentUpon>Transport.tt</DependentUpon>
+    </Compile>
+    <Compile Include="TblDefaultMasterDetail.cs">
+      <DependentUpon>Transport.tt</DependentUpon>
+    </Compile>
+    <Compile Include="TblDefaultMasterHeader.cs">
+      <DependentUpon>Transport.tt</DependentUpon>
+    </Compile>
+    <Compile Include="TblHomePage.cs">
+      <DependentUpon>Transport.tt</DependentUpon>
+    </Compile>
+    <Compile Include="TblMenuMasterDetail.cs">
+      <DependentUpon>Transport.tt</DependentUpon>
+    </Compile>
+    <Compile Include="TblMenuMasterHeader.cs">
+      <DependentUpon>Transport.tt</DependentUpon>
+    </Compile>
+    <Compile Include="TblMenuRoleMatrixAccess.cs">
+      <DependentUpon>Transport.tt</DependentUpon>
+    </Compile>
+    <Compile Include="TblRoleMaster.cs">
+      <DependentUpon>Transport.tt</DependentUpon>
+    </Compile>
+    <Compile Include="TblUserMaster.cs">
+      <DependentUpon>Transport.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Transport.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Transport.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Transport.Designer.cs">
+      <DependentUpon>Transport.edmx</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Transport1.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Transport.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Vehicle.cs">
+      <DependentUpon>Transport.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.Config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="packages.config" />
+    <EntityDeploy Include="Transport.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>Transport.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="Transport.edmx.diagram">
+      <DependentUpon>Transport.edmx</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Transport.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>Transport.edmx</DependentUpon>
+      <LastGenOutput>Transport.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Transport.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>Transport.edmx</DependentUpon>
+      <LastGenOutput>Transport1.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,440 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="TransportModelStoreContainer" CdmEntityContainer="TransportEntities">
+    <EntitySetMapping Name="JobStatus">
+      <EntityTypeMapping TypeName="TransportModel.JobStatu">
+        <MappingFragment StoreEntitySet="JobStatus">
+          <ScalarProperty Name="UpdatedDate" ColumnName="UpdatedDate" />
+          <ScalarProperty Name="UpdatedBy" ColumnName="UpdatedBy" />
+          <ScalarProperty Name="JobStatus" ColumnName="JobStatus" />
+          <ScalarProperty Name="JobCode" ColumnName="JobCode" />
+          <ScalarProperty Name="JobStatusCode" ColumnName="JobStatusCode" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="JobVendors">
+      <EntityTypeMapping TypeName="TransportModel.JobVendor">
+        <MappingFragment StoreEntitySet="JobVendors">
+          <ScalarProperty Name="Status" ColumnName="Status" />
+          <ScalarProperty Name="ContactNo" ColumnName="ContactNo" />
+          <ScalarProperty Name="Address3" ColumnName="Address3" />
+          <ScalarProperty Name="Address2" ColumnName="Address2" />
+          <ScalarProperty Name="Address1" ColumnName="Address1" />
+          <ScalarProperty Name="JobVendorName" ColumnName="JobVendorName" />
+          <ScalarProperty Name="JobVendorCode" ColumnName="JobVendorCode" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ServiceTypes">
+      <EntityTypeMapping TypeName="TransportModel.ServiceType">
+        <MappingFragment StoreEntitySet="ServiceTypes">
+          <ScalarProperty Name="Status" ColumnName="Status" />
+          <ScalarProperty Name="ServiceTypeName" ColumnName="ServiceTypeName" />
+          <ScalarProperty Name="ServiceTypeCode" ColumnName="ServiceTypeCode" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="TblDefaultMasterDetails">
+      <EntityTypeMapping TypeName="TransportModel.TblDefaultMasterDetail">
+        <MappingFragment StoreEntitySet="TblDefaultMasterDetail">
+          <ScalarProperty Name="LastModifiedDate" ColumnName="LastModifiedDate" />
+          <ScalarProperty Name="LastModifiedBy" ColumnName="LastModifiedBy" />
+          <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="Status" ColumnName="Status" />
+          <ScalarProperty Name="IsPage" ColumnName="IsPage" />
+          <ScalarProperty Name="IsSearch" ColumnName="IsSearch" />
+          <ScalarProperty Name="DefaultOrder" ColumnName="DefaultOrder" />
+          <ScalarProperty Name="Image" ColumnName="Image" />
+          <ScalarProperty Name="DefaultValueField" ColumnName="DefaultValueField" />
+          <ScalarProperty Name="DefaultTextField" ColumnName="DefaultTextField" />
+          <ScalarProperty Name="DefaultHeaderID" ColumnName="DefaultHeaderID" />
+          <ScalarProperty Name="DefaultDetailID" ColumnName="DefaultDetailID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="TblDefaultMasterHeaders">
+      <EntityTypeMapping TypeName="TransportModel.TblDefaultMasterHeader">
+        <MappingFragment StoreEntitySet="TblDefaultMasterHeader">
+          <ScalarProperty Name="LastModifiedDate" ColumnName="LastModifiedDate" />
+          <ScalarProperty Name="LastModifiedBy" ColumnName="LastModifiedBy" />
+          <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="Status" ColumnName="Status" />
+          <ScalarProperty Name="DefaultOrder" ColumnName="DefaultOrder" />
+          <ScalarProperty Name="IsImage" ColumnName="IsImage" />
+          <ScalarProperty Name="SystemType" ColumnName="SystemType" />
+          <ScalarProperty Name="IsTextValue" ColumnName="IsTextValue" />
+          <ScalarProperty Name="DefaultHeaderName" ColumnName="DefaultHeaderName" />
+          <ScalarProperty Name="DefaultHeaderID" ColumnName="DefaultHeaderID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="TblHomePages">
+      <EntityTypeMapping TypeName="TransportModel.TblHomePage">
+        <MappingFragment StoreEntitySet="TblHomePage">
+          <ScalarProperty Name="LastModifiedDate" ColumnName="LastModifiedDate" />
+          <ScalarProperty Name="LastModifiedBy" ColumnName="LastModifiedBy" />
+          <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="Status" ColumnName="Status" />
+          <ScalarProperty Name="ActionName" ColumnName="ActionName" />
+          <ScalarProperty Name="ControllerName" ColumnName="ControllerName" />
+          <ScalarProperty Name="HomePageName" ColumnName="HomePageName" />
+          <ScalarProperty Name="HomePageViewID" ColumnName="HomePageViewID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="TblMenuMasterDetails">
+      <EntityTypeMapping TypeName="TransportModel.TblMenuMasterDetail">
+        <MappingFragment StoreEntitySet="TblMenuMasterDetail">
+          <ScalarProperty Name="LastModifiedDate" ColumnName="LastModifiedDate" />
+          <ScalarProperty Name="LastModifiedBy" ColumnName="LastModifiedBy" />
+          <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="IsPageAccess" ColumnName="IsPageAccess" />
+          <ScalarProperty Name="OrderByTab" ColumnName="OrderByTab" />
+          <ScalarProperty Name="Disabled" ColumnName="Disabled" />
+          <ScalarProperty Name="IconCls" ColumnName="IconCls" />
+          <ScalarProperty Name="PageUrl" ColumnName="PageUrl" />
+          <ScalarProperty Name="MenuName" ColumnName="MenuName" />
+          <ScalarProperty Name="HeaderViewID" ColumnName="HeaderViewID" />
+          <ScalarProperty Name="DetailViewID" ColumnName="DetailViewID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="TblMenuMasterHeaders">
+      <EntityTypeMapping TypeName="TransportModel.TblMenuMasterHeader">
+        <MappingFragment StoreEntitySet="TblMenuMasterHeader">
+          <ScalarProperty Name="LastModifiedDate" ColumnName="LastModifiedDate" />
+          <ScalarProperty Name="LastModifiedBy" ColumnName="LastModifiedBy" />
+          <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="IconCls" ColumnName="IconCls" />
+          <ScalarProperty Name="OrderByTab" ColumnName="OrderByTab" />
+          <ScalarProperty Name="Disabled" ColumnName="Disabled" />
+          <ScalarProperty Name="MenuName" ColumnName="MenuName" />
+          <ScalarProperty Name="HeaderViewID" ColumnName="HeaderViewID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="TblMenuRoleMatrixAccesses">
+      <EntityTypeMapping TypeName="TransportModel.TblMenuRoleMatrixAccess">
+        <MappingFragment StoreEntitySet="TblMenuRoleMatrixAccess">
+          <ScalarProperty Name="LastModifiedDate" ColumnName="LastModifiedDate" />
+          <ScalarProperty Name="LastModifiedBy" ColumnName="LastModifiedBy" />
+          <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="Status" ColumnName="Status" />
+          <ScalarProperty Name="IsPageAccess" ColumnName="IsPageAccess" />
+          <ScalarProperty Name="DisplayOrder" ColumnName="DisplayOrder" />
+          <ScalarProperty Name="DetailViewID" ColumnName="DetailViewID" />
+          <ScalarProperty Name="HeaderViewID" ColumnName="HeaderViewID" />
+          <ScalarProperty Name="RoleID" ColumnName="RoleID" />
+          <ScalarProperty Name="RoleMatrixAccessID" ColumnName="RoleMatrixAccessID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="TblRoleMasters">
+      <EntityTypeMapping TypeName="TransportModel.TblRoleMaster">
+        <MappingFragment StoreEntitySet="TblRoleMaster">
+          <ScalarProperty Name="LastModifiedDate" ColumnName="LastModifiedDate" />
+          <ScalarProperty Name="LastModifiedBy" ColumnName="LastModifiedBy" />
+          <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="status" ColumnName="status" />
+          <ScalarProperty Name="IsPOS" ColumnName="IsPOS" />
+          <ScalarProperty Name="HomePageViewID" ColumnName="HomePageViewID" />
+          <ScalarProperty Name="Description" ColumnName="Description" />
+          <ScalarProperty Name="RoleName" ColumnName="RoleName" />
+          <ScalarProperty Name="RoleID" ColumnName="RoleID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="TblUserMasters">
+      <EntityTypeMapping TypeName="TransportModel.TblUserMaster">
+        <MappingFragment StoreEntitySet="TblUserMaster">
+          <ScalarProperty Name="LastModifiedDate" ColumnName="LastModifiedDate" />
+          <ScalarProperty Name="LastModifiedBy" ColumnName="LastModifiedBy" />
+          <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="Status" ColumnName="Status" />
+          <ScalarProperty Name="RoleID" ColumnName="RoleID" />
+          <ScalarProperty Name="PasswordAttemptCount" ColumnName="PasswordAttemptCount" />
+          <ScalarProperty Name="MobileNumber" ColumnName="MobileNumber" />
+          <ScalarProperty Name="EmailID" ColumnName="EmailID" />
+          <ScalarProperty Name="Password" ColumnName="Password" />
+          <ScalarProperty Name="LastName" ColumnName="LastName" />
+          <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+          <ScalarProperty Name="LoginName" ColumnName="LoginName" />
+          <ScalarProperty Name="UserID" ColumnName="UserID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Vehicles">
+      <EntityTypeMapping TypeName="TransportModel.Vehicle">
+        <MappingFragment StoreEntitySet="Vehicles">
+          <ScalarProperty Name="Status" ColumnName="Status" />
+          <ScalarProperty Name="VehicleName" ColumnName="VehicleName" />
+          <ScalarProperty Name="VehicleCode" ColumnName="VehicleCode" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <FunctionImportMapping FunctionImportName="sp_frm_Clear_Trxns" FunctionName="TransportModel.Store.sp_frm_Clear_Trxns" />
+    <FunctionImportMapping FunctionImportName="sp_frm_get_CashInHand_Report" FunctionName="TransportModel.Store.sp_frm_get_CashInHand_Report">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="TransportModel.sp_frm_get_CashInHand_Report_Result">
+          <ScalarProperty Name="CashOrder" ColumnName="CashOrder" />
+          <ScalarProperty Name="CreditJob" ColumnName="CreditJob" />
+          <ScalarProperty Name="TotalOrder" ColumnName="TotalOrder" />
+          <ScalarProperty Name="CashInHand" ColumnName="CashInHand" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="sp_frm_get_Credit_Report" FunctionName="TransportModel.Store.sp_frm_get_Credit_Report">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="TransportModel.sp_frm_get_Credit_Report_Result">
+          <ScalarProperty Name="CreditJob" ColumnName="CreditJob" />
+          <ScalarProperty Name="JobVendorName" ColumnName="JobVendorName" />
+          <ScalarProperty Name="JobVendorCode" ColumnName="JobVendorCode" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="sp_frm_get_CreditCustomers_Report" FunctionName="TransportModel.Store.sp_frm_get_CreditCustomers_Report">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="TransportModel.sp_frm_get_CreditCustomers_Report_Result">
+          <ScalarProperty Name="CreditJob" ColumnName="CreditJob" />
+          <ScalarProperty Name="Customerame" ColumnName="Customerame" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="sp_frm_get_Dashboard_Daily" FunctionName="TransportModel.Store.sp_frm_get_Dashboard_Daily">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="TransportModel.sp_frm_get_Dashboard_Daily_Result">
+          <ScalarProperty Name="Requests" ColumnName="Requests" />
+          <ScalarProperty Name="PendingJobs" ColumnName="PendingJobs" />
+          <ScalarProperty Name="OnGoingJobs" ColumnName="OnGoingJobs" />
+          <ScalarProperty Name="CompletedJobs" ColumnName="CompletedJobs" />
+          <ScalarProperty Name="TotalCredit" ColumnName="TotalCredit" />
+          <ScalarProperty Name="TotalCash" ColumnName="TotalCash" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="sp_frm_get_Dashboard_Report" FunctionName="TransportModel.Store.sp_frm_get_Dashboard_Report" />
+    <FunctionImportMapping FunctionImportName="sp_frm_get_Total_Report" FunctionName="TransportModel.Store.sp_frm_get_Total_Report">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="TransportModel.sp_frm_get_Total_Report_Result">
+          <ScalarProperty Name="CashOrder" ColumnName="CashOrder" />
+          <ScalarProperty Name="CreditJob" ColumnName="CreditJob" />
+          <ScalarProperty Name="TotalOrder" ColumnName="TotalOrder" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="sp_frm_get_Vehicle_Expense_Report" FunctionName="TransportModel.Store.sp_frm_get_Vehicle_Expense_Report">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="TransportModel.sp_frm_get_Vehicle_Expense_Report_Result">
+          <ScalarProperty Name="VehicleName" ColumnName="VehicleName" />
+          <ScalarProperty Name="ServiceTypeName" ColumnName="ServiceTypeName" />
+          <ScalarProperty Name="Charge" ColumnName="Charge" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="sp_frm_get_Vehicle_Report" FunctionName="TransportModel.Store.sp_frm_get_Vehicle_Report">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="TransportModel.sp_frm_get_Vehicle_Report_Result">
+          <ScalarProperty Name="CashOrder" ColumnName="CashOrder" />
+          <ScalarProperty Name="CreditJob" ColumnName="CreditJob" />
+          <ScalarProperty Name="TotalOrder" ColumnName="TotalOrder" />
+          <ScalarProperty Name="VehicleName" ColumnName="VehicleName" />
+          <ScalarProperty Name="VehicleCode" ColumnName="VehicleCode" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="sp_frm_get_Vehicle_Total_Report" FunctionName="TransportModel.Store.sp_frm_get_Vehicle_Total_Report">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="TransportModel.sp_frm_get_Vehicle_Total_Report_Result">
+          <ScalarProperty Name="CashOrder" ColumnName="CashOrder" />
+          <ScalarProperty Name="CreditJob" ColumnName="CreditJob" />
+          <ScalarProperty Name="TotalOrder" ColumnName="TotalOrder" />
+          <ScalarProperty Name="VehicleName" ColumnName="VehicleName" />
+          <ScalarProperty Name="VehicleCode" ColumnName="VehicleCode" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <EntitySetMapping Name="JobRequests">
+      <EntityTypeMapping TypeName="TransportModel.JobRequest">
+        <MappingFragment StoreEntitySet="JobRequests">
+          <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+          <ScalarProperty Name="JobRequestStatus" ColumnName="JobRequestStatus" />
+          <ScalarProperty Name="NoOfBags" ColumnName="NoOfBags" />
+          <ScalarProperty Name="NoOfPaxs" ColumnName="NoOfPaxs" />
+          <ScalarProperty Name="Cost" ColumnName="Cost" />
+          <ScalarProperty Name="ContactNo" ColumnName="ContactNo" />
+          <ScalarProperty Name="CustomerName" ColumnName="CustomerName" />
+          <ScalarProperty Name="JobRequestTo" ColumnName="JobRequestTo" />
+          <ScalarProperty Name="JobRequestFrom" ColumnName="JobRequestFrom" />
+          <ScalarProperty Name="JobRequestTime" ColumnName="JobRequestTime" />
+          <ScalarProperty Name="JobRequestDate" ColumnName="JobRequestDate" />
+          <ScalarProperty Name="JobRequestCode" ColumnName="JobRequestCode" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <FunctionImportMapping FunctionImportName="sp_frm_get_Jobs" FunctionName="TransportModel.Store.sp_frm_get_Jobs">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="TransportModel.sp_frm_get_Jobs_Result">
+          <ScalarProperty Name="JobCode" ColumnName="JobCode" />
+          <ScalarProperty Name="JobDate" ColumnName="JobDate" />
+          <ScalarProperty Name="JobTime" ColumnName="JobTime" />
+          <ScalarProperty Name="VehicleName" ColumnName="VehicleName" />
+          <ScalarProperty Name="JobFrom" ColumnName="JobFrom" />
+          <ScalarProperty Name="JobTo" ColumnName="JobTo" />
+          <ScalarProperty Name="JobGivenBy" ColumnName="JobGivenBy" />
+          <ScalarProperty Name="DrivingBy" ColumnName="DrivingBy" />
+          <ScalarProperty Name="OutSource" ColumnName="OutSource" />
+          <ScalarProperty Name="OutsourceAmount" ColumnName="OutsourceAmount" />
+          <ScalarProperty Name="CustomerName" ColumnName="CustomerName" />
+          <ScalarProperty Name="ContactNo" ColumnName="ContactNo" />
+          <ScalarProperty Name="Cost" ColumnName="Cost" />
+          <ScalarProperty Name="Credit" ColumnName="Credit" />
+          <ScalarProperty Name="Cash" ColumnName="Cash" />
+          <ScalarProperty Name="CashInHandName" ColumnName="CashInHandName" />
+          <ScalarProperty Name="JobStatus" ColumnName="JobStatus" />
+          <ScalarProperty Name="Remarks" ColumnName="Remarks" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="UpdatedBy" ColumnName="UpdatedBy" />
+          <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+          <ScalarProperty Name="UpdatedDate" ColumnName="UpdatedDate" />
+          <ScalarProperty Name="SubmissionDate" ColumnName="SubmissionDate" />
+          <ScalarProperty Name="CashInHand" ColumnName="CashInHand" />
+          <ScalarProperty Name="NoOfPaxs" ColumnName="NoOfPaxs" />
+          <ScalarProperty Name="NoOfBags" ColumnName="NoOfBags" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="sp_frm_get_Jobs_Report" FunctionName="TransportModel.Store.sp_frm_get_Jobs_Report">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="TransportModel.sp_frm_get_Jobs_Report_Result">
+          <ScalarProperty Name="JobCode" ColumnName="JobCode" />
+          <ScalarProperty Name="JobDate" ColumnName="JobDate" />
+          <ScalarProperty Name="JobTime" ColumnName="JobTime" />
+          <ScalarProperty Name="VehicleName" ColumnName="VehicleName" />
+          <ScalarProperty Name="JobFrom" ColumnName="JobFrom" />
+          <ScalarProperty Name="JobTo" ColumnName="JobTo" />
+          <ScalarProperty Name="JobGivenBy" ColumnName="JobGivenBy" />
+          <ScalarProperty Name="DrivingBy" ColumnName="DrivingBy" />
+          <ScalarProperty Name="OutSource" ColumnName="OutSource" />
+          <ScalarProperty Name="OutSourceAmount" ColumnName="OutSourceAmount" />
+          <ScalarProperty Name="CustomerName" ColumnName="CustomerName" />
+          <ScalarProperty Name="ContactNo" ColumnName="ContactNo" />
+          <ScalarProperty Name="Cost" ColumnName="Cost" />
+          <ScalarProperty Name="Credit" ColumnName="Credit" />
+          <ScalarProperty Name="Cash" ColumnName="Cash" />
+          <ScalarProperty Name="CashInHandName" ColumnName="CashInHandName" />
+          <ScalarProperty Name="JobStatus" ColumnName="JobStatus" />
+          <ScalarProperty Name="Remarks" ColumnName="Remarks" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="UpdatedBy" ColumnName="UpdatedBy" />
+          <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+          <ScalarProperty Name="UpdatedDate" ColumnName="UpdatedDate" />
+          <ScalarProperty Name="SubmissionDate" ColumnName="SubmissionDate" />
+          <ScalarProperty Name="CashInHand" ColumnName="CashInHand" />
+          <ScalarProperty Name="NoOfPaxs" ColumnName="NoOfPaxs" />
+          <ScalarProperty Name="NoOfBags" ColumnName="NoOfBags" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <EntitySetMapping Name="Jobs">
+      <EntityTypeMapping TypeName="TransportModel.Job">
+        <MappingFragment StoreEntitySet="Jobs">
+          <ScalarProperty Name="OutSourceAmountGiven" ColumnName="OutSourceAmountGiven" />
+          <ScalarProperty Name="UpdatedDate" ColumnName="UpdatedDate" />
+          <ScalarProperty Name="UpdatedBy" ColumnName="UpdatedBy" />
+          <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="Remarks" ColumnName="Remarks" />
+          <ScalarProperty Name="JobRequestCode" ColumnName="JobRequestCode" />
+          <ScalarProperty Name="CashInHand" ColumnName="CashInHand" />
+          <ScalarProperty Name="Cash" ColumnName="Cash" />
+          <ScalarProperty Name="Credit" ColumnName="Credit" />
+          <ScalarProperty Name="Cost" ColumnName="Cost" />
+          <ScalarProperty Name="JobStatus" ColumnName="JobStatus" />
+          <ScalarProperty Name="ContactNo" ColumnName="ContactNo" />
+          <ScalarProperty Name="CustomerName" ColumnName="CustomerName" />
+          <ScalarProperty Name="OutSourceAmount" ColumnName="OutSourceAmount" />
+          <ScalarProperty Name="OutSource" ColumnName="OutSource" />
+          <ScalarProperty Name="DrivingBy" ColumnName="DrivingBy" />
+          <ScalarProperty Name="VehicleCode" ColumnName="VehicleCode" />
+          <ScalarProperty Name="JobVendorCode" ColumnName="JobVendorCode" />
+          <ScalarProperty Name="JobTo" ColumnName="JobTo" />
+          <ScalarProperty Name="JobFrom" ColumnName="JobFrom" />
+          <ScalarProperty Name="JobTime" ColumnName="JobTime" />
+          <ScalarProperty Name="JobDate" ColumnName="JobDate" />
+          <ScalarProperty Name="JobCode" ColumnName="JobCode" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <FunctionImportMapping FunctionImportName="sp_frm_get_OutSourceJobs_Report" FunctionName="TransportModel.Store.sp_frm_get_OutSourceJobs_Report">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="TransportModel.sp_frm_get_OutSourceJobs_Report_Result">
+          <ScalarProperty Name="JobCode" ColumnName="JobCode" />
+          <ScalarProperty Name="JobDate" ColumnName="JobDate" />
+          <ScalarProperty Name="JobTime" ColumnName="JobTime" />
+          <ScalarProperty Name="VehicleName" ColumnName="VehicleName" />
+          <ScalarProperty Name="JobFrom" ColumnName="JobFrom" />
+          <ScalarProperty Name="JobTo" ColumnName="JobTo" />
+          <ScalarProperty Name="JobGivenBy" ColumnName="JobGivenBy" />
+          <ScalarProperty Name="DrivingBy" ColumnName="DrivingBy" />
+          <ScalarProperty Name="OutSource" ColumnName="OutSource" />
+          <ScalarProperty Name="OutSourceAmount" ColumnName="OutSourceAmount" />
+          <ScalarProperty Name="OutSourceAmountGiven" ColumnName="OutSourceAmountGiven" />
+          <ScalarProperty Name="CustomerName" ColumnName="CustomerName" />
+          <ScalarProperty Name="ContactNo" ColumnName="ContactNo" />
+          <ScalarProperty Name="Cost" ColumnName="Cost" />
+          <ScalarProperty Name="Credit" ColumnName="Credit" />
+          <ScalarProperty Name="Cash" ColumnName="Cash" />
+          <ScalarProperty Name="CashInHandName" ColumnName="CashInHandName" />
+          <ScalarProperty Name="JobStatus" ColumnName="JobStatus" />
+          <ScalarProperty Name="Remarks" ColumnName="Remarks" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="UpdatedBy" ColumnName="UpdatedBy" />
+          <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+          <ScalarProperty Name="UpdatedDate" ColumnName="UpdatedDate" />
+          <ScalarProperty Name="SubmissionDate" ColumnName="SubmissionDate" />
+          <ScalarProperty Name="CashInHand" ColumnName="CashInHand" />
+          <ScalarProperty Name="NoOfPaxs" ColumnName="NoOfPaxs" />
+          <ScalarProperty Name="NoOfBags" ColumnName="NoOfBags" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <EntitySetMapping Name="SupplierTypes">
+      <EntityTypeMapping TypeName="TransportModel.SupplierType">
+        <MappingFragment StoreEntitySet="SupplierTypes">
+          <ScalarProperty Name="Status" ColumnName="Status" />
+          <ScalarProperty Name="PricePerLr" ColumnName="PricePerLr" />
+          <ScalarProperty Name="SupplierTypeName" ColumnName="SupplierTypeName" />
+          <ScalarProperty Name="SupplierTypeCode" ColumnName="SupplierTypeCode" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Expenses">
+      <EntityTypeMapping TypeName="TransportModel.Expense">
+        <MappingFragment StoreEntitySet="Expense">
+          <ScalarProperty Name="UpdatedDate" ColumnName="UpdatedDate" />
+          <ScalarProperty Name="UpdatedBy" ColumnName="UpdatedBy" />
+          <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="PaidTo" ColumnName="PaidTo" />
+          <ScalarProperty Name="PaymentBy" ColumnName="PaymentBy" />
+          <ScalarProperty Name="ExpenseDate" ColumnName="ExpenseDate" />
+          <ScalarProperty Name="Remarks" ColumnName="Remarks" />
+          <ScalarProperty Name="Charge" ColumnName="Charge" />
+          <ScalarProperty Name="Qty" ColumnName="Qty" />
+          <ScalarProperty Name="SupplierTypeCode" ColumnName="SupplierTypeCode" />
+          <ScalarProperty Name="ServiceTypeCode" ColumnName="ServiceTypeCode" />
+          <ScalarProperty Name="VehicleCode" ColumnName="VehicleCode" />
+          <ScalarProperty Name="ExpenseCode" ColumnName="ExpenseCode" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping>
