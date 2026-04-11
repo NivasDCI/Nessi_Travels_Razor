@@ -1,0 +1,233 @@
+﻿
+@using Transport.Repository.Resource;
+
+@{
+    Layout = "";
+}
+
+<head>
+
+    <script>
+        $("#TxtFromDate").datepicker({
+            format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small'
+        });
+
+        $("#TxtToDate").datepicker({
+            format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small'
+        });
+       
+        function TodayDateRange() {
+            let monthNames = ["Jan", "Feb", "Mar", "Apr",
+                "May", "Jun", "Jul", "Aug",
+                "Sep", "Oct", "Nov", "Dec"];
+
+            var today = new Date();
+            var dd = today.getDate();
+            var mm = today.getMonth(); //January is 0!
+            var yyyy = today.getFullYear();
+
+            if (dd < 10) {
+                dd = '0' + dd
+            }
+
+            let monthName = monthNames[mm];
+
+            return dd + '-' + monthName + '-' + yyyy;
+        }
+
+        function MonthStartDate() {
+            let monthNames = ["Jan", "Feb", "Mar", "Apr",
+                "May", "Jun", "Jul", "Aug",
+                "Sep", "Oct", "Nov", "Dec"];
+
+            var today = new Date();
+            var dd = today.getDate();
+            var mm = today.getMonth(); //January is 0!
+            var yyyy = today.getFullYear();
+
+            if (dd < 10) {
+                dd = '0' + dd
+            }
+
+            let monthName = monthNames[mm];
+
+            return '01' + '-' + monthName + '-' + yyyy;
+        }
+        
+        $(document).ready(function () {
+            $('input[id="TxtFromDate"]').val(MonthStartDate);
+            $('input[id="TxtToDate"]').val(TodayDateRange);
+
+        });
+
+        GrdMyTrxnReport = $("#GrdMyTrxnReport").grid({
+            primaryKey: "TrxnID",
+            uiLibrary: "bootstrap4",
+            resizableColumns: true,
+            dataSource: '@Url.Action("MyTrxn_FindAll", "Reports")',
+            columns: [
+                { field: "TrxnDate", width: 62, title: "DATE", type: "date", format: Common_Date_Format, sortable: false, align: "left" },
+                { field: "ServiceName", width: 149, title: "SERVICE", sortable: true, align: "left" },
+                {
+                    field: "Debit", width: 39, title: "DEBIT", sortable: false, align: "center", renderer: function (value, record) {
+                        if (intVal(value).toFixed(2) == 0.00) {
+                            return '';
+                        }
+                        else {
+                            return intVal(value).toFixed(2);
+                        }
+                    }
+                },
+                {
+                    field: "Credit", width: 39, title: "CREDIT", sortable: false, align: "center", renderer: function (value, record) {
+                        if (intVal(value).toFixed(2) == 0.00) {
+                            return '';
+                        }
+                        else {
+                            return intVal(value).toFixed(2);
+                        }
+                    }
+                },
+                {
+                    field: "Credit", width: 39, title: "TOTAL", sortable: false, align: "center", renderer: function (value, record) {
+                       return '';
+                    }
+                }
+
+            ],
+            pager: { enable: true, limit: GridRowsDisplayLimit, sizes: ArrPaging }
+        });
+
+        GrdMyTrxnReport.on('dataBound', function (e, records, totalRecords) {
+            var debitamt = 0, creditamt = 0, totamt = 0, $tfoot;
+            // Remove the formatting to get integer data for summation
+            var intVal = function (i) {
+                return typeof i === 'string' ?
+                    i.replace(/[\$,]/g, '') * 1 :
+                    typeof i === 'number' ?
+                        i : 0;
+            };
+
+            $.each(records, function () {
+                debitamt += intVal(this.Debit);
+                creditamt += intVal(this.Credit);
+            });
+            totamt = creditamt - debitamt;
+            $tfoot = GrdMyTrxnReport.children('tfoot');
+            $tfoot.children('tr[data-role="summary"]').remove();
+            $tfoot.prepend('<tr data-role="summary" style="text-align:right"><th></th><th></th><th>' + debitamt.toFixed(2) + '</th><th>' + creditamt.toFixed(2) + '</th><th>' + totamt.toFixed(2) + '</th>' +
+                '</tr > ');
+        });
+
+        function TrxnSearch() {
+            var searchFromDate = '';
+            var searchToDate = '';
+
+            if ($("#TxtFromDate").val() != 0) {
+                searchFromDate = $('#TxtFromDate').val();
+            }
+
+            if ($("#TxtToDate").val() != "") {
+                searchToDate = $('#TxtToDate').val();
+            }
+
+            GrdMyTrxnReport.clear();
+            GrdMyTrxnReport.reload({ StartDate: searchFromDate, EndDate: searchToDate });
+        }
+        //Search filter methods
+        $('#btnSearch').click(function () {
+            TrxnSearch();
+        });
+
+        $('#btnSearchClear').click(function () {
+            $('input[id="TxtFromDate"]').val(MonthStartDate);
+            $('input[id="TxtToDate"]').val(TodayDateRange);
+            GrdMyTrxnReport.reload({ StartDate: null, EndDate: null });
+        });
+        function OnIndexCall(elem) {
+            $(elem).attr('href', $(elem).attr('href') + '?Length=1&UserID=' + $("#ddlUserID").val() + '&StartDate=' + $("#TxtFromDate").val() + '&EndDate=' + $('#TxtToDate').val());
+        }
+        function intVal(i) {
+            return typeof i === 'string' ?
+                i.replace(/[\$,]/g, '') * 1 :
+                typeof i === 'number' ?
+                    i : 0;
+        };
+    </script>
+</head>
+<body>
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content">
+        <!-- Content Header (Page header) -->
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card card-pd">
+                        <div class="card-header">
+                            <span style="font-size: 18px;" class="m-0"><i class="fa fa-random"></i></span>
+                            <span style="font-size: 18px; border-left: 1px solid #ccc; padding-left: 10px;"> Transactions Report</span>
+                            <div style="float: right;">
+                                <span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px; ">
+                                    <a href="#" data-toggle="tooltip" data-placement="bottom" title="Show Form" onclick="showForm()"><i class="fas fa-caret-square-down"></i></a>
+                                </span><span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px;">
+                                    <a href="#" data-toggle="tooltip" data-placement="bottom" title="Hide Form" onclick="hideForm()"><i class="fas fa-caret-square-up"></i></a>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <div>
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label class="control-label">From</label>
+                                            <div>
+                                                <input type="text" id="TxtFromDate" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>To</label>
+                                            <div>
+                                                <input type="text" id="TxtToDate" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-sm-4">
+                                        <div class="pdt-25">
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <button type="button" id="btnSearch" class="btn btn-primary btn-block"><i class="fa fa-search"></i> @Transport.Repository.WEBPAGEBUTTON.SEARCH</button>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <button type="button" id="btnSearchClear" class="btn btn-primary btn-block"><i class="fa fa-paint-brush"></i> @Transport.Repository.WEBPAGEBUTTON.CLEAR</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="box-body table-responsive no-padding">
+                                        <table id="GrdMyTrxnReport" class="table table-hover"></table>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div><!-- /.content-wrapper -->
+        </div>
+    </div>
+
+</body>
+
+

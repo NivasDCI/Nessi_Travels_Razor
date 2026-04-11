@@ -1,0 +1,8 @@
+Page Name          :PurchasePayments_Delete
+Date and Time      :30 Apr 2023 10:59 PM
+Error Message      :Object reference not set to an instance of an object.
+Stack Trace        :   at SparePro.Repository.PurchaseRepository.PurchasePayment_Delete(Int32 PurchasePaymentID, Int32 LastModifiedBy) in C:\Users\P0105443\Documents\repos\SparePro\SparePro.Repository\PurchaseRepository.cs:line 728
+Error Source       :SparePro.Repository
+Target Site        :SparePro.Model.ReturnMessageModel PurchasePayment_Delete(Int32, Int32)
+
+----------------------------------------------------------------

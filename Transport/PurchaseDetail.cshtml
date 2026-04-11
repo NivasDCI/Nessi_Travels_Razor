@@ -1,0 +1,1079 @@
+﻿
+@using POS.Repository.Resource;
+
+@{
+    Layout = "";
+}
+
+
+<head>
+    <style>
+        .PurchasePopover {
+            padding: 15px 25px 20px 25px;
+        }
+
+        a.ViewLinkChange:hover, a.ViewLinkChange:active {
+            color: #0069d9;
+            font-weight: bold
+        }
+    </style>
+    <script>
+        var GrdPurchases, PaymentStatus = '', PurchaseStatus = '', Status = 1, PurchaseStatusText = '';
+
+        ShowCommonBack();
+
+        $('body').on('click', function (e) {
+            if ($(e.target).data('toggle') !== 'popover' && $(e.target).parents('.popover.in').length === 0) {
+                $('.popover').popover('hide');
+            }
+        });
+
+        document.onkeydown = function (evt) {
+            var keyCode = evt ? (evt.which ? evt.which : evt.keyCode) : event.keyCode;
+            if (keyCode == 13) {
+                PurchaseSearch();
+                return false;
+            }
+        }
+
+        $('#TxtAmount').change(function () {
+            if ($('#TxtAmount').val() == "") {
+                $('#TxtAmount').val(0);
+            }
+        });
+
+        $.ajax({
+            type: "GET",
+            url: BaseURL + "Common/Load_Status",
+            datatype: "Json",
+            success: function (data) {
+                $.each(data, function (index, value) {
+                    $('#DdlStatus').append('<option value="' + value.ID + '">' + value.Name + '</option>');
+                });
+            }
+        }).done(function (result) {
+
+            if (Status == 0 || Status == 1) {
+                $("#DdlStatus").val(Status);
+            }
+            else {
+                $("#DdlStatus").val(-1);
+            }
+        });
+
+
+        $.ajax({
+            type: "GET",
+            url: BaseURL + "Common/Load_DefaultTypeSearch",
+            datatype: "Json",
+            data: { DefaultType: "@POS.Repository.DEFAULTMASTER.DefaultHeaderMaster_PurchaseStatus_ViewID"},
+            success: function (data) {
+                $("#DdlPurchaseStatus option").remove();
+                $.each(data, function (index, value) {
+                    if (
+
+                        value.DefaultID == "@POS.Repository.DEFAULTMASTER.DefaultDetailMaster_ReceivedPurchasedStatus_ViewID" ||
+                        value.DefaultID == "@POS.Repository.DEFAULTMASTER.DefaultDetailMaster_OrderedPurchasedStatus_ViewID")
+                    {
+                            $('#DdlPurchaseStatus').append('<option value="' + value.DefaultID + '">' + value.DefaultName + '</option>');
+                        }
+
+                });
+            }
+        }).done(function (result) {
+            if (PurchaseStatus != '') {
+                $("#DdlPurchaseStatus").val(PurchaseStatus);
+            }
+            else {
+                $("#DdlPurchaseStatus").val("");
+            }
+        });
+
+
+
+        $.ajax({
+            type: "GET",
+            url: BaseURL + "Common/Load_DefaultType",
+            datatype: "Json",
+            data: { DefaultType: "@POS.Repository.DEFAULTMASTER.DefaultHeaderMaster_PaymentStatus_ViewID" },
+            success: function (data) {
+                $("#DdlPurPaymentStatus option").remove();
+                $.each(data, function (index, value) {
+                    $('#DdlPurPaymentStatus').append('<option value="' + value.DefaultID + '">' + value.DefaultName + '</option>');
+                });
+            }
+        }).done(function (result) {
+            if (PaymentStatus != '') {
+                $("#DdlPurPaymentStatus").val(PaymentStatus);
+            }
+            else {
+                $("#DdlPurPaymentStatus").val("");
+            }
+        });
+
+
+        renderer = function (value, record, $cell, $displayEl, id) {
+
+            var $editBtn = $('<i class="fa fa-object-group" data-toggle="popover" ID=' + id + ' title="Action" style="font-size:20px"></i>')
+
+            $editBtn.on('click', function (e) {
+
+                $('[data-toggle="popover"]').popover("hide");
+
+                $('#' + id).popover({
+                    html: true,
+                    template: '<div class="popover"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>'
+                }).popover('show');
+
+                var HTMLContent = '<div class="PurchasePopover">';
+
+                if ("@Model.IsEdit" == 'True' && (record.PurchaseStatusStr == "Partial Purchase" || record.PurchaseStatusStr == "Received")) {
+                    HTMLContent += '<a tabindex="-1" class="ViewLinkChange" onclick="EditPurchase(' + id + ',' + "'" + record.PurchaseStatus + "'" + ')" style="cursor:pointer"><i class="fas fa-edit" style="color:#6777ef"></i> @Button.Button_Edit</a><br/><br/>';
+                }
+
+                if ("@Model.IsEdit" == 'True' && (record.PurchaseStatusStr == "Ordered")) {
+
+                    HTMLContent += '<a tabindex="-1" class="ViewLinkChange" onclick="EditPurchase(' + id + ',' + "'" + record.PurchaseStatus + "'" + ')" style="cursor:pointer"><i class="fas fa-edit" style="color:#6777ef"></i> @Button.Button_GoodReceipt</a><br/><br/>';
+
+                }
+                HTMLContent += '<a tabindex="-1" class="ViewLinkChange" onclick="ViewInvoice(' + id + ',' + "'" + record.PurchaseStatus + "'" + ',' + "'" + record.StoreID + "'" + ')" style="cursor:pointer"><i class="fas fa-file-alt"></i>@Button.Button_ViewInvoice</a><br/><br/>';
+
+                if ("@Model.IsPayment" == 'True' && (record.PurchaseStatusStr != "Ordered")) {
+                    HTMLContent += '<a tabindex="-1" class="ViewLinkChange" onclick="PurchasePayment(' + id + ',' + record.GrandTotal + ',' + record.Paid  + ',' + "'" + record.PurchaseStatus + "'" + ',' + "'" + record.StoreID + "'" + ',' + record.SupplierID + ')" style="cursor:pointer"><i class="fas fa-money-bill-alt" style="color:#6777ef"></i> @Button.Button_Payment</a><br/><br/>';
+                    $("#LblItemCount").html(record.ProductCount);
+                }
+
+                $('#HdnStoreName').val(record.StoreName);
+                $('#HdnSupplierName').val(record.SupplierName);
+                $('.popover-content').html("");
+                $('.popover-content').html(HTMLContent);
+
+            });
+
+            $displayEl.html("");
+            $displayEl.append($editBtn);
+
+        }
+
+        GrdPurchases = $("#GrdPurchases").grid({
+            primaryKey: "PurchaseID",
+            uiLibrary: "bootstrap4",
+            dataSource: '@Url.Action("Purchases_FindAll", "Purchase")',
+            columns: [
+                { field: "PurchaseDate", width: 30, title: "@PROPageModel.Purchases_PurchaseDate", type: 'date', format: Common_Date_Format, sortable: true, align: "right" },
+                { field: "DisplayCreatedDate", width: 40, title: "@PROPageModel.Common_CreatedDate", sortable: true, align: "center" },
+                { field: "ReferenceNO", width: 40, title: "@PROPageModel.Purchases_PONO", sortable: true, align: "left" },
+                { field: "SupplierInvoice", width: 40, title: "@PROPageModel.Purchases_SupplierInvoice", sortable: true, align: "left" },
+                { field: "SupplierName", width: 45, title: "@PROPageModel.Purchases_Supplier", sortable: true, align: "left" },
+                { field: "Quantity", width: 20, title: "@PROPageModel.Purchases_Quantity", sortable: true, align: "right", renderer: function (value, record) { return record.Quantity == null ? 0 : record.Quantity } },
+                { field: "FreeQuantity", width: 20, title: "@PROPageModel.Purchases_FreeQuantity", sortable: true, align: "right", renderer: function (value, record) { return record.FreeQuantity == null ? 0 : record.FreeQuantity } },
+                { field: "GrandTotal", width: 30, title: "@PROPageModel.Purchases_GrandTotal", sortable: true, align: "right" },
+                { field: "Paid", width: 20, title: "@PROPageModel.Purchases_Paid", sortable: true, align: "left" },
+                {
+                    field: "Balance", width: 20, title: "@PROPageModel.Purchases_Balance", align: "right", renderer: function (value, record) {
+
+                        var dec_Paid = parseFloat(record.Paid);
+                        var dec_TotPayable = parseFloat(record.GrandTotal);
+                        var Dec_Balance = 0;
+
+                        if (dec_Paid == 0) {
+                            Dec_Balance = (parseFloat(dec_TotPayable).toFixed(2));
+                        }
+                        else if (dec_Paid != 0)
+                        {
+                            Dec_Balance = (parseFloat(dec_TotPayable) - parseFloat(dec_Paid)).toFixed(2);
+                        }
+
+                        if (Dec_Balance == 0) {
+                            return "0";
+                        }
+                        else {
+                            return Dec_Balance;
+                       }
+                    }
+                },
+                {
+                    field: "PurchaseStatusStr", width: 25, title: "@PROPageModel.Purchases_PurchaseStatus", sortable: true, renderer: function (value, record) {
+                        if (record.PurchaseStatus == "@POS.Repository.DEFAULTMASTER.DefaultDetailMaster_ReceivedPurchasedStatus_ViewID") {
+                            return '<div class="text-center"><span class="badge badge-success">' + record.PurchaseStatusStr + '</span></div>';
+                        }
+                        else if (record.PurchaseStatus == "@POS.Repository.DEFAULTMASTER.DefaultDetailMaster_OrderedPurchasedStatus_ViewID") {
+                            return '<div class="text-center"><span class="badge badge-info">' + record.PurchaseStatusStr + '</span></div>';
+                        }
+                        else {
+                            return record.PurchaseStatusStr;
+                        }
+                    }
+                },
+                {
+                    field: "PaymentStatusStr", width: 25, title: "@PROPageModel.Purchases_PaymentStatus", sortable: true, renderer: function (value, record) {
+                        if (record.PaymentStatusStr == "Paid") {
+                            return '<div class="text-center"><span class="badge badge-success">' + record.PaymentStatusStr + '</span></div>';
+                        }
+                        else if (record.PaymentStatusStr == "Due") {
+                            return '<div class="text-center"><span class="badge badge-info">' + record.PaymentStatusStr + '</span></div>';
+                        }
+                        else if (record.PaymentStatusStr == "Partial") {
+                            return '<div class="text-center"><span class="badge badge-warning">' + record.PaymentStatusStr + '</span></div>';
+                        }
+                        else if (record.PaymentStatusStr == "New") {
+                            return '<div class="text-center"><span class="badge badge-info">Due</span></div>';
+                        }
+                        else {
+                            return record.PaymentStatusStr;
+                        }
+                    }
+                },
+                {
+                    field: 'FileName', width: 15, title: '<i class="fa fa-download"></i>', align: "center", renderer: function (value, record) {
+                        if (record.FileName != "" && record.FileName != null) {
+                            return '<span onclick="FileDownload(' + record.PurchaseID + ')"><i class="fa fa-download" ></i><span>';
+                        }
+                        else {
+                            return "--";
+                        }
+
+                    }
+                },
+
+                { field: '@Button.Button_Action', width: 15, align: "center", renderer: renderer, title: '<i class="fa fa-object-group"></i>' }
+            ],
+            pager: { limit: GridRowsDisplayLimit }
+        });
+
+
+        function FileDownload(PurchaseID) {
+            location.href = BaseURL + "Purchase/DownloadDocument?PurchaseID=" + PurchaseID;
+            return false;
+        }
+
+        function ViewInvoice(ID, PurchaseStatus, StoreID) {
+            var url = "";
+            if (PurchaseStatus == "@POS.Repository.DEFAULTMASTER.DefaultDetailMaster_ReceivedPurchasedStatus_ViewID") {
+                url = '@Url.Content("~/Purchase/PurchasePrintInvoice")' + '?PurchaseID=' + ID + "&StoreID=" + StoreID;
+                var varheight = $(window).height() -70;
+                var varWidth = $(window).width() - 100;
+                window.open(url, 'window', 'width=' + varWidth + ',height=' + varheight + ';');
+            }
+        }
+
+        function EditPurchase(PurchaseID, PurchaseStatus) {
+            var ParamData = [
+                { ParameterName: "PurchaseDate", ParameterValue: $("#TxtPurchaseDate").val() },
+                { ParameterName: "PurcahseRefNo", ParameterValue: $("#TxtPurchaseRefNo").val() },
+                { ParameterName: "Supplier", ParameterValue: $("#TxtSupplier").val() },
+                { ParameterName: "PurchaseStatus", ParameterValue: $("#DdlPurchaseStatus").val() },
+                { ParameterName: "PaymentStatus", ParameterValue: $("#DdlPurPaymentStatus").val() }
+            ]
+
+            AddBackURLStore(JSON.stringify(ParamData));
+
+            if ($("#HdnDashboardCount").val() == 1) {
+                GetMenu('@Url.Action("AddEditPurchase", "Purchase")' + '?PurchaseID=' + PurchaseID);
+            }
+            else {
+                GetMenu('@Url.Action("AddEditPurchase", "Purchase")' + '?PurchaseID=' + PurchaseID + '&PurchaseStatus=' + PurchaseStatus + '&HeaderViewID=' + GetParamValue("HeaderViewID") + '&DetailViewID=' + GetParamValue("DetailViewID"));
+            }
+
+        }
+
+        $('#btnAddPurchase').click(function () {
+            var ParamData = [
+                { ParameterName: "PurchaseDate", ParameterValue: $("#TxtPurchaseDate").val() },
+                { ParameterName: "PurcahseRefNo", ParameterValue: $("#TxtPurchaseRefNo").val() },
+                { ParameterName: "Supplier", ParameterValue: $("#TxtSupplier").val() },
+                { ParameterName: "PurchaseStatus", ParameterValue: $("#DdlPurchaseStatus").val() },
+                { ParameterName: "PaymentStatus", ParameterValue: $("#DdlPurPaymentStatus").val() }
+            ]
+
+            AddBackURLStore(JSON.stringify(ParamData));
+            if ($("#HdnDashboardCount").val() == 1) {
+                GetMenu('@Url.Action("AddPurchaseRequest", "Purchase")' + '?PurchaseID=0');
+            }
+            else {
+                GetMenu('@Url.Action("AddPurchaseRequest", "Purchase")' + '?PurchaseID=0' + '&PurchaseStatus=' + PurchaseStatus + '&HeaderViewID=' + GetParamValue("HeaderViewID") + '&DetailViewID=' + GetParamValue("DetailViewID"));
+            }
+        });
+
+
+
+        /*:::::::::::::::::::::::::::::::::::::::::::::::::: Payment ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
+
+        function FormValidate() {
+            var Result = true;
+            if ($("#LblItemCount").html() == 0) {
+                alert("Please add product");
+                Result = false;
+                return false
+            }
+
+            return Result;
+        }
+
+        LoadAccountsType();
+
+        function LoadAccountsType() {
+
+            $.ajax({
+                type: "GET",
+                url: BaseURL + "Accounts/Load_AccountsType",
+                datatype: "Json",
+                success: function (data) {
+                    $("#DdlAccount option").remove();
+                    $.each(data, function (index, value) {
+                        $('#DdlAccount').append('<option value="' + value.ID + '">' + value.Name + '</option>');
+                    });
+                }
+            });
+        }
+        $('#DdlAccount').change(function () {
+             $("#TxtPaymentNote").val("@PROMessage.Payment_AccountNote" + $('#DdlAccount option:selected').text());
+            GetAccountBalance($("#HdnStoreID").val(), $("#DdlAccount").val());
+        });
+
+        function GetAccountBalance(StoreID, AccountID) {
+
+            if (StoreID != "" && AccountID != 0) {
+                $.ajax({
+                    url: BaseURL + "Accounts/Get_AccountBalance", type: "Get",
+                    data: { StoreID: StoreID, AccountID: AccountID }
+                }).done(function (result) {
+                    if (result == 0 || result == "") {
+                        $("#TxtBalance").val(0);
+                    }
+                    else {
+                        $("#TxtBalance").val(parseFloat(result).toFixed(2));
+                    }
+                });
+            }
+            else {
+                var _errorMsg = "";
+                _errorMsg += '<br />' + "@PROMessage.Err_AccountMaster_StoreName";
+                _errorMsg += '<br />' + "@PROMessage.Err_AccountMaster_AccountType";
+                if (_errorMsg.length > 0) {
+                    ErrorAlert(_errorMsg);
+                    return false;
+                }
+            }
+        }
+
+        function PurchasePayment(longPurchaseID, GrandTotal, PaidAmount,PurchaseStatus, StoreID, SupplierID) {
+            $('#ModalPayment').modal('show');
+            PurchaseStatusText = PurchaseStatus;
+            ClearPurchaseAdjust();
+            if (PurchaseStatus == "@POS.Repository.DEFAULTMASTER.DefaultDetailMaster_ReceivedPurchasedStatus_ViewID" || PurchaseStatus == "@POS.Repository.DEFAULTMASTER.DefaultDetailMaster_PartialReturnPurchasedStatus_ViewID"
+                || PurchaseStatus=="@POS.Repository.DEFAULTMASTER.DefaultDetailMaster_PartialReceivedPurchasedStatus_ViewID"  || PurchaseStatus=="@POS.Repository.DEFAULTMASTER.DefaultDetailMaster_ReturnedPurchaseStatus_ViewID"
+            )
+            {
+                $('#BtnPaymentAdd').show();
+            }
+            else {
+                $('#BtnPaymentAdd').hide();
+            }
+            $("#TxtAmount").val(0);
+            GrdPayment.clear();
+            GrdPayment.reload({ PurchaseID: longPurchaseID , AccountMode: "@POS.Repository.DEFAULTMASTER.DefaultDetailID_PurchaseAccountMode"});
+            $('#HdnPurchaseID').val(longPurchaseID);
+            $('#HdnStoreID').val(StoreID);
+            $('#HdnSupplierID').val(SupplierID);
+            $('#LblTotalPayable').html(GrandTotal);
+            $('#HdnGrandTotal').val(GrandTotal);
+            $('#HdnPurchaseStatus').val(PurchaseStatus);
+            $('#TxtAmount').val(GrandTotal);
+            if (SupplierID != 0) {
+                $.ajax({
+                    url: BaseURL + "Purchase/SupplierInvoiceDetails", type: "Get",
+                    data: { SupplierID: SupplierID, StoreID: StoreID }
+                }).done(function (result) {
+                    $("#LblbalanceAmt").html(parseFloat(result).toFixed(2));
+                });
+            }
+
+        }
+
+        renderer = function (value, record, $cell, $displayEl, id) {
+            var PayingBy = "'" + record.PaymentMode + "'";
+            var Notes = "'" + record.Description + "'";
+
+            var dAmount = 0;
+            var cAmount = 0;
+            if (record.DebitAmount != null) {
+                dAmount = record.DebitAmount;
+            }
+            if (record.DebitAmount != null) {
+                cAmount = record.CreditAmount;
+            }
+
+            var HTMLContent = '<table style=width:100%><tr>';
+            if (PurchaseStatusText == "@POS.Repository.DEFAULTMASTER.DefaultDetailMaster_ReceivedPurchasedStatus_ViewID" || PurchaseStatusText == "@POS.Repository.DEFAULTMASTER.DefaultDetailMaster_PartialReturnPurchasedStatus_ViewID"
+                || PurchaseStatusText=="@POS.Repository.DEFAULTMASTER.DefaultDetailMaster_ReturnedPurchaseStatus_ViewID" || PurchaseStatusText == "@POS.Repository.DEFAULTMASTER.DefaultDetailMaster_PartialReceivedPurchasedStatus_ViewID"
+
+            ) {
+                HTMLContent += '<td style="border:0px solid #FFF;"><a tabindex="-1" onclick="DeletePayment(' + id + ')" style="cursor:pointer"><i class="far fa-trash-alt Form-GridDeleteButton"></i></a></td>';
+            }
+            else {
+                $('#BtnPaymentAdd').hide();
+            }
+
+            $displayEl.html("</tr></table>");
+            $displayEl.append(HTMLContent);
+
+        }
+
+        var GrdPayment = $("#GrdPayment").grid({
+                primaryKey: "AccountsID",
+                uiLibrary: "bootstrap4",
+                autoLoad: false,
+                dataSource: '@Url.Action("Payment_FindAll", "Purchase")',
+                columns: [
+                    {
+                        field: "Date", title: "@PROPageModel.Common_Date", type: 'date', format: Common_Date_Format, width: 50, align: "center", sortable: true
+                    },
+                    { field: "ReturnReference_NO", width: 80,title: "@PROPageModel.PurchaseReturn_ReferenceNo" },
+                    { field: "Paidby", width: 60, title: "@PROPageModel.Accounts_Paidby" },
+                    { field: "DebitAmount", width: 50,title: "@PROPageModel.DebitAmount" },
+                    { field: "CreditAmount", width: 50,title: "@PROPageModel.CreditAmount" },
+                    { field: "Description", width: 70,title: "@PROPageModel.Common_Description" },
+                    { field: '@Button.Button_Action', width: 30, align: "center", renderer: renderer }
+
+                ],
+            pager: { limit: GridRowsDisplayLimit }
+         });
+
+        GrdPayment.on('dataBound', function (e, records, totalRecords) {
+
+            var PaidPayment = 0;
+            var vSupplier = 0;
+            var vStore = "";
+            var bal = 0;
+
+            $.each(records, function () {
+                vSupplier = this.SupplierID;
+                vStore = this.StoreID;
+                if ((!isNaN(this.Totalcredit) && this.Totalcredit != "") || (!isNaN(this.Totaldebit) && this.Totaldebit != "")) {
+                    PaidPayment = parseFloat(this.Totaldebit);
+                }
+            });
+
+            $('#HdnPaidAmount').val(PaidPayment);
+            $("#LblTotalPaying").html(PaidPayment);
+            var vGrandTotal =$('#HdnGrandTotal').val();
+            var vBal = vGrandTotal - PaidPayment;
+
+            if (vBal == 0) {
+                $("#BtnPaymentAdd").attr("disabled", "true");
+            }
+            else {
+                $("#BtnPaymentAdd").removeAttr("disabled");
+            }
+            $("#Lblbalance").html(parseFloat(vBal).toFixed(2));
+
+            if (vSupplier != 0) {
+                $.ajax({
+                    url: BaseURL + "Purchase/SupplierInvoiceDetails", type: "Get",
+                    data: { SupplierID: vSupplier, StoreID: vStore }
+                }).done(function (result) {
+                    $("#LblbalanceAmt").html(parseFloat(result).toFixed(2));
+                });
+            }
+        });
+
+        function EditPayment(AccountsID, Date, PayableType,Paymentstatus,DebitAmount,CreditAmount,Notes) {
+                $('#HdnAccountsID').val(AccountsID);
+                $("#DdlPayableType").val(PayableType);
+                if ($("#DdlPayableType").val() == "@POS.Repository.DEFAULTMASTER.DefaultDetailID_DebitAccounts_ViewID") {
+                    $("#TxtAmount").val(DebitAmount);
+                }
+                else if ($("#DdlPayableType").val() == "@POS.Repository.DEFAULTMASTER.DefaultDetailID_CreditAccounts_ViewID") {
+                    $("#TxtAmount").val(CreditAmount);
+                }
+                $("#TxtDate").val(Date);
+                $("#TxtPaymentNote").val(Notes);
+        }
+
+        function DeletePayment(PurchasePayAmountsID) {
+            $.confirm({
+                title: ConfirmAlert_SuccessMessage,
+                content: ConfirmAlert_Message_Content.replace("{0}", ConfirmAlert_InactivateMessage_Content),
+                animation: 'zoom',
+                closeAnimation: 'zoom',
+                buttons: {
+                    'confirm': {
+                        text: Alert_YesMessage,
+                        btnClass: Alert_Button_Style,
+                        action: function () {
+                            $.ajax({ url: BaseURL + "Purchase/PurchasePayAmounts_Delete", type: "POST", data: { PurchasePayAmountsID: PurchasePayAmountsID } })
+                                .done(function (result) {
+                                    if (result.Result == true) {
+                                        SucessAlert(result.Message);
+                                        ClearPurchasePayAmounts();
+                                        GrdPayment.reload();
+                                        GrdPurchases.reload();
+                                    }
+                                    else {
+                                        ErrorAlert(result.Message);
+                                    }
+                                })
+                                .fail(function () {
+                                    ErrorAlert(result.Message);
+                                });
+                        }
+                    },
+                    cancel: {
+                        text: Alert_NoMessage,
+                        btnClass: Alert_Button_Style
+                    }
+                }
+            });
+        }
+
+        function ClearPurchasePayAmounts() {
+            $("#TxtAmount").val(0);
+            $("#TxtPaymentNote").val("@PROMessage.Payment_AccountNote" + $('#DdlAccount option:selected').text());
+        }
+
+        function ClearPurchaseAdjust() {
+            $("#TxtAdjustAmount").val(0);
+            $("#TxtAdjustPaymentNote").val("@PROMessage.PurchasePaymentAdjust");
+        }
+
+
+
+
+        $('#BtnPaymentAdd').click(function () {
+            var DebitAmt = 0;
+            var CreditAmt = 0;
+
+            DebitAmt = $("#TxtAmount").val();
+
+            if ($("#TxtAmount").val() == "" || $("#TxtAmount").val() == 0) {
+                ErrorAlert("@PROMessage.ErrPurchases_Amount");
+                Result = false;
+                return false
+            }
+            else if ($("#TxtDate").val() == "") {
+                ErrorAlert("@PROMessage.ErrPurchases_PaymentDate");
+                Result = false;
+                return false
+            }
+            else {
+
+                $("#BtnPaymentAdd").attr("disabled", "true");
+                var ObjfrmPurchasePayAmounts = {
+                    AccountsID: $('#HdnAccountsID').val(),
+                    AccountID: $('#DdlAccount').val(),
+                    PurchaseID: $('#HdnPurchaseID').val(),
+                    Date: $('#TxtDate').val(),
+                    StoreID: $('#HdnStoreID').val(),
+                    SupplierID: $('#HdnSupplierID').val(),
+                    StoreName: $('#HdnStoreName').val(),
+                    SupplierName: $('#HdnSupplierName').val(),
+                    PayableType: "@POS.Repository.DEFAULTMASTER.DefaultDetailID_DebitAccounts_ViewID",
+                    PaymentStatus: "@POS.Repository.WEBCONSTANTMESSAGECODE.PurchasePaymentStatus",
+                    DebitAmount: DebitAmt,
+                    CreditAmount: CreditAmt,
+                    AccountsMode: "@POS.Repository.DEFAULTMASTER.DefaultDetailID_PurchaseAccountMode",
+                    PaymentMode: "@POS.Repository.DEFAULTMASTER.DefaultDetailID_StoreCashPayment_ViewID",
+                    Description: $('#TxtPaymentNote').val()
+                };
+
+                $.confirm({
+                    title: ConfirmAlert_SuccessMessage,
+                    content: $("#HdnAccountsID").val() == 0 ? ConfirmAlert_Message_Content.replace("{0}", ConfirmAlert_SaveMessage_Content) : ConfirmAlert_Message_Content.replace("{0}", ConfirmAlert_UpdateMessage_Content),
+                    animation: 'zoom',
+                    closeAnimation: 'zoom',
+                    buttons: {
+                        'confirm': {
+                            text: Alert_YesMessage,
+                            btnClass: Alert_Button_Style,
+                            action: function () {
+                                $.ajax({ url: BaseURL + "Purchase/PurchasePayAmounts_Save", type: "POST", data: { ObjPurchasePayAmounts: ObjfrmPurchasePayAmounts } })
+                                    .done(function (result) {
+                                        if (result.Result == true) {
+                                            ClearPurchasePayAmounts();
+                                            $("#BtnPaymentAdd").removeAttr("disabled");
+                                            SucessAlert(result.Message);
+                                            GrdPayment.reload();
+                                            GrdPurchases.reload();
+                                        }
+                                        else if (result.Result == false) {
+                                            ErrorAlert(result.Message);
+                                        }
+                                    })
+                                    .fail(function () {
+                                        ErrorAlert(result.Message);
+                                    });
+                            }
+                        },
+                        cancel: {
+                            text: Alert_NoMessage,
+                            btnClass: Alert_Button_Style
+                        }
+                    }
+                });
+            }
+        });
+
+        $('#BtnPaymentAdjust').click(function () {
+            var DebitAmt = 0;
+            var CreditAmt = 0;
+
+            DebitAmt = $("#TxtAdjustAmount").val();
+             var _errorMsg = '';
+            var vAmount = 0;
+            var vBal = 0;
+
+            if ($("#TxtAdjustAmount").val() == "" || $("#TxtAdjustAmount").val() == 0) {
+                ErrorAlert("@PROMessage.ErrPurchases_Amount");
+                $("#BtnPaymentAdjust").removeAttr("disabled");
+                return false;
+            }
+            else {
+                if ($("#TxtAdjustAmount").val() > 0) {
+                    vAmount = parseFloat($("#TxtAdjustAmount").val());
+                    vBal = parseFloat($("#Lblbalance").html());
+                    var vSupplierBalance = parseFloat($("#LblbalanceAmt").html());
+
+                    if (vSupplierBalance < vAmount) {
+                        _errorMsg = ("@PROMessage.Err_AccountMaster_SupplierAmountValidate").replace("{0}", " (" + vSupplierBalance + ") ").replace("{1}", " (" + vAmount + ") ");
+                    }
+                    @*if (vAmount > vBal) {
+                        _errorMsg = _errorMsg + '</br>' + ("@PROMessage.Err_Common_AmountValidate").replace("{0}", " (" + vAmount + ") ").replace("{1}", " (" + vBal + ") ");
+                    }*@
+                    if (_errorMsg.length > 0) {
+                        ErrorAlert(_errorMsg);
+                        $("#BtnPaymentAdjust").removeAttr("disabled");
+                        return false;
+                    }
+                }
+
+                $("#BtnPaymentAdjust").attr("disabled", "true");
+                var ObjfrmPurchasePayAmounts = {
+                    AccountsID: $('#HdnAccountsID').val(),
+                    AccountID: 0,
+                    PurchaseID: $('#HdnPurchaseID').val(),
+                    Date: $('#TxtAdjustDate').val(),
+                    StoreID: $('#HdnStoreID').val(),
+                    SupplierID: $('#HdnSupplierID').val(),
+                    StoreName: $('#HdnStoreName').val(),
+                    SupplierName: $('#HdnSupplierName').val(),
+                    PayableType: "@POS.Repository.DEFAULTMASTER.DefaultDetailID_DebitAccounts_ViewID",
+                    PaymentStatus: "@POS.Repository.WEBCONSTANTMESSAGECODE.PurchasePaymentStatus",
+                    DebitAmount: DebitAmt,
+                    CreditAmount: CreditAmt,
+                    AccountsMode: "@POS.Repository.DEFAULTMASTER.DefaultDetailID_PurchaseAccountMode",
+                    PaymentMode: "@POS.Repository.DEFAULTMASTER.DefaultDetailID_StoreCashPayment_ViewID",
+                    Description: $('#TxtAdjustPaymentNote').val()
+                };
+
+                $.confirm({
+                    title: ConfirmAlert_SuccessMessage,
+                    content: $("#HdnAccountsID").val() == 0 ? ConfirmAlert_Message_Content.replace("{0}", ConfirmAlert_SaveMessage_Content) : ConfirmAlert_Message_Content.replace("{0}", ConfirmAlert_UpdateMessage_Content),
+                    animation: 'zoom',
+                    closeAnimation: 'zoom',
+                    buttons: {
+                        'confirm': {
+                            text: Alert_YesMessage,
+                            btnClass: Alert_Button_Style,
+                            action: function () {
+                                $.ajax({ url: BaseURL + "Purchase/PurchaseAdjustPayment_Save", type: "POST", data: { ObjPurchasePayAmounts: ObjfrmPurchasePayAmounts } })
+                                    .done(function (result) {
+                                        if (result.Result == true) {
+                                            ClearPurchaseAdjust();
+                                            $("#BtnPaymentAdjust").removeAttr("disabled");
+                                            SucessAlert(result.Message);
+                                            GrdPayment.reload();
+                                            GrdPurchases.reload();
+                                        }
+                                        else if (result.Result == false) {
+                                            ErrorAlert(result.Message);
+                                        }
+                                    })
+                                    .fail(function () {
+                                        ErrorAlert(result.Message);
+                                    });
+                            }
+                        },
+                        cancel: {
+                            text: Alert_NoMessage,
+                            btnClass: Alert_Button_Style
+                        }
+                    }
+                });
+            }
+        });
+
+
+        $("#TxtPurchaseDate").datepicker({
+            format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small',
+        });
+
+        $("#TxtDate").datepicker({
+            format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small',
+        });
+
+        $("#TxtAdjustDate").datepicker({
+            format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small',
+        });
+
+        $('input[id="TxtDate"]').val(TodayDateRange);
+        $('input[id="TxtPurchaseDate"]').val(TodayDateRange);
+        $('input[id="TxtAdjustDate"]').val(TodayDateRange);
+
+        function TodayDateRange() {
+            let monthNames = ["Jan", "Feb", "Mar", "Apr",
+                "May", "Jun", "Jul", "Aug",
+                "Sep", "Oct", "Nov", "Dec"];
+
+            var today = new Date();
+            var dd = today.getDate();
+            var mm = today.getMonth(); //January is 0!
+            var yyyy = today.getFullYear();
+
+            if (dd < 10) {
+                dd = '0' + dd
+            }
+
+            let monthName = monthNames[mm];
+
+            return dd + '-' + monthName + '-' + yyyy;
+        }
+
+        //Search functions
+
+        function PurchaseSearch() {
+            var searchPurchaseDate = '';
+            var SearchPurchaseRefNo = '';
+            var SearchSupplier = '';
+            var searchPurchaseStatus = "";
+            var searchPaymentStatus = "";
+            var SupplierInvoice="";
+
+            if ($("#TxtPurchaseDate").val() != "") {
+                searchPurchaseDate = $('#TxtPurchaseDate').val();
+            }
+
+            if ($("#TxtPurchaseRefNo").val() != "") {
+                SearchPurchaseRefNo = $('#TxtPurchaseRefNo').val();
+            }
+
+            if ($("#TxtSupplierInvoice").val() != "") {
+                SupplierInvoice = $('#TxtSupplierInvoice').val();
+            }
+
+            if ($("#TxtSupplier").val() != "") {
+                SearchSupplier = $("#TxtSupplier").val();
+            }
+
+            if ($("#DdlPurchaseStatus").val() != "") {
+                searchPurchaseStatus = $('#DdlPurchaseStatus').val();
+            }
+            if ($("#DdlPurPaymentStatus").val() != "") {
+                searchPaymentStatus = $('#DdlPurPaymentStatus').val();
+            }
+
+            GrdPurchases.clear();
+            GrdPurchases.reload({ PurchaseDate: searchPurchaseDate, PurchaseRefNo: SearchPurchaseRefNo,SupplierInvoice:SupplierInvoice, Supplier: SearchSupplier, PurchaseStatus: searchPurchaseStatus, PaymentStatus: searchPaymentStatus });
+
+        }
+
+        //Search filter methods
+        $('#btnPurchaseSearch').click(function () {
+            PurchaseSearch();
+        });
+
+        $('#btnPurchaseSearchClear').click(function () {
+            $("#TxtPurchaseDate").val("");
+            $("#TxtPurchaseRefNo").val("");
+            $("#TxtSupplier").val("");
+            $("#DdlPurPaymentStatus").val("");
+            $("#DdlPurchaseStatus").val("");
+            GrdPurchases.clear();
+            GrdPurchases.reload({ PurchaseDate: '', PurchaseRefNo: '', SupplierInvoice: '', Supplier: "", PurchaseStatus: '', PaymentStatus: '' });
+        });
+    </script>
+
+</head>
+<body>
+    <input type="hidden" id="HdnAccountsID" value="0" />
+    <input type="hidden" id="HdnPurchaseID" />
+    <input type="hidden" id="HdnPurchaseStatus" />
+    <input type="hidden" id="HdnStoreID" />
+    <input type="hidden" id="HdnSupplierID" />
+    <input type="hidden" id="HdnStoreName" />
+    <input type="hidden" id="HdnSupplierName" />
+    <input type="hidden" id="HdnPaidAmount" />
+    <input type="hidden" id="HdnGrandTotal" />
+
+    <div class="modal fade" id="ModalPayment" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Finalize Purchase</h4>
+
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group" style="padding-bottom: 5px;">
+                                <div style="padding: 15px; background-color: #f6f6f6;">
+
+                                    <ul class="nav nav-tabs" id="tabs" role="tablist">
+                                        <li class="nav-item active"><a data-toggle="tab" href="#Payment" role="tab" class="nav-link">Payment</a></li>
+                                        <li class="nav-item"><a data-toggle="tab" href="#PaymentAdjust" role="tab" class="nav-link">Payment Adjust</a></li>
+                                    </ul>
+
+                                    <div class="tab-content border">
+                                        <div class="tab-pane active" id="Payment">
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <div class="form-group required">
+                                                        <label class="control-label">@PROPageModel.Accounts_PayableAccountName</label>
+                                                        @Html.DropDownList("DdlAccount", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @width = "100%" })
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-6">
+
+                                                    <div class="form-group">
+                                                        <label>@PROPageModel.Accounts_Balance</label>
+                                                        <input type="text" autofocus class="form-control" id="TxtBalance" maxlength="50" readonly placeholder="@PROPageModel.Accounts_Balance">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <label>@PROPageModel.EmployeeAccounts_Date</label>
+                                                    <div>
+                                                        <input type="text" id="TxtDate" class="form-control" autocomplete="off" placeholder="@PROPageModel.EmployeeAccounts_Date">
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <label>@PROPageModel.Payment_Amount</label>
+                                                    <input type="text" class="form-control" id="TxtAmount">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <label>@PROPageModel.Payment_Note</label>
+                                                    <textarea class="form-control" id="TxtPaymentNote"></textarea>
+                                                </div>
+
+                                                <div class="col-lg-6">
+                                                    <label></label>
+                                                    <button type="button" id="BtnPaymentAdd" class="btn btn-primary btn-block"><i class="fa fa-plus"></i> @POS.Repository.WEBPAGEBUTTON.ADD</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane" id="PaymentAdjust">
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <label><b>@PROPageModel.Payment_SupplierBalance</b></label>
+                                                    <label id="LblbalanceAmt"></label>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <label>@PROPageModel.Common_Date</label>
+                                                    <div>
+                                                        <input type="text" id="TxtAdjustDate" class="form-control" autocomplete="off" placeholder="@PROPageModel.EmployeeAccounts_Date">
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <label>@PROPageModel.Payment_Amount</label>
+                                                    <input type="text" class="form-control" id="TxtAdjustAmount">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <label>@PROPageModel.Payment_Note</label>
+                                                    <textarea class="form-control" id="TxtAdjustPaymentNote" value="@PROMessage.PurchasePaymentAdjust"></textarea>
+                                                </div>
+
+                                                <div class="col-lg-6">
+                                                    <label></label>
+                                                    <button type="button" id="BtnPaymentAdjust" class="btn btn-primary btn-block"><i class="fa fa-plus"></i> @POS.Repository.WEBPAGEBUTTON.ADD</button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-sm-12 col-sm-offset-1 pt-1">
+                                            <table id="GrdPayment" class="tableFixHead"></table>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                            <div class="form-group">
+                                <table class="table table-bordered table-striped pay" width="100%">
+                                    <tbody>
+                                        <tr>
+                                            <td>@PROPageModel.Payment_TotalItems</td>
+                                            <td><span id="LblItemCount">0</span></td>
+                                            <td>@PROPageModel.Payment_TotalPayable</td>
+                                            <td><span id="LblTotalPayable">0.00</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>@PROPageModel.Payment_TotalPaying</td>
+                                            <td><span id="LblTotalPaying">0.00</span></td>
+                                            <td><b>@PROPageModel.Payment_Balance </b></td>
+                                            <td><b><span id="Lblbalance">0.00</span></b></td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content">
+        <!-- Content Header (Page header) -->
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card card-pd">
+
+                        <div class="card-header">
+                            <span style="font-size: 18px;" class="m-0"><i class="fas fa-shipping-fast"></i></span>
+                            <span style="font-size: 18px; border-left: 1px solid #ccc; padding-left: 10px;"> @PROTitle.Title_PurchaseMaster_View </span>
+                            <div style="float: right;">
+                                <span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px;">
+                                    <a href="#" data-toggle="tooltip" data-placement="bottom" title="Add Purchase" id="btnAddPurchase"><i class="fas fa-plus-circle"></i> </a>
+                                </span>
+                                <span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px;">
+                                    <a href="#" data-toggle="tooltip" data-placement="bottom" title="Show Form" onclick="showForm()"><i class="fas fa-caret-square-down"></i></a>
+                                </span><span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px;">
+                                    <a href="#" data-toggle="tooltip" data-placement="bottom" title="Hide Form" onclick="hideForm()"><i class="fas fa-caret-square-up"></i></a>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <div id="hidden-form" style="display: none;">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>@PROPageModel.Purchases_PurchaseDate</label>
+                                            <div>
+                                                <input type="text" id="TxtPurchaseDate" autocomplete="off" placeholder="@PROPageModel.Purchases_PurchaseDate" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>@PROPageModel.Purchases_Supplier</label>
+                                            <div>
+                                                <input type="text" id="TxtSupplier" placeholder="@PROPageModel.Purchases_Supplier" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>@PROPageModel.Purchases_SupplierInvoice</label>
+                                            <input type="text" class="form-control" autocomplete="off" id="TxtSupplierInvoice" maxlength="100" placeholder="@PROPageModel.Purchases_SupplierInvoice">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>@PROPageModel.Purchases_PONO</label>
+                                            <div>
+                                                <input type="text" id="TxtPurchaseRefNo" placeholder="@PROPageModel.Purchases_PONO" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+
+                                        <div class="form-group">
+                                            <label>@PROPageModel.Purchases_PurchaseStatus</label>
+                                            <div>
+                                                @Html.DropDownList("DdlPurchaseStatus", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @width = "100%" })
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>@PROPageModel.Purchases_PaymentStatus</label>
+                                            <div>
+                                                @Html.DropDownList("DdlPurPaymentStatus", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @width = "100%" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+
+                                        <div class="pdt-25">
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <button type="button" id="btnPurchaseSearch" class="btn btn-primary btn-block"><i class="fa fa-search"></i> @POS.Repository.WEBPAGEBUTTON.SEARCH</button>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <button type="button" id="btnPurchaseSearchClear" class="btn btn-primary btn-block"><i class="fa fa-paint-brush"></i> @POS.Repository.WEBPAGEBUTTON.CLEAR</button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            </br>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="box-body table-responsive no-padding">
+                                        <table id="GrdPurchases" class="table table-hover"></table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div><!-- /.content-wrapper -->
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        if (ArrParameterData[GetBackURLCount()] != null) {
+            var vStatus;
+
+            if (ArrParameterData[GetBackURLCount()][0].ParameterName == "PurchaseDate") {
+                $('#TxtPurchaseDate').val(ArrParameterData[0][0].ParameterValue);
+            }
+            if (ArrParameterData[GetBackURLCount()][1].ParameterName == "PurcahseRefNo") {
+                $('#TxtPurchaseRefNo').val(ArrParameterData[0][1].ParameterValue);
+            }
+            if (ArrParameterData[GetBackURLCount()][2].ParameterName == "Supplier") {
+                $('#TxtSupplier').val(ArrParameterData[0][2].ParameterValue);
+            }
+            if (ArrParameterData[GetBackURLCount()][3].ParameterName == "PurchaseStatus") {
+                PurchaseStatus = ArrParameterData[0][3].ParameterValue;
+                $('#DdlPurchaseStatus').val(ArrParameterData[0][3].ParameterValue);
+            }
+            if (ArrParameterData[GetBackURLCount()][4].ParameterName == "PaymentStatus") {
+                PaymentStatus = ArrParameterData[0][4].ParameterValue;
+                $('#DdlPurPaymentStatus').val(ArrParameterData[0][4].ParameterValue);
+            }
+
+            GrdPurchases.reload({ PurchaseDate: $('#TxtPurchaseDate').val(), PurchaseRefNo: $('#TxtPurchaseRefNo').val(), Supplier: $('#TxtSupplier').val(), PurchaseStatus: PurchaseStatus, PaymentStatus: PaymentStatus });
+
+        }
+
+        $("#btnAddPurchase").hide();
+
+        if ("@Model.IsAdd"=='True') {
+            $("#btnAddPurchase").show();
+        }
+
+        if ("@Model.IsEdit" == 'False' && "@Model.IsDelete" =='False'  && "@Model.IsPayment " =='False') {
+            GrdPurchases.hideColumn("Action");
+        }
+        $('#tabs a:first').tab('show');
+    </script>
+
+</body>

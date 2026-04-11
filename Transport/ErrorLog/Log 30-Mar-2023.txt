@@ -1,0 +1,47 @@
+Page Name          :Global Error
+Date and Time      :30 Mar 2023 12:53 PM
+Error Message      :The data reader is incompatible with the specified 'SpareProModel.sp_frm_get_Order_Report_Result'. A member of the type, 'CreatedDate', does not have a corresponding column in the data reader with the same name.
+Stack Trace        :   at System.Data.Entity.Core.Query.InternalTrees.ColumnMapFactory.GetMemberOrdinalFromReader(DbDataReader storeDataReader, EdmMember member, EdmType currentType, Dictionary`2 renameList)
+   at System.Data.Entity.Core.Query.InternalTrees.ColumnMapFactory.GetColumnMapsForType(DbDataReader storeDataReader, EdmType edmType, Dictionary`2 renameList)
+   at System.Data.Entity.Core.Query.InternalTrees.ColumnMapFactory.CreateColumnMapFromReaderAndType(DbDataReader storeDataReader, EdmType edmType, EntitySet entitySet, Dictionary`2 renameList)
+   at System.Data.Entity.Core.Query.InternalTrees.ColumnMapFactory.CreateFunctionImportStructuralTypeColumnMap(DbDataReader storeDataReader, FunctionImportMappingNonComposable mapping, Int32 resultSetIndex, EntitySet entitySet, StructuralType baseStructuralType)
+   at System.Data.Entity.Core.EntityClient.Internal.EntityCommandDefinition.FunctionColumnMapGenerator.System.Data.Entity.Core.EntityClient.Internal.EntityCommandDefinition.IColumnMapGenerator.CreateColumnMap(DbDataReader reader)
+   at System.Data.Entity.Core.Objects.ObjectContext.MaterializedDataRecord[TElement](EntityCommand entityCommand, DbDataReader storeReader, Int32 resultSetIndex, ReadOnlyCollection`1 entitySets, EdmType[] edmTypes, ShaperFactory`1 shaperFactory, MergeOption mergeOption, Boolean streaming)
+   at System.Data.Entity.Core.Objects.ObjectContext.CreateFunctionObjectResult[TElement](EntityCommand entityCommand, ReadOnlyCollection`1 entitySets, EdmType[] edmTypes, ExecutionOptions executionOptions)
+   at System.Data.Entity.Core.Objects.ObjectContext.<>c__DisplayClass10`1.<ExecuteFunction>b__f()
+   at System.Data.Entity.Core.Objects.ObjectContext.ExecuteInTransaction[T](Func`1 func, IDbExecutionStrategy executionStrategy, Boolean startLocalTransaction, Boolean releaseConnectionOnSuccess)
+   at System.Data.Entity.Core.Objects.ObjectContext.<>c__DisplayClass10`1.<ExecuteFunction>b__e()
+   at System.Data.Entity.SqlServer.DefaultSqlExecutionStrategy.Execute[TResult](Func`1 operation)
+   at System.Data.Entity.Core.Objects.ObjectContext.ExecuteFunction[TElement](String functionName, ExecutionOptions executionOptions, ObjectParameter[] parameters)
+   at SparePro.Entity.SpareProEntities.sp_frm_get_Order_Report(Nullable`1 requestedBy, Nullable`1 fromDate, Nullable`1 toDate) in C:\Users\P0105443\Documents\repos\SparePro\SparePro.Entity\SpareProDBModel.Context.cs:line 109
+   at SparePro.Repository.PurchaseRepository.Order_FindAll(Nullable`1 page, Nullable`1 limit, String sortBy, Nullable`1 RequestedBy, Nullable`1 fromDate, Nullable`1 toDate, String direction, Int32& TotalCount) in C:\Users\P0105443\Documents\repos\SparePro\SparePro.Repository\PurchaseRepository.cs:line 1003
+   at SparePro.Controllers.ReportsController.Order_FindAll(Nullable`1 page, Nullable`1 limit, Nullable`1 RequestedBy, Nullable`1 fromDate, Nullable`1 toDate, String sortBy, String direction) in C:\Users\P0105443\Documents\repos\SparePro\SparePro\Controllers\ReportsController.cs:line 56
+   at lambda_method(Closure , ControllerBase , Object[] )
+   at System.Web.Mvc.ReflectedActionDescriptor.Execute(ControllerContext controllerContext, IDictionary`2 parameters)
+   at System.Web.Mvc.ControllerActionInvoker.InvokeActionMethod(ControllerContext controllerContext, ActionDescriptor actionDescriptor, IDictionary`2 parameters)
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.<BeginInvokeSynchronousActionMethod>b__39(IAsyncResult asyncResult, ActionInvocation innerInvokeState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResult`2.CallEndDelegate(IAsyncResult asyncResult)
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.EndInvokeActionMethod(IAsyncResult asyncResult)
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.AsyncInvocationWithFilters.<InvokeActionMethodFilterAsynchronouslyRecursive>b__3d()
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.AsyncInvocationWithFilters.<>c__DisplayClass46.<InvokeActionMethodFilterAsynchronouslyRecursive>b__3f()
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.AsyncInvocationWithFilters.<>c__DisplayClass46.<InvokeActionMethodFilterAsynchronouslyRecursive>b__3f()
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.AsyncInvocationWithFilters.<>c__DisplayClass46.<InvokeActionMethodFilterAsynchronouslyRecursive>b__3f()
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.EndInvokeActionMethodWithFilters(IAsyncResult asyncResult)
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.<>c__DisplayClass21.<>c__DisplayClass2b.<BeginInvokeAction>b__1c()
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.<>c__DisplayClass21.<BeginInvokeAction>b__1e(IAsyncResult asyncResult)
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.EndInvokeAction(IAsyncResult asyncResult)
+   at System.Web.Mvc.Controller.<BeginExecuteCore>b__1d(IAsyncResult asyncResult, ExecuteCoreState innerState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncVoid`1.CallEndDelegate(IAsyncResult asyncResult)
+   at System.Web.Mvc.Controller.EndExecuteCore(IAsyncResult asyncResult)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncVoid`1.CallEndDelegate(IAsyncResult asyncResult)
+   at System.Web.Mvc.Controller.EndExecute(IAsyncResult asyncResult)
+   at System.Web.Mvc.MvcHandler.<BeginProcessRequest>b__5(IAsyncResult asyncResult, ProcessRequestState innerState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncVoid`1.CallEndDelegate(IAsyncResult asyncResult)
+   at System.Web.Mvc.MvcHandler.EndProcessRequest(IAsyncResult asyncResult)
+   at System.Web.HttpApplication.CallHandlerExecutionStep.System.Web.HttpApplication.IExecutionStep.Execute()
+   at System.Web.HttpApplication.ExecuteStepImpl(IExecutionStep step)
+   at System.Web.HttpApplication.ExecuteStep(IExecutionStep step, Boolean& completedSynchronously)
+Error Source       :EntityFramework
+Target Site        :Int32 GetMemberOrdinalFromReader(System.Data.Common.DbDataReader, System.Data.Entity.Core.Metadata.Edm.EdmMember, System.Data.Entity.Core.Metadata.Edm.EdmType, System.Collections.Generic.Dictionary`2[System.String,System.Data.Entity.Core.Mapping.FunctionImportReturnTypeStructuralTypeColumnRenameMapping])
+
+----------------------------------------------------------------

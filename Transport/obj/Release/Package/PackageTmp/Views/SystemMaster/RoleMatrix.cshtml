@@ -1,0 +1,444 @@
+﻿@using Transport.Repository.Resource;
+
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <script>
+        ShowCommonBack();
+        document.onkeydown = function (evt) {
+            var keyCode = evt ? (evt.which ? evt.which : evt.keyCode) : event.keyCode;
+            if (keyCode == 13) {
+                UserRoleMatrixSearch();
+                return false;
+            }
+        }
+
+        var GridRoleMatrix;
+
+
+            GridRoleMatrix = $('#GridRoleMatrix').grid({
+                primaryKey: 'RoleMatrixAccessID',
+                uiLibrary: "bootstrap4",
+                autoLoad: false,
+                dataSource: '@Url.Action("RoleMatrix_FindAll", "SystemMaster")',
+                 grouping: { groupBy: 'HeaderMenu' },
+                columns: [
+
+                    { field: "DetailMenu", title: "@SYSPageModel.RoleMatrix_MenuName", sortable: false },
+                    {
+                        field: "PageAccessName", title: "@SYSPageModel.RoleMatrix_PageAccessView", minWidth: 230, priority: 1, wrap: true, sortable: false, renderer: function (value, record) {
+
+                            var Result = "";
+                            if (record.PageAccessName != null && record.PageAccessName != "") {
+                                var mySplitResult = (record.PageAccessName).split(","); 
+                                for (i = 0; i < mySplitResult.length; i++) {
+                                    Result += '<span class="badge badge-primary" style="font-size:12px">' + mySplitResult[i].split('_')[0] + '</span> '; 
+                                }
+                                 
+                            }  
+                            else {
+                                Result = '<span class="badge"></span> ';
+                            }
+                           
+                            return Result;
+                        }
+                    },
+
+                    {
+                        field: '', title: "@SYSPageModel.RoleMatrix_PageAccess", width: 100, align: "center", renderer: function (value, record) {
+                            if (record.IsMenuDetailPageAccess == true){
+                                return '<span class="fa fa-list-alt" style="font-size:16px;cursor:pointer" onclick=EditAccess(' + record.RoleMatrixAccessID + ')></span>';
+                            }
+
+                        },
+                    },
+                    {
+                        field: 'IsPageAccess', title: '@SYSPageModel.RoleMatrix_MenuAccess', width: 100, align: "center", renderer: function (value, record) {
+                            return '<input type="checkbox" name="UniqRoleMatrixAccessID" ID="UniqRoleMatrixAccessID" class="gj-checkbox-bootstrap gj-checkbox-glyphicons" style="padding:0;margin:0"><input type="text" name="txtUniqRoleMatrixAccessID" ID="txtUniqRoleMatrixAccessID" value="' + record.RoleMatrixAccessID + '" style="visibility: hidden;width:1px;height:1px" />';
+                        },
+                    }
+
+                ]  
+            });
+
+            GridRoleMatrix.on('dataBound', function (e, records, totalRecords) {
+
+                $(GridRoleMatrix).find('tbody tr[role="group"]').each(function (rowIndex, r) {
+
+                     var $tds2 = $(this).find('td');
+                     $tds2.eq(1).html("<i class=\"fa fa-server\"></i> <b style=font-size:13px>" + $tds2.eq(1).text().replace("HeaderMenu:", "") + "</b>");
+
+                });
+
+            });
+
+            GridRoleMatrix.on('cellDataBound', function (e, $wrapper, id, column, record) {
+                if ('IsPageAccess' === column.field) {
+                    $wrapper.find('input[type="checkbox"]').prop("checked", record.IsPageAccess);
+                }
+            });
+
+
+        function EditAccessPopUP() {
+               $("#EditAccessdialog").dialog({
+                title: Popup_CommonTitleHeader.replace("{0}", ''),
+                uiLibrary: 'bootstrap',
+                autoOpen: false,
+                height: 300,
+                modal: true,
+                buttons: {
+                    "Cancel": function () { $(this).dialog("close"); }
+                }
+
+            })
+            $("#EditAccessdialog").dialog("open");
+            $("#LblPopupTitleHeader").html('@SYSTitle.Title_RoleMatrix_EditAccess');
+        }
+
+        function BindAvailableAccess(RoleMatrixID) {
+            $.ajax({
+                type: "GET",
+                url: BaseURL + "SystemMaster/Load_AvailableAccess_RoleMatrix",
+                datatype: "Json",
+                async: true,
+                cache: false,
+                data: { RoleMatrixID: RoleMatrixID },
+                success: function (data) {
+                    $("#lstUnSelectedAccessID option").remove();
+                    $.each(data, function (index, value) { 
+                        $('#lstUnSelectedAccessID').append('<option value="' + value.ID + '">' + value.Name + '</option>');
+                    });
+                }
+            });
+
+            $.ajax({
+                type: "GET",
+                url: BaseURL + "SystemMaster/Load_SelectedAccess_RoleMatrix",
+                datatype: "Json",
+                async: true,
+                cache: false,
+                data: { RoleMatrixID: RoleMatrixID},
+                success: function (data) {
+                    $("#lstSelectedAccessID option").remove();
+                    $.each(data, function (index, value) {
+                        $('#lstSelectedAccessID').append('<option value="' + value.ID + '">' + value.Name + '</option>');
+                    });
+                }
+            });
+        }
+
+        function EditAccess(RoleMatrixAccessID) {
+            EditAccessPopUP();
+            BindAvailableAccess(RoleMatrixAccessID);
+            $('#HtnRoleMatrixAccessID').val(RoleMatrixAccessID);
+        }
+
+        function GetMenuAccessDetails() {
+
+            var Arr = new Array();
+
+            $(GridRoleMatrix).find('tbody tr[data-role="row"]').each(function (rowIndex, r) {
+                var chk = $(this).closest('tr').find('input:checkbox');
+                var txt = $(this).closest('tr').find('input:text');
+
+                var Obj = new Object();
+
+                Obj.ID = txt.val();
+
+                if (chk[0].checked == true) {
+                    Obj.Name = true;
+                }
+                else {
+                    Obj.Name = false;
+                }
+
+                Arr[rowIndex] = Obj;
+
+            });
+            return Arr;
+        }
+
+        function MoveListBoxItem(fromId, toId) {
+            $("#" + fromId + " option:selected").remove().appendTo("#" + toId);
+        }
+
+
+      $("#btnRoleMatrixUpdate").click(function () {
+
+            if (RoleMatrixValidate() == true) {
+   
+                var Arr = GetMenuAccessDetails();
+
+                $.confirm({
+                    title: '<b style=color:green;font-size:18px>@SYSTitle.RoleMatrix_ConfirmationMessage</b>',
+                    content: ConfirmAlert_Message_Content.replace("{0}", ConfirmAlert_UpdateMessage_Content),
+                    icon: 'fa fa-warning',
+                    animation: 'zoom',
+                    closeAnimation: 'zoom',
+                    buttons: {
+                        'confirm': {
+                            text: 'Yes',
+                            btnClass: 'btn-blue',
+                            action: function () {
+
+                                $.ajax({ url: BaseURL + "SystemMaster/RoleMatrix_Save", type: "POST", data: { RoleMatrixUpdateValue: Arr } })
+                                    .done(function (result) {
+                                        if (result.Result == true) {
+                                            SucessAlert(result.Message);
+                                        }
+                                        else if (result.Result == false) {
+                                            ErrorAlert(result.Message);
+                                        }
+
+                                    })
+                                    .fail(function (result) {
+                                        ErrorAlert(result.Message);
+                                    });
+                            }
+                        },
+                        cancel: {
+                            text: 'No',
+                            btnClass: 'btn-blue'
+                        }
+                    }
+                });
+            }
+
+        });
+
+        $("#btnEditAccessUpdate").click(function () {
+
+            var Arr = new Array();
+            $('#lstSelectedAccessID option').each(function (index) {
+                var Obj = new Object();
+                Obj.ID = this.value;
+                Obj.Name = this.Name;
+                Arr[index] = Obj;
+            })
+
+                $.confirm({
+                    title: '<b style=color:green;font-size:18px>@SYSTitle.RoleMatrix_ConfirmationMessage</b>',
+                    content: ConfirmAlert_Message_Content.replace("{0}", ConfirmAlert_UpdateMessage_Content),
+                    icon: 'fa fa-warning',
+                    animation: 'zoom',
+                    closeAnimation: 'zoom',
+                    buttons: {
+                        'confirm': {
+                            text: 'Yes',
+                            btnClass: 'btn-blue',
+                            action: function () {
+
+                                $.ajax({
+                                    url: BaseURL + "SystemMaster/RoleMatrix_UpdateAccess_Save", type: "POST",
+                                    data: { RoleMatrixAccessID: $("#HtnRoleMatrixAccessID").val(), SelectedAccessID: Arr, RoleID: $("#DdlRoleMatrixRole").val() }
+                                })
+                                    .done(function (result) {
+                                        if (result.Result == true) {
+
+                                            var ArrMenu = GetMenuAccessDetails();
+
+                                            $.ajax({
+                                                url: BaseURL + "SystemMaster/RoleMatrix_Save",
+                                                type: "POST",
+                                                data: { RoleMatrixUpdateValue: ArrMenu }
+                                            })
+                                            .done(function (result) {
+                                                SucessAlert(result.Message);
+                                                EditAccessClose();
+                                              })
+                                        }
+                                        else if (result.Result == false) {
+                                            ErrorAlert(result.Message);
+                                        }
+
+                                    })
+                                    .fail(function (result) {
+                                        ErrorAlert(result.Message);
+                                    });
+                            }
+                        },
+                        cancel: {
+                            text: 'No',
+                            btnClass: 'btn-blue'
+                        }
+
+                    }
+                });
+
+        });
+
+        $('#btnEditAccessClose').click(function () {
+            EditAccessClose();
+        });
+
+        function EditAccessClose() {
+            $('#HtnRoleMatrixAccessID').val("");
+            $("#EditAccessdialog").dialog("close");
+            GridRoleMatrix.reload();
+        }
+
+        function RoleMatrixValidate() {
+            var Result = true;
+
+            if ($("#DdlRoleMatrixRole").val() == "") {
+                GridRoleMatrix.reload({ RoleID: '' });
+                $("#DdlRoleMatrixRole").focus();
+                ErrorAlert("@SYSPageModel.RoleMatrix_SelectRole");
+                Result = false;
+                return false;
+            }
+            return Result;
+        }
+
+        function UserRoleMatrixSearch() {
+            var Role = '';
+
+            if ($("#DdlRoleMatrixRole").val() != 0) {
+                Role = $('#DdlRoleMatrixRole').val();
+            }
+
+            if ($("#DdlRoleMatrixRole").val() != 0 ) {
+                $("#btnRoleMatrixUpdate").removeAttr("disabled");
+                GridRoleMatrix.reload({ RoleID: $('#DdlRoleMatrixRole').val() });
+            }
+            else {
+                $("#DdlRoleMatrixRole").focus();
+                    ErrorAlert("@SYSPageModel.RoleMatrix_SelectRole");
+            }
+        }
+
+       //Search filter methods
+        $('#btnUserRoleMatrixSearch').click(function () {
+            UserRoleMatrixSearch();
+        });
+
+        $('#btnUserRoleMatrixSearchClear').click(function () {
+            $("#DdlRoleMatrixRole").val("");
+
+            $("#btnRoleMatrixUpdate").attr("disabled", true);
+
+            GridRoleMatrix.reload({ RoleID: '' });
+
+        });
+
+
+    </script>
+</head>
+<body>
+    <input type="hidden" id="HtnRoleMatrixAccessID" />
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content">
+        <!-- Content Header (Page header) -->
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card card-pd">
+                       
+                        <div class="card-header">
+                            <span style="font-size: 18px;" class="m-0"><i class="fa fa-cog"></i></span>
+                            <span style="font-size: 18px; border-left: 1px solid #ccc; padding-left: 10px;"> @SYSTitle.Title_Role_Setup_View </span>
+                            <div style="float: right;">
+                                <button type="button" id="btnRoleMatrixUpdate" class="btn btn-primary"><i class="fa fa-save"></i> @Transport.Repository.WEBPAGEBUTTON.UPDATE</button>
+                            </div>
+
+                            </div>
+
+                            <div class="card-body">
+                                <!-- /hidden_div -->
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <div class="form-group required">
+                                            <label class="control-label">@SYSPageModel.RoleSetUp_Role</label>
+                                            <div>
+                                                @Html.DropDownList("DdlRoleMatrixRole", (SelectList)Model.LoadRoleData, new { @class = "form-control select2", @width = "100%" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="col-sm-4">
+                                        <div class="pdt-25">
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <button type="button" id="btnUserRoleMatrixSearch" class="btn btn-primary btn-block"><i class="fa fa-search"></i> @Transport.Repository.WEBPAGEBUTTON.SEARCH</button>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <button type="button" id="btnUserRoleMatrixSearchClear" class="btn btn-primary btn-block"><i class="fa fa-paint-brush"></i> @Transport.Repository.WEBPAGEBUTTON.CLEAR</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="EditAccessdialog" width="500" height="270" class="col-lg-6 Form-LineHeight" style="display:none;border: 1px solid #000000" PopupName="PopupDialogHeader">
+
+
+                                    <div class="row">
+                                        <div class="col-lg-4">
+                                            @Html.Label(@SYSPageModel.RoleMatrix_AvailableAccess, htmlAttributes: new { @class = "control-label" })
+                                        </div>
+                                        <div class="col-lg-4">
+
+                                        </div>
+                                        <div class="col-lg-4">
+                                            @Html.Label(@SYSPageModel.RoleMatrix_EnabledAccess, htmlAttributes: new { @class = "control-label" })
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-4">
+                                            @Html.ListBox("lstUnSelectedAccessID", new SelectList(string.Empty, "ID", "Name"), new { @style = "width:100%;height:100%", @class = "Form-TextBoxControl" })
+                                        </div>
+                                        <div class="col-lg-4 text-center">
+                                            <button type="button" id="btnright" class="btn btn-warning btn-xs" style="color:black" onclick="javascript: MoveListBoxItem('lstUnSelectedAccessID', 'lstSelectedAccessID')"><i class="fa fa-angle-double-right" style="font-size:16px;font-weight:bold"></i></button>
+                                            <button type="button" id="btnright" class="btn btn-warning btn-xs" style="color:black" onclick="javascript: MoveListBoxItem('lstSelectedAccessID', 'lstUnSelectedAccessID')"><i class="fa fa-angle-double-left" style="font-size:16px;font-weight:bold"></i></button>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            @Html.ListBox("lstSelectedAccessID", new SelectList(string.Empty, "ID", "Name"), new { @style = "width:100%;height:100%", @class = "Form-TextBoxControl" })
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-lg-12 text-center">
+                                            <button type="button" id="btnEditAccessUpdate" class="btn btn-primary"><i class="fa fa-save"></i> @Transport.Repository.WEBPAGEBUTTON.UPDATE</button>
+                                            <button type="button" id="btnEditAccessClose" class="btn btn-secondary"> <i class="fa fa-remove"></i> @Transport.Repository.WEBPAGEBUTTON.CLOSE</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="box-body table-responsive no-padding">
+                                            <table id="GridRoleMatrix" class="table table-hover"></table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                </div>
+
+            </div><!-- /.content-wrapper -->
+        </div>
+    </div>
+   
+
+    <script type="text/javascript">
+
+            @*$("#btnRoleMatrixUpdate").hide();
+            $("#btnEditAccessUpdate").hide();
+
+            if ("@Model.IsUpdate"=='True') {
+                $("#btnRoleMatrixUpdate").show();
+                $("#btnEditAccessUpdate").show();
+            }*@
+              
+
+    </script>
+
+</body>
+
+</html>

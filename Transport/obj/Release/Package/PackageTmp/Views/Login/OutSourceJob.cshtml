@@ -1,0 +1,95 @@
+﻿@using Transport.Repository.Resource;
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Nissi Travels</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link href="https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+    <script type="text/javascript">
+        var BaseURL = "@Url.Content("~/")";
+
+        function SaveRequest(_status) {
+            var jobcode = $('#HdnOutSourceJobCode').val();
+            console.log(_status);
+
+            $.ajax({
+                url: '@Url.Content("~/Login/OutSourceJobUpdate")',
+                type: 'POST',
+                data: JSON.stringify({ JobCode: jobcode, Status: _status }),
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function (result) {
+                    if (result.success === true) {
+                        $('#lblsuccess').html(result.response);
+                        $("#success-alert").fadeTo(2000, 500).slideUp(5000, function () {
+                            $("#success-alert").slideUp(5000);
+                        });
+                        location.reload();
+                    }
+                    if (result.success === false) {
+                    }
+                }
+            });
+        }
+
+        $(document).ready(function () {
+
+            $('#btnjobstart').hide(); $('#btnwaitcustomer').hide(); $('#btntripstart').hide(); $('#btnjobcomplete').hide();
+            console.log('@ViewBag.JobStatus');
+            $('#HdnOutSourceJobCode').val('@ViewBag.OutSourceJobCode');
+            $('#jobheader').html('@ViewBag.JobHeader');
+            $('#linkcontent').html('@Html.Raw(@ViewBag.LinkContent)');
+
+            if ('@ViewBag.JobStatus' == "Assigned") { $('#btnjobstart').show(); }
+            if ('@ViewBag.JobStatus' == "Job Started") { $('#btnwaitcustomer').show(); }
+            if ('@ViewBag.JobStatus' == "Waiting for Customer") { $('#btntripstart').show(); }
+            if ('@ViewBag.JobStatus' == "Passenger on board") { $('#btnjobcomplete').show(); }
+        });
+
+        function showAlert(message) {
+            $('#lblerror').text(message); $('#lblerror').html(message);
+            $("#error-alert").fadeTo(2000, 500).slideUp(500, function () {
+                $("#error-alert").slideUp(500);
+            });
+        }
+
+    </script>
+</head>
+<body>
+    <input type="hidden" id="HdnOutSourceJobCode" />
+    <div class="container">
+        <h2 id="jobheader"></h2>
+        <div>
+            <h4 id="linkcontent" class="responsive-font-example text-info"></h4>
+        </div>
+        <div class="alert alert-success" id="success-alert">
+            <button type="button" class="close" data-dismiss="alert">x</button>
+            <strong id="lblsuccess"></strong>
+        </div>
+        <div class="alert alert-danger fade out" role="alert" id="error-alert">
+            <button type="button" class="close" data-dismiss="alert">x</button>
+            <strong id="lblerror" name="lblerror"></strong>
+        </div>
+        <button type="button" onclick="SaveRequest(this.value);" id="btnjobstart" value="Job Started" class="btn btn-info btn-block">Job Started</button>
+        <button type="button" onclick="SaveRequest(this.value);" id="btnwaitcustomer" value="Waiting for Customer" class="btn btn-warning btn-block">Waiting for Customer</button>
+        <button type="button" onclick="SaveRequest(this.value);" id="btntripstart" value="Passenger on board" class="btn btn-secondary btn-block">Passenger on board</button>
+        <button type="button" onclick="SaveRequest(this.value);" id="btnjobcomplete" value="Job Completed" class="btn btn-success btn-block">Job Completed</button>
+
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,213 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Receipt</title>
+
+    <style>
+        .invoice-box {
+            max-width: 600px;
+            margin: auto;
+            padding: 10px;
+            line-height: 15px;
+            font-family: Tahoma;
+            font-size: 9pt;
+            font-weight: bolder
+        }
+
+            .invoice-box table {
+                width: 100%;
+                line-height: inherit;
+                text-align: left;
+            }
+
+                .invoice-box table td {
+                    padding: 5px;
+                    vertical-align: top;
+                }
+
+                .invoice-box table tr td:nth-child(2) {
+                    text-align: right;
+                }
+
+                .invoice-box table tr.top table td {
+                    padding-bottom: 2px;
+                }
+
+                    .invoice-box table tr.top table td.title {
+                        line-height: 5px;
+                    }
+
+        .logo-center {
+            text-align: center;
+        }
+
+        .invoice-box table tr.information table td {
+            padding-bottom: 10px;
+        }
+
+        .invoice-box table tr.heading td {
+            background: #eee;
+            border-bottom: 1px solid #ddd;
+            font-weight: bold;
+        }
+
+        .invoice-box table tr.details td {
+            padding-bottom: 2px;
+        }
+
+        .invoice-box table tr.item td {
+            border-bottom: 1px solid #eee;
+        }
+
+        .invoice-box table tr.item.last td {
+            border-bottom: none;
+        }
+
+        .invoice-box table tr.total td:nth-child(2) {
+            border-top: 2px solid #eee;
+            font-weight: bold;
+        }
+
+        .center {
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <center>
+            <img src="@Url.Content("~/AppImages/logo_nissi_151.png")" width="130px" />
+
+            <h4 style="line-height: 22px;font-size: 9pt; font-family: Tahoma;">
+                NISSI TOURS AND TRAVELS PTE. LTD</br>
+                291 SERANGOON ROAD, SINGAPORE 218107.</br>
+                TEL NO +65 62920521, <br />
+                Booking@nissitravels.com<br />
+
+            </h4>
+        </center>
+    </div>
+    <div class="invoice-box">
+        <table cellpadding="0" cellspacing="0">
+
+            <tr class="heading">
+                <td colspan="2">
+                    Receipt
+                </td>
+            </tr>
+
+            <tr class="details">
+                <td>
+                    Name :
+                </td>
+
+                <td>
+                    @ViewBag.CustomerName
+                </td>
+            </tr>
+
+            <tr class="details">
+                <td>
+                    Invoice No :
+                </td>
+
+                <td>
+                    @ViewBag.InvoiceNo
+                </td>
+            </tr>
+
+            <tr class="details">
+                <td>
+                    Invoice Date :
+                </td>
+
+                <td>
+                    @ViewBag.InvoiceDate
+                </td>
+            </tr>
+            <tr class="details">
+                <td>
+                    Job Date :
+                </td>
+
+                <td>
+                    @ViewBag.JobDate.ToString("dd-MMM-yyyy")
+                </td>
+            </tr>
+            <tr class="details">
+                <td>
+                    Job Time :
+                </td>
+
+                <td>
+                    @ViewBag.JobTime
+                </td>
+            </tr>
+            <tr class="details">
+                <td>
+                    Job From :
+                </td>
+
+                <td>
+                    @ViewBag.JobFrom
+                </td>
+            </tr>
+            <tr class="details">
+                <td>
+                    Job To :
+                </td>
+
+                <td>
+                    @ViewBag.JobTo
+                </td>
+            </tr>
+            <tr class="details">
+                <td>
+                    Total Amount:
+                </td>
+
+                <td>
+                    $@ViewBag.NetAmount
+                </td>
+            </tr>
+            <tr class="details">
+                <td colspan="2" align="center">
+                    Thank you! Please come again!
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <center>
+            <img src="@Url.Content("~/AppImages/QRCode.png")" width="130px" />
+        </center>
+    </div>
+    <div>
+        <center>
+            <button type="button" id="printpagebutton" class="btn btn-primary btn-xs" onclick="myFunction()">Print</button>
+        </center>
+    </div>
+    
+
+    <script type="text/javascript">
+        function myFunction() {
+            //Get the print button and put it into a variable
+            var printButton = document.getElementById("printpagebutton");
+            //Set the print button visibility to 'hidden'
+            printButton.style.visibility = 'hidden';
+            //Print the page content
+            window.print()
+            //Set the print button to 'visible' again
+            //[Delete this line if you want it to stay hidden after printing]
+            printButton.style.visibility = 'visible';
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,20 @@
+Page Name          :Miscellaneous_Update
+Date and Time      :08 Apr 2024 9:47 AM
+Error Message      :Nullable object must have a value.
+Stack Trace        :   at System.ThrowHelper.ThrowInvalidOperationException(ExceptionResource resource)
+   at System.Nullable`1.get_Value()
+   at RangoonAir.Repository.MiscellaneousRepository.Miscellaneous_Update(MiscellaneousModel objMiscellaneous) in C:\Users\user\Documents\repos\RangoonAir\RangoonAir.Repository\MiscellaneousRepository.cs:line 238
+Error Source       :mscorlib
+Target Site        :Void ThrowInvalidOperationException(System.ExceptionResource)
+
+----------------------------------------------------------------
+Page Name          :Miscellaneous_Update
+Date and Time      :08 Apr 2024 9:48 AM
+Error Message      :Nullable object must have a value.
+Stack Trace        :   at System.ThrowHelper.ThrowInvalidOperationException(ExceptionResource resource)
+   at System.Nullable`1.get_Value()
+   at RangoonAir.Repository.MiscellaneousRepository.Miscellaneous_Update(MiscellaneousModel objMiscellaneous) in C:\Users\user\Documents\repos\RangoonAir\RangoonAir.Repository\MiscellaneousRepository.cs:line 238
+Error Source       :mscorlib
+Target Site        :Void ThrowInvalidOperationException(System.ExceptionResource)
+
+----------------------------------------------------------------

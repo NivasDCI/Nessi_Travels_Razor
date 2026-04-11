@@ -1,0 +1,245 @@
+﻿@using Transport.Repository.Resource;
+@{
+    Layout = "";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <script>
+        $('body').on('click', function (e) {
+            if ($(e.target).data('toggle') !== 'popover' && $(e.target).parents('.popover.in').length === 0) {
+                $('.popover').popover('hide');
+            }
+        });
+
+        document.onkeydown = function (evt) {
+            var keyCode = evt ? (evt.which ? evt.which : evt.keyCode) : event.keyCode;
+            if (keyCode == 13) {
+                JobVendorSearch();
+                return false;
+            }
+        }
+
+        ShowCommonBack();
+        var GrdJobVendorMaster;
+        var JobVendorsStatus;
+       
+        LoadStatus(-1);       
+
+        function LoadStatus(JobVendorsStatus) {
+
+            $.ajax({
+                type: "GET",
+                url: BaseURL + "Common/Load_Status",
+                datatype: "Json",
+                success: function (data) {
+                    $("#DdlsearchJobVendorsStatus option").remove();
+                    $.each(data, function (index, value) {
+                        $('#DdlsearchJobVendorsStatus').append('<option value="' + value.ID + '">' + value.Name + '</option>');
+                    });
+                }
+            }).done(function (result) {
+                if (JobVendorsStatus == 0 || JobVendorsStatus == 1) {
+                    $("#DdlsearchJobVendorsStatus").val(JobVendorsStatus);
+                }
+                else {
+                    $("#DdlsearchJobVendorsStatus").val(-1);
+                }
+            });
+        }
+
+        renderer = function (value, record, $cell, $displayEl, id) {
+
+            var HTMLContent = '<table style=width:100%><tr>';
+                HTMLContent += '<td style="border:0px solid #FFF;"><a tabindex="-1" onclick="EditJobVendors(' + record.JobVendorCode + ')" style="cursor:pointer"><i class="fas fa-edit Form-GridEditButton"></i></a></td>';
+            $displayEl.html("</tr></table>");
+            $displayEl.append(HTMLContent);
+
+        }
+
+        var tstamp = (new Date()).getTime();
+
+        GrdJobVendorMaster = $("#GrdJobVendorMaster").grid({
+            primaryKey: "JobVendorsCode",
+            uiLibrary: "bootstrap4",
+            autoLoad: true,
+            dataSource: '@Url.Action("JobVendorsMaster_FindAll", "ProjectMaster")',
+            columns: [
+                    { field: 'JobVendorCode', title: "Code", width: 75, align: "center", editor: false, sortable: true },
+                    { field: "JobVendorName", title: "Company Name", sortable: true },
+                    { field: "Address1", title: "Address 1" },
+                    { field: "Address2", title: "Address 2" },
+                    { field: "Address3", title: "Address 3" },
+                    { field: "ContactNo", title: "Contact No" },
+                    { field: '@PROPageModel.Common_Status', width: 75, align: "center", editor: false, sortable: true, renderer: function (value, record) { return record.Status == true ? '<span class="badge badge-success" style=font-size:12px>@Button.Button_Active</span>' : '<span class="badge badge-danger" style=font-size:12px>@Button.Button_Inactive</span>'; } },
+                    { field: '@Button.Button_Action', width: 90, align: "center", renderer: renderer }
+            ]
+            
+         });
+
+        $('#btnAddJobVendorsDetail').click(function () {
+            var ParamData = [
+
+                { ParameterName: "JobVendorsName", ParameterValue: $("#TxtSearchJobVendorsName").val() },
+                { ParameterName: "JobVendorsStatus", ParameterValue: $("#DdlsearchJobVendorsStatus").val() }
+
+            ]
+
+            AddBackURLStore(JSON.stringify(ParamData));
+            if ($("#HdnDashboardCount").val() == 1) {
+                GetMenu('@Url.Action("AddJobVendorsMaster", "ProjectMaster")' + '?JobVendorCode=0');
+            }
+            else {
+                GetMenu('@Url.Action("AddJobVendorsMaster", "ProjectMaster")' + '?JobVendorCode=0' + '&HeaderViewID=' + GetParamValue("HeaderViewID") + '&DetailViewID=' + GetParamValue("DetailViewID"));
+            }
+        });
+
+        function EditJobVendors(JobVendorCode) {
+            var ParamData = [
+
+                { ParameterName: "JobVendorsName", ParameterValue: $("#TxtSearchJobVendorsName").val() },
+                { ParameterName: "JobVendorsStatus", ParameterValue: $("#DdlsearchJobVendorsStatus").val() }
+
+            ]
+
+            AddBackURLStore(JSON.stringify(ParamData));
+            if ($("#HdnDashboardCount").val() == 1) {
+                GetMenu('@Url.Action("AddJobVendorsMaster", "ProjectMaster")' + '?JobVendorCode=' + JobVendorCode);
+            }
+            else {
+
+                GetMenu('@Url.Action("AddJobVendorsMaster", "ProjectMaster")' + '?JobVendorCode=' + JobVendorCode + '&HeaderViewID=' + GetParamValue("HeaderViewID") + '&DetailViewID=' + GetParamValue("DetailViewID"));
+            }
+        }
+
+        function JobVendorSearch() {
+            var searchJobVendorsName = '';
+            var JobVendorsStatus = null;
+            searchJobVendorsName = $('#TxtSearchJobVendorsName').val();
+
+            if ($("#DdlsearchJobVendorsStatus").val() == 0) {
+                JobVendorsStatus = false;
+            }
+            else if ($("#DdlsearchJobVendorsStatus").val() == 1) {
+                JobVendorsStatus = true;            }
+
+            GrdJobVendorMaster.reload({ JobVendorName: searchJobVendorsName, Status: JobVendorsStatus });
+
+        }
+        //Search filter methods
+        $("#btnJobVendorsSearch").click(function () {           
+            JobVendorSearch();
+        });
+
+        $("#btnJobVendorsSearchClear").click(function () {           
+            $("#TxtSearchJobVendorsName").val("");
+            $("#DdlsearchJobVendorsStatus").val(-1);
+            GrdJobVendorMaster.reload({ JobVendorName: '', Status: null });
+        });
+
+    </script>
+
+</head>
+<body>
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content">
+        <!-- Content Header (Page header) -->
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card card-pd">
+
+                        <div class="card-header">
+                            <span style="font-size: 18px;" class="m-0"><i class="fa fa-users"></i></span>
+                            <span style="font-size: 18px; border-left: 1px solid #ccc; padding-left: 10px;"> Job Vendors Master - View  </span>
+                            <div style="float: right;">
+                                <span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px;">
+                                    <a href="#" data-toggle="tooltip" data-placement="bottom" title="Add JobVendors" id="btnAddJobVendorsDetail"><i class="fas fa-plus-circle"></i> </a>
+                                </span>
+                                <span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px;">
+                                    <a href="#" data-toggle="tooltip" data-placement="bottom" title="Show Form" onclick="showForm()"><i class="fas fa-caret-square-down"></i></a>
+                                </span><span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px;">
+                                    <a href="#" data-toggle="tooltip" data-placement="bottom" title="Hide Form" onclick="hideForm()"><i class="fas fa-caret-square-up"></i></a>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <!-- /hidden_div -->
+                            <div id="hidden-form">
+                                <div class="row">
+                                   
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>Job Vendor Name</label>
+                                            <div>
+                                                <input type="text" tabindex="1" id="TxtSearchJobVendorsName"  maxlength="200"  placeholder="Job Vendor Name" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>Status</label>
+                                            <div>
+                                                @Html.DropDownList("DdlsearchJobVendorsStatus", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @tabindex = 2, @width = "100%" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="pdt-25">
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <button type="button" tabindex="3" id="btnJobVendorsSearch" class="btn btn-primary btn-block"><i class="fa fa-search"></i> @Transport.Repository.WEBPAGEBUTTON.SEARCH</button>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <button type="button" tabindex="4" id="btnJobVendorsSearchClear" class="btn btn-primary btn-block"><i class="fa fa-paint-brush"></i> @Transport.Repository.WEBPAGEBUTTON.CLEAR</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="box-body table-responsive no-padding">
+                                        <table id="GrdJobVendorMaster" class="table table-hover"></table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- /.content-wrapper -->
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        if (ArrParameterData[GetBackURLCount()] != null) {
+
+            var vJobVendorsStatus;
+            if (ArrParameterData[GetBackURLCount()][0].ParameterName == "JobVendorsName") {
+                $('#TxtSearchJobVendorsName').val(ArrParameterData[0][0].ParameterValue);
+            }
+            if (ArrParameterData[GetBackURLCount()][1].ParameterName == "JobVendorsStatus") {
+                JobVendorsStatus = ArrParameterData[0][1].ParameterValue;
+                $('#DdlsearchJobVendorsStatus').val(JobVendorsStatus);
+                if (JobVendorsStatus == 0) {
+                    vJobVendorsStatus = false;
+                }
+                else if (JobVendorsStatus == 1) {
+                    vJobVendorsStatus = true;
+                }
+            }
+            GrdJobVendorMaster.reload({ JobVendorName: $('#TxtSearchJobVendorsName').val(), Status: vJobVendorsStatus });
+        }
+
+    </script>
+
+</body>
+</html>
+

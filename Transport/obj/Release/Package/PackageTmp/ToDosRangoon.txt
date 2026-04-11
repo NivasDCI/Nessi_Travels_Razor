@@ -1,0 +1,34 @@
+Rangoon Air
+* One PNR, 1 buying, 1 selling, 1 phone no -- done
+* Passenger name, desc, paxtype, ticket no (Add 1st Passenger name autofill customer name) -- done
+* Ticket & ETicket combine -- done
+* Invoice & Ticket same page print seperate -- done
+* PNR for Ticket & Invoice for Visa & Misc -- done
+* Based on PNR all the Transactions
+	Ex :  Add 1 Ticket -> Add Luggage -> Ticket Return -- done
+
+* Bills & Misc Refund with commision -- done
+
+* Topup Amount Entry -> Add Refund Column -- done
+
+* Created Date & Last modified date in all places -- done
+
+* Remove delete all places -- done
+
+* Search Passport no & phone number in like condition in all search -- done
+
+* Display refunds in dashboard - done
+
+* In Dashboard -> Visa & Ticket Income with Profit instead of actual amount &
+		Add Commission to the Profit (Ticket, Visa & Misc) -- done
+
+* PNR Based Report -- done
+
+* Credit Account form for Customer -- done
+
+* Download option
+
+
+
+
+

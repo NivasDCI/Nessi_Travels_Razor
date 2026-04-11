@@ -1,0 +1,581 @@
+﻿
+@using Distributor.Repository.Resource;
+
+@{
+    Layout = "";
+}
+
+
+<!DOCTYPE html>
+
+<html>
+<head>
+
+    <script>
+
+        var GrdProduct, ProductType = '', MakerID = '',  CategoryID = '', authorID = 0, HSNID = 0, ProductStatus = -1;
+
+        $('body').on('click', function (e) {
+            if ($(e.target).data('toggle') !== 'popover' && $(e.target).parents('.popover.in').length === 0) {
+                $('.popover').popover('hide');
+            }
+        });
+
+        ShowCommonBack();
+
+        document.onkeydown = function (evt) {
+            var keyCode = evt ? (evt.which ? evt.which : evt.keyCode) : event.keyCode;
+            if (keyCode == 13) {
+                ProductSearch();
+                return false;
+            }
+        }
+
+        LoadProductType();
+        LoadMaker();
+        LoadCategory();
+
+        LoadHSN();
+
+
+        $.ajax({
+            type: "GET",
+            url: BaseURL + "Common/Load_Status",
+            datatype: "Json",
+            success: function (data) {
+                $("#DdlsearchProductStatus option").remove();
+                $.each(data, function (index, value) {
+                    $('#DdlsearchProductStatus').append('<option value="' + value.ID + '">' + value.Name + '</option>');
+                });
+            }
+        }).done(function (result) {
+            if (ProductStatus == 0 || ProductStatus == 1) {
+                $("#DdlsearchProductStatus").val(ProductStatus);
+            }
+            else {
+                $("#DdlsearchProductStatus").val(-1);
+            }
+        });
+
+        function LoadProductType() {
+
+            $.ajax({
+                type: "GET",
+                url: BaseURL + "Common/Load_DefaultType",
+                data: { DefaultType: "@Distributor.Repository.DEFAULTMASTER.DefaultHeaderMaster_ProductType_ViewID" },
+                datatype: "Json",
+                success: function (data) {
+                    $("#DdlProductType option").remove();
+                    $.each(data, function (index, value) {
+                        $('#DdlProductType').append('<option value="' + value.DefaultID + '">' + value.DefaultName + '</option>');
+                    });
+                }
+            }).done(function (result) {
+
+                if (ProductType != "") {
+                    $("#DdlProductType").val(ProductType);
+                }
+                else {
+                    $("#DdlProductType").val("");
+                }
+            });
+        }
+
+        function LoadMaker() {
+
+            $.ajax({
+                type: "GET",
+                url: BaseURL + "Common/Load_DefaultType",
+                data: { DefaultType: "@Distributor.Repository.DEFAULTMASTER.DefaultHeaderMaster_Maker_ViewID" },
+                datatype: "Json",
+                success: function (data) {
+                    $("#DdlMaker option").remove();
+                    $.each(data, function (index, value) {
+                        $('#DdlMaker').append('<option value="' + value.DefaultID + '">' + value.DefaultName + '</option>');
+                    });
+                }
+            }).done(function (result) {
+
+                if (MakerID != "") {
+                    $("#DdlMaker").val(MakerID);
+                }
+                else {
+                    $("#DdlMaker").val("");
+                }
+            });
+        }
+
+
+
+        function LoadCategory() {
+
+            $.ajax({
+                type: "GET",
+                url: BaseURL + "Common/Load_DefaultType",
+                data: { DefaultType: "@Distributor.Repository.DEFAULTMASTER.DefaultHeaderMaster_Category_ViewID" },
+                datatype: "Json",
+                success: function (data) {
+                    $("#DdlCategory option").remove();
+                    $.each(data, function (index, value) {
+                        $('#DdlCategory').append('<option value="' + value.DefaultID + '">' + value.DefaultName + '</option>');
+                    });
+                }
+            }).done(function (result) {
+
+                if (CategoryID != "") {
+                    $("#DdlCategory").val(CategoryID);
+                }
+                else {
+                    $("#DdlCategory").val("");
+                }
+                $('#DdlSubCategory').append('<option value=0>@Distributor.Repository.Resource.PROMessage.ProductMaster_PleaseSelectSubCategory</option>');
+            });
+        }
+
+
+        $('#DdlCategory').change(function () {
+            SubCategoryLoad($('#DdlCategory').val(), 0);
+        });
+
+        function LoadAuthor() {
+
+            $.ajax({
+                type: "GET",
+                url: BaseURL + "Common/Load_DefaultType",
+                data: { DefaultType: "@Distributor.Repository.DEFAULTMASTER.DefaultHeaderMaster_Author_ViewID" },
+                datatype: "Json",
+                success: function (data) {
+                    $("#DdlAuthor option").remove();
+                    $.each(data, function (index, value) {
+                        $('#DdlAuthor').append('<option value="' + value.DefaultID + '">' + value.DefaultName + '</option>');
+                    });
+                }
+            }).done(function (result) {
+
+                if (authorID != "") {
+                    $("#DdlAuthor").val(authorID);
+                }
+                else {
+                    $("#DdlAuthor").val("");
+                }
+            });
+        }
+
+        function SubCategoryLoad(CategoryID, SubCategoryID) {
+            $.ajax({
+                type: "GET",
+                url: BaseURL + "Common/Load_SubCategory",
+                data: { CategoryID: CategoryID },
+                datatype: "Json",
+                success: function (data) {
+                    $("#DdlSubCategory option").remove();
+
+                    $.each(data, function (index, value) {
+                        $('#DdlSubCategory').append('<option value="' + value.ID + '">' + value.Name + '</option>');
+                    });
+                }
+            }).done(function (result) {
+
+                if (SubCategoryID != 0) {
+                    $("#DdlSubCategory").val(SubCategoryID);
+                }
+            });
+
+        }
+
+        function LoadHSN() {
+
+            $.ajax({
+                type: "GET",
+                url: BaseURL + "Common/Load_HSN",
+                datatype: "Json",
+                success: function (data) {
+                    $("#DdlHSN option").remove();
+                    $.each(data, function (index, value) {
+                        $('#DdlHSN').append('<option value="' + value.ID + '">' + value.Name + '</option>');
+                    });
+                }
+            }).done(function (result) {
+
+                if (HSNID != 0) {
+                    $("#DdlHSN").val(HSNID);
+                }
+            });
+        }
+
+        renderer = function (value, record, $cell, $displayEl, id) {
+
+            var HTMLContent = '<table style=width:100%><tr>';
+            if ("@Model.IsEdit" == 'True') {
+                HTMLContent += '<td style="border:0px solid #FFF;"><a tabindex="-1" onclick="EditProduct(' + id + ')" style="cursor:pointer"><i class="fas fa-edit Form-GridEditButton"></i></a></td>';
+            }
+            if ("@Model.IsDelete" == 'True') {
+                HTMLContent += '<td style="border:0px solid #FFF;"><a tabindex="-1" onclick="DeleteProduct(' + id + ')" style="cursor:pointer"><i class="far fa-trash-alt Form-GridDeleteButton"></i></a></td>';
+            }
+            $displayEl.html("</tr></table>");
+            $displayEl.append(HTMLContent);
+
+        }
+
+        var Template = '<div class="docs-callout"><div class="row"><div class="col-lg-4"><b>@PROPageModel.Product_StoreName :</b> {StoreName}</div><div class="col-lg-4"><b>@PROPageModel.Product_Type:</b> {ProductTypeName}</div><div class="col-lg-4"><b>@PROPageModel.Product_MakerName:</b> {MakerName}</div></div>';
+        Template += '<div class="row"><div class="col-lg-4"><b>@PROPageModel.Product_SubCategoryName :</b> {SubCategoryName}</div><div class="col-lg-4"><b>@PROPageModel.Product_HSN:</b> {HSNName}:</div><div class="col-lg-4"><b>@PROPageModel.Product_MRP:</b> {MRP}</div></div>';
+
+        var tstamp = (new Date()).getTime();
+
+        GrdProduct = $("#GrdProduct").grid({
+            primaryKey: "ProductID",
+            uiLibrary: "bootstrap4",
+            autoLoad: true,
+            detailTemplate: Template,
+            dataSource: '@Url.Action("ProductMaster_FindAll", "ProjectMaster")',
+            columns: [
+                {
+                    field: 'ProductID', title: "@PROPageModel.Product_Image", width: 75, align: "center", editor: false, sortable: true, renderer: function (value, record) {
+                        return "<img style=width:30px;height:30px src=\"@Url.Action("GetImageProductView", "Sales")?ProductID=" + record.ProductID + "&CurrentTime=" + tstamp + "\">";
+                    }
+                },
+                { field: "CodeName", title: "@PROPageModel.Product_PrintName", width:400, sortable: true, align: "left" },
+                { field: "Category", title: "@PROPageModel.Product_CategoryName", sortable: true, align: "left" },
+                { field: "ProductQuantity", title: "@PROPageModel.Product_Quantity", sortable: true, align: "right" },
+                {
+                    field: '@PROPageModel.Common_Status', width: 75, align: "center", editor: false, sortable: true, renderer: function (value, record) {
+
+
+                        return record.Status == true ?'<span class="badge badge-success" style=font-size:12px>@Button.Button_Active</span>' : '<span class="badge badge-danger" style=font-size:12px>@Button.Button_Inactive</span>';
+                    }
+                },
+                { field: '@Button.Button_Action', width: 90, align: "center", renderer: renderer }
+            ],
+            pager: { limit: GridRowsDisplayLimit }
+        });
+
+        function EditProduct(ProductID) {
+            var ParamData = [
+                { ParameterName: "ProductCode", ParameterValue: $("#TxtSearchProductCode").val() },
+                { ParameterName: "ProductType", ParameterValue: $("#DdlProductType").val() },
+                { ParameterName: "Category", ParameterValue: $("#DdlCategory").val() },
+                { ParameterName: "SubCategory", ParameterValue: $("#DdlSubCategory").val() },
+                { ParameterName: "MakerID", ParameterValue: $("#DdlMaker").val() },
+                { ParameterName: "HSNID", ParameterValue: $("#DdlHSN").val() },
+                { ParameterName: "PrintName", ParameterValue: $("#TxtSearchPrintName").val() },
+                { ParameterName: "ProductStatus", ParameterValue: $("#DdlsearchProductStatus").val() }
+            ]
+
+            AddBackURLStore(JSON.stringify(ParamData));
+
+            if ($("#HdnDashboardCount").val() == 1) {
+                GetMenu('@Url.Action("AddProductMaster", "ProjectMaster")' + '?ProductID=' + ProductID);
+            }
+            else {
+                GetMenu('@Url.Action("AddProductMaster", "ProjectMaster")' + '?ProductID=' + ProductID + '&HeaderViewID=' + GetParamValue("HeaderViewID") + '&DetailViewID=' + GetParamValue("DetailViewID"));
+            }
+
+        }
+
+        $('#btnAddProduct').click(function () {
+
+            var ParamData = [
+                { ParameterName: "ProductCode", ParameterValue: $("#TxtSearchProductCode").val() },
+                { ParameterName: "ProductType", ParameterValue: $("#DdlProductType").val() },
+                { ParameterName: "Category", ParameterValue: $("#DdlCategory").val() },
+                { ParameterName: "SubCategory", ParameterValue: $("#DdlSubCategory").val() },
+                { ParameterName: "MakerID", ParameterValue: $("#DdlMaker").val() },
+                { ParameterName: "HSNID", ParameterValue: $("#DdlHSN").val() },
+                { ParameterName: "PrintName", ParameterValue: $("#TxtSearchPrintName").val() },
+                { ParameterName: "ProductStatus", ParameterValue: $("#DdlsearchProductStatus").val() }
+            ]
+
+            AddBackURLStore(JSON.stringify(ParamData));
+            if ($("#HdnDashboardCount").val() == 1) {
+                GetMenu('@Url.Action("AddProductMaster", "ProjectMaster")' + '?ProductID=0');
+            }
+            else {
+                GetMenu('@Url.Action("AddProductMaster", "ProjectMaster")' + '?ProductID=0' + '&HeaderViewID=' + GetParamValue("HeaderViewID") + '&DetailViewID=' + GetParamValue("DetailViewID"));
+            }
+        });
+
+        function DeleteProduct(ProductID) {
+            $.confirm({
+                title: ConfirmAlert_SuccessMessage,
+                content: ConfirmAlert_Message_Content.replace("{0}", ConfirmAlert_InactivateMessage_Content),
+                animation: 'zoom',
+                closeAnimation: 'zoom',
+                buttons: {
+                    'confirm': {
+                        text: Alert_YesMessage,
+                        btnClass: Alert_Button_Style,
+                        action: function () {
+                            $.ajax({ url: BaseURL + "ProjectMaster/ProductMaster_Delete", type: "POST", data: { ProductID: ProductID } })
+                                .done(function (result) {
+                                    if (result.Result == true) {
+                                        GrdProduct.reload();
+                                        SucessAlert(result.Message);
+                                    }
+                                    else {
+                                        ErrorAlert(result.Message);
+                                    }
+                                })
+                                .fail(function () {
+                                    ErrorAlert(result.Message);
+                                });
+                        }
+                    },
+                    cancel: {
+                        text: Alert_NoMessage,
+                        btnClass: Alert_Button_Style
+                    }
+                }
+            });
+        }
+
+        function ProductSearch() {
+            var searchProductCode = '';
+            var SearchProductType = '';
+            var SearchProductStatus = '';
+            var SearchCategory = '';
+            var SearchSubCategory = 0;
+            var SearchMakerID = '';
+            var SearchHSNID = 0;
+            var SearchPrintName = '';
+
+            if ($("#TxtSearchProductCode").val() != "") {
+                searchProductCode = $('#TxtSearchProductCode').val();
+            }
+
+            if ($("#DdlProductType").val() != "") {
+                SearchProductType = $("#DdlProductType").val();
+            }
+
+            if ($("#DdlCategory").val() != "") {
+                SearchCategory = $('#DdlCategory').val();
+            }
+
+            if ($("#DdlSubCategory").val() != "") {
+                SearchSubCategory = $("#DdlSubCategory").val();
+            }
+
+            if ($("#DdlMaker").val() != "") {
+                SearchMakerID = $('#DdlMaker').val();
+            }
+
+
+
+            if ($("#DdlHSN").val() != "") {
+                SearchHSNID = $('#DdlHSN').val();
+            }
+
+            if ($("#TxtSearchPrintName").val() != "") {
+                SearchPrintName = $("#TxtSearchPrintName").val();
+            }
+            if ($("#DdlsearchProductStatus").val() == 0) {
+                SearchProductStatus = false;
+            }
+            else if ($("#DdlsearchProductStatus").val() == 1) {
+                SearchProductStatus = true;
+            }
+
+            GrdProduct.clear();
+            GrdProduct.reload({ ProductCode: searchProductCode, ProductType: SearchProductType, Category: SearchCategory, SubCategory: SearchSubCategory, MakerID: SearchMakerID, HSNID: SearchHSNID, PrintName: SearchPrintName, Status: SearchProductStatus });
+
+        }
+
+        //Search filter methods
+        $('#btnProductSearch').click(function () {
+            ProductSearch();
+        });
+
+        $('#btnProductSearchClear').click(function () {
+            $("#TxtSearchProductCode").val('');
+            $("#DdlProductType").val("");
+            $("#DdlCategory").val("");
+            $("#DdlSubCategory").val(0);
+            $("#DdlMaker").val('');
+
+            $("#DdlHSN").val(0);
+            $("#TxtSearchPrintName").val("");
+            $("#DdlsearchProductStatus").val(-1);
+
+            GrdProduct.reload({ ProductCode: '', ProductType: '', Category: '', SubCategory: 0, MakerID: '', HSNID: 0, PrintName: '', Status: true });
+        });
+
+    </script>
+
+</head>
+<body>
+
+    <input type="hidden" id="HtnProductUniqID" value="0" />
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content">
+        <!-- Content Header (Page header) -->
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card card-pd">
+                        
+                            <div class="card-header">
+                                <span style="font-size: 18px;" class="m-0"><i class="fa fa-barcode"></i></span>
+                                <span style="font-size: 18px; border-left: 1px solid #ccc; padding-left: 10px;"> @PROTitle.Title_ProductMaster_View </span>
+                                <div style="float: right;">
+                                    <span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px;">
+                                        <a href="#" data-toggle="tooltip" data-placement="bottom" title="Add Product" id="btnAddProduct"><i class="fas fa-plus-circle"></i> </a>
+                                    </span>
+                                    <span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px;">
+                                        <a href="#" data-toggle="tooltip" data-placement="bottom" title="Show Form" onclick="showForm()"><i class="fas fa-caret-square-down"></i></a>
+                                    </span><span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px;">
+                                        <a href="#" data-toggle="tooltip" data-placement="bottom" title="Hide Form" onclick="hideForm()"><i class="fas fa-caret-square-up"></i></a>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="card-body">
+                                <div id="hidden-form" style="display: none;">
+                                    <div class="row">
+                                        <div class="col-sm-3">
+                                            
+                                            <div class="form-group">
+                                                <label>@PROPageModel.Product_MakerName</label>
+                                                <div>
+                                                    @Html.DropDownList("DdlMaker", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @tabindex = 1, @width = "100%" })
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>@PROPageModel.Common_Status</label>
+                                                <div>
+                                                    @Html.DropDownList("DdlsearchProductStatus", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @tabindex = 2, @width = "100%" })
+                                                </div>
+                                            </div>
+                                            <div class="pdt-10">
+                                                <div class="row">
+                                                    <div class="col-sm-6">
+                                                        <button type="button" id="btnProductSearch" class="btn btn-primary btn-block"><i class="fa fa-search"></i> @Distributor.Repository.WEBPAGEBUTTON.SEARCH</button>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <button type="button" id="btnProductSearchClear" class="btn btn-primary btn-block"><i class="fa fa-paint-brush"></i> @Distributor.Repository.WEBPAGEBUTTON.CLEAR</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <label>@PROPageModel.Product_CategoryName</label>
+                                                <div>
+                                                    @Html.DropDownList("DdlCategory", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @tabindex = 2, @width = "100%" })
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>@PROPageModel.Product_Type</label>
+                                                <div>
+                                                    @Html.DropDownList("DdlProductType", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @tabindex = 2, @width = "100%" })
+                                                </div>
+                                            </div>
+                                           
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <label>@PROPageModel.Product_SubCategoryName</label>
+                                                <div>
+                                                    @Html.DropDownList("DdlSubCategory", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @tabindex = 2, @width = "100%" })
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>@PROPageModel.Product_HSNName</label>
+                                                <div>
+                                                    @Html.DropDownList("DdlHSN", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @tabindex = 2, @width = "100%" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <label>@PROPageModel.Product_Code</label>
+                                                <div>
+                                                    <input type="text" tabindex="1" id="TxtSearchProductCode"  maxlength="50"  placeholder="@PROPageModel.Product_Code" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>@PROPageModel.Product_PrintName</label>
+                                                <div>
+                                                    <input type="text" tabindex="1" id="TxtSearchPrintName"  maxlength="100" placeholder="@PROPageModel.Product_PrintName" class="form-control">
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="box-body table-responsive no-padding">
+                                            <table id="GrdProduct" class="table table-hover"></table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                 </div>
+             </div><!-- /.content-wrapper -->
+        </div>
+    </div>
+
+
+    <script type="text/javascript">
+        if (ArrParameterData[GetBackURLCount()] != null) {
+            var vProductStatus;
+            if (ArrParameterData[GetBackURLCount()][0].ParameterName == "ProductCode") {
+                $('#TxtSearchProductCode').val(ArrParameterData[0][0].ParameterValue);
+            }
+            if (ArrParameterData[GetBackURLCount()][1].ParameterName == "ProductType") {
+                ProductType = ArrParameterData[0][1].ParameterValue;
+                $('#DdlProductType').val(ArrParameterData[0][1].ParameterValue);
+            }
+            if (ArrParameterData[GetBackURLCount()][2].ParameterName == "Category") {
+                CategoryID = ArrParameterData[0][2].ParameterValue;
+                $('#DdlCategory').val(ArrParameterData[0][2].ParameterValue);
+            }
+            if (ArrParameterData[GetBackURLCount()][3].ParameterName == "SubCategory") {
+                SubCategoryID = ArrParameterData[0][3].ParameterValue;
+                $('#DdlSubCategory').val(ArrParameterData[0][3].ParameterValue);
+            }
+            if (ArrParameterData[GetBackURLCount()][4].ParameterName == "MakerID") {
+                MakerID = ArrParameterData[0][4].ParameterValue;
+                $('#DdlMaker').val(ArrParameterData[0][4].ParameterValue);
+            }
+         
+            if (ArrParameterData[GetBackURLCount()][5].ParameterName == "HSNID") {
+                HSNID = ArrParameterData[0][5].ParameterValue;
+                $('#DdlHSN').val(ArrParameterData[0][5].ParameterValue);
+            }
+            if (ArrParameterData[GetBackURLCount()][6].ParameterName == "PrintName") {
+                $('#TxtSearchPrintName').val(ArrParameterData[0][6].ParameterValue);
+            }
+            if (ArrParameterData[GetBackURLCount()][7].ParameterName == "ProductStatus") {
+                ProductStatus = ArrParameterData[0][7].ParameterValue;
+                $('#DdlsearchProductStatus').val(ProductStatus);
+                if (ProductStatus == 0) {
+                    vProductStatus = false;
+                }
+                else if (ProductStatus == 1) {
+                    vProductStatus = true;
+                }
+            }
+            GrdProduct.reload({ ProductCode: $('#TxtSearchProductCode').val(), ProductType: ProductType, Category: CategoryID, SubCategory: SubCategoryID, MakerID: MakerID, HSNID: HSNID, PrintName: $('#TxtSearchPrintName').val(), Status: vProductStatus });
+        }
+  
+        //Page Access
+
+        $("#btnAddProduct").hide();
+
+        if ("@Model.IsAdd"=='True') {
+            $("#btnAddProduct").show();
+        }
+
+        if ("@Model.IsEdit" == 'False' && "@Model.IsDelete" =='False') {
+            GrdProduct.hideColumn("Action");
+        }
+
+    </script>
+
+</body>
+</html>
+

@@ -1,0 +1,199 @@
+﻿@using Transport.Repository.Resource;
+
+
+@{
+    ViewBag.Title = "Add Vehicle";
+    Layout = "";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <script>
+
+        ShowCommonBack();
+        //Handling Focus on load and Submit On Enter
+        EditVehicle();
+
+        $('#btnVehicleSave').click(function (e) {
+            if ($(this).hasClass("unclickable")) {
+                e.preventDefault();
+            } else {
+                var _errorMsg = "";
+
+                if ($("#TxtVehicleName").val() == "") {
+                    _errorMsg += '<br />' + "Vehicle No is Required";
+                }
+
+
+                if (_errorMsg.length > 0) {
+                    ErrorAlert(_errorMsg);
+                    return false;
+                }
+
+                $.confirm({
+                    title: ConfirmAlert_SuccessMessage,
+                    content: GetParamValue("VehicleCode") == 0 ? ConfirmAlert_Message_Content.replace("{0}", ConfirmAlert_SaveMessage_Content) : ConfirmAlert_Message_Content.replace("{0}", ConfirmAlert_UpdateMessage_Content),
+                    animation: 'zoom',
+                    closeAnimation: 'zoom',
+                    buttons: {
+                        'confirm': {
+                            text: Alert_YesMessage,
+                            btnClass: Alert_Button_Style,
+                            keys: ['enter'],
+                            action: function () {
+
+                                var fileData = new FormData();
+
+                                fileData.append("VehicleCode", GetParamValue("VehicleCode"));
+                                fileData.append("VehicleName", ($('#TxtVehicleName').val() || "").toUpperCase());
+                                fileData.append("Status", $("#VehicleStatus").is(":checked"));
+                                $.ajax({
+                                    url: BaseURL + "ProjectMaster/VehicleMaster_Save", type: "POST",
+                                    contentType: false, // Not to set any content header
+                                    processData: false,
+                                    data: fileData
+                                }).done(function (result) {
+                                    if (result.Result == true) {
+                                        SucessAlert(result.Message);
+                                        VehicleClear();
+                                        BackFunction();
+                                    }
+                                    else if (result.Result == false) {
+                                        ErrorAlert(result.Message);
+                                    }
+                                })
+                                    .fail(function () {
+                                        ErrorAlert(result.Message);
+                                    });
+                            }
+                        },
+                        cancel: {
+                            text: Alert_NoMessage,
+                            btnClass: Alert_Button_Style
+                        }
+                    }
+                });
+
+            }
+        });
+
+        function VehicleClear() {
+            $('#TxtVehicleName').val("");
+            $('#VehicleStatus').prop('checked', true);
+        }
+
+        $("#btnVehicleReset").click(function (e) {
+            if ($(this).hasClass("unclickable")) {
+                e.preventDefault();
+            } else {
+
+                $(this).addClass("unclickable");
+                ResetVehicle();
+            }
+        });
+
+        function ResetVehicle() {
+            if (GetParamValue("VehicleCode") != 0) {
+                EditVehicle();
+            }
+            else {
+                VehicleClear();
+            }
+        }
+
+        function EditVehicle() {
+
+            if (GetParamValue("VehicleCode") != 0) {
+                $.ajax({
+                    type: "GET",
+                    url: BaseURL + "ProjectMaster/VehicleMaster_Edit",
+                    data: { VehicleCode: GetParamValue("VehicleCode") },
+                    datatype: "Json",
+                    success: function (data) {
+                        $("#TxtVehicleName").val(data.VehicleName);
+                        if (data.Status) {
+                            $('#VehicleStatus').prop('checked', true);
+                        }
+                        else {
+                            $('#VehicleStatus').prop('checked', false);
+                        }
+                    }
+                });
+            }
+            else {
+                $('#VehicleStatus').prop('checked', true);
+            }
+        }
+
+
+    </script>
+</head>
+<body>
+    <!-- Main content -->
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+
+                <!-- /.col-md-12 -->
+                <div class="col-lg-12">
+                    <div class="card card-pd">
+                        <div class="card-header">
+                            <span style="font-size: 18px;" class="m-0"><i class="fas fa-truck"></i></span>
+                            <span style="font-size: 18px; border-left: 1px solid #ccc; padding-left: 10px;"> Vehicle Master - [Add/Edit] </span>
+                        </div>
+                        <div class="card-body">
+
+                            <p class="introtext">@SYSPageModel.Common_Hint</p>
+
+                            <div class="row">
+                                <div class="col-sm-5">
+
+                                    <div class="form-group required">
+                                        <label class="control-label">Vehicle No</label>
+                                        <input type="text" tabindex="1" class="form-control" style="text-transform: uppercase" id="TxtVehicleName" placeholder="Vehicle Name">
+                                    </div>
+
+
+                                    <div class="pdt-25">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <div class="form-group clearfix">
+                                                    <div class="icheck-primary">
+                                                        @Html.CheckBox("VehicleStatus", new { @tabindex = 2 })
+                                                        <label for="VehicleStatus">
+                                                            @PROPageModel.CustomerMaster_Status
+                                                        </label>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="pdt-30">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <button type="button" tabindex="3" id="btnVehicleSave" class="btn btn-primary btn-block"><i class="fa fa-save"></i> @Transport.Repository.WEBPAGEBUTTON.SAVE</button>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <button type="button" tabindex="4" id="btnVehicleReset" class="btn btn-secondary btn-block"><i class="fa fa-undo"></i> @Transport.Repository.WEBPAGEBUTTON.RESET</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.col-md-12 -->
+                </div>
+                <!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content -->
+    </div>
+
+</body>
+</html>

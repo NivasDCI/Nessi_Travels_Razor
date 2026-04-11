@@ -1,0 +1,286 @@
+﻿
+@using Transport.Repository.Resource;
+
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <script>
+
+        var Rolegrid;
+        var RoleStatus;
+        var ISAddPage = false;
+
+        ShowCommonBack();
+
+            document.onkeydown = function (evt) {
+                var keyCode = evt ? (evt.which ? evt.which : evt.keyCode) : event.keyCode;
+                if (keyCode == 13 && ISAddPage == false) {
+                    RoleSearch();
+                    return false;
+                }
+            }
+        renderer = function (value, record, $cell, $displayEl, id) {
+
+            var var_ID = "'" + id.trim() + "'";
+            var HTMLContent = '<table style=width:100%><tr>';
+            if ("@Model.IsEdit" == 'True') {
+                HTMLContent += '<td style="border:0px solid #FFF;"><a tabindex="-1" onclick="EditUserRole(' + var_ID + ')" style="cursor:pointer"><i class="fas fa-edit Form-GridEditButton"></i></a></td>';
+            }
+            if ("@Model.IsDelete" == 'True') {
+                HTMLContent += '<td style="border:0px solid #FFF;"><a tabindex="-1" onclick="DeleteUserRole(' + var_ID + ')" style="cursor:pointer"><i class="far fa-trash-alt Form-GridDeleteButton"></i></a></td>';
+            }
+            $displayEl.html("</tr></table>");
+            $displayEl.append(HTMLContent);
+
+        }
+
+        $.ajax({
+            type: "GET",
+            url: BaseURL + "Common/Load_Status",
+            datatype: "Json",
+            success: function (data) {
+                $("#DdlsearchRoleStatus option").remove();
+                $.each(data, function (index, value) {
+                    $('#DdlsearchRoleStatus').append('<option value="' + value.ID + '">' + value.Name + '</option>');
+                });
+            }
+            }).done(function (result) {
+
+                if (RoleStatus == 0 || RoleStatus == 1) {
+                    $("#DdlsearchRoleStatus").val(RoleStatus);
+                }
+                else {
+                    $("#DdlsearchRoleStatus").val(-1);
+                }
+        });
+
+        Rolegrid = $("#Rolegrid").grid({
+            primaryKey: "RoleID",
+            uiLibrary: "bootstrap4",
+            dataSource: '@Url.Action("RoleMaster_FindAll", "SystemMaster")',
+            columns: [
+                { field: "RoleName", title: "@SYSPageModel.Role_RoleName", sortable: true,  align: "left" },
+                { field: "Description", title: "@SYSPageModel.Role_Description", sortable: true, align: "left"  },
+                { field: "CreatedUser", title: "@SYSPageModel.Common_CreatedBy", width: 105, sortable: true, align: "left" },
+                { field: "DisplayCreatedDate", title: "@PROPageModel.Common_CreatedDate", sortable: true, align: "center"},
+                { field: "LastModifiedUser", title: "@SYSPageModel.Common_ModifiedBy", width: 105, sortable: true, align: "left" },
+                {  field: "DisplayModifiedDate", title: "@PROPageModel.Common_ModifiedDate", sortable: true, align: "center"},
+              {
+                    field: '@PROPageModel.Common_Status', width: 75, align: "center", editor: false, sortable: true, renderer: function (value, record) { 
+                        return record.status == true ? '<span class="badge badge-success" style=font-size:12px>@Button.Button_Active</span>' : '<span class="badge badge-danger" style=font-size:12px>@Button.Button_Inactive</span>';
+                    }
+                },
+                { field: '@Button.Button_Action', width: 90, align: "center", renderer: renderer }
+            ],
+            pager: { enable: true, limit: GridRowsDisplayLimit, sizes: ArrPaging }
+        });
+
+
+        $("#btnAddUserRole").click(function () {
+            var ParamData = [
+                { ParameterName: "RoleName", ParameterValue: $("#txtsearchRoleName").val() },
+                { ParameterName: "Status", ParameterValue: $("#DdlsearchRoleStatus").val() }]
+
+            AddBackURLStore(JSON.stringify(ParamData));
+
+            GetMenu('@Url.Action("AddRoleMasterDetail", "SystemMaster")' + '?RoleID=E' + '&HeaderViewID=' + GetParamValue("HeaderViewID") + '&DetailViewID=' + GetParamValue("DetailViewID"));
+        });
+
+
+        function EditUserRole(RoleID) {
+            var ParamData = [
+                { ParameterName: "RoleName", ParameterValue: $("#txtsearchRoleName").val() },
+                { ParameterName: "Status", ParameterValue: $("#DdlsearchRoleStatus").val() }]
+
+            AddBackURLStore(JSON.stringify(ParamData));
+
+            GetMenu('@Url.Action("AddRoleMasterDetail", "SystemMaster")' + '?RoleID=' + RoleID+ '&HeaderViewID=' + GetParamValue("HeaderViewID") + '&DetailViewID=' + GetParamValue("DetailViewID"));
+        }
+
+
+        function DeleteUserRole(RoleID) {
+            $.confirm({
+                title: ConfirmAlert_SuccessMessage,
+                content: ConfirmAlert_Message_Content.replace("{0}", ConfirmAlert_InactivateMessage_Content),
+                animation: 'zoom',
+                closeAnimation: 'zoom',
+                buttons: {
+                    'confirm': {
+                        text: Alert_YesMessage,
+                        btnClass: Alert_Button_Style,
+                        action: function () {
+                            $.ajax({ url: BaseURL + "SystemMaster/RoleMaster_Delete", type: "POST", data: { RoleID: RoleID } })
+                                .done(function (result) {
+                                    if (result.Result == true) {
+                                        Rolegrid.reload();
+                                        SucessAlert(result.Message);
+                                    }
+                                    else {
+                                        ErrorAlert(result.Message);
+                                    }
+                                })
+                                .fail(function () {
+                                    ErrorAlert(result.Message);
+                                });
+                        }
+                    },
+                    cancel: {
+                        text: Alert_NoMessage,
+                        btnClass: Alert_Button_Style
+                    }
+                }
+            });
+
+        }
+
+
+        function RoleSearch() {
+            var searchRoleName = '';
+            var searchRoleStatus = true;
+
+            if ($("#txtsearchRoleName").val() != "") {
+                searchRoleName = $('#txtsearchRoleName').val();
+            }
+
+            if ($("#DdlsearchRoleStatus").val() == 0) {
+                searchRoleStatus = false;
+            }
+
+            Rolegrid.reload({ RoleName: searchRoleName, Status: searchRoleStatus });
+
+        }
+
+
+
+        //Search filter methods
+        $('#btnRoleSearch').click(function () {
+            RoleSearch();
+        });
+
+        $('#btnRoleSearchClear').click(function () {
+            $("#txtsearchRoleName").val("");
+            $("#DdlsearchRoleStatus").val(-1);
+            Rolegrid.reload({ RoleName: '', Status: true  });
+        });
+
+    </script>
+</head>
+<body>
+    <input type="hidden" id="HtnRoleUniqID" />
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content">
+        <!-- Content Header (Page header) -->
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card card-pd">
+                        
+                            <div class="card-header">
+                                <span style="font-size: 18px;" class="m-0"><i class="fas fa-user-cog"></i></span>
+                                <span style="font-size: 18px; border-left: 1px solid #ccc; padding-left: 10px;"> @SYSTitle.Title_Role_Master_View </span>
+                                <div style="float: right;">
+                                    <span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px;">
+                                        <a href="#" data-toggle="tooltip" data-placement="bottom" title="Add user Role" id="btnAddUserRole"><i class="fas fa-plus-circle"></i> </a>
+                                    </span>
+                                    <span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px;">
+                                        <a href="#" data-toggle="tooltip" data-placement="bottom" title="Show Form" onclick="showForm()"><i class="fas fa-caret-square-down"></i></a>
+                                    </span><span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px;">
+                                        <a href="#" data-toggle="tooltip" data-placement="bottom" title="Hide Form" onclick="hideForm()"><i class="fas fa-caret-square-up"></i></a>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="card-body">
+                                <!-- /hidden_div -->
+                                <div id="hidden-form" style="display: none;">
+                                    <div class="row">
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <label>@SYSPageModel.Role_RoleName</label>
+                                                <div>
+                                                    <input type="text" tabindex="1" id="txtsearchRoleName" maxlength="100" placeholder="@SYSPageModel.Tooltip_RoleName..." class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>                                      
+
+                                        <div class="col-sm-2">
+                                            <div class="form-group">
+                                                <label>@SYSPageModel.Common_Status</label>
+                                                <div>
+                                                    @Html.DropDownList("DdlsearchRoleStatus", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @tabindex = 2, @width = "100%" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="pdt-25">
+                                                <div class="row">
+                                                    <div class="col-sm-6">
+                                                        <button type="button" id="btnRoleSearch" class="btn btn-primary btn-block"><i class="fa fa-search"></i> @Transport.Repository.WEBPAGEBUTTON.SEARCH</button>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <button type="button" id="btnRoleSearchClear" class="btn btn-primary btn-block"><i class="fa fa-paint-brush"></i> @Transport.Repository.WEBPAGEBUTTON.CLEAR</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="box-body table-responsive no-padding">
+                                            <table id="Rolegrid" class="table table-hover"></table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </div>
+
+            </div><!-- /.content-wrapper -->
+        </div>
+    </div>
+   
+    <script type="text/javascript">
+            if (ArrParameterData[GetBackURLCount()] != null) {
+                var searchRoleStatus;
+                if (ArrParameterData[GetBackURLCount()][0].ParameterName == "RoleName") {
+                    $('#txtsearchRoleName').val(ArrParameterData[0][0].ParameterValue);
+                }
+
+                if (ArrParameterData[GetBackURLCount()][1].ParameterName == "Status") {
+                    RoleStatus = ArrParameterData[0][1].ParameterValue;
+                    $('#DdlsearchUserStatus').val(ArrParameterData[0][1].ParameterValue);
+
+                }
+
+                if (RoleStatus == 0) {
+                    searchRoleStatus = false;
+                }
+                else if (RoleStatus == 1) {
+                    searchRoleStatus = true;
+                }
+
+                Rolegrid.reload({ RoleName: $('#txtsearchRoleName').val(), Status: searchRoleStatus });
+            }
+
+        //Page Access
+
+        $("#btnAddUserRole").hide();
+
+        if ("@Model.IsAdd"=='True') {
+            $("#btnAddUserRole").show();
+        }
+
+        if ("@Model.IsEdit" == 'False' && "@Model.IsDelete" =='False') {
+            Rolegrid.hideColumn("Action");
+        }
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,254 @@
+﻿@using Transport.Repository.Resource;
+
+@{
+    Layout = "";
+}
+
+<head>  
+    <script>
+        var GrdMyExpense;
+
+        $('body').on('click', function (e) {
+            if ($(e.target).data('toggle') !== 'popover' && $(e.target).parents('.popover.in').length === 0) {
+                $('.popover').popover('hide');
+            }
+        });
+
+        function TodayDateRange() {
+            let monthNames = ["Jan", "Feb", "Mar", "Apr",
+                "May", "Jun", "Jul", "Aug",
+                "Sep", "Oct", "Nov", "Dec"];
+
+            var today = new Date();
+            var dd = today.getDate();
+            var mm = today.getMonth(); //January is 0!
+            var yyyy = today.getFullYear();
+
+            if (dd < 10) {
+                dd = '0' + dd
+            }
+
+            let monthName = monthNames[mm];
+
+            return dd + '-' + monthName + '-' + yyyy;
+        }
+
+        function FirstDateRange() {
+            let monthNames = ["Jan", "Feb", "Mar", "Apr",
+                "May", "Jun", "Jul", "Aug",
+                "Sep", "Oct", "Nov", "Dec"];
+
+            var today = new Date();
+            var dd = 1;
+            var mm = today.getMonth(); //January is 0!
+            var yyyy = today.getFullYear();
+
+            if (dd < 10) {
+                dd = '0' + dd
+            }
+
+            let monthName = monthNames[mm];
+
+            return dd + '-' + monthName + '-' + yyyy;
+        }
+
+        $("#TxtFromDate").datepicker({
+            format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small'
+        });
+
+        $("#TxtToDate").datepicker({
+            format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small'
+        });
+
+        document.onkeydown = function (evt) {
+            var keyCode = evt ? (evt.which ? evt.which : evt.keyCode) : event.keyCode;
+            if (keyCode == 13) {
+                MyExpenseSearch();
+                return false;
+            }
+        }
+
+        GrdMyExpense = $("#GrdMyExpense").grid({
+            primaryKey: "ExpenseCode",
+            uiLibrary: "bootstrap4",
+            responsive: true,
+            resizableColumns: true,
+            dataSource: '@Url.Action("MyExpense_FindAll", "Expense")',
+            columns: [
+                { field: "ExpenseDate", width: 54, title: "DATE", type: "date", format: Common_Date_Format, sortable: false, align: "left" },
+                { field: "ExpenseCode", width: 31, title: "CODE", hidden: true },
+                {
+                    field: "VehicleName", width: 59, title: "VEHICLE", sortable: true, align: "center", renderer: function (value, record) {
+                        var _class = (record.VehicleName == "PC5148U") ? 'badge badge-primary' : (record.VehicleName == "PC7219K") ? 'badge badge-info' : (record.VehicleName == "PD5148P") ? 'badge badge-warning' : 'badge badge-dark';
+                        return '<div class="text-center" ><span class= ' + "'" + _class + "'" + '>' + record.VehicleName + '</span></div >';
+                    }
+                },
+                { field: "ServiceTypeName", width: 97, title: "SERVICE TYPE", sortable: false, align: "left" },
+                { field: "SupplierTypeName", width: 97, title: "Supplier", sortable: false, align: "left" },
+                { field: "Qty", width: 34, title: "Qty", sortable: false, align: "right" },
+                { field: "Charge", width: 34, title: "Charge", sortable: false, align: "right" },
+
+            ],
+            pager: { enable: true, limit: 50, sizes: ArrPaging }
+        });
+
+        $('#btnAddMyExpense').click(function () {
+            var ParamData = [
+                { ParameterName: "MyExpense", ParameterValue: $("#txtMyExpense").val() }
+            ]
+
+            AddBackURLStore(JSON.stringify(ParamData));
+            GetMenu('@Url.Action("AddMyExpense", "Expense")' + '?VehicleMyExpenseCode=0' + '&HeaderViewID=' + GetParamValue("HeaderViewID") + '&DetailViewID=' + GetParamValue("DetailViewID"));
+        });
+
+        function EditMyExpense(ID) {
+
+            var ParamData = [
+                { ParameterName: "MyExpense", ParameterValue: $("#txtMyExpense").val() }
+            ]
+
+            AddBackURLStore(JSON.stringify(ParamData));
+
+            GetMenu('@Url.Action("AddMyExpense", "MyExpense")' + '?VehicleMyExpenseCode=' + ID + '&HeaderViewID=' + GetParamValue("HeaderViewID") + '&DetailViewID=' + GetParamValue("DetailViewID"));
+
+        }
+
+        function DeleteMyExpense(longMyExpenseCode) {
+            $.confirm({
+                title: ConfirmAlert_SuccessMessage,
+                content: ConfirmAlert_Message_Content.replace("{0}", ConfirmAlert_DeleteMessage_Content),
+                animation: 'zoom',
+                closeAnimation: 'zoom',
+                buttons: {
+                    'confirm': {
+                        text: Alert_YesMessage,
+                        btnClass: Alert_Button_Style,
+                        action: function () {
+                            $.ajax({ url: BaseURL + "MyExpense/MyExpense_Delete", type: "POST", data: { MyExpenseCode: longMyExpenseCode } })
+                                .done(function (result) {
+                                    if (result.Result == true) {
+                                        GrdMyExpense.reload();
+                                        SucessAlert(result.Message);
+                                    }
+                                    else {
+                                        ErrorAlert(result.Message);
+                                    }
+                                })
+                                .fail(function (result) {
+                                    ErrorAlert(result.Message);
+                                });
+                        }
+                    },
+                    cancel: {
+                        text: Alert_NoMessage,
+                        btnClass: Alert_Button_Style
+                    }
+                }
+            });
+        }
+
+        function MyExpenseSearch() {
+            var searchFromDate = '';
+            var searchToDate = '';
+
+            if ($("#TxtFromDate").val() != 0) {
+                searchFromDate = $('#TxtFromDate').val();
+            }
+
+            if ($("#TxtToDate").val() != "") {
+                searchToDate = $('#TxtToDate').val();
+            }
+            GrdMyExpense.clear();
+            GrdMyExpense.reload({ StartDate: searchFromDate, EndDate: searchToDate });
+        }
+
+        $('#btnMyExpenseSearch').click(function () {
+            MyExpenseSearch();
+        });
+
+        $('#btnMyExpenseSearchClear').click(function () {
+            $("#TxtFromDate").val(TodayDateRange); $("#TxtToDate").val(TodayDateRange);
+            GrdMyExpense.reload({ StartDate: $("#TxtFromDate").val(), EndDate: $("#TxtToDate").val() });
+        });
+
+        $(document).ready(function () {
+            $('input[id="TxtFromDate"]').val(FirstDateRange);
+            $('input[id="TxtToDate"]').val(TodayDateRange);
+        });
+
+    </script>
+    
+    <style>
+        ul.ui-autocomplete {
+            z-index: 1100;
+        }
+    </style>
+</head>
+<body>    
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content">
+        <!-- Content Header (Page header) -->
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card card-pd">
+
+                        <div class="card-header">
+                            <span style="font-size: 18px;" class="m-0"><i class="fas fa-clipboard-check"></i></span>
+                            <span style="font-size: 18px; border-left: 1px solid #ccc; padding-left: 10px;"> Expenses</span>
+                            <div style="float: right;">
+                                <span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px;">
+                                    <a href="#" data-toggle="tooltip" data-placement="bottom" title="Add Entry" id="btnAddMyExpense"><i class="fas fa-plus-circle"></i> </a>
+                                </span>
+
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label class="control-label">From</label>
+                                        <div>
+                                            <input type="text" id="TxtFromDate" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label>To</label>
+                                        <div>
+                                            <input type="text" id="TxtToDate" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="pdt-25">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <button type="button" id="btnMyExpenseSearch" class="btn btn-primary btn-block"><i class="fa fa-search"></i> @Transport.Repository.WEBPAGEBUTTON.SEARCH</button>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <button type="button" id="btnMyExpenseSearchClear" class="btn btn-primary btn-block"><i class="fa fa-paint-brush"></i> @Transport.Repository.WEBPAGEBUTTON.CLEAR</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                         
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="box-body table-responsive no-padding">
+                                        <table id="GrdMyExpense" class="table table-hover"></table>
+                                    </div>
+                                </div>
+                            </div>
+                          </div>
+
+                        </div>
+                    </div>
+            </div><!-- /.content-wrapper -->
+        </div>
+    </div>
+
+</body>

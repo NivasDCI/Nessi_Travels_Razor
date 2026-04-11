@@ -1,0 +1,376 @@
+﻿
+@using Transport.Repository.Resource;
+
+@{
+    Layout = "";
+}
+ 
+<head>
+    
+    <script>
+
+        $("#TxtFromDate").datepicker({
+            format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small'
+        });
+
+        $("#TxtToDate").datepicker({
+            format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small'
+        });
+
+        $(document).ready(function () {
+
+
+        });
+
+        $.ajax({
+            type: "GET",
+            url: BaseURL + "Common/Load_JobVendors",
+            datatype: "Json",
+            success: function (data) {
+                $("#ddlJobVendorCode option").remove();
+                $.each(data, function (index, value) {
+                    $('#ddlJobVendorCode').append('<option value="' + value.ID + '">' + value.Name + '</option>');
+                });
+            }
+        });
+
+        $.ajax({
+            type: "GET",
+            url: BaseURL + "Common/Load_SystemUserDetail",
+            datatype: "Json",
+            success: function (data) {
+                $("#ddlDrivingBy option").remove();
+                $.each(data, function (index, value) {
+                    $('#ddlDrivingBy').append('<option value="' + value.ID + '">' + value.Name + '</option>');
+                });
+            }
+        });
+
+        $.ajax({
+            type: "GET",
+            url: BaseURL + "Common/Load_SystemUserDetail",
+            datatype: "Json",
+            success: function (data) {
+                $("#ddlCashInHand option").remove();
+                $.each(data, function (index, value) {
+                    $('#ddlCashInHand').append('<option value="' + value.ID + '">' + value.Name + '</option>');
+                });
+            }
+        });
+
+        $.ajax({
+            type: "GET",
+            url: BaseURL + "Common/Load_Vehicles",
+            datatype: "Json",
+            success: function (data) {
+                $("#ddlVehicleCode option").remove();
+                $.each(data, function (index, value) {
+                    $('#ddlVehicleCode').append('<option value="' + value.ID + '">' + value.Name + '</option>');
+                });
+            }
+        })
+
+        GrdOutSourceJobsReport = $("#GrdOutSourceJobsReport").grid({
+            primaryKey: "JobCode",
+            uiLibrary: "bootstrap4",
+            resizableColumns: true,
+            dataSource: '@Url.Action("OutSourceJob_FindAll", "Reports")',
+            columns: [
+                { field: "JobDate", width: 62, title: "DATE", type: "date", format: Common_Date_Format, sortable: false, align: "left" },
+                { field: "JobTime", width: 50, title: "TIME", sortable: false, align: "left" },
+                //{ field: "VehicleName", width: 49, title: "VEHICLE", sortable: true, align: "left" },
+                { field: "JobFrom", width: 146, title: "FROM", sortable: false, align: "left" },
+                { field: "JobTo", width: 168, title: "TO", sortable: false, align: "left" },
+                { field: "JobVendorName", width: 93, title: "JOB GIVEN BY", sortable: true, align: "right" },
+                { field: "DrivingByName", width: 87, title: "DRIVING BY", sortable: false, align: "right" },
+                { field: "ContactNo", width: 65, title: "CONTACT NO", sortable: false, align: "left" },
+                //{
+                //    field: "Credit", width: 39, title: "CREDIT", sortable: false, align: "center", renderer: function (value, record) {
+                //        if (intVal(value).toFixed(2) == 0.00) {
+                //            return '';
+                //        }
+                //        else {
+                //            return '<div class="text-center" ><span class="badge badge-danger">' + intVal(value).toFixed(2) + '</span></div >';
+                //        }
+                //    }
+                //},
+                //{
+                //    field: "Cash", width: 39, title: "CASH", sortable: false, align: "center", renderer: function (value, record) {
+                //        if (intVal(value).toFixed(2) == 0.00) {
+                //            return '';
+                //        }
+                //        else {
+                //            return intVal(value).toFixed(2);
+                //        }                        
+                //    }
+                //},
+                { field: "CashInHandName", width: 87, title: "CASH IN HAND", sortable: false, align: "left" },
+                { field: "OutSource", width: 87, title: "OUTSOURCE", sortable: false, align: "left" },
+                {
+                    field: "OutSourceAmount", width: 39, title: "OUT AMT", sortable: false, align: "center", renderer: function (value, record) {
+                        if (intVal(value).toFixed(2) == 0.00) {
+                            return '';
+                        }
+                        else {
+                            return intVal(value).toFixed(2);
+                        }
+                    }
+                },
+                {
+                    field: "OutSourceAmountGiven", width: 39, title: "OUT AMT GIVEN", sortable: false, align: "center", renderer: function (value, record) {
+                        if (intVal(value).toFixed(2) == 0.00) {
+                            return '';
+                        }
+                        else {
+                            return intVal(value).toFixed(2);
+                        }
+                    }
+                },
+
+                {
+                    field: "JobStatus", width: 82, title: "STATUS", sortable: false, align: "center", renderer: function (value, record) {
+                        var _class = (record.JobStatus == "Cancelled") ? 'badge badge-danger' : (record.JobStatus == "Assigned") ? 'badge badge-info' :
+                            (record.JobStatus == "Job Started") ? 'badge badge-primary' : (record.JobStatus == "Waiting for Customer") ? 'badge badge-warning' : (record.JobStatus == "No Show") ? 'badge badge-danger' :
+                                (record.JobStatus == "Passenger on board") ? 'badge badge-secondary' : 'badge badge-success';
+
+                            return '<div class="text-center"><button class= ' + "'" + _class + "'" + ' >' + record.JobStatus + '</button></div>';
+                    }
+                },
+                {
+                    field: "JobCode", width: 45, title: "View", sortable: true, renderer: function (value, record) {
+
+                        return '<div class="text-center"><button onclick="ViewClick(' + "'" + record.JobCode + "'" + ')" class="badge badge-info" data-toggle="modal" data-target="#myModal">History</button></div>';
+
+                    }
+                }
+            ],
+            pager: { enable: true, limit: GridRowsDisplayLimit, sizes: ArrPaging }
+        });
+
+        GrdOutSourceJobsReport.on('dataBound', function (e, records, totalRecords) {
+            var costamt = 0, creditamt = 0, cashamt = 0, outamt = 0, outamtgiven = 0, $tfoot;
+            // Remove the formatting to get integer data for summation
+            var intVal = function (i) {
+                return typeof i === 'string' ?
+                    i.replace(/[\$,]/g, '') * 1 :
+                    typeof i === 'number' ?
+                        i : 0;
+            };
+
+            $.each(records, function () {
+                costamt += intVal(this.Cost);
+                creditamt += intVal(this.Credit);
+                cashamt += intVal(this.Cash);
+                outamt += intVal(this.OutSourceAmount);
+                outamtgiven += intVal(this.OutSourceAmountGiven);
+            });
+            $tfoot = GrdOutSourceJobsReport.children('tfoot');
+            $tfoot.children('tr[data-role="summary"]').remove();
+            $tfoot.prepend('<tr data-role="summary" style="text-align:right"><th></th><th></th><th></th><th></th><th></th><th></th><th>Total</th><th></th>' +
+                '<th></th><th>' + outamt.toFixed(2) + '</th><th>' + outamtgiven.toFixed(2) + '</th><th></th><th></th></tr > ');
+        });
+
+        GrdJobReportStatus = $("#GrdJobReportStatus").grid({
+            primaryKey: "JobStatusCode",
+            uiLibrary: "bootstrap4",
+            responsive: true,
+            dataSource: '@Url.Action("JobStatus_FindAll", "Job")',
+            columns: [
+                { field: "JobStatus", title: 'Status', width: 100, align: "left" },
+                { field: "DisplayLastModifiedBy", title: 'Updated By', width: 100, align: "left" },
+                { field: "DisplayLastModifiedDate", title: 'Date & Time', width: 175, align: "left" },
+            ]
+        });
+
+        function ViewClick(trxnid) {
+            GrdJobReportStatus.clear();
+            GrdJobReportStatus.reload({ JobCode: trxnid });
+        }
+
+        function JobSearch() {
+            var searchFromDate = '';
+            var searchToDate = '';
+
+            if ($("#TxtFromDate").val() != 0) {
+                searchFromDate = $('#TxtFromDate').val();
+            }
+
+            if ($("#TxtToDate").val() != "") {
+                searchToDate = $('#TxtToDate').val();
+            }
+
+            GrdOutSourceJobsReport.clear();
+            GrdOutSourceJobsReport.reload({ StartDate: searchFromDate, EndDate: searchToDate, VehicleCode: $("#ddlVehicleCode").val(), JobVendorCode: $("#ddlJobVendorCode").val(), CustomerName: $("#txtCustomerName").val(), ContactNo: $("#txtContactNo").val(), DrivingBy: $("#ddlDrivingBy").val(), CashInHand: $("#ddlCashInHand").val() });
+        }
+
+        //Search filter methods
+        $('#btnJobSearch').click(function () {
+            JobSearch();
+        });
+
+        $('#btnJobSearchClear').click(function () {
+            $("#TxtFromDate").val(""); $("#TxtToDate").val(""); $("#txtCustomerName").val(""); $("#txtContactNo").val("");
+            $("#ddlJobVendorCode").val(0); $("#ddlDrivingBy").val(0); $("#ddlVehicleCode").val(0); $("#ddlCashInHand").val(0)
+
+            GrdOutSourceJobsReport.reload({ StartDate: null, EndDate: null, VehicleCode: $("#ddlVehicleCode").val(), JobVendorCode: $("#ddlJobVendorCode").val(), CustomerName: $("#txtCustomerName").val(), ContactNo: $("#txtContactNo").val(), DrivingBy: $("#ddlDrivingBy").val(), CashInHand: $("#ddlCashInHand").val() });
+        });
+
+        function OnIndexCall(elem) {
+            $(elem).attr('href', $(elem).attr('href') + '?Length=1&VehicleCode=' + $("#ddlVehicleCode").val() + '&JobVendorCode=' + $("#ddlJobVendorCode").val() + '&CustomerName=' + $("#txtCustomerName").val() + '&ContactNo=' + $("#txtContactNo").val() + '&DrivingBy=' + $("#ddlDrivingBy").val() + '&StartDate=' + $("#TxtFromDate").val() + '&EndDate=' + $('#TxtToDate').val() + '&CashInHand=' + $("#ddlCashInHand").val());
+        }
+        function intVal(i) {
+            return typeof i === 'string' ?
+                i.replace(/[\$,]/g, '') * 1 :
+                typeof i === 'number' ?
+                    i : 0;
+        };
+    </script>
+</head>
+<body>
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content" style="width:850px">
+
+                <div class="modal-body">
+                    <div class="box-body">
+                        <div class="box-body table-responsive no-padding">
+                            <table id="GrdJobReportStatus" class="table table-hover"></table>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content">
+        <!-- Content Header (Page header) -->
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card card-pd">
+
+                        <div class="card-header">
+                            <span style="font-size: 18px;" class="m-0"><i class="fa fa-random"></i></span>
+                            <span style="font-size: 18px; border-left: 1px solid #ccc; padding-left: 10px;"> OutSource Jobs Report</span>
+                            <div style="float: right;">
+                                <button onclick="GrdOutSourceJobsReport.downloadCSV('OutSourceJobsReport.csv', true)" class="btn btn-primary">Download Current Page</button>
+                                @Html.ActionLink("Download All", "OutSourceJobsExcelExport", "Reports", new { @onclick = "OnIndexCall(this)", @class = "btn btn-primary" })
+
+                                <span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px; ">
+                                    <a href="#" data-toggle="tooltip" data-placement="bottom" title="Show Form" onclick="showForm()"><i class="fas fa-caret-square-down"></i></a>
+                                </span><span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px;">
+                                    <a href="#" data-toggle="tooltip" data-placement="bottom" title="Hide Form" onclick="hideForm()"><i class="fas fa-caret-square-up"></i></a>
+                                </span>
+                            </div>
+                        </div>
+                       
+                        <div class="card-body">
+                            <div id="hidden-form" style="display: none;">
+
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>Vehicle</label>
+                                            <div>
+                                                @Html.DropDownList("ddlVehicleCode", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @width = "100%" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>Driving By</label>
+                                            <div>
+                                                @Html.DropDownList("ddlDrivingBy", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @width = "100%" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>Job Given By</label>
+                                            <div>
+                                                @Html.DropDownList("ddlJobVendorCode", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @width = "100%" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <label>Contact No</label>
+                                        <div>
+                                            <input type="text" id="txtContactNo" maxlength="15" placeholder="Contact No" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-sm-2" style="display:none">
+                                        <label>Customer Name</label>
+                                        <div>
+                                            <input type="text" id="txtCustomerName" maxlength="75" placeholder="Customer Name" class="form-control">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label class="control-label">From</label>
+                                            <div>
+                                                <input type="text" id="TxtFromDate" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>To</label>
+                                            <div>
+                                                <input type="text" id="TxtToDate" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>Cash In Hand</label>
+                                            <div>
+                                                @Html.DropDownList("ddlCashInHand", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @width = "100%" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="pdt-25">
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <button type="button" id="btnJobSearch" class="btn btn-primary btn-block"><i class="fa fa-search"></i> @Transport.Repository.WEBPAGEBUTTON.SEARCH</button>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <button type="button" id="btnJobSearchClear" class="btn btn-primary btn-block"><i class="fa fa-paint-brush"></i> @Transport.Repository.WEBPAGEBUTTON.CLEAR</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="box-body table-responsive no-padding">
+                                        <table id="GrdOutSourceJobsReport" class="table table-hover"></table>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div><!-- /.content-wrapper -->
+        </div>
+    </div>
+
+</body>
+
+    

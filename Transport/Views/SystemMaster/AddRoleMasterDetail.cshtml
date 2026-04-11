@@ -1,0 +1,279 @@
+﻿@using Transport.Repository.Resource;
+@{
+    Layout = null;
+}
+
+
+<html>
+<head>
+    <script>
+        ShowCommonBack();
+    </script>
+</head>
+<body>
+    <input type="hidden" id="HtnRoleUniqID" />
+    <!-- Main content -->
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+
+                <!-- /.col-md-12 -->
+                <div class="col-lg-12">
+                    <div class="card card-pd">
+                        <div class="card-header">
+                            <span style="font-size: 18px;" class="m-0"><i class="fas fa-user-cog"></i></span>
+                            <span style="font-size: 18px; border-left: 1px solid #ccc; padding-left: 10px;"> @SYSTitle.Title_RoleMaster </span>
+                        </div>
+                        <div class="card-body">
+
+                            <p class="introtext">@SYSPageModel.Common_Hint</p>
+
+                            <div class="row">
+                                <div class="col-sm-5">
+                                    <div class="form-group required">
+                                        <label class="control-label">@SYSPageModel.Role_RoleName</label>
+                                        <input type="text" autofocus class="form-control" name="TxtRoleName" id="TxtRoleName" tabindex="1" maxlength="100" placeholder="@SYSPageModel.Role_RoleName">
+
+                                    </div>
+                                    <div class="form-group required">
+                                        <label class="control-label">@SYSPageModel.Common_Home</label>
+                                        <div>
+                                            @Html.DropDownList("DdlHomePage", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @tabindex = 1, @width = "100%" })
+                                        </div>
+                                    </div>
+                                    <div class="pdt-25">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <div class="form-group clearfix">
+                                                    <div class="icheck-primary">
+                                                        @Html.CheckBox("ChkRoleIsPOS")
+                                                        <label for="ChkRoleIsPOS">
+                                                            @SYSPageModel.Role_IsPOS
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col-sm-2">
+                                </div>
+                                <div class="col-sm-5">
+                                    <div class="form-group required">
+                                        <label class="control-label">@SYSPageModel.Role_RoleDescription</label>
+                                        <textarea rows="3" cols="50" name="TxtRoleDescription" id="TxtRoleDescription" maxlength="500" class="form-control" placeholder="@SYSPageModel.Role_RoleDescription"></textarea>
+                                    </div>
+
+                                    <div class="pdt-25">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <div class="form-group clearfix">
+                                                    <div class="icheck-primary">
+                                                        @Html.CheckBox("ChkRoleUserActive")
+                                                        <label for="ChkRoleUserActive">
+                                                            @SYSPageModel.Common_Status
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="pdt-30">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <button type="button" id="btnResetUserRole" class="btn btn-secondary btn-block"><i class="fa fa-undo"></i> @Transport.Repository.WEBPAGEBUTTON.RESET</button>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <button type="button" id="btnSaveUserRole" class="btn btn-primary btn-block"><i class="fa fa-save"></i> @Transport.Repository.WEBPAGEBUTTON.SAVE</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.col-md-12 -->
+            </div>
+            <!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content -->
+
+    <script>
+
+       
+        EditUserRole();
+
+
+        function LoadHomePage(HomePageViewID) {
+            
+                       $.ajax({
+                type: "GET",
+                url: BaseURL + "Common/Load_HomePage",
+
+                datatype: "Json",
+                success: function (data) {
+                    $("#DdlHomePage option").remove();
+                    $.each(data, function (index, value) {
+                        $('#DdlHomePage').append('<option value="' + value.HomePageViewID + '">' + value.HomePageName + '</option>');
+                    });
+                }
+
+            }).done(function (result) {
+                if (HomePageViewID != "") {
+                    $("#DdlHomePage").val(HomePageViewID);
+                }
+                else {
+                    $("#DdlHomePage").val("");
+                }
+            });
+        }
+
+        function ClearUserRole() {
+            $("#HtnRoleUniqID").val("E");
+            
+            $("#TxtRoleName").val("");
+            $("#DdlHomePage").val("");
+            $("#TxtRoleDescription").val("");
+            $('#ChkRoleUserActive').prop('checked', true);
+        }
+
+        $("#btnResetUserRole").click(function (e) {
+            $(this).addClass("unclickable");
+            ResetUserRole();
+           
+        });
+
+        function ResetUserRole() {
+            if (GetParamValue("RoleID") != "E") {
+                EditUserRole();
+            }
+            else {
+
+                ClearUserRole();
+            }
+        }
+
+        function FormValidate() {
+            var Result = true;
+
+            if ($("#TxtRoleName").val() == "") {
+                $("#TxtRoleName").focus();
+                ErrorAlert("@SYSMessage.UserRole_EnterRoleName");
+                Result = false;
+                return false;
+            }
+            else if ($("#TxtRoleDescription").val() == "") {
+                $("#TxtRoleDescription").focus();
+                ErrorAlert("@SYSMessage.UserRole_EnterRoleDescription");
+                Result = false;
+                return false;
+            }
+
+            else if ($("#DdlHomePage").val() == "") {
+
+                $("#DdlHomePage").focus();
+                ErrorAlert("@SYSMessage.UserRole_SelectHome");
+                Result = false;
+                return false;
+            }
+            return Result;
+        }
+
+        $('#btnSaveUserRole').click(function (e) {
+            if ($(this).hasClass("unclickable")) {
+                e.preventDefault();
+            } else {
+                $(this).addClass("unclickable");
+                if (FormValidate() == true) {
+                    var RoleDetail = {
+                        RoleID: $("#HtnRoleUniqID").val(),
+                        RoleName: $("#TxtRoleName").val(),
+                        Description: $("#TxtRoleDescription").val(),
+                        IsPOS: $('#ChkRoleIsPOS').is(":checked"),
+                        HomePageViewID: $('#DdlHomePage').val(),
+
+                        status: $("#ChkRoleUserActive").is(":checked")
+                    };
+                    $.confirm({
+                        title: ConfirmAlert_SuccessMessage,
+                        content: GetParamValue("HtnRoleUniqID") == "E" ? ConfirmAlert_Message_Content.replace("{0}", ConfirmAlert_SaveMessage_Content) : ConfirmAlert_Message_Content.replace("{0}", ConfirmAlert_UpdateMessage_Content),
+                        animation: 'zoom',
+                        closeAnimation: 'zoom',
+                        buttons: {
+                            'confirm': {
+                                text: Alert_YesMessage,
+                                btnClass: Alert_Button_Style,
+                                keys: ['enter'],
+                                action: function () {
+                                    $.ajax({ url: BaseURL + "SystemMaster/RoleMaster_Save", type: "POST", data: { ObjRoleModel: RoleDetail } })
+                                        .done(function (result) {
+                                            if (result.Result == true) {
+                                                SucessAlert(result.Message);
+                                                ClearUserRole();
+                                                BackFunction();
+
+                                            }
+                                            else if (result.Result == false) {
+                                                ErrorAlert(result.Message);
+                                            }
+                                        })
+                                        .fail(function (result) {
+                                            ErrorAlert(result.Message);
+                                        });
+                                }
+                            },
+                            cancel: {
+                                text: Alert_NoMessage,
+                                btnClass: Alert_Button_Style
+                            }
+                        }
+                    });
+                }
+            }
+
+        });
+
+        function EditUserRole() {
+            if (GetParamValue("RoleID") !="E") {
+                $.ajax({
+                    type: "GET",
+                    url: BaseURL + "SystemMaster/RoleMaster_Edit",
+                    data: { RoleID: GetParamValue("RoleID") },
+                    datatype: "Json",
+                    success: function (data) {
+                        $("#HtnRoleUniqID").val(data.RoleID);
+                          $("#TxtRoleName").val(data.RoleName);
+                        $("#TxtRoleDescription").val(data.Description);
+                           LoadHomePage(data.HomePageViewID);
+
+                        if (data.IsPOS) {
+                            $('#ChkRoleIsPOS').prop('checked', true);
+                        }
+                        else {
+                            $('#ChkRoleIsPOS').prop('checked', false);
+                        }
+                        if (data.status) {
+                            $('#ChkRoleUserActive').prop('checked', true);
+                        }
+                        else {
+                            $('#ChkRoleUserActive').prop('checked', false);
+                        }
+                    }
+                });
+
+            }
+            else {
+
+                LoadHomePage("");
+                $("#ChkRoleUserActive").prop("checked", true);
+            }
+        }
+
+    </script>
+</body>
+</html>

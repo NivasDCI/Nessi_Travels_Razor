@@ -1,0 +1,243 @@
+﻿@using Transport.Repository.Resource;
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Nissi Travels</title> 
+    <link href="~/Scripts/PublicUser/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="~/Content/jquery-confirm.css" rel="stylesheet" />
+    <link href="~/Content/CustomStyle.css" rel="stylesheet" />
+    <script src="~/scripts/JQuery/jquery-3.3.1.min.js"></script>
+    <script src="~/scripts/JQuery/jquery-confirm.js"></script>
+    <script src="~/scripts/JQuery/jquery-ui.js"></script> 
+
+    <script src="~/scripts/AppScript/CommonScript.js"></script> 
+    <link href="~/Content/LoginStyle.css" rel="stylesheet" />
+   
+  @Html.Partial("CommonScript") 
+<script>
+         var BaseURL = "@Url.Content("~/")";
+
+        $(document).keypress(function (e) {
+            var key = e.which;
+            if (key == 13)  // the enter key code
+            {
+                Login();
+               
+                return false;
+            }
+        });
+
+        function Login() {
+
+            if (LoginValidate() == true) {
+                $('#BtnLogin').html('<span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span>Loading...').addClass('disabled');
+                $.ajax({
+                    type: 'GET',
+                    data: { "LoginName": $("#TxtUserName").val(), "Password": $("#TxtPassword").val() },
+                    url: '@Url.Action("GetLoginAccess", "Login")',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: 'json',
+                    cache: false,
+                    success: function (data) {
+
+                        if (data.IsLogin) {
+                            setCookie("LoginName", $("#TxtUserName").val(), 1);
+                            CommonRemoveCookies("LoginSuccess", 0);
+                            CommonSetCookie("LoginSuccess", 1, 1);
+                            if (data.ISStore) {
+                                location.href = BaseURL + "Job/MyJobs";
+                            }
+                            else {
+                                location.href = BaseURL + data.ControllerName + "/" + data.ActionName;
+                            }
+                        }
+                        else if (data.InValidPassword) {
+                            $('#BtnLogin').html("@Button.Button_Login").removeClass('disabled');
+                            $("#MsgError").show();
+                            if (data.PasswordAttemptCount > 3) {
+                                $("#LblError").html("@SYSMessage.Login_AccountLocked");
+                            }
+                            else {
+                                $("#LblError").html("@SYSMessage.Login_InvalidPassword");
+                            }
+                        }
+                    },
+                    error: function (err) {
+
+                        ErrorAlert(err);
+                    }
+                });
+            }
+        }
+        
+        function LoginValidate() {
+            var Result = true;
+
+            if (($("#TxtUserName").val() == "")) {
+                $("#TxtUserName").focus();
+                $("#MsgError").show();
+                $("#LblError").html("@SYSMessage.Login_EnterUsername");
+
+                Result = false;
+                return false;
+            }
+            else if (($("#TxtPassword").val() == "")) {
+                $("#TxtPassword").focus();
+                $("#MsgError").show();
+                $("#LblError").html("@SYSMessage.Login_EnterPassword");
+                Result = false;
+                return false;
+            }
+            return Result;
+        }
+
+        function Reset() {
+            $("#TxtUserName").val("");
+            $("#TxtPassword").val("");
+            $("#MsgError").hide();
+            $("#LblError").html("");
+        }
+
+</script> 
+    <style>
+      
+        .form-control, .form-control:focus, .input-group-addon {
+            border-color: #e1e1e1;
+            border-radius: 0;
+        }
+
+        .signup-form {
+            width: 390px;
+            margin: 0 auto;
+            padding: 30px 0;
+        }
+
+            .signup-form h2 {
+                color: #636363;
+                margin: 0 0 15px;
+                text-align: center;
+            }
+
+            .signup-form .lead {
+                font-size: 14px;
+                margin-bottom: 30px;
+                text-align: center;
+            }
+
+            .signup-form form {
+                border-radius: 1px;
+                margin-bottom: 15px;
+                background: #fff;
+                border: 1px solid #000;
+                box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+                padding: 30px;
+            }
+
+            .signup-form .form-group {
+                margin-bottom: 20px;
+            }
+
+            .signup-form label {
+                font-weight: normal;
+                font-size: 13px;
+            }
+
+            .signup-form .form-control {
+                min-height: 38px;
+                box-shadow: none !important;
+                border-width: 0 0 1px 0;
+            }
+
+            .signup-form .input-group-addon {
+                max-width: 42px;
+                text-align: center;
+                background: none;
+                border-bottom: 1px solid #e1e1e1;
+                padding-left: 5px;
+            }
+
+            .signup-form .btn, .signup-form .btn:active {
+                font-size: 16px;
+                font-weight: bold;
+                background: #6777ef !important;
+                border-radius: 3px;
+                border: none;
+                min-width: 140px;
+            }
+
+                .signup-form .btn:hover, .signup-form .btn:focus {
+                    background: #4c60da !important;
+                }
+
+            .signup-form a {
+                color: #4c60da;
+                text-decoration: none;
+            }
+
+                .signup-form a:hover {
+                    text-decoration: underline;
+                }
+
+            .signup-form .fa {
+                font-size: 21px;
+                position: relative;
+                top: 8px;
+            }
+
+            .signup-form .fa-paper-plane {
+                font-size: 17px;
+            }
+
+            .signup-form .fa-check {
+                color: #fff;
+                left: 9px;
+                top: 18px;
+                font-size: 7px;
+                position: absolute;
+            }
+    </style>
+    
+</head> 
+
+
+<body class="c-app flex-row align-items-center" style="background-image: url('../../Images/Backround.jpg'); ">
+     
+    <div class="signup-form">
+        <form>
+            <h2>@SYSTitle.Title_Login</h2>
+            <p class="lead">@SYSTitle.Title_SignIn</p>
+            <div class="form-group">
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                    <input type="text" autofocus class="form-control" id="TxtUserName" placeholder="@SYSPageModel.ToolTip_LoginUserName" value="">
+                </div>
+            </div>
+           
+            <div class="form-group">
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+                    <input type="password" class="form-control" placeholder="@SYSPageModel.ToolTip_LoginPassword" id="TxtPassword" value="">
+                </div>
+            </div> 
+            <div class="form-group">
+                 <div class="input-group" style="display:none; margin-bottom:0rem!important;" id="MsgError"><center><label id="LblError" style="color:red;font-weight:bold;font-size:11px"></label></center></div> 
+            </div>
+            <div class="form-group">
+                <button type="button" class="btn btn-primary btn-block btn-lg" id="BtnLogin" onclick="Login()">@Button.Button_Login</button>
+            </div> 
+            <div class="form-group">
+                <button class="btn btn-primary btn-block btn-lg" type="button" onclick="Reset()">@Button.Button_Reset</button>
+            </div> 
+        </form>
+      
+    </div>
+     
+</body> 
+</html>

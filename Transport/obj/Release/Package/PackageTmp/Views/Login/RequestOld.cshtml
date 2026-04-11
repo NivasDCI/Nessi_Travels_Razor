@@ -1,0 +1,241 @@
+﻿@using Transport.Repository.Resource;
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Nissi Travels</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link href="https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel="stylesheet">
+    <link href="https://www.jonthornton.com/jquery-timepicker/jquery.timepicker.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://www.jonthornton.com/jquery-timepicker/jquery.timepicker.js"></script>
+    <!--Contact number dropdown-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.12/css/intlTelInput.css" integrity="sha512-gxWow8Mo6q6pLa1XH/CcH8JyiSDEtiwJV78E+D+QP0EVasFs8wKXq16G8CLD4CJ2SnonHr4Lm/yY2fSI2+cbmw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.12/js/intlTelInput-jquery.min.js" integrity="sha512-QK4ymL3xaaWUlgFpAuxY+6xax7QuxPB3Ii/99nykNP/PlK3NTQa/f/UbQQnWsM4h5yjQoMjWUhCJbYgWamtL6g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+
+    <script type="text/javascript">
+        var BaseURL = "@Url.Content("~/")";
+
+        $(document).keypress(function (e) {
+            var key = e.which;
+            if (key == 13)  // the enter key code
+            {
+                SaveRequest();
+                return false;
+            }
+        });
+
+        function titleCase(str) {
+            var splitStr = str.toLowerCase().split(' ');
+            for (var i = 0; i < splitStr.length; i++) {
+                // You do not need to check if i is larger than splitStr length, as your for does that for you
+                // Assign it back to the array
+                splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);
+            }
+            // Directly return the joined string
+            return splitStr.join(' ');
+        }
+
+        function SaveRequest() {
+            if ($(this).hasClass("unclickable")) {
+                e.preventDefault();
+            } else {
+
+                if (FormValidate() == true) {
+
+                    var fileData = new FormData();
+
+                    fileData.append("JobRequestDate", $('#txtJobRequestDate').val());
+                    fileData.append("JobRequestTime", $('#txtJobRequestTime').val());
+                    fileData.append("JobRequestFrom", titleCase($('#txtJobRequestFrom').val()));
+                    fileData.append("JobRequestTo", titleCase($('#txtJobRequestTo').val()));
+                    fileData.append("CustomerName", titleCase($('#txtCustomerName').val() || ""));
+                    fileData.append("ContactNo", $("#HdnContactNo").val());
+
+                    $.ajax({
+                        url: BaseURL + "Login/JobRequest_Save", type: "POST",
+                        contentType: false, // Not to set any content header
+                        processData: false,
+                        data: fileData
+
+                    }).done(function (result) {
+                        if (result.Result == true) {
+                            $("#success-alert").fadeTo(2000, 500).slideUp(5000, function () {
+                                $("#success-alert").slideUp(5000);
+                            });
+                            
+                            if (confirm('We have received your Request. Would you like sent instant Message to Nissi Travels?')) {
+                               
+                                var linkcontent = '';
+                                linkcontent += "New Job Request!"; linkcontent += " %0A ";
+                                linkcontent += "Name : " + titleCase($('#txtCustomerName').val() || ""); linkcontent += " %0A ";
+                                linkcontent += "Contact No : " + $("#HdnContactNo").val(); linkcontent += " %0A ";
+                                linkcontent += "Date : " + $('#txtJobRequestDate').val(); linkcontent += " %0A ";
+                                linkcontent += "Time : " + $('#txtJobRequestTime').val(); linkcontent += " %0A ";
+                                linkcontent += "Pickup : " + titleCase($('#txtJobRequestFrom').val()); linkcontent += " %0A ";
+                                linkcontent += "Dropoff : " + titleCase($('#txtJobRequestTo').val()); linkcontent += " %0A ";
+
+                                var _link = 'https://wa.me/+6562920521?text=' + linkcontent + '';
+                                console.log(_link);
+                                ResetRequest();
+                                window.open(_link, "_blank");
+                            }
+                        }
+                        else if (result.Result == false) {
+                            showAlert(result.Message);
+                        }
+                    }).fail(function (result) {
+                        showAlert(result.Message);
+                    });
+                }
+            }
+        }
+
+        function ClearRequest() {
+            if ($(this).hasClass("unclickable")) {
+                e.preventDefault();
+            } else {
+                $(this).addClass("unclickable");
+                ResetRequest();
+            }
+        }
+
+        function FormValidate() {
+            var Result = true;
+
+            if ($("#txtJobRequestDate").val() == "") {
+                showAlert("Please Enter Pick Up  Date");
+                Result = false;
+                return false
+            }
+            if ($("#txtJobRequestTime").val() == "") {
+                showAlert("Please Enter Pick Up Time");
+                Result = false;
+                return false
+            }
+            if ($("#txtJobRequestFrom").val() == "") {
+                showAlert("Please Enter Picking up location");
+                Result = false;
+                return false
+            }
+            if ($("#txtJobRequestTo").val() == "") {
+                showAlert("Please Enter Drop Off location");
+                Result = false;
+                return false
+            }
+            if ($("#txtContactNo").val() == "") {
+                showAlert("Please Enter Contact Number");
+                Result = false;
+                return false
+            }
+            return Result;
+        }
+
+        function ResetRequest() {
+            $("#txtJobRequestDate").val(""); $("#txtCustomerName").val(""); $("#txtContactNo").val(""); $("#HdnContactNo").val("");
+            $("#txtJobRequestTime").val(""); $("#txtJobRequestFrom").val(""); $("#txtJobRequestTo").val("");
+            $("#success-alert").fadeTo(2000, 500).slideUp(5000, function () {
+                $("#success-alert").slideUp(5000);
+            });           
+
+        }
+
+        $(document).ready(function () {
+            var tabindex = 1;
+            $('[tabindex=' + tabindex + ']').focus();
+
+            $("#error-alert").hide(); $("#success-alert").hide();
+            $("[name=txtContactNo]").val("+65");
+            var instance = $("[name=txtContactNo]")
+            instance.intlTelInput({ initialCountry: "SG" });
+
+            $("[name=txtContactNo]").on("blur", function () {
+                //console.log(instance.intlTelInput('getSelectedCountryData').dialCode) //get counrty code
+                //$('#HdnContactNo').val('+' + instance.intlTelInput('getSelectedCountryData').dialCode + $("[name=txtContactNo]").val());
+                $('#HdnContactNo').val($("[name=txtContactNo]").val());
+            })
+
+        });
+
+        function showAlert(message) {
+            $('#lblerror').text(message); $('#lblerror').html(message);
+            $("#error-alert").fadeTo(2000, 500).slideUp(500, function () {
+                $("#error-alert").slideUp(500);
+            });
+        }
+
+        $(function () {
+            $("#txtJobRequestDate").datepicker({
+                dateFormat: "dd-M-yy",
+            });
+            $('#txtJobRequestTime').timepicker({
+                'scrollDefault': 'now',
+                'step': 10,
+                'forceRoundTime': true,
+                //'timeFormat': 'h:i A'
+                'timeFormat': 'H:i'
+            });
+        });
+
+    </script>
+</head>
+<body>
+    <input type="hidden" id="HdnContactNo" />
+    <div class="container">
+        <h2>Make your online booking</h2>
+        <div>
+            <h4 class="responsive-font-example text-info">Kindly Contact our Hotline at +65 62920521 / 91000521 / 90686384 via Phone or WhatsApp for Bookings.</h4>
+        </div>
+        <div class="alert alert-success" id="success-alert">
+            <button type="button" class="close" data-dismiss="alert">x</button>
+            <strong>We have received your booking Request. Our Staff will contact you as soon as possible!. </strong>
+        </div>
+        <div class="alert alert-danger fade out" role="alert" id="error-alert">
+            <button type="button" class="close" data-dismiss="alert">x</button>
+            <strong id="lblerror" name="lblerror"></strong>
+        </div>
+        <form>
+            <div class="form-group">
+                <label for="txtJobRequestDate">Pick Up Date:</label>
+                <input type="text" class="form-control" autocomplete="off" id="txtJobRequestDate" placeholder="Date.." >
+            </div>
+            <div class="form-group">
+                <label for="txtJobRequestTime">Pick Up Time:</label>
+                <input type="text" class="form-control time ui-timepicker-input" autocomplete="off" id="txtJobRequestTime" placeholder="Time.." >
+            </div>
+            <div class="form-group">
+                <label for="txtCustomerName">Name:</label>
+                <input type="text" class="form-control" style="text-transform: capitalize" id="txtCustomerName" placeholder="Your Name.." name="txtCustomerName">
+            </div>
+            <div class="form-group">
+                <label for="txtContactNo">Contact Number:</label>
+                <input type="text" class="form-control" id="txtContactNo" placeholder="Contact Number.." name="txtContactNo" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label for="txtJobRequestFrom">Picking up location:</label>
+                <input type="text" class="form-control" style="text-transform: capitalize" id="txtJobRequestFrom" placeholder="Picking up location.." name="txtJobRequestFrom">
+            </div>
+            <div class="form-group">
+                <label for="txtJobRequestTo">Drop Off location:</label>
+                <input type="text" class="form-control" style="text-transform: capitalize" id="txtJobRequestTo" placeholder="Drop Off location.." name="txtJobRequestTo">
+            </div>
+
+            <button type="button" onclick="SaveRequest();" class="btn btn-success btn-block">Submit</button>
+            <button type="button" onclick="ResetRequest();" class="btn btn-info btn-block">Reset</button>
+        </form>
+    </div>
+
+</body>
+
+</html>

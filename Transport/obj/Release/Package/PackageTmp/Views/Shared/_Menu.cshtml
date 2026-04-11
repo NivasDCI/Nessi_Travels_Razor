@@ -1,0 +1,62 @@
+﻿@using Transport.Repository.Resource;
+<style>
+    [class*=sidebar-dark-] .nav-sidebar>.nav-item.menu-open>.nav-link, [class*=sidebar-dark-] .nav-sidebar>.nav-item:hover>.nav-link, [class*=sidebar-dark-] .nav-sidebar>.nav-item>.nav-link:focus {
+    background-color:#007bff;
+    color: #fff;
+}
+</style>
+<nav class="mt-2">
+    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+        @{
+            <li class="nav-item">
+                <a class="nav-link" onclick="GetDashboard()" href="javascript:void(0);">
+                    <i class="nav-icon fas fa-tachometer-alt"></i>
+                    <p>
+                        @SYSTitle.Title_DashBoard
+                    </p>
+                </a>
+            </li>
+
+            var controller = ViewContext.Controller as Transport.Controllers.HomeController;
+            List <Transport.Model.MenuMasterHeader> MenuMasterHeader = new List<Transport.Model.MenuMasterHeader>();
+            MenuMasterHeader = controller.MenuMasterHeader();
+
+            for (int i = 0; i < MenuMasterHeader.Count; i++)
+            {
+                <li class="nav-item has-treeview">
+                    <a href="#" class="nav-link ">
+                        <i class="nav-icon @MenuMasterHeader[i].IconCls"></i>
+                        <p>
+                            @MenuMasterHeader[i].MenuName
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        @{
+                            List<Transport.Model.MenuMasterDetail> MenuMasterDetail = new List<Transport.Model.MenuMasterDetail>();
+                            MenuMasterDetail = controller.MenuMasterDetail(MenuMasterHeader[i].HeaderViewID);
+                            if (MenuMasterDetail.Count > 0)
+                            {
+                                for (int j = 0; j < MenuMasterDetail.Count; j++)
+                                {
+                                    <li class="nav-item">
+                                        <a class="nav-link" style="cursor:pointer" onclick="GetMenu('@MenuMasterDetail[j].PageUrl?HeaderViewID=@MenuMasterDetail[j].HeaderViewID&DetailViewID=@MenuMasterDetail[j].DetailViewID','M')">
+                                            <i class="nav-icon @MenuMasterDetail[j].IconCls"></i>
+                                            <p>@MenuMasterDetail[j].MenuName</p>
+                                        </a>
+                                    </li>
+                                    }
+                                }
+                            }
+                        </ul>
+                </li>
+            }
+        }
+    </ul>
+    </nav>
+
+
+
+
+
+ 

@@ -1,0 +1,454 @@
+﻿@using Transport.Repository.Resource;
+
+@{
+    Layout = "";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <script>
+        var BaseURL = "@Url.Content("~/")";
+
+        jQuery(document).ready(function () {
+            var tabindex = 1;
+            $('[tabindex=' + tabindex + ']').focus();
+
+            $('#txtCharge').on('keydown', function (e) {
+                // Allow: backspace, delete, tab, escape, enter and .
+                if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+                    // Allow: Ctrl+A, Command+A
+                    (e.keyCode == 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                    // Allow: home, end, left, right, down, up
+                    (e.keyCode >= 35 && e.keyCode <= 40)) {
+                    // let it happen, don't do anything
+                    return;
+                }
+                // Ensure that it is a number and stop the keypress
+                if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                    e.preventDefault();
+                }
+            });
+
+            $('#txtQty').on('keydown', function (e) {
+                // Allow: backspace, delete, tab, escape, enter and .
+                if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+                    // Allow: Ctrl+A, Command+A
+                    (e.keyCode == 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                    // Allow: home, end, left, right, down, up
+                    (e.keyCode >= 35 && e.keyCode <= 40)) {
+                    // let it happen, don't do anything
+                    return;
+                }
+                // Ensure that it is a number and stop the keypress
+                if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                    e.preventDefault();
+                }
+            });
+            $(".floatNumberField").change(function () {
+                $(this).val(parseFloat($(this).val()).toFixed(2));
+            });
+
+        });
+
+        $("#ddlServiceTypeCode").on("change", function () {
+            ShowHideSupplier();
+        });
+
+        function ShowHideSupplier() {
+            // Get the selected value
+            var selectedValue = $("#ddlServiceTypeCode").val();
+
+            // You can also get the selected text
+            var selectedText = $("#ddlServiceTypeCode").find("option:selected").text();
+            //console.log(selectedValue);
+
+            if (selectedValue == 2) {
+                $('#ddlSupplierTypeCode').prop('disabled', false);
+                $('#txtQty').prop('readonly', false);
+                $('#txtCharge').prop('readonly', true); $('#txtCharge').val('');
+            }
+            else {
+                $('#ddlSupplierTypeCode').prop('disabled', true); $("#ddlSupplierTypeCode").val($("#ddlSupplierTypeCode option:first").val());
+                $('#txtQty').prop('readonly', true); $('#txtQty').val('');
+                $('#txtCharge').prop('readonly', false);
+            }
+        }
+
+        function ShowHideSupplier1(selectedValue) {
+            // Get the selected value
+            //console.log(selectedValue);
+
+            if (selectedValue == 2) {
+                $('#ddlSupplierTypeCode').prop('disabled', false);
+                $('#txtQty').prop('readonly', false);
+                $('#txtCharge').prop('readonly', true); $('#txtCharge').val('');
+            }
+            else {
+                $('#ddlSupplierTypeCode').prop('disabled', true); $("#ddlSupplierTypeCode").val($("#ddlSupplierTypeCode option:first").val());
+                $('#txtQty').prop('readonly', true); $('#txtQty').val('');
+                $('#txtCharge').prop('readonly', false);
+            }
+        }
+
+        $("#txtQty").focusout(function () {
+            //CalcSupplierCost();
+        });
+
+        function CalcSupplierCost() {
+            $('#txtCharge').val('');
+
+            $.ajax({
+                url: BaseURL + "Expense/GetSupplierCost",
+                type: 'GET',
+                data: {
+                    SupplierTypeCode: intVal($('#ddlSupplierTypeCode').val())
+                },
+                dataType: 'json',
+
+                success: function (result) {
+                    console.log(result);
+                    var _qty = parseFloat($('#txtQty').val() || 0);
+                    $('#hdnSupplierCost').val(intVal(result).toFixed(2));
+                    var _cost = parseFloat($('#hdnSupplierCost').val() || 0);
+                    var _charge = _cost * _qty;
+                    $('#txtCharge').val(intVal(_charge).toFixed(2));
+                }
+            });
+        }
+
+        function LoadVehicles(VehicleCode) {
+
+            $.ajax({
+                type: "GET",
+                url: BaseURL + "Common/Load_Vehicles",
+                datatype: "Json",
+                success: function (data) {
+                    $("#ddlVehicleCode option").remove();
+                    $.each(data, function (index, value) {
+                        $('#ddlVehicleCode').append('<option value="' + value.ID + '">' + value.Name + '</option>');
+                    });
+                }
+            }).done(function (result) {
+
+                if (VehicleCode != 0) {
+                    $("#ddlVehicleCode").val(VehicleCode);
+                }
+                else {
+                    $("#ddlVehicleCode").val(0);
+                }
+            });
+        }
+
+        function LoadServiceTypes(ServiceTypeCode) {
+
+            $.ajax({
+                type: "GET",
+                url: BaseURL + "Common/Load_ServiceTypesStaff",
+                datatype: "Json",
+                success: function (data) {
+                    $("#ddlServiceTypeCode option").remove();
+                    $.each(data, function (index, value) {
+                        $('#ddlServiceTypeCode').append('<option value="' + value.ID + '">' + value.Name + '</option>');
+                    });
+                }
+            }).done(function (result) {
+
+                if (ServiceTypeCode != 0) {
+                    $("#ddlServiceTypeCode").val(ServiceTypeCode);
+                }
+                else {
+                    $("#ddlServiceTypeCode").val(0);
+                }
+            });
+        }
+        function LoadSupplierTypes(SupplierTypeCode) {
+
+            $.ajax({
+                type: "GET",
+                url: BaseURL + "Common/Load_SupplierTypes",
+                datatype: "Json",
+                success: function (data) {
+                    $("#ddlSupplierTypeCode option").remove();
+                    $.each(data, function (index, value) {
+                        $('#ddlSupplierTypeCode').append('<option value="' + value.ID + '">' + value.Name + '</option>');
+                    });
+                }
+            }).done(function (result) {
+
+                if (ServiceTypeCode != 0) {
+                    $("#ddlSupplierTypeCode").val(SupplierTypeCode);
+                }
+                else {
+                    $("#ddlSupplierTypeCode").val(0);
+                }
+            });
+        }
+        
+
+        ShowCommonBack();
+
+        $('#txtExpenseDate').datepicker({
+            format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small', todayHighlight: true
+        });
+
+        $('input[id="txtExpenseDate"]').val(TodayDateRange);
+
+        function TodayDateRange() {
+            let monthNames = ["Jan", "Feb", "Mar", "Apr",
+                "May", "Jun", "Jul", "Aug",
+                "Sep", "Oct", "Nov", "Dec"];
+
+            var today = new Date();
+            var dd = today.getDate();
+            var mm = today.getMonth(); //January is 0!
+            var yyyy = today.getFullYear();
+
+            if (dd < 10) {
+                dd = '0' + dd
+            }
+
+            let monthName = monthNames[mm];
+
+            return dd + '-' + monthName + '-' + yyyy;
+        }
+
+        function FormValidate() {
+            var Result = true;
+            if ($("#txtExpenseDate").val() == "") {
+                ErrorAlert("Please Select Expense Date");
+                Result = false;
+                return false
+            }
+            if ($("#ddlVehicleCode").val() == 0 || $("#ddlVehicleCode").val() == null) {
+                ErrorAlert("Please Select Vehicle");
+                Result = false;
+                return false
+            }
+            if ($("#ddlServiceTypeCode").val() == 0 || $("#ddlServiceTypeCode").val() == null) {
+                ErrorAlert("Please Select Service");
+                Result = false;
+                return false
+            }
+            //if ($("#ddlSupplierTypeCode").val() == 0 || $("#ddlSupplierTypeCode").val() == null) {
+            //    ErrorAlert("Please Select Supplier");
+            //    Result = false;
+            //    return false
+            //}
+            //if ($("#ddlPaymentBy").val() == 0 || $("#ddlPaymentBy").val() == null) {
+            //    ErrorAlert("Please Select Payment By");
+            //    Result = false;
+            //    return false
+            //}
+            //if ($("#txtCharge").val() == "") {
+            //    ErrorAlert("Please Enter Amount");
+            //    Result = false;
+            //    return false
+            //}
+            return Result;
+        }
+
+        $('#btnSaveExpense').click(function (e) {
+            if ($(this).hasClass("unclickable")) {
+                e.preventDefault();
+            } else {
+
+                if (FormValidate() == true) {
+
+                        var fileData = new FormData();
+                        fileData.append("ExpenseDate", $('#txtExpenseDate').val());
+                        fileData.append("ExpenseCode", $('#HdnExpenseCode').val());
+                        fileData.append("VehicleCode", $('#ddlVehicleCode').val());
+                        fileData.append("ServiceTypeCode", $('#ddlServiceTypeCode').val());
+                        fileData.append("SupplierTypeCode", $('#ddlSupplierTypeCode').val());
+                        //fileData.append("PaymentBy", $('#ddlPaymentBy').val());
+                        fileData.append("Qty", $("#txtQty").val());
+                        fileData.append("Charge", $("#txtCharge").val());
+                        fileData.append("Remarks", $("#txtRemarks").val());
+
+                        $.ajax({
+                            url: BaseURL + "Expense/MyExpense_Save", type: "POST",
+                            contentType: false, // Not to set any content header
+                            processData: false,
+                            data: fileData
+
+                        }).done(function (result) {
+                            if (result.Result == true) {
+                                SucessAlert(result.Message);
+                                ClearExpenses();
+                                GetMenu('@Url.Action("ListMyExpense", "Expense")' + '?HeaderViewID=EXPMSTER5 & DetailViewID=EXP3N035');
+                                //BackFunction();
+                            }
+                            else if (result.Result == false) {
+                                ErrorAlert(result.Message);
+                            }
+                        })
+                            .fail(function (result) {
+                                ErrorAlert(result.Message);
+                            });
+
+
+                }
+            }
+        });
+
+        $("#btnExpenseReset").click(function () {
+            if ($(this).hasClass("unclickable")) {
+                e.preventDefault();
+            } else {
+                $(this).addClass("unclickable");
+                ResetExpense();
+            }
+        });
+
+        function ResetExpense() {
+            if (GetParamValue("MyExpenseCode") != 0) {                
+                EditExpenses();
+            }
+            else {
+                ClearExpenses();
+            }
+        }
+
+        function ClearExpenses() {
+            $("#ddlVehicleCode").val($("#ddlVehicleCode option:first").val());
+            //$("#ddlServiceTypeCode").val($("#ddlServiceTypeCode option:first").val());
+            $("#ddlSupplierTypeCode").val($("#ddlSupplierTypeCode option:first").val());
+            //$("#ddlPaymentBy").val($("#ddlPaymentBy option:first").val());
+            $('#txtQty').val(''); $('#txtCharge').val(''); $('#txtRemarks').val(''); $('#txtExpenseDate').text('');
+        }
+
+        EditExpenses();
+
+        function EditExpenses() {
+
+            if (GetParamValue("ExpenseCode") != 0) {
+
+                $.ajax({
+                    type: "GET",
+                    url: BaseURL + "Expense/Expense_Edit",
+                    data: { ExpenseCode: GetParamValue("ExpenseCode") },
+                    datatype: "Json",
+                    success: function (data) {
+                        $("#txtExpenseDate").val(GetParseJsonDate(data.ExpenseDate));
+                        $("#HdnExpenseCode").val(data.ExpenseCode);                       
+                        $("#txtQty").val(data.Qty); $("#txtCharge").val(data.Charge);
+                        $("#txtRemarks").val(data.Remarks);
+                        LoadVehicles(data.VehicleCode);
+                        LoadServiceTypes(data.ServiceTypeCode);
+                        LoadSupplierTypes(data.SupplierTypeCode);
+                        ShowHideSupplier1(data.ServiceTypeCode);
+                    }
+                });
+            }
+            else {
+                LoadVehicles(0);
+                LoadServiceTypes(0);
+                LoadSupplierTypes(0);
+                //LoadPaymentBy(0);
+            }
+        }      
+
+        $('[data-widget="pushmenu"]').PushMenu("collapse");
+    </script>
+</head>
+<body>
+    <input type="hidden" id="HdnExpenseCode">
+    <input type="hidden" id="hdnSupplierCost" />
+    @*<input type="hidden" id="txtCharge">*@
+    <!-- Main content -->
+    <div class="content" id="contentdiv">
+        <div class="container-fluid">
+            <div class="row">
+
+                <!-- /.col-md-12 -->
+                <div class="col-lg-12">
+                    <div class="card card-pd">
+                        <div class="card-header">
+                            <span style="font-size: 18px;" class="m-0"><i class="fas fa-clipboard-check"></i></span>
+                            <span style="font-size: 18px; border-left: 1px solid #ccc; padding-left: 10px;"> Expense - [Add] </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <div class="form-group required">
+                                        <label class="control-label">Expense Date</label>
+                                        <input type="text" tabindex="1" autocomplete="off" class="form-control" id="txtExpenseDate">
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label class="control-label">Vehicle</label>
+                                        @Html.DropDownList("ddlVehicleCode", new SelectList(string.Empty, "Value", "Text"), new { @tabindex = 2, @class = "form-control select2", @width = "100%" })
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label class="control-label">Service Type</label>
+                                        @Html.DropDownList("ddlServiceTypeCode", new SelectList(string.Empty, "Value", "Text"), new { @tabindex = 3, @class = "form-control select2", @width = "100%" })
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="row">
+                               
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label class="control-label">Supplier</label>
+                                        @Html.DropDownList("ddlSupplierTypeCode", new SelectList(string.Empty, "Value", "Text"), new { @tabindex = 3, @class = "form-control select2", @width = "100%" })
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="form-group required">
+                                        <label class="control-label">Qty (in Litters)</label>
+                                        @*<input type="number" tabindex="4" autocomplete="off" class="floatNumberField form-control" value="0.00" placeholder="0.00" step="0.01" id="txtQty" name="txtQty" />*@
+                                        <input type="text" tabindex="4" class="form-control" id="txtQty" name="txtQty" placeholder="Qty">
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="form-group required">
+                                        <label class="control-label">Charge</label>
+                                        <input type="text" tabindex="5" class="form-control" id="txtCharge" name="txtCharge" placeholder="Charge">
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+                            <div class="row">
+
+                                <div class="col-sm-4" style="display:none">
+                                    <label class="control-label">Remarks</label>
+                                    <textarea rows="4" tabindex="7" cols="50" class="form-control" id="txtRemarks" name="txtRemarks" placeholder="Enter Remarks" />
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="pdt-25">
+                                        <div class="row">
+
+                                            <div class="col-sm-6">
+                                                <button type="button" tabindex="8" id="btnSaveExpense" class="btn btn-primary btn-block"><i class="fa fa-save"></i> Save</button>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <button type="button" tabindex="9" id="btnExpenseReset" class="btn btn-secondary btn-block"><i class="fa fa-undo"></i> @Transport.Repository.WEBPAGEBUTTON.RESET</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- /.col-md-12 -->
+            </div>
+            <!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content -->    
+    
+</body>
+
+</html>
+

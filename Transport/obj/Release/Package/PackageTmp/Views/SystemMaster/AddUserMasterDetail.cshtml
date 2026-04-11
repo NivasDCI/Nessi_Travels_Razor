@@ -1,0 +1,322 @@
+﻿@using Transport.Repository.Resource;
+@{
+    Layout = null;
+}
+
+<html>
+<head>
+    <script src="~/Scripts/chosen/chosen.jquery.min.js"></script>
+    <script src="~/Scripts/chosen/chosen-active.js"></script>
+    <script>
+
+        ShowCommonBack();
+
+        EditUser();
+        $(".NumericOnly").on("keypress keyup blur paste drop", function (event) {
+            AllowNumeric(event);
+        });
+
+        $(".toggle-password").hover(function () {
+            $(this).toggleClass("fa-eye fa-eye-slash");
+            var input = $($(this).attr("toggle"));
+            if (input.attr("type") == "password") {
+                input.attr("type", "text");
+            } else {
+                input.attr("type", "password");
+            }
+        });
+
+
+       // EditUser();
+
+        function ClearUser() {
+            $("#HtnUserUniqID").val("");
+            $("#txtLoginName").val("");
+            $("#txtFirstName").val("");
+            $("#txtLastName").val("");
+            $("#txtPassword").val("");
+            $("#txtUserEmailID").val("");
+            $("#txtUserMobileNumber").val("");
+            $('#ChkUserActive').prop('checked', true);
+            $("#DdlUserRole").val("");
+
+        }
+
+        $("#btnResetUser").click(function () {
+           ResetUser();
+        });
+
+
+        function ResetUser() {
+            if (GetParamValue("UserID") != 0) {
+                EditUser();
+            }
+            else {
+                ClearUser();
+            }
+        }
+
+        function EditUser() {
+
+            if (GetParamValue("UserID") != 0) {
+                $.ajax({
+                    type: "GET",
+                    url: BaseURL + "SystemMaster/UserMaster_Edit",
+                    data: { UserID: GetParamValue("UserID") },
+                    datatype: "Json",
+                    success: function (data) {
+
+                        $("#HtnUserUniqID").val(data.UserID);
+                        $("#txtLoginName").val(data.LoginName);
+                        $.ajax({
+                            url: BaseURL + "Common/DecryptPassword",
+                            data: { vPassword: data.Password },
+                            dataType: "JSON",
+                            type: "GET",
+                            success: function (Data) {
+                                $('#txtPassword').val(Data);
+                            }
+                        });
+                        $("#txtFirstName").val(data.FirstName);
+                        $("#txtLastName").val(data.LastName);
+                        $("#txtUserEmailID").val(data.EmailID);
+                        $("#txtUserMobileNumber").val(data.MobileNumber);
+
+                        if (data.RoleID != null) {
+                            $("#DdlUserRole").val(data.RoleID);
+                        }
+
+                        if (data.Status) {
+                            $('#ChkUserActive').prop('checked', true);
+                        }
+                        else {
+                            $('#ChkUserActive').prop('checked', false);
+                        }
+                    }
+                });
+              }
+               else {
+                       $('#ChkUserActive').prop('checked', true);
+                 }
+
+        }
+
+        $("#btnResetUser").click(function () {
+            ResetUser();
+        });
+
+
+        function FormValidate() {
+            var _errorMsg = "";
+            if ($("#txtLoginName").val() == "") {
+                _errorMsg += "@SYSMessage.UserMaster_EnterLoginName";
+            }
+            if ($("#txtPassword").val() == "") {
+                _errorMsg += '<br />' + "@SYSMessage.UserMaster_EnterPassword";
+            }
+            if ($("#txtFirstName").val() == "") {
+                _errorMsg += '<br />' + "@SYSMessage.UserMaster_EnterFirstName";
+            }
+            //if ($("#txtLastName").val() == "") {
+                //_errorMsg += '<br />' + "@SYSMessage.UserMaster_EnterLastName";
+            //}
+            if ($("#DdlUserRole").val() == "") {
+                _errorMsg += '<br />' + "@SYSMessage.UserRole_SelectUserRole";
+            }
+
+            if ($("#txtUserEmailID").val() != "") {
+                if (!isValidEmail($("#txtUserEmailID").val()))
+                    _errorMsg += '<br />' + "@PROMessage.Common_EnterValidEmailAddress";
+            }
+
+            if (_errorMsg.length > 0) {
+                ErrorAlert(_errorMsg);
+                return false;
+            }
+            else
+                return true;
+        }
+
+
+        $('#btnSaveUser').click(function (e) {
+
+            if ($(this).hasClass("unclickable")) {
+                e.preventDefault();
+            } else {
+                $(this).addClass("unclickable");
+            if (FormValidate() == true) {
+
+                var fileData = new FormData();
+
+                fileData.append("UserID", $("#HtnUserUniqID").val());
+                fileData.append("LoginName", $("#txtLoginName").val());
+                fileData.append("FirstName", $("#txtFirstName").val());
+                fileData.append("LastName", $("#txtLastName").val());
+                fileData.append("Password", $("#txtPassword").val());
+                fileData.append("EmailID", $("#txtUserEmailID").val());
+                fileData.append("MobileNumber", $("#txtUserMobileNumber").val());
+
+
+                fileData.append("Status", $("#ChkUserActive").is(":checked"));
+                fileData.append("RoleID", $("#DdlUserRole").val());
+
+
+                  $.confirm({
+                    title: ConfirmAlert_SuccessMessage,
+                    content: $("#HtnUserUniqID").val() == "" ? ConfirmAlert_Message_Content.replace("{0}", ConfirmAlert_SaveMessage_Content) : ConfirmAlert_Message_Content.replace("{0}", ConfirmAlert_UpdateMessage_Content),
+                    animation: 'zoom',
+                    closeAnimation: 'zoom',
+                    buttons: {
+                        'confirm': {
+                            text: Alert_YesMessage,
+                            btnClass: Alert_Button_Style,
+                            keys: ['enter'],
+                            action: function () {
+                                $.ajax({
+                                    url: BaseURL + "SystemMaster/UserMaster_Save", type: "POST",
+                                    contentType: false,
+                                    processData: false,
+                                    data: fileData
+                                })
+                                .done(function (result) {
+                                    if (result.Result == true) {
+                                        SucessAlert(result.Message);
+                                        ClearUser();
+                                        BackFunction();
+
+                                    }
+                                    else if (result.Result == false) {
+                                        ErrorAlert(result.Message);
+                                    }
+                                })
+                                .fail(function () {
+                                    ErrorAlert(result.Message);
+                                });
+                            }
+                        },
+                        cancel: {
+                            text: Alert_NoMessage,
+                            btnClass: Alert_Button_Style
+                        }
+                    }
+                });
+                }
+            }
+        });
+
+    </script>
+    <style>
+        .field-icon {
+            float: right;
+            margin-left: -25px;
+            margin-top: -25px;
+            position: relative;
+            z-index: 2;
+        }
+    </style>
+</head>
+<body>
+    <input type="hidden" id="HtnUserUniqID" />
+    
+    <!-- Main content -->
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+
+                <!-- /.col-md-12 -->
+                <div class="col-lg-12">
+                    <div class="card card-pd">
+                        <div class="card-header">
+                            <span style="font-size: 18px;" class="m-0"><i class="fas fa-user"></i></span>
+                            <span style="font-size: 18px; border-left: 1px solid #ccc; padding-left: 10px;"> @SYSTitle.Title_UserMaster_AddEdit </span>
+                        </div>
+                        <div class="card-body">
+
+                            <p class="introtext">@SYSPageModel.Common_Hint</p>
+
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <div class="form-group required">
+                                        <label class="control-label">@SYSPageModel.UserMaster_LoginName</label>
+                                        <input type="text" autofocus class="form-control" id="txtLoginName" tabindex="1" maxlength="50" placeholder="@SYSMessage.UserMaster_EnterLoginName">
+                                    </div>
+                                    <div class="form-group required">
+                                        <label class="control-label">@SYSPageModel.UserMaster_Password</label>
+                                        <input type="password" class="form-control" id="txtPassword" tabindex="2" maxlength="100" placeholder="@SYSMessage.UserMaster_EnterPassword">
+                                        <span toggle="#txtPassword" class="fa fa-fw fa-eye field-icon toggle-password"></span>
+                                    </div>
+                                   
+                                    <div class="pdt-30">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <button type="button" id="btnResetUser" tabindex="9" class="btn btn-secondary btn-block"><i class="fa fa-undo"></i> @Transport.Repository.WEBPAGEBUTTON.RESET</button>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <button type="button" id="btnSaveUser" tabindex="10" class="btn btn-primary btn-block"><i class="fa fa-save"></i> @Transport.Repository.WEBPAGEBUTTON.SAVE</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-4">
+                                    <div class="form-group required">
+                                        <label class="control-label">@SYSPageModel.UserMaster_FirstName</label>
+                                        <input type="text" class="form-control" tabindex="3" id="txtFirstName" maxlength="100" placeholder="@SYSMessage.UserMaster_EnterFirstName">
+                                    </div>
+                                    <div class="form-group required">
+                                        <label class="control-label">@SYSPageModel.Role_RoleName</label>
+                                        @Html.DropDownList("DdlUserRole", (SelectList)Model.LoadUserRoleData, new { @tabindex = 6, @class = "form-control select2", @width = "100%" })
+                                    </div>
+                                   
+                                    <div class="form-group">
+                                        <label class="control-label">@SYSPageModel.UserMaster_MobileNumber</label>
+                                        <input type="text" class="form-control" id="txtUserMobileNumber" tabindex="8" maxlength="50" placeholder="@SYSPageModel.ToolTip_EnterMobileNumber">
+                                    </div> 
+                                  
+                                    <div class="pdt-25">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+
+                                                <div class="form-group clearfix">
+                                                    <div class="icheck-primary">
+                                                        @Html.CheckBox("ChkUserActive")
+                                                        <label for="ChkUserActive">
+                                                            @SYSPageModel.Common_Status
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label>@SYSPageModel.UserMaster_LastName</label>
+                                        <input type="text" class="form-control" tabindex="4" id="txtLastName" maxlength="100" placeholder="@SYSMessage.UserMaster_EnterLastName">
+                                    </div>
+                                  
+                                   
+                                    <div class="form-group">
+                                        <label class="control-label">@SYSPageModel.UserMaster_Email</label>
+                                        <input type="text" class="form-control" id="txtUserEmailID" tabindex="7" maxlength="200" placeholder="@SYSPageModel.ToolTip_EnterEmailID">
+                                    </div>
+                                  
+                                </div>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.col-md-12 -->
+            </div>
+            <!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content -->
+     
+</body>
+</html>
+
+ 

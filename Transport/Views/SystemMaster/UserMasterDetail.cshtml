@@ -1,0 +1,322 @@
+﻿@using Transport.Repository.Resource;
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <script>
+        var UserStatus;
+        ShowCommonBack();
+
+       
+        $.ajax({
+            type: "GET",
+            url: BaseURL + "Common/Load_Status",
+            datatype: "Json",
+            success: function (data) {
+                $("#DdlsearchUserStatus option").remove();
+                $.each(data, function (index, value) {
+                    $('#DdlsearchUserStatus').append('<option value="' + value.ID + '">' + value.Name + '</option>');
+                });
+            }
+        }).done(function (result) {
+
+            if (UserStatus == 0 || UserStatus == 1) {
+                $("#DdlsearchUserStatus").val(UserStatus);
+            }
+            else {
+                $("#DdlsearchUserStatus").val(-1);
+            }
+        });
+
+    </script>
+    <style>
+        .field-icon {
+            float: right;
+            margin-left: -25px;
+            margin-top: -20px;
+            position: relative;
+            z-index: 2;
+        }
+    </style>
+</head>
+<body>
+    <input type="hidden" id="HtnUserUniqID" />
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content">
+        <!-- Content Header (Page header) -->
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card card-pd">
+                                                   <div class="card-header">
+                                <span style="font-size: 18px;" class="m-0"><i class="fas fa-user"></i></span>
+                                <span style="font-size: 18px; border-left: 1px solid #ccc; padding-left: 10px;"> @SYSTitle.Title_User_Master_View </span>
+                                <div style="float: right;">
+                                    <span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px;">
+                                        <a href="#" data-toggle="tooltip" data-placement="bottom" title="Add User" id="btnAddUser"><i class="fas fa-plus-circle"></i> </a>
+                                    </span>
+                                    <span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px;">
+                                        <a href="#" data-toggle="tooltip" data-placement="bottom" title="Show Form" onclick="showForm()"><i class="fas fa-caret-square-down"></i></a>
+                                    </span><span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px;">
+                                        <a href="#" data-toggle="tooltip" data-placement="bottom" title="Hide Form" onclick="hideForm()"><i class="fas fa-caret-square-up"></i></a>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="card-body">
+                                <!-- /hidden_div -->
+                                <div id="hidden-form" style="display: none;">
+                                    <div class="row">
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <label>@SYSPageModel.UserMaster_LoginName</label>
+                                                <div>
+                                                    <input type="text" tabindex="1" id="txtsearchLoginName" maxlength="50" placeholder="@SYSPageModel.Tooltip_LoginName" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <label>@SYSPageModel.UserMaster_DisplayName</label>
+                                                <div>
+                                                    <input type="text" tabindex="2" id="txtsearchDisplayName" maxlength="200" placeholder="@SYSPageModel.Tooltip_DisplayName" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <div class="form-group">
+                                                <label>@SYSPageModel.Common_Status</label>
+                                                <div>
+                                                    @Html.DropDownList("DdlsearchUserStatus", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @tabindex = 3, @width = "100%" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="pdt-25">
+                                                <div class="row">
+                                                    <div class="col-sm-6">
+                                                        <button type="button" id="btnUserSearch" class="btn btn-primary btn-block"><i class="fa fa-search"></i> @Transport.Repository.WEBPAGEBUTTON.SEARCH</button>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <button type="button" id="btnUserSearchClear" class="btn btn-primary btn-block"><i class="fa fa-paint-brush"></i> @Transport.Repository.WEBPAGEBUTTON.CLEAR</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="box-body table-responsive no-padding">
+                                            <table id="Usergrid" class="table table-hover"></table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </div>
+
+            </div><!-- /.content-wrapper -->
+        </div>
+    </div>
+   
+
+    <script>
+        ShowCommonBack();
+        var Usergrid;
+        var ObjCommonEdit, StrPageMode;
+
+        document.onkeydown = function (evt) {
+            var keyCode = evt ? (evt.which ? evt.which : evt.keyCode) : event.keyCode;
+            if (keyCode == 13) {
+                UserSearch();
+                return false;
+            }
+        }
+
+        renderer = function (value, record, $cell, $displayEl, id) {
+
+            var HTMLContent = '<table style=width:100%><tr>';
+
+            HTMLContent += '<td style="border:0px solid #FFF;"><a tabindex="-1" onclick="EditUser(' + id + ')" style="cursor:pointer"><i class="fas fa-edit Form-GridEditButton"></i></a></td>';
+            /*HTMLContent += '<td style="border:0px solid #FFF;"><a tabindex="-1" onclick="DeleteUser(' + id + ')" style="cursor:pointer"><i class="far fa-trash-alt Form-GridDeleteButton"></i></a></td>';*/
+            
+            $displayEl.html("</tr></table>");
+            $displayEl.append(HTMLContent);
+
+        }
+
+        var Template = '<div class="docs-callout"><div class="row"><div class="col-lg-4"><b>@SYSPageModel.UserMaster_Email:</b> {EmailID}</div><div class="col-lg-4"><b>@SYSPageModel.UserMaster_MobileNumber:</b> {MobileNumber}</div></div>';
+
+
+        Usergrid = $("#Usergrid").grid({
+            primaryKey: "UserID",
+            uiLibrary: "bootstrap4",
+            dataSource: '@Url.Action("UserMaster_FindAll", "SystemMaster")',
+            detailTemplate: Template,
+            columns: [
+
+                { field: "LoginName", title: "@SYSPageModel.UserMaster_LoginName", sortable: true, align: "left" },
+                { field: "DisplayName", title: "@SYSPageModel.UserMaster_DisplayName", sortable: true, align: "left"  },
+                { field: "RoleName", title: "@SYSPageModel.UserMaster_RoleName", sortable: true, align: "left" },
+                { field: "CreatedUser", title: "@SYSPageModel.Common_CreatedBy", sortable: true, align: "left" },
+               { field: "DisplayCreatedDate", title: "@PROPageModel.Common_CreatedDate", sortable: true, align: "center"},
+                //{ field: "LastModifiedUser", title: "@SYSPageModel.Common_ModifiedBy", sortable: true, align: "left"  },
+               //{  field: "DisplayModifiedDate", title: "@PROPageModel.Common_ModifiedDate", sortable: true, align: "center"},
+                 {
+                    field: '@PROPageModel.Common_Status', width: 75, align: "center", editor: false, sortable: true, renderer: function (value, record) {
+
+
+                        return record.Status == true ?'<span class="badge badge-success" style=font-size:12px>@Button.Button_Active</span>' : '<span class="badge badge-danger" style=font-size:12px>@Button.Button_Inactive</span>';
+                    }
+                },
+                { field: '@Button.Button_Action', width: 90, align: "center", renderer: renderer }
+            ],
+            pager: { enable: true, limit: GridRowsDisplayLimit, sizes: ArrPaging }
+        });
+
+        $(".NumericOnly").on("keypress keyup blur paste drop", function (event) {
+            AllowNumeric(event);
+        });
+
+
+        $("#btnAddUser").click(function () {
+
+            var ParamData = [
+                { ParameterName: "LoginName", ParameterValue: $('#txtsearchLoginName').val() },
+                { ParameterName: "DisplayName", ParameterValue: $('#txtsearchDisplayName').val() },
+                { ParameterName: "UserStatus", ParameterValue: $("#DdlsearchUserStatus").val() }]
+
+            UserStatus = $("#DdlsearchUserStatus").val();
+            AddBackURLStore(JSON.stringify(ParamData));
+            GetMenu('@Url.Action("AddUserMasterDetail", "SystemMaster")' + '?UserID=0'+ '&HeaderViewID=' + GetParamValue("HeaderViewID") + '&DetailViewID=' + GetParamValue("DetailViewID"));
+        });
+
+
+        function EditUser(UserID) {
+
+            var ParamData = [
+              { ParameterName: "LoginName", ParameterValue: $('#txtsearchLoginName').val() },
+              { ParameterName: "DisplayName", ParameterValue: $('#txtsearchDisplayName').val() },
+               { ParameterName: "UserStatus", ParameterValue: $("#DdlsearchUserStatus").val() }]
+            UserStatus = $("#DdlsearchUserStatus").val();
+            AddBackURLStore(JSON.stringify(ParamData));
+            GetMenu('@Url.Action("AddUserMasterDetail", "SystemMaster")' + '?UserID=' + UserID+ '&HeaderViewID=' + GetParamValue("HeaderViewID") + '&DetailViewID=' + GetParamValue("DetailViewID"));
+
+        }
+
+        function DeleteUser(UserID) {
+
+            $.confirm({
+                title: ConfirmAlert_SuccessMessage,
+                content: ConfirmAlert_Message_Content.replace("{0}", ConfirmAlert_InactivateMessage_Content),
+                animation: 'zoom',
+                closeAnimation: 'zoom',
+                buttons: {
+                    'confirm': {
+                        text: Alert_YesMessage,
+                        btnClass: Alert_Button_Style,
+                        action: function () {
+                            $.ajax({ url: BaseURL + "SystemMaster/UserMaster_Delete", type: "POST", data: { UserID: UserID } })
+                                .done(function (result) {
+                                    if (result.Result == true) {
+                                        Usergrid.reload();
+                                        SucessAlert(result.Message);
+                                    }
+                                    else {
+                                        ErrorAlert(result.Message);
+                                    }
+                                })
+                               .fail(function (result) {
+                                    ErrorAlert(result.Message);
+                                });
+                        }
+                    },
+                    cancel: {
+                        text: Alert_NoMessage,
+                        btnClass: Alert_Button_Style
+                    }
+                }
+            });
+        }
+
+        function UserSearch() {
+            var searchUserLoginName = '';
+            var searchUserDisplayName = '';
+            var searchUserStatus = null;
+
+            if ($("#txtsearchLoginName").val() != "") {
+                searchUserLoginName = $('#txtsearchLoginName').val();
+            }
+
+            if ($("#txtsearchDisplayName").val() != "") {
+                searchUserDisplayName = $('#txtsearchDisplayName').val();
+            }
+
+            if ($("#DdlsearchUserStatus").val() == 0) {
+                searchUserStatus = false;
+            }
+            else if ($("#DdlsearchUserStatus").val() == 1) {
+                searchUserStatus = true;
+            }
+            Usergrid.clear();
+            Usergrid.reload({ LoginName: searchUserLoginName, DisplayName: searchUserDisplayName, Status: searchUserStatus });
+
+        }
+
+
+        //Search filter methods
+        $('#btnUserSearch').click(function () {
+            UserSearch();
+        });
+
+        $('#btnUserSearchClear').click(function () {
+
+            $("#txtsearchLoginName").val("");
+            $("#txtsearchDisplayName").val("");
+            $("#DdlsearchUserStatus").val(-1);
+            Usergrid.reload({ LoginName: '', DisplayName: '', Status: true });
+        });
+
+        $("#txtUserMobileNumber").attr('maxlength', $("#HtnPhoneValidDigits").val());
+    </script>
+
+       
+    <script type="text/javascript">
+        if (ArrParameterData[GetBackURLCount()] != null) {
+
+            if (ArrParameterData[GetBackURLCount()][0].ParameterName == "LoginName") {
+                $('#txtsearchLoginName').val(ArrParameterData[0][0].ParameterValue);
+            }
+
+            if (ArrParameterData[GetBackURLCount()][1].ParameterName == "DisplayName") {
+                $('#txtsearchDisplayName').val(ArrParameterData[0][1].ParameterValue);
+            }
+
+            if (ArrParameterData[GetBackURLCount()][2].ParameterName == "UserStatus") {
+                UserStatus = ArrParameterData[0][2].ParameterValue;
+                $('#DdlsearchUserStatus').val(UserStatus);
+            }
+            var vUserStatus = null;
+
+            if (UserStatus == 0) {
+                vUserStatus = false;
+            }
+            else if (UserStatus == 1) {
+                vUserStatus = true;
+            }
+
+            Usergrid.reload({ LoginName: $('#txtsearchLoginName').val(), DisplayName: $('#txtsearchDisplayName').val(), Status: vUserStatus });
+        }
+
+
+    </script>
+
+</body>
+
+</html>

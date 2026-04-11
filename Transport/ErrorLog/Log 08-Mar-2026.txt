@@ -1,0 +1,302 @@
+Page Name          :Expense_Update
+Date and Time      :08 Mar 2026 12:48 PM
+Error Message      :Nullable object must have a value.
+Stack Trace        :   at System.ThrowHelper.ThrowInvalidOperationException(ExceptionResource resource)
+   at System.Nullable`1.get_Value()
+   at Transport.Repository.ExpenseRepository.Expense_Update(ExpenseModel objExpense) in C:\Users\HP\Documents\repos\Transport\Transport.Repository\ExpenseRepository.cs:line 218
+Error Source       :mscorlib
+Target Site        :Void ThrowInvalidOperationException(System.ExceptionResource)
+
+----------------------------------------------------------------
+Page Name          :Global Error
+Date and Time      :08 Mar 2026 3:53 PM
+Error Message      :The wait operation timed out
+Stack Trace        :
+Error Source       :
+Target Site        :
+
+----------------------------------------------------------------
+Page Name          :Global Error
+Date and Time      :08 Mar 2026 3:56 PM
+Error Message      :The wait operation timed out
+Stack Trace        :
+Error Source       :
+Target Site        :
+
+----------------------------------------------------------------
+Page Name          :Global Error
+Date and Time      :08 Mar 2026 4:13 PM
+Error Message      :The wait operation timed out
+Stack Trace        :
+Error Source       :
+Target Site        :
+
+----------------------------------------------------------------
+Page Name          :Global Error
+Date and Time      :08 Mar 2026 4:19 PM
+Error Message      :The wait operation timed out
+Stack Trace        :
+Error Source       :
+Target Site        :
+
+----------------------------------------------------------------
+Page Name          :Global Error
+Date and Time      :08 Mar 2026 5:32 PM
+Error Message      :The wait operation timed out
+Stack Trace        :
+Error Source       :
+Target Site        :
+
+----------------------------------------------------------------
+Page Name          :Global Error
+Date and Time      :08 Mar 2026 5:32 PM
+Error Message      :A public action method 'MyTrxn_FindAll' was not found on controller 'Transport.Controllers.ReportsController'.
+Stack Trace        :   at System.Web.Mvc.Controller.HandleUnknownAction(String actionName)
+   at System.Web.Mvc.Controller.<BeginExecuteCore>b__1d(IAsyncResult asyncResult, ExecuteCoreState innerState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncVoid`1.CallEndDelegate(IAsyncResult asyncResult)
+   at System.Web.Mvc.Controller.EndExecuteCore(IAsyncResult asyncResult)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncVoid`1.CallEndDelegate(IAsyncResult asyncResult)
+   at System.Web.Mvc.Controller.EndExecute(IAsyncResult asyncResult)
+   at System.Web.Mvc.MvcHandler.<BeginProcessRequest>b__5(IAsyncResult asyncResult, ProcessRequestState innerState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncVoid`1.CallEndDelegate(IAsyncResult asyncResult)
+   at System.Web.Mvc.MvcHandler.EndProcessRequest(IAsyncResult asyncResult)
+   at System.Web.HttpApplication.CallHandlerExecutionStep.System.Web.HttpApplication.IExecutionStep.Execute()
+   at System.Web.HttpApplication.ExecuteStepImpl(IExecutionStep step)
+   at System.Web.HttpApplication.ExecuteStep(IExecutionStep step, Boolean& completedSynchronously)
+Error Source       :System.Web.Mvc
+Target Site        :Void HandleUnknownAction(System.String)
+
+----------------------------------------------------------------
+Page Name          :Global Error
+Date and Time      :08 Mar 2026 6:02 PM
+Error Message      :The wait operation timed out
+Stack Trace        :
+Error Source       :
+Target Site        :
+
+----------------------------------------------------------------
+Page Name          :Global Error
+Date and Time      :08 Mar 2026 6:02 PM
+Error Message      :Cannot call action method 'System.Collections.Generic.List`1[Transport.Model.TrxnsReportModel] MyTrxn_FindAll(System.Nullable`1[System.Int32], System.Nullable`1[System.DateTime], System.Nullable`1[System.DateTime], System.Nullable`1[System.Int32], System.String, System.String, Int32 ByRef)' on controller 'Transport.Controllers.ReportsController' because the parameter 'Int32& TotalCount' is passed by reference.
+Parameter name: methodInfo
+Stack Trace        :   at System.Web.Mvc.ReflectedActionDescriptor..ctor(MethodInfo methodInfo, String actionName, ControllerDescriptor controllerDescriptor, Boolean validateMethod)
+   at System.Web.Mvc.Async.AsyncActionMethodSelector.<>c__DisplayClass4.<GetActionDescriptorDelegate>b__2(String actionName, ControllerDescriptor controllerDescriptor)
+   at System.Web.Mvc.ControllerActionInvoker.FindAction(ControllerContext controllerContext, ControllerDescriptor controllerDescriptor, String actionName)
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.BeginInvokeAction(ControllerContext controllerContext, String actionName, AsyncCallback callback, Object state)
+   at System.Web.Mvc.Controller.<BeginExecuteCore>b__1c(AsyncCallback asyncCallback, Object asyncState, ExecuteCoreState innerState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncVoid`1.CallBeginDelegate(AsyncCallback callback, Object callbackState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.Begin(AsyncCallback callback, Object state, Int32 timeout)
+   at System.Web.Mvc.Controller.BeginExecuteCore(AsyncCallback callback, Object state)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.Begin(AsyncCallback callback, Object state, Int32 timeout)
+   at System.Web.Mvc.Controller.BeginExecute(RequestContext requestContext, AsyncCallback callback, Object state)
+   at System.Web.Mvc.MvcHandler.<BeginProcessRequest>b__4(AsyncCallback asyncCallback, Object asyncState, ProcessRequestState innerState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncVoid`1.CallBeginDelegate(AsyncCallback callback, Object callbackState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.Begin(AsyncCallback callback, Object state, Int32 timeout)
+   at System.Web.Mvc.MvcHandler.BeginProcessRequest(HttpContextBase httpContext, AsyncCallback callback, Object state)
+   at System.Web.HttpApplication.CallHandlerExecutionStep.System.Web.HttpApplication.IExecutionStep.Execute()
+   at System.Web.HttpApplication.ExecuteStepImpl(IExecutionStep step)
+   at System.Web.HttpApplication.ExecuteStep(IExecutionStep step, Boolean& completedSynchronously)
+Error Source       :System.Web.Mvc
+Target Site        :Void .ctor(System.Reflection.MethodInfo, System.String, System.Web.Mvc.ControllerDescriptor, Boolean)
+
+----------------------------------------------------------------
+Page Name          :Global Error
+Date and Time      :08 Mar 2026 6:02 PM
+Error Message      :Cannot call action method 'System.Collections.Generic.List`1[Transport.Model.TrxnsReportModel] MyTrxn_FindAll(System.Nullable`1[System.Int32], System.Nullable`1[System.DateTime], System.Nullable`1[System.DateTime], System.Nullable`1[System.Int32], System.String, System.String, Int32 ByRef)' on controller 'Transport.Controllers.ReportsController' because the parameter 'Int32& TotalCount' is passed by reference.
+Parameter name: methodInfo
+Stack Trace        :   at System.Web.Mvc.ReflectedActionDescriptor..ctor(MethodInfo methodInfo, String actionName, ControllerDescriptor controllerDescriptor, Boolean validateMethod)
+   at System.Web.Mvc.Async.AsyncActionMethodSelector.<>c__DisplayClass4.<GetActionDescriptorDelegate>b__2(String actionName, ControllerDescriptor controllerDescriptor)
+   at System.Web.Mvc.ControllerActionInvoker.FindAction(ControllerContext controllerContext, ControllerDescriptor controllerDescriptor, String actionName)
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.BeginInvokeAction(ControllerContext controllerContext, String actionName, AsyncCallback callback, Object state)
+   at System.Web.Mvc.Controller.<BeginExecuteCore>b__1c(AsyncCallback asyncCallback, Object asyncState, ExecuteCoreState innerState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncVoid`1.CallBeginDelegate(AsyncCallback callback, Object callbackState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.Begin(AsyncCallback callback, Object state, Int32 timeout)
+   at System.Web.Mvc.Controller.BeginExecuteCore(AsyncCallback callback, Object state)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.Begin(AsyncCallback callback, Object state, Int32 timeout)
+   at System.Web.Mvc.Controller.BeginExecute(RequestContext requestContext, AsyncCallback callback, Object state)
+   at System.Web.Mvc.MvcHandler.<BeginProcessRequest>b__4(AsyncCallback asyncCallback, Object asyncState, ProcessRequestState innerState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncVoid`1.CallBeginDelegate(AsyncCallback callback, Object callbackState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.Begin(AsyncCallback callback, Object state, Int32 timeout)
+   at System.Web.Mvc.MvcHandler.BeginProcessRequest(HttpContextBase httpContext, AsyncCallback callback, Object state)
+   at System.Web.HttpApplication.CallHandlerExecutionStep.System.Web.HttpApplication.IExecutionStep.Execute()
+   at System.Web.HttpApplication.ExecuteStepImpl(IExecutionStep step)
+   at System.Web.HttpApplication.ExecuteStep(IExecutionStep step, Boolean& completedSynchronously)
+Error Source       :System.Web.Mvc
+Target Site        :Void .ctor(System.Reflection.MethodInfo, System.String, System.Web.Mvc.ControllerDescriptor, Boolean)
+
+----------------------------------------------------------------
+Page Name          :Global Error
+Date and Time      :08 Mar 2026 6:06 PM
+Error Message      :Cannot call action method 'System.Collections.Generic.List`1[Transport.Model.TrxnsReportModel] MyTrxn_FindAll(System.Nullable`1[System.Int32], System.Nullable`1[System.DateTime], System.Nullable`1[System.DateTime], System.Nullable`1[System.Int32], System.String, System.String, Int32 ByRef)' on controller 'Transport.Controllers.ReportsController' because the parameter 'Int32& TotalCount' is passed by reference.
+Parameter name: methodInfo
+Stack Trace        :   at System.Web.Mvc.ReflectedActionDescriptor..ctor(MethodInfo methodInfo, String actionName, ControllerDescriptor controllerDescriptor, Boolean validateMethod)
+   at System.Web.Mvc.Async.AsyncActionMethodSelector.<>c__DisplayClass4.<GetActionDescriptorDelegate>b__2(String actionName, ControllerDescriptor controllerDescriptor)
+   at System.Web.Mvc.ControllerActionInvoker.FindAction(ControllerContext controllerContext, ControllerDescriptor controllerDescriptor, String actionName)
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.BeginInvokeAction(ControllerContext controllerContext, String actionName, AsyncCallback callback, Object state)
+   at System.Web.Mvc.Controller.<BeginExecuteCore>b__1c(AsyncCallback asyncCallback, Object asyncState, ExecuteCoreState innerState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncVoid`1.CallBeginDelegate(AsyncCallback callback, Object callbackState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.Begin(AsyncCallback callback, Object state, Int32 timeout)
+   at System.Web.Mvc.Controller.BeginExecuteCore(AsyncCallback callback, Object state)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.Begin(AsyncCallback callback, Object state, Int32 timeout)
+   at System.Web.Mvc.Controller.BeginExecute(RequestContext requestContext, AsyncCallback callback, Object state)
+   at System.Web.Mvc.MvcHandler.<BeginProcessRequest>b__4(AsyncCallback asyncCallback, Object asyncState, ProcessRequestState innerState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncVoid`1.CallBeginDelegate(AsyncCallback callback, Object callbackState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.Begin(AsyncCallback callback, Object state, Int32 timeout)
+   at System.Web.Mvc.MvcHandler.BeginProcessRequest(HttpContextBase httpContext, AsyncCallback callback, Object state)
+   at System.Web.HttpApplication.CallHandlerExecutionStep.System.Web.HttpApplication.IExecutionStep.Execute()
+   at System.Web.HttpApplication.ExecuteStepImpl(IExecutionStep step)
+   at System.Web.HttpApplication.ExecuteStep(IExecutionStep step, Boolean& completedSynchronously)
+Error Source       :System.Web.Mvc
+Target Site        :Void .ctor(System.Reflection.MethodInfo, System.String, System.Web.Mvc.ControllerDescriptor, Boolean)
+
+----------------------------------------------------------------
+Page Name          :Global Error
+Date and Time      :08 Mar 2026 6:06 PM
+Error Message      :Cannot call action method 'System.Collections.Generic.List`1[Transport.Model.TrxnsReportModel] MyTrxn_FindAll(System.Nullable`1[System.Int32], System.Nullable`1[System.DateTime], System.Nullable`1[System.DateTime], System.Nullable`1[System.Int32], System.String, System.String, Int32 ByRef)' on controller 'Transport.Controllers.ReportsController' because the parameter 'Int32& TotalCount' is passed by reference.
+Parameter name: methodInfo
+Stack Trace        :   at System.Web.Mvc.ReflectedActionDescriptor..ctor(MethodInfo methodInfo, String actionName, ControllerDescriptor controllerDescriptor, Boolean validateMethod)
+   at System.Web.Mvc.Async.AsyncActionMethodSelector.<>c__DisplayClass4.<GetActionDescriptorDelegate>b__2(String actionName, ControllerDescriptor controllerDescriptor)
+   at System.Web.Mvc.ControllerActionInvoker.FindAction(ControllerContext controllerContext, ControllerDescriptor controllerDescriptor, String actionName)
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.BeginInvokeAction(ControllerContext controllerContext, String actionName, AsyncCallback callback, Object state)
+   at System.Web.Mvc.Controller.<BeginExecuteCore>b__1c(AsyncCallback asyncCallback, Object asyncState, ExecuteCoreState innerState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncVoid`1.CallBeginDelegate(AsyncCallback callback, Object callbackState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.Begin(AsyncCallback callback, Object state, Int32 timeout)
+   at System.Web.Mvc.Controller.BeginExecuteCore(AsyncCallback callback, Object state)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.Begin(AsyncCallback callback, Object state, Int32 timeout)
+   at System.Web.Mvc.Controller.BeginExecute(RequestContext requestContext, AsyncCallback callback, Object state)
+   at System.Web.Mvc.MvcHandler.<BeginProcessRequest>b__4(AsyncCallback asyncCallback, Object asyncState, ProcessRequestState innerState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncVoid`1.CallBeginDelegate(AsyncCallback callback, Object callbackState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.Begin(AsyncCallback callback, Object state, Int32 timeout)
+   at System.Web.Mvc.MvcHandler.BeginProcessRequest(HttpContextBase httpContext, AsyncCallback callback, Object state)
+   at System.Web.HttpApplication.CallHandlerExecutionStep.System.Web.HttpApplication.IExecutionStep.Execute()
+   at System.Web.HttpApplication.ExecuteStepImpl(IExecutionStep step)
+   at System.Web.HttpApplication.ExecuteStep(IExecutionStep step, Boolean& completedSynchronously)
+Error Source       :System.Web.Mvc
+Target Site        :Void .ctor(System.Reflection.MethodInfo, System.String, System.Web.Mvc.ControllerDescriptor, Boolean)
+
+----------------------------------------------------------------
+Page Name          :Global Error
+Date and Time      :08 Mar 2026 6:17 PM
+Error Message      :Cannot call action method 'System.Collections.Generic.List`1[Transport.Model.TrxnsReportModel] MyTrxn_FindAll(System.Nullable`1[System.Int32], System.Nullable`1[System.DateTime], System.Nullable`1[System.DateTime], System.Nullable`1[System.Int32], System.String, System.String, Int32 ByRef)' on controller 'Transport.Controllers.ReportsController' because the parameter 'Int32& TotalCount' is passed by reference.
+Parameter name: methodInfo
+Stack Trace        :   at System.Web.Mvc.ReflectedActionDescriptor..ctor(MethodInfo methodInfo, String actionName, ControllerDescriptor controllerDescriptor, Boolean validateMethod)
+   at System.Web.Mvc.Async.AsyncActionMethodSelector.<>c__DisplayClass4.<GetActionDescriptorDelegate>b__2(String actionName, ControllerDescriptor controllerDescriptor)
+   at System.Web.Mvc.ControllerActionInvoker.FindAction(ControllerContext controllerContext, ControllerDescriptor controllerDescriptor, String actionName)
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.BeginInvokeAction(ControllerContext controllerContext, String actionName, AsyncCallback callback, Object state)
+   at System.Web.Mvc.Controller.<BeginExecuteCore>b__1c(AsyncCallback asyncCallback, Object asyncState, ExecuteCoreState innerState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncVoid`1.CallBeginDelegate(AsyncCallback callback, Object callbackState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.Begin(AsyncCallback callback, Object state, Int32 timeout)
+   at System.Web.Mvc.Controller.BeginExecuteCore(AsyncCallback callback, Object state)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.Begin(AsyncCallback callback, Object state, Int32 timeout)
+   at System.Web.Mvc.Controller.BeginExecute(RequestContext requestContext, AsyncCallback callback, Object state)
+   at System.Web.Mvc.MvcHandler.<BeginProcessRequest>b__4(AsyncCallback asyncCallback, Object asyncState, ProcessRequestState innerState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncVoid`1.CallBeginDelegate(AsyncCallback callback, Object callbackState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.Begin(AsyncCallback callback, Object state, Int32 timeout)
+   at System.Web.Mvc.MvcHandler.BeginProcessRequest(HttpContextBase httpContext, AsyncCallback callback, Object state)
+   at System.Web.HttpApplication.CallHandlerExecutionStep.System.Web.HttpApplication.IExecutionStep.Execute()
+   at System.Web.HttpApplication.ExecuteStepImpl(IExecutionStep step)
+   at System.Web.HttpApplication.ExecuteStep(IExecutionStep step, Boolean& completedSynchronously)
+Error Source       :System.Web.Mvc
+Target Site        :Void .ctor(System.Reflection.MethodInfo, System.String, System.Web.Mvc.ControllerDescriptor, Boolean)
+
+----------------------------------------------------------------
+Page Name          :Global Error
+Date and Time      :08 Mar 2026 6:18 PM
+Error Message      :Cannot call action method 'System.Collections.Generic.List`1[Transport.Model.TrxnsReportModel] MyTrxn_FindAll(System.Nullable`1[System.Int32], System.Nullable`1[System.DateTime], System.Nullable`1[System.DateTime], System.Nullable`1[System.Int32], System.String, System.String, Int32 ByRef)' on controller 'Transport.Controllers.ReportsController' because the parameter 'Int32& TotalCount' is passed by reference.
+Parameter name: methodInfo
+Stack Trace        :   at System.Web.Mvc.ReflectedActionDescriptor..ctor(MethodInfo methodInfo, String actionName, ControllerDescriptor controllerDescriptor, Boolean validateMethod)
+   at System.Web.Mvc.Async.AsyncActionMethodSelector.<>c__DisplayClass4.<GetActionDescriptorDelegate>b__2(String actionName, ControllerDescriptor controllerDescriptor)
+   at System.Web.Mvc.ControllerActionInvoker.FindAction(ControllerContext controllerContext, ControllerDescriptor controllerDescriptor, String actionName)
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.BeginInvokeAction(ControllerContext controllerContext, String actionName, AsyncCallback callback, Object state)
+   at System.Web.Mvc.Controller.<BeginExecuteCore>b__1c(AsyncCallback asyncCallback, Object asyncState, ExecuteCoreState innerState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncVoid`1.CallBeginDelegate(AsyncCallback callback, Object callbackState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.Begin(AsyncCallback callback, Object state, Int32 timeout)
+   at System.Web.Mvc.Controller.BeginExecuteCore(AsyncCallback callback, Object state)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.Begin(AsyncCallback callback, Object state, Int32 timeout)
+   at System.Web.Mvc.Controller.BeginExecute(RequestContext requestContext, AsyncCallback callback, Object state)
+   at System.Web.Mvc.MvcHandler.<BeginProcessRequest>b__4(AsyncCallback asyncCallback, Object asyncState, ProcessRequestState innerState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncVoid`1.CallBeginDelegate(AsyncCallback callback, Object callbackState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.Begin(AsyncCallback callback, Object state, Int32 timeout)
+   at System.Web.Mvc.MvcHandler.BeginProcessRequest(HttpContextBase httpContext, AsyncCallback callback, Object state)
+   at System.Web.HttpApplication.CallHandlerExecutionStep.System.Web.HttpApplication.IExecutionStep.Execute()
+   at System.Web.HttpApplication.ExecuteStepImpl(IExecutionStep step)
+   at System.Web.HttpApplication.ExecuteStep(IExecutionStep step, Boolean& completedSynchronously)
+Error Source       :System.Web.Mvc
+Target Site        :Void .ctor(System.Reflection.MethodInfo, System.String, System.Web.Mvc.ControllerDescriptor, Boolean)
+
+----------------------------------------------------------------
+Page Name          :Global Error
+Date and Time      :08 Mar 2026 6:21 PM
+Error Message      :Cannot call action method 'System.Web.Mvc.ActionResult MyTrxn_FindAll(System.Nullable`1[System.Int32], System.Nullable`1[System.DateTime], System.Nullable`1[System.DateTime], System.Nullable`1[System.Int32], System.String, System.String, Int32 ByRef)' on controller 'Transport.Controllers.ReportsController' because the parameter 'Int32& TotalCount' is passed by reference.
+Parameter name: methodInfo
+Stack Trace        :   at System.Web.Mvc.ReflectedActionDescriptor..ctor(MethodInfo methodInfo, String actionName, ControllerDescriptor controllerDescriptor, Boolean validateMethod)
+   at System.Web.Mvc.Async.AsyncActionMethodSelector.<>c__DisplayClass4.<GetActionDescriptorDelegate>b__2(String actionName, ControllerDescriptor controllerDescriptor)
+   at System.Web.Mvc.ControllerActionInvoker.FindAction(ControllerContext controllerContext, ControllerDescriptor controllerDescriptor, String actionName)
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.BeginInvokeAction(ControllerContext controllerContext, String actionName, AsyncCallback callback, Object state)
+   at System.Web.Mvc.Controller.<BeginExecuteCore>b__1c(AsyncCallback asyncCallback, Object asyncState, ExecuteCoreState innerState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncVoid`1.CallBeginDelegate(AsyncCallback callback, Object callbackState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.Begin(AsyncCallback callback, Object state, Int32 timeout)
+   at System.Web.Mvc.Controller.BeginExecuteCore(AsyncCallback callback, Object state)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.Begin(AsyncCallback callback, Object state, Int32 timeout)
+   at System.Web.Mvc.Controller.BeginExecute(RequestContext requestContext, AsyncCallback callback, Object state)
+   at System.Web.Mvc.MvcHandler.<BeginProcessRequest>b__4(AsyncCallback asyncCallback, Object asyncState, ProcessRequestState innerState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncVoid`1.CallBeginDelegate(AsyncCallback callback, Object callbackState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.Begin(AsyncCallback callback, Object state, Int32 timeout)
+   at System.Web.Mvc.MvcHandler.BeginProcessRequest(HttpContextBase httpContext, AsyncCallback callback, Object state)
+   at System.Web.HttpApplication.CallHandlerExecutionStep.System.Web.HttpApplication.IExecutionStep.Execute()
+   at System.Web.HttpApplication.ExecuteStepImpl(IExecutionStep step)
+   at System.Web.HttpApplication.ExecuteStep(IExecutionStep step, Boolean& completedSynchronously)
+Error Source       :System.Web.Mvc
+Target Site        :Void .ctor(System.Reflection.MethodInfo, System.String, System.Web.Mvc.ControllerDescriptor, Boolean)
+
+----------------------------------------------------------------
+Page Name          :Global Error
+Date and Time      :08 Mar 2026 6:22 PM
+Error Message      :Cannot call action method 'System.Web.Mvc.ActionResult MyTrxn_FindAll(System.Nullable`1[System.Int32], System.Nullable`1[System.DateTime], System.Nullable`1[System.DateTime], System.Nullable`1[System.Int32], System.String, System.String, Int32 ByRef)' on controller 'Transport.Controllers.ReportsController' because the parameter 'Int32& TotalCount' is passed by reference.
+Parameter name: methodInfo
+Stack Trace        :   at System.Web.Mvc.ReflectedActionDescriptor..ctor(MethodInfo methodInfo, String actionName, ControllerDescriptor controllerDescriptor, Boolean validateMethod)
+   at System.Web.Mvc.Async.AsyncActionMethodSelector.<>c__DisplayClass4.<GetActionDescriptorDelegate>b__2(String actionName, ControllerDescriptor controllerDescriptor)
+   at System.Web.Mvc.ControllerActionInvoker.FindAction(ControllerContext controllerContext, ControllerDescriptor controllerDescriptor, String actionName)
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.BeginInvokeAction(ControllerContext controllerContext, String actionName, AsyncCallback callback, Object state)
+   at System.Web.Mvc.Controller.<BeginExecuteCore>b__1c(AsyncCallback asyncCallback, Object asyncState, ExecuteCoreState innerState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncVoid`1.CallBeginDelegate(AsyncCallback callback, Object callbackState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.Begin(AsyncCallback callback, Object state, Int32 timeout)
+   at System.Web.Mvc.Controller.BeginExecuteCore(AsyncCallback callback, Object state)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.Begin(AsyncCallback callback, Object state, Int32 timeout)
+   at System.Web.Mvc.Controller.BeginExecute(RequestContext requestContext, AsyncCallback callback, Object state)
+   at System.Web.Mvc.MvcHandler.<BeginProcessRequest>b__4(AsyncCallback asyncCallback, Object asyncState, ProcessRequestState innerState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncVoid`1.CallBeginDelegate(AsyncCallback callback, Object callbackState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.Begin(AsyncCallback callback, Object state, Int32 timeout)
+   at System.Web.Mvc.MvcHandler.BeginProcessRequest(HttpContextBase httpContext, AsyncCallback callback, Object state)
+   at System.Web.HttpApplication.CallHandlerExecutionStep.System.Web.HttpApplication.IExecutionStep.Execute()
+   at System.Web.HttpApplication.ExecuteStepImpl(IExecutionStep step)
+   at System.Web.HttpApplication.ExecuteStep(IExecutionStep step, Boolean& completedSynchronously)
+Error Source       :System.Web.Mvc
+Target Site        :Void .ctor(System.Reflection.MethodInfo, System.String, System.Web.Mvc.ControllerDescriptor, Boolean)
+
+----------------------------------------------------------------
+Page Name          :Global Error
+Date and Time      :08 Mar 2026 6:23 PM
+Error Message      :Cannot call action method 'System.Web.Mvc.ActionResult MyTrxn_FindAll(System.Nullable`1[System.Int32], System.Nullable`1[System.DateTime], System.Nullable`1[System.DateTime], System.Nullable`1[System.Int32], System.String, System.String, Int32 ByRef)' on controller 'Transport.Controllers.ReportsController' because the parameter 'Int32& TotalCount' is passed by reference.
+Parameter name: methodInfo
+Stack Trace        :   at System.Web.Mvc.ReflectedActionDescriptor..ctor(MethodInfo methodInfo, String actionName, ControllerDescriptor controllerDescriptor, Boolean validateMethod)
+   at System.Web.Mvc.Async.AsyncActionMethodSelector.<>c__DisplayClass4.<GetActionDescriptorDelegate>b__2(String actionName, ControllerDescriptor controllerDescriptor)
+   at System.Web.Mvc.ControllerActionInvoker.FindAction(ControllerContext controllerContext, ControllerDescriptor controllerDescriptor, String actionName)
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.BeginInvokeAction(ControllerContext controllerContext, String actionName, AsyncCallback callback, Object state)
+   at System.Web.Mvc.Controller.<BeginExecuteCore>b__1c(AsyncCallback asyncCallback, Object asyncState, ExecuteCoreState innerState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncVoid`1.CallBeginDelegate(AsyncCallback callback, Object callbackState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.Begin(AsyncCallback callback, Object state, Int32 timeout)
+   at System.Web.Mvc.Controller.BeginExecuteCore(AsyncCallback callback, Object state)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.Begin(AsyncCallback callback, Object state, Int32 timeout)
+   at System.Web.Mvc.Controller.BeginExecute(RequestContext requestContext, AsyncCallback callback, Object state)
+   at System.Web.Mvc.MvcHandler.<BeginProcessRequest>b__4(AsyncCallback asyncCallback, Object asyncState, ProcessRequestState innerState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncVoid`1.CallBeginDelegate(AsyncCallback callback, Object callbackState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.Begin(AsyncCallback callback, Object state, Int32 timeout)
+   at System.Web.Mvc.MvcHandler.BeginProcessRequest(HttpContextBase httpContext, AsyncCallback callback, Object state)
+   at System.Web.HttpApplication.CallHandlerExecutionStep.System.Web.HttpApplication.IExecutionStep.Execute()
+   at System.Web.HttpApplication.ExecuteStepImpl(IExecutionStep step)
+   at System.Web.HttpApplication.ExecuteStep(IExecutionStep step, Boolean& completedSynchronously)
+Error Source       :System.Web.Mvc
+Target Site        :Void .ctor(System.Reflection.MethodInfo, System.String, System.Web.Mvc.ControllerDescriptor, Boolean)
+
+----------------------------------------------------------------

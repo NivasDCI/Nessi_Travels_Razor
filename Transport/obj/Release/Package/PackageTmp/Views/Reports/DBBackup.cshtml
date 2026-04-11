@@ -1,0 +1,178 @@
+﻿
+@using Transport.Repository.Resource;
+
+@{
+    Layout = "";
+}
+ 
+<head>
+    
+    <script>
+       
+
+        $(document).ready(function () {
+            
+        });
+
+       
+        $('#btnBackup').click(function () {
+            if ($(this).hasClass("unclickable")) {
+                e.preventDefault();
+            } else {
+                var _errorMsg = "";
+
+               if (_errorMsg.length > 0) {
+                    ErrorAlert(_errorMsg);
+                    return false;
+                }
+
+                $.confirm({
+                    title: ConfirmAlert_SuccessMessage,
+                    content: "Take DB Backup?",
+                    animation: 'zoom',
+                    closeAnimation: 'zoom',
+                    buttons: {
+                        'confirm': {
+                            text: Alert_YesMessage,
+                            btnClass: Alert_Button_Style,
+                            keys: ['enter'],
+                            action: function () {
+
+                                var fileData = new FormData();
+
+                                $.ajax({
+                                    url: BaseURL + "Reports/TakeDBBackup", type: "POST",
+                                    contentType: false, // Not to set any content header
+                                    processData: false,
+                                    data: fileData
+                                }).done(function (result) {
+                                    if (result.Result == true) {
+                                        SucessAlert(result.Message);
+                                    }
+                                    else if (result.Result == false) {
+                                        ErrorAlert(result.Message);
+                                    }
+                                })
+                                    .fail(function () {
+                                        ErrorAlert(result.Message);
+                                    });
+                            }
+                        },
+                        cancel: {
+                            text: Alert_NoMessage,
+                            btnClass: Alert_Button_Style
+                        }
+                    }
+                });
+
+            }
+        });       
+
+        $('#btnEmail').click(function () {
+            if ($(this).hasClass("unclickable")) {
+                e.preventDefault();
+            } else {
+                var _errorMsg = "";
+
+                if (_errorMsg.length > 0) {
+                    ErrorAlert(_errorMsg);
+                    return false;
+                }
+
+                $.confirm({
+                    title: ConfirmAlert_SuccessMessage,
+                    content: "Send Email?",
+                    animation: 'zoom',
+                    closeAnimation: 'zoom',
+                    buttons: {
+                        'confirm': {
+                            text: Alert_YesMessage,
+                            btnClass: Alert_Button_Style,
+                            keys: ['enter'],
+                            action: function () {
+
+                                var fileData = new FormData();
+
+                                $.ajax({
+                                    url: BaseURL + "Reports/SendEmail", type: "POST",
+                                    contentType: false, // Not to set any content header
+                                    processData: false,
+                                    data: fileData
+                                }).done(function (result) {
+                                    if (result.Result == true) {
+                                        SucessAlert(result.Message);
+                                    }
+                                    else if (result.Result == false) {
+                                        ErrorAlert(result.Message);
+                                    }
+                                })
+                                    .fail(function () {
+                                        ErrorAlert(result.Message);
+                                    });
+                            }
+                        },
+                        cancel: {
+                            text: Alert_NoMessage,
+                            btnClass: Alert_Button_Style
+                        }
+                    }
+                });
+
+            }
+        });
+
+        function intVal(i) {
+            return typeof i === 'string' ?
+                i.replace(/[\$,]/g, '') * 1 :
+                typeof i === 'number' ?
+                    i : 0;
+        };
+
+    </script>
+</head>
+<body>   
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content">
+        <!-- Content Header (Page header) -->
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card card-pd">
+                        <div class="card-header">
+                            <span style="font-size: 18px;" class="m-0"><i class="fa fa-random"></i></span>
+                            <span style="font-size: 18px; border-left: 1px solid #ccc; padding-left: 10px;"> Test Mail Backup</span>
+                            
+                        </div>
+                       
+                        <div class="card-body">
+                            <div>
+                                <div class="row">
+
+                                    <div class="col-sm-4">
+                                        <div class="pdt-25">
+                                            <div class="row">
+                                                @*<div class="col-sm-6">
+                                                    <button type="button" id="btnBackup" class="btn btn-primary btn-block"><i class="fa fa-search"></i> Backup Database</button>
+                                                </div>*@
+                                                <div class="col-sm-6">
+                                                    <button type="button" id="btnEmail" class="btn btn-primary btn-block"><i class="fa fa-paint-brush"></i> Send Email</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                            
+                        </div>
+
+                    </div>
+                </div>
+            </div><!-- /.content-wrapper -->
+        </div>
+    </div>
+
+</body>
+
+    

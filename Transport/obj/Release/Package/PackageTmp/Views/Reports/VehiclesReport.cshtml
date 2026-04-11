@@ -1,0 +1,327 @@
+﻿
+@using Transport.Repository.Resource;
+
+@{
+    Layout = "";
+}
+ 
+<head>
+    
+    <script>
+        var GrdVehicleTotalReport; var GrdVehicleExpenseReport;
+
+        $("#TxtFromDate").datepicker({
+            format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small'
+        });
+
+        $("#TxtToDate").datepicker({
+            format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small'
+        });
+
+        function TodayDateRange() {
+            let monthNames = ["Jan", "Feb", "Mar", "Apr",
+                "May", "Jun", "Jul", "Aug",
+                "Sep", "Oct", "Nov", "Dec"];
+
+            var today = new Date();
+            var dd = today.getDate();
+            var mm = today.getMonth(); //January is 0!
+            var yyyy = today.getFullYear();
+
+            if (dd < 10) {
+                dd = '0' + dd
+            }
+
+            let monthName = monthNames[mm];
+
+            return dd + '-' + monthName + '-' + yyyy;
+        }
+
+        $(document).ready(function () {
+            $('input[id="TxtFromDate"]').val(TodayDateRange);
+            $('input[id="TxtToDate"]').val(TodayDateRange);
+        });
+
+        $.ajax({
+            type: "GET",
+            url: BaseURL + "Common/Load_Vehicles",
+            datatype: "Json",
+            success: function (data) {
+                $("#ddlVehicleCode option").remove();
+                $.each(data, function (index, value) {
+                    $('#ddlVehicleCode').append('<option value="' + value.ID + '">' + value.Name + '</option>');
+                });
+            }
+        })
+
+        GrdVehicleTotalReport = $("#GrdVehicleTotalReport").grid({
+            //primaryKey: "JobCode",
+            uiLibrary: "bootstrap4",
+            resizableColumns: true,
+            dataSource: '@Url.Action("VehicleTotalReport", "Reports")',
+            columns: [
+                {
+                    field: "VehicleName", width: 70, title: "VEHICLE", sortable: true, align: "center", renderer: function (value, record) {
+                        var _class = (record.VehicleName == "PC5148U") ? 'badge badge-primary' : (record.VehicleName == "PC7219K") ? 'badge badge-info' : (record.VehicleName == "PD5148P") ? 'badge badge-warning' : 'badge badge-dark';
+                        return '<div class="text-center" ><span class= ' + "'" + _class + "'" + '>' + record.VehicleName + '</span></div >';
+                    }
+                },
+                {
+                    field: "CashOrder", width: 70, title: "Cash Order", sortable: false, align: "center", renderer: function (value, record) {
+                        if (intVal(value).toFixed(2) == 0.00) {
+                            return '';
+                        }
+                        else {
+                            return intVal(value).toFixed(2);
+                        }
+                    }
+                },
+                {
+                    field: "CreditJob", width: 70, title: "Credit Job", sortable: false, align: "center", renderer: function (value, record) {
+                        if (intVal(value).toFixed(2) == 0.00) {
+                            return '';
+                        }
+                        else {
+                            return intVal(value).toFixed(2);
+                        }
+                    }
+                },
+                {
+                    field: "TotalOrder", width: 70, title: "Total Order", sortable: false, align: "center", renderer: function (value, record) {
+                        if (intVal(value).toFixed(2) == 0.00) {
+                            return '';
+                        }
+                        else {
+                            return intVal(value).toFixed(2);
+                        }
+                    }
+                }
+            ],
+            pager: { enable: true, limit: GridRowsDisplayLimit, sizes: ArrPaging }
+        });
+
+        GrdVehicleTotalReport.on('dataBound', function (e, records, totalRecords) {
+            var cashamt = 0, creditamt = 0, totamt = 0, $tfoot;
+            // Remove the formatting to get integer data for summation
+            var intVal = function (i) {
+                return typeof i === 'string' ?
+                    i.replace(/[\$,]/g, '') * 1 :
+                    typeof i === 'number' ?
+                        i : 0;
+            };
+
+            $.each(records, function () {
+                cashamt += intVal(this.CashOrder);
+                creditamt += intVal(this.CreditJob);
+                totamt += intVal(this.TotalOrder);
+            });
+            $("#txtOrderTotal").text(totamt.toFixed(2));
+            $tfoot = GrdVehicleTotalReport.children('tfoot');
+            $tfoot.children('tr[data-role="summary"]').remove();
+            $tfoot.prepend('<tr data-role="summary" style="text-align:center"><th>Total</th><th>$' + cashamt.toFixed(2) + '</th><th>$' + creditamt.toFixed(2) + '</th><th>$' + totamt.toFixed(2) + '</th></tr >');
+        });
+
+        GrdVehicleExpenseReport = $("#GrdVehicleExpenseReport").grid({
+            //primaryKey: "ExpenseCode",
+            uiLibrary: "bootstrap4",
+            responsive: true,
+            resizableColumns: true,
+            dataSource: '@Url.Action("VehicleExpenseReport", "Reports")',
+            columns: [
+                {
+                    field: "VehicleName", width: 70, title: "VEHICLE", sortable: true, align: "center", renderer: function (value, record) {
+                        var _class = (record.VehicleName == "PC5148U") ? 'badge badge-primary' : (record.VehicleName == "PC7219K") ? 'badge badge-info' : (record.VehicleName == "PD5148P") ? 'badge badge-warning' : 'badge badge-dark';
+                        return '<div class="text-center" ><span class= ' + "'" + _class + "'" + '>' + record.VehicleName + '</span></div >';
+                    }
+                },
+                { field: "ServiceTypeName", width: 96, title: "SERVICE TYPE", sortable: false, align: "left" },
+                //{ field: "Charge", width: 34, title: "Charge", sortable: false, align: "right" },
+                {
+                    field: "Charge", width: 35, title: "Charge", sortable: false, align: "right", renderer: function (value, record) {
+                        if (intVal(value).toFixed(2) == 0.00) {
+                            return '';
+                        }
+                        else {
+                            return intVal(value).toFixed(2);
+                        }
+                    }
+                },
+                { field: "ExpenseDate", width: 70, title: "DATE", type: "date", format: Common_Date_Format, sortable: false, align: "left" },
+                //{ field: "DisplayCreatedDate", width: 125, title: "Created Date", sortable: false, align: "center" }               
+            ],
+            pager: { enable: true, limit: 50, sizes: ArrPaging }
+        });
+
+        GrdVehicleExpenseReport.on('dataBound', function (e, records, totalRecords) {
+            var chargeamt = 0,$tfoot;
+            // Remove the formatting to get integer data for summation
+            var intVal = function (i) {
+                return typeof i === 'string' ?
+                    i.replace(/[\$,]/g, '') * 1 :
+                    typeof i === 'number' ?
+                        i : 0;
+            };
+
+            $.each(records, function () {
+                chargeamt += intVal(this.Charge);
+            });
+            
+            $("#txtExpenseTotal").text(chargeamt.toFixed(2));
+            var _ordertotal = intVal($("#txtOrderTotal").text());
+            
+            var _balance = _ordertotal - chargeamt;
+            $("#txtBalanceTotal").text(intVal(_balance).toFixed(2));
+
+            $tfoot = GrdVehicleExpenseReport.children('tfoot');
+            $tfoot.children('tr[data-role="summary"]').remove();
+            $tfoot.prepend('<tr data-role="summary" style="text-align:center"><th></th><th>Total</th><th>$' + chargeamt.toFixed(2) + '</th></tr >');
+        });       
+
+        function Search() {
+            var searchFromDate = '';
+            var searchToDate = '';
+
+            if ($("#TxtFromDate").val() != 0) {
+                searchFromDate = $('#TxtFromDate').val();
+            }
+
+            if ($("#TxtToDate").val() != "") {
+                searchToDate = $('#TxtToDate').val();
+            }
+
+            GrdVehicleTotalReport.clear();
+            GrdVehicleTotalReport.reload({ VehicleCode: $('#ddlVehicleCode').val(), StartDate: searchFromDate, EndDate: searchToDate });
+            GrdVehicleExpenseReport.clear();
+            GrdVehicleExpenseReport.reload({ VehicleCode: $('#ddlVehicleCode').val(), StartDate: searchFromDate, EndDate: searchToDate });
+        }
+
+        //Search filter methods
+        $('#btnSearch').click(function () {
+            Search();
+        });
+
+        $('#btnSearchClear').click(function () {
+            $('input[id="TxtFromDate"]').val(TodayDateRange);
+            $('input[id="TxtToDate"]').val(TodayDateRange);
+            GrdVehicleTotalReport.reload({ VehicleCode: $('#ddlVehicleCode').val(), StartDate: $('#TxtFromDate').val(), EndDate: $('#TxtToDate').val() });
+            GrdVehicleExpenseReport.reload({ VehicleCode: $('#ddlVehicleCode').val(), StartDate: $('#TxtFromDate').val(), EndDate: $('#TxtToDate').val() });
+        });
+
+        function intVal(i) {
+            return typeof i === 'string' ?
+                i.replace(/[\$,]/g, '') * 1 :
+                typeof i === 'number' ?
+                    i : 0;
+        };
+    </script>
+</head>
+<body>   
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content">
+        <!-- Content Header (Page header) -->
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card card-pd">
+                        <div class="card-header">
+                            <span style="font-size: 18px;" class="m-0"><i class="fa fa-random"></i></span>
+                            <span style="font-size: 18px; border-left: 1px solid #ccc; padding-left: 10px;"> Vehicles Report</span>
+                            <div style="float: right;">
+                                <span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px; ">
+                                    <a href="#" data-toggle="tooltip" data-placement="bottom" title="Show Form" onclick="showForm()"><i class="fas fa-caret-square-down"></i></a>
+                                </span><span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px;">
+                                    <a href="#" data-toggle="tooltip" data-placement="bottom" title="Hide Form" onclick="hideForm()"><i class="fas fa-caret-square-up"></i></a>
+                                </span>
+                            </div>
+                        </div>
+                       
+                        <div class="card-body">
+                            <div>
+                                <div class="row">
+
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label class="control-label">Vehicle</label>
+                                            <div>
+                                                @Html.DropDownList("ddlVehicleCode", new SelectList(string.Empty, "Value", "Text"), new { @tabindex = 1, @class = "form-control select2", @width = "100%" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label class="control-label">From</label>
+                                            <div>
+                                                <input type="text" id="TxtFromDate" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>To</label>
+                                            <div>
+                                                <input type="text" id="TxtToDate" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-4">
+                                        <div class="pdt-25">
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <button type="button" id="btnSearch" class="btn btn-primary btn-block"><i class="fa fa-search"></i> @Transport.Repository.WEBPAGEBUTTON.SEARCH</button>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <button type="button" id="btnSearchClear" class="btn btn-primary btn-block"><i class="fa fa-paint-brush"></i> @Transport.Repository.WEBPAGEBUTTON.CLEAR</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6" style="border: 1px solid;">
+                                    <div>
+                                        <h4 align="center">Order</h4>
+                                    </div>
+                                    <div class="box-body table-responsive no-padding">
+                                        <table id="GrdVehicleTotalReport" class="table table-hover"></table>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6" style="border: 1px solid;">
+                                    <div>
+                                        <h4 align="center">Expense</h4>
+                                    </div>
+                                    <div class="box-body table-responsive no-padding">
+                                        <table id="GrdVehicleExpenseReport" class="table table-hover"></table>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+                            <div id="bottom-total" class="well well-sm" style="margin-bottom: 0px; position: static; bottom: 0px; width:100%; z-index: 2;">
+                                <table class="table table-bordered table-condensed totals" style="margin-bottom:0;">
+                                    <tbody>
+                                        <tr class="TotalView">
+                                            <td>Total Order $ <span class="totals_val pull-right" style="font-weight: bold;" id="txtOrderTotal">0.00</span></td>
+
+                                            <td>Total Expense $ <span class="totals_val pull-right" style="font-weight: bold;" id="txtExpenseTotal">0.00</span></td>
+
+                                            <td>Balance  $ <span class="totals_val pull-right" style="font-weight: bold;" id="txtBalanceTotal">0.00</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div><!-- /.content-wrapper -->
+        </div>
+    </div>
+
+</body>
+
+    

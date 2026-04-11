@@ -1,0 +1,183 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Nissi Trous and Travels - Invoice - INV001</title>
+
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 12px;
+        }
+
+        .title-text {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 26px;
+            font-weight: 700;
+            color: red;
+            text-align: center;
+            margin: 2px;
+        }
+
+        .sub-title-text {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+            font-weight: 300;
+            color: #000;
+            text-align: center;
+            line-height: 14px;
+            margin: 2px;
+        }
+
+        table.border {
+            border-width: 1px;
+            border-style: solid;
+            border-color: #000;
+            border-collapse: collapse;
+            font-weight:bold;
+        }
+
+        table {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .text {
+            text-align: center;
+        }
+    </style>
+
+</head>
+<body>
+
+    <table width="100%">
+        <tr>
+            <td width="15%" style="margin-top:10px;">
+                <img src="@Url.Content("~/AppImages/logo_nissi_151.png")" title="Nissi Trous and Travels" alt="Logo" width="130px" />
+            </td>
+            <td width="85%">
+                <h1 class="title-text">NISSI TOURS AND TRAVELS PTE. LTD</h1>
+                <h3 class="sub-title-text">291 SERANGOON ROAD, SINGAPORE 218107</h3>
+                <h3 class="sub-title-text">TEL NO +65 62920521, HP NO. +65 90686384</h3>
+                <h3 class="sub-title-text">Booking@nissitravels.com</h3>
+
+            </td>
+        </tr>
+    </table>
+    <table class="border" width="100%">
+        <tr>
+            <td rowspan="5" style="vertical-align: top; padding: 10px 0px 0px 15px;" width="70%">
+                @ViewBag.CustomerName
+            </td>
+            <td class="text" style="border-left: 1px solid #000; border-bottom: 1px solid #000; padding: 10px;" colspan="3" width="30%">
+                INVOICE
+            </td>
+        </tr>
+        <tr>
+            <td style="border-left: 1px solid #000; padding: 5px;">Inv No</td>
+            <td>:</td>
+            <td>@ViewBag.InvoiceNo</td>
+        </tr>
+        <tr>
+            <td style="border-left: 1px solid #000; padding: 5px;">Inv Date</td>
+            <td>:</td>
+            <td>@ViewBag.InvoiceDate</td>
+        </tr>
+        <tr>
+            <td style="border-left: 1px solid #000; padding: 5px;">Staff</td>
+            <td>:</td>
+            <td>@HttpContext.Current.Session["USER_NAME"]</td>
+        </tr>
+        <tr>
+            <td style="border-left: 1px solid #000; padding: 5px;">Terms</td>
+            <td>:</td>
+            @if (ViewBag.IsCredit)
+            {
+                <td>Credit</td>
+}
+            else
+            {
+                <td>Cash</td>
+}
+        </tr>
+    </table>
+
+    <!-- table start -->
+
+    <table style="border-left: 1px solid #000; border-right: 1px solid #000; border-bottom: 1px solid #000; border-collapse: collapse;" width="100%">
+        <!-- item header table -->
+        <thead>
+            <tr>
+                <th style="border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 10px; text-align: center; width: 10%">S.No</th>
+                <th style="border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 10px; text-align: center;">Job Date</th>
+                <th style="border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 10px; text-align: center;">Job Time</th>
+                <th style="border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 10px; text-align: center;">Pickup</th>
+                <th style="border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 10px; text-align: center;">Dropoff</th>
+                <th style="border-bottom: 1px solid #000; padding: 10px; text-align: right;">Amount</td>
+                </th>
+            </tr>
+        </thead>
+        <thead>
+            <!-- end item header table -->
+            <!-- item table -->
+        </thead>
+        <tbody>
+            @{int idx = 1;}
+            @foreach (Transport.Model.JobModel mod in ViewBag.details)
+            {
+                <tr>
+                    <td style="border-right: 1px solid #000; padding: 5px; text-align: center;">
+                        @idx
+                    </td>
+                    <td style="border-right: 1px solid #000; padding: 5px; text-align: left;">
+                        @mod.JobDate.Value.Date.ToString("dd-MMM-yyyy")
+                    </td>
+                    <td style="border-right: 1px solid #000; padding: 5px; text-align: center;">
+                        @mod.JobTime
+                    </td>
+                    <td style="border-right: 1px solid #000; padding: 5px; text-align: center;">
+                        @mod.JobFrom
+                    </td>
+                    <td style="border-right: 1px solid #000; padding: 5px; text-align: center;">
+                        @mod.JobTo
+                    </td>
+                    <td style="padding: 5px; text-align: right;">
+                        @mod.Credit
+                    </td>
+                </tr>
+            }
+                
+            </tbody>
+        <tbody>
+            <!-- end item table -->
+        </tbody>
+        <tfoot>
+            <tr>
+                <td style="border-top: 1px solid #000; border-right: 1px solid #000; padding: 10px; text-align: left; vertical-align: top;" colspan="3"><b>Amount in words :</b><br /> @ViewBag.AmountinWords</td>
+                <td style="border-top: 1px solid #000; border-right: 1px solid #000; padding: 10px; text-align: left; vertical-align: top;" colspan="2" rowspan="2">Gross Amount</td>
+                <td style="border-top: 1px solid #000; padding: 5px; text-align: right; vertical-align: top;" rowspan="2">$ @String.Format("{0:n}", ViewBag.GrossAmount)</td>
+            </tr>
+            <tr>
+                <td style="border-right: 1px solid #000; padding: 10px; text-align: left; vertical-align: top;" colspan="3"><b>Payment transfer to :</b><br /> Paynow: 201710306R<br />DBS current Account: 107 - 903506 - 0</td>
+            </tr>
+            <tr>
+                <td colspan="3"></td>
+                <td style="border-top: 1px solid #000; border-left: 1px solid #000; border-right: 1px solid #000; padding: 10px; text-align: left; vertical-align: top;" colspan="2"><b>NET Amount</b></td>
+                <td style="border-top: 1px solid #000; padding: 5px; text-align: right; vertical-align: top;"><b>$ @String.Format("{0:n}", ViewBag.NetAmount)</b></td>
+            </tr>
+            <tr>
+                <td style="border-top: 1px solid #000; padding: 5px; text-align: right; vertical-align: top; height: 150px;" colspan="6"><h3><b>for NISSI TOURS AND TRAVELS PTE. LTD</b></h3></td>
+            </tr>
+            <tr>
+                <td style="text-align: center; vertical-align: middle;" colspan="6"><p>This is computer generated invoice signature not required.</p></td>
+            </tr>
+        </tfoot>
+    </table>
+    <!-- table end -->
+
+
+</body>
+</html>
+

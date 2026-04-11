@@ -1,0 +1,85 @@
+.btn-cat-con {
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    right: -236px;
+    top: 50%;
+    z-index: 6;
+    width: 500px;
+    height: 40px;
+}
+
+.rotate {
+    -webkit-transform: rotate(-90deg);
+    -moz-transform: rotate(-90deg);
+    -ms-transform: rotate(-90deg);
+    -o-transform: rotate(-90deg);
+    transform: rotate(-90deg);
+
+    /* also accepts left, right, top, bottom coordinates; not required, but a good idea for styling */
+    -webkit-transform-origin: 50% 50%;
+    -moz-transform-origin: 50% 50%;
+    -ms-transform-origin: 50% 50%;
+    -o-transform-origin: 50% 50%;
+    transform-origin: 50% 50%;
+
+    /* Should be unset in IE9+ I think. */
+    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+}
+
+.btn-app {
+    border-radius: 3px;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    color: #6c757d;
+    font-size: 12px;
+    height: 120px;
+    margin: 0 0 10px 10px;
+	width: 130px;
+    min-width: 0px;
+    padding: 15px 5px;
+    position: relative;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 5px;
+}
+
+.tableFixHead .table td, .table th {
+	padding: 5px;
+	vertical-align: middle;
+	
+}
+
+.form-control-prod {
+	height: 28px;
+}
+
+.tableFixHead thead th { 
+	position: sticky; 
+	top: 0; 
+	background-color: #428BCA;
+    color: white;
+    text-align: center;
+	height: 20px;
+	border: 1px solid #428BCA;
+}
+
+.tableFixHead th {
+  box-shadow: inset 2px 2px 2px 2px #428BCA, 2px 2px 2px 2px #428BCA;
+}
+
+
+thead {
+	background-color: #428BCA;
+    color: white;
+    text-align: center;
+	height: 20px;
+}
+
+img {
+	width: 60px;
+	height: 60px;
+}

@@ -1,0 +1,54 @@
+Page Name          :Global Error
+Date and Time      :06 Sep 2023 3:07 PM
+Error Message      :The current request for action 'PaidReport' on controller type 'ReportsController' is ambiguous between the following action methods:
+System.Web.Mvc.ActionResult paidReport(System.String, System.String) on type SparePro.Controllers.ReportsController
+System.Web.Mvc.ActionResult PaidReport(System.String, System.String) on type SparePro.Controllers.ReportsController
+Stack Trace        :   at System.Web.Mvc.ActionMethodSelectorBase.FindActionMethod(ControllerContext controllerContext, String actionName)
+   at System.Web.Mvc.Async.AsyncActionMethodSelector.FindAction(ControllerContext controllerContext, String actionName)
+   at System.Web.Mvc.Async.ReflectedAsyncControllerDescriptor.FindAction(ControllerContext controllerContext, String actionName)
+   at System.Web.Mvc.ControllerActionInvoker.FindAction(ControllerContext controllerContext, ControllerDescriptor controllerDescriptor, String actionName)
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.BeginInvokeAction(ControllerContext controllerContext, String actionName, AsyncCallback callback, Object state)
+   at System.Web.Mvc.Controller.<BeginExecuteCore>b__1c(AsyncCallback asyncCallback, Object asyncState, ExecuteCoreState innerState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncVoid`1.CallBeginDelegate(AsyncCallback callback, Object callbackState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.Begin(AsyncCallback callback, Object state, Int32 timeout)
+   at System.Web.Mvc.Controller.BeginExecuteCore(AsyncCallback callback, Object state)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.Begin(AsyncCallback callback, Object state, Int32 timeout)
+   at System.Web.Mvc.Controller.BeginExecute(RequestContext requestContext, AsyncCallback callback, Object state)
+   at System.Web.Mvc.MvcHandler.<BeginProcessRequest>b__4(AsyncCallback asyncCallback, Object asyncState, ProcessRequestState innerState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncVoid`1.CallBeginDelegate(AsyncCallback callback, Object callbackState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.Begin(AsyncCallback callback, Object state, Int32 timeout)
+   at System.Web.Mvc.MvcHandler.BeginProcessRequest(HttpContextBase httpContext, AsyncCallback callback, Object state)
+   at System.Web.HttpApplication.CallHandlerExecutionStep.System.Web.HttpApplication.IExecutionStep.Execute()
+   at System.Web.HttpApplication.ExecuteStepImpl(IExecutionStep step)
+   at System.Web.HttpApplication.ExecuteStep(IExecutionStep step, Boolean& completedSynchronously)
+Error Source       :System.Web.Mvc
+Target Site        :System.Reflection.MethodInfo FindActionMethod(System.Web.Mvc.ControllerContext, System.String)
+
+----------------------------------------------------------------
+Page Name          :Global Error
+Date and Time      :06 Sep 2023 3:08 PM
+Error Message      :The current request for action 'PaidReport' on controller type 'ReportsController' is ambiguous between the following action methods:
+System.Web.Mvc.ActionResult paidReport(System.String, System.String) on type SparePro.Controllers.ReportsController
+System.Web.Mvc.ActionResult PaidReport(System.String, System.String) on type SparePro.Controllers.ReportsController
+Stack Trace        :   at System.Web.Mvc.ActionMethodSelectorBase.FindActionMethod(ControllerContext controllerContext, String actionName)
+   at System.Web.Mvc.Async.AsyncActionMethodSelector.FindAction(ControllerContext controllerContext, String actionName)
+   at System.Web.Mvc.Async.ReflectedAsyncControllerDescriptor.FindAction(ControllerContext controllerContext, String actionName)
+   at System.Web.Mvc.ControllerActionInvoker.FindAction(ControllerContext controllerContext, ControllerDescriptor controllerDescriptor, String actionName)
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.BeginInvokeAction(ControllerContext controllerContext, String actionName, AsyncCallback callback, Object state)
+   at System.Web.Mvc.Controller.<BeginExecuteCore>b__1c(AsyncCallback asyncCallback, Object asyncState, ExecuteCoreState innerState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncVoid`1.CallBeginDelegate(AsyncCallback callback, Object callbackState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.Begin(AsyncCallback callback, Object state, Int32 timeout)
+   at System.Web.Mvc.Controller.BeginExecuteCore(AsyncCallback callback, Object state)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.Begin(AsyncCallback callback, Object state, Int32 timeout)
+   at System.Web.Mvc.Controller.BeginExecute(RequestContext requestContext, AsyncCallback callback, Object state)
+   at System.Web.Mvc.MvcHandler.<BeginProcessRequest>b__4(AsyncCallback asyncCallback, Object asyncState, ProcessRequestState innerState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncVoid`1.CallBeginDelegate(AsyncCallback callback, Object callbackState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.Begin(AsyncCallback callback, Object state, Int32 timeout)
+   at System.Web.Mvc.MvcHandler.BeginProcessRequest(HttpContextBase httpContext, AsyncCallback callback, Object state)
+   at System.Web.HttpApplication.CallHandlerExecutionStep.System.Web.HttpApplication.IExecutionStep.Execute()
+   at System.Web.HttpApplication.ExecuteStepImpl(IExecutionStep step)
+   at System.Web.HttpApplication.ExecuteStep(IExecutionStep step, Boolean& completedSynchronously)
+Error Source       :System.Web.Mvc
+Target Site        :System.Reflection.MethodInfo FindActionMethod(System.Web.Mvc.ControllerContext, System.String)
+
+----------------------------------------------------------------

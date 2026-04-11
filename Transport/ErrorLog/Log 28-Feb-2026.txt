@@ -1,0 +1,8 @@
+Page Name          :Global Error
+Date and Time      :28 Feb 2026 11:15 AM
+Error Message      :The wait operation timed out
+Stack Trace        :
+Error Source       :
+Target Site        :
+
+----------------------------------------------------------------

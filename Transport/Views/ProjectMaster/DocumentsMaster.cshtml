@@ -1,0 +1,227 @@
+﻿@using Transport.Repository.Resource;
+@{
+    Layout = "";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <script>
+        ShowCommonBack();
+        var GrdDocumentsMaster;
+        var DocumentsStatus;       
+        LoadStatus(0);       
+
+        function LoadStatus(DocumentsStatus) {
+
+            $.ajax({
+                type: "GET",
+                url: BaseURL + "Common/Load_Status",
+                datatype: "Json",
+                success: function (data) {
+                    $("#DdlsearchDocumentsStatus option").remove();
+                    $.each(data, function (index, value) {
+                        $('#DdlsearchDocumentsStatus').append('<option value="' + value.ID + '">' + value.Name + '</option>');
+                    });
+                }
+            }).done(function (result) {
+                if (DocumentsStatus == 0 || DocumentsStatus == 1) {
+                    $("#DdlsearchDocumentsStatus").val(DocumentsStatus);
+                }
+                else {
+                    $("#DdlsearchDocumentsStatus").val(-1);
+                }
+            });
+        }
+
+        renderer = function (value, record, $cell, $displayEl, id) {
+
+            var HTMLContent = '<table style=width:100%><tr>';
+                HTMLContent += '<td style="border:0px solid #FFF;"><a tabindex="-1" onclick="EditDocuments(' + record.DocumentCode + ')" style="cursor:pointer"><i class="fas fa-edit Form-GridEditButton"></i></a></td>';
+            $displayEl.html("</tr></table>");
+            $displayEl.append(HTMLContent);
+
+        }
+        var tstamp = (new Date()).getTime();
+
+         GrdDocumentsMaster = $("#GrdDocumentsMaster").grid({
+            primaryKey: "DocumentsCode",
+            uiLibrary: "bootstrap4",
+            autoLoad: true,
+            dataSource: '@Url.Action("DocumentsMaster_FindAll", "ProjectMaster")',
+            columns: [
+                    { field: 'DocumentCode', title: "Code", width: 75, align: "center", editor: false, sortable: true },
+                    { field: "DocumentName", title: "Company Name", width: 600, sortable: true },
+                    { field: "VisaCost", title: "VisaCost" },
+                    { field: "Charge", title: "Charge" },
+                    { field: "SortOrder", title: "SortOrder" },
+                    { field: '@PROPageModel.Common_Status', width: 75, align: "center", editor: false, sortable: true, renderer: function (value, record) { return record.Status == true ? '<span class="badge badge-success" style=font-size:12px>@Button.Button_Active</span>' : '<span class="badge badge-danger" style=font-size:12px>@Button.Button_Inactive</span>'; } },
+                    { field: '@Button.Button_Action', width: 90, align: "center", renderer: renderer }
+            ]
+            
+         });
+
+        $('#btnAddDocumentsDetail').click(function () {
+            var ParamData = [
+
+                { ParameterName: "DocumentsName", ParameterValue: $("#TxtSearchDocumentsName").val() },
+                { ParameterName: "DocumentsStatus", ParameterValue: $("#DdlsearchDocumentsStatus").val() }
+
+            ]
+
+            AddBackURLStore(JSON.stringify(ParamData));
+            if ($("#HdnDashboardCount").val() == 1) {
+                GetMenu('@Url.Action("AddDocumentsMaster", "ProjectMaster")' + '?DocumentCode=0');
+            }
+            else {
+                GetMenu('@Url.Action("AddDocumentsMaster", "ProjectMaster")' + '?DocumentCode=0' + '&HeaderViewID=' + GetParamValue("HeaderViewID") + '&DetailViewID=' + GetParamValue("DetailViewID"));
+            }
+        });
+
+        function EditDocuments(DocumentCode) {
+            var ParamData = [
+
+                { ParameterName: "DocumentsName", ParameterValue: $("#TxtSearchDocumentsName").val() },
+                { ParameterName: "DocumentsStatus", ParameterValue: $("#DdlsearchDocumentsStatus").val() }
+
+            ]
+
+            AddBackURLStore(JSON.stringify(ParamData));
+            if ($("#HdnDashboardCount").val() == 1) {
+                GetMenu('@Url.Action("AddDocumentsMaster", "ProjectMaster")' + '?DocumentCode=' + DocumentCode);
+            }
+            else {
+
+                GetMenu('@Url.Action("AddDocumentsMaster", "ProjectMaster")' + '?DocumentCode=' + DocumentCode + '&HeaderViewID=' + GetParamValue("HeaderViewID") + '&DetailViewID=' + GetParamValue("DetailViewID"));
+            }
+        }
+
+        //Search filter methods
+        $("#btnDocumentsSearch").click(function () {
+            var searchDocumentsName = '';           
+            var DocumentsStatus = null;
+            searchDocumentsName = $('#TxtSearchDocumentsName').val();                     
+
+            if ($("#DdlsearchDocumentsStatus").val() == 0) {
+                DocumentsStatus = false;
+            }
+            else if ($("#DdlsearchDocumentsStatus").val() == 1) {
+                DocumentsStatus = true;
+            }
+
+            GrdDocumentsMaster.reload({ DocumentsName: searchDocumentsName, Status: DocumentsStatus });
+
+        });
+
+        $("#btnDocumentsSearchClear").click(function () {           
+            $("#TxtSearchDocumentsName").val("");
+            $("#DdlsearchDocumentsStatus").val(-1);
+            GrdDocumentsMaster.reload({ DocumentsName: '', Status: null });
+        });
+
+    </script>
+
+</head>
+<body>
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content">
+        <!-- Content Header (Page header) -->
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card card-pd">
+
+                        <div class="card-header">
+                            <span style="font-size: 18px;" class="m-0"><i class="fa fa-file"></i></span>
+                            <span style="font-size: 18px; border-left: 1px solid #ccc; padding-left: 10px;"> Documents Master - View  </span>
+                            <div style="float: right;">
+                                <span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px;">
+                                    <a href="#" data-toggle="tooltip" data-placement="bottom" title="Add Documents" id="btnAddDocumentsDetail"><i class="fas fa-plus-circle"></i> </a>
+                                </span>
+                                <span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px;">
+                                    <a href="#" data-toggle="tooltip" data-placement="bottom" title="Show Form" onclick="showForm()"><i class="fas fa-caret-square-down"></i></a>
+                                </span><span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px;">
+                                    <a href="#" data-toggle="tooltip" data-placement="bottom" title="Hide Form" onclick="hideForm()"><i class="fas fa-caret-square-up"></i></a>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <!-- /hidden_div -->
+                            <div id="hidden-form">
+                                <div class="row">
+                                   
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>Document Name</label>
+                                            <div>
+                                                <input type="text" tabindex="1" id="TxtSearchDocumentsName"   maxlength="200"  placeholder="Document Name" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>Status</label>
+                                            <div>
+                                                @Html.DropDownList("DdlsearchDocumentsStatus", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @tabindex = 2, @width = "100%" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="pdt-25">
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <button type="button" tabindex="3" id="btnDocumentsSearchClear" class="btn btn-primary btn-block"><i class="fa fa-paint-brush"></i> @Transport.Repository.WEBPAGEBUTTON.CLEAR</button>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <button type="button" tabindex="4" id="btnDocumentsSearch" class="btn btn-primary btn-block"><i class="fa fa-search"></i> @Transport.Repository.WEBPAGEBUTTON.SEARCH</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="box-body table-responsive no-padding">
+                                        <table id="GrdDocumentsMaster" class="table table-hover"></table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div><!-- /.content-wrapper -->
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        if (ArrParameterData[GetBackURLCount()] != null) {
+
+            var vDocumentsStatus;
+            if (ArrParameterData[GetBackURLCount()][0].ParameterName == "DocumentsName") {
+                $('#TxtSearchDocumentsName').val(ArrParameterData[0][0].ParameterValue);
+            }
+            if (ArrParameterData[GetBackURLCount()][1].ParameterName == "DocumentsStatus") {
+                SupplierUserStatus = ArrParameterData[0][1].ParameterValue;
+                $('#DdlsearchDocumentsStatus').val(SupplierUserStatus);
+                if (DocumentsStatus == 0) {
+                    vDocumentsStatus = false;
+                }
+                else if (DocumentsStatus == 1) {
+                    vDocumentsStatus = true;
+                }
+            }
+            GrdDocumentsMaster.reload({ DocumentsName: $('#TxtSearchDocumentsName').val(), Status: vDocumentsStatus });
+        }
+
+    </script>
+
+</body>
+</html>
+

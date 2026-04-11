@@ -1,0 +1,330 @@
+﻿@using Transport.Repository.Resource;
+
+@{
+    Layout = "";
+}
+
+<head>  
+    <script>
+        var GrdMyJob;
+
+        $('body').on('click', function (e) {
+            if ($(e.target).data('toggle') !== 'popover' && $(e.target).parents('.popover.in').length === 0) {
+                $('.popover').popover('hide');
+            }
+        });
+
+        $.ajax({
+            type: "GET",
+            url: BaseURL + "Common/Load_SystemUserDetail",
+            datatype: "Json",
+            success: function (data) {
+                $("#ddlCashInHand option").remove();
+                $.each(data, function (index, value) {
+                    $('#ddlCashInHand').append('<option value="' + value.ID + '">' + value.Name + '</option>');
+                });
+            }
+        });
+
+        GrdMyJob = $("#GrdMyJob").grid({
+            primaryKey: "JobCode",
+            uiLibrary: "bootstrap4",
+            detailTemplate: '<div class="docs-callout"><div class="row"></div></div>',
+            responsive: true,
+            showHiddenColumnsAsDetails: true,
+            dataSource: '@Url.Action("MyJob_FindAll", "Job")',
+            columns: [
+
+                { field: "JobDate",  title: "DATE", type: "date", format: Common_Date_Format, sortable: false, align: "left" },
+                { field: "JobTime", title: "TIME", sortable: false, align: "left" },
+                //{ field: "VehicleName", minWidth: 70, priority: 1, title: "VEHICLE", sortable: true, align: "left" },
+                {
+                    field: "VehicleName", minWidth: 70, priority: 1, title: "VEHICLE", sortable: false, align: "center", renderer: function (value, record) {
+                        var _class = (record.VehicleName == "PC5148U") ? 'badge badge-primary' : (record.VehicleName == "PC7219K") ? 'badge badge-info' : (record.VehicleName == "PD5148P") ? 'badge badge-warning' : 'badge badge-dark';
+                        return '<div class="text-center" ><span class= ' + "'" + _class + "'" + '>' + record.VehicleName + '</span></div >';
+                    }
+                },
+                { field: "JobFrom", minWidth: 120, priority: 2, title: "FROM", sortable: false, align: "left" },
+                { field: "JobTo", minWidth: 120, priority: 3, title: "TO", sortable: false, align: "left" },
+                { field: "CustomerName", minWidth: 70, priority: 4, title: "NAME", sortable: false, align: "left" },
+                { field: "NoOfPaxs", minWidth: 65, priority: 5, title: "NO OF PAXS", sortable: false, align: "left" },
+                { field: "NoOfBags", minWidth: 65, priority: 6, title: "NO OF BAGS", sortable: false, align: "left" },
+                {
+                    field: "ContactNo", minWidth: 45, title: "CONTACT NO", sortable: false, align: "center", renderer: function (value, record) {
+                        return '<div class="text-center"><button onclick="SendWhatsApp(' + "'" + record.ContactNo + "'" + ', ' + "'" + record.CustomerName + "'" + ')" class="badge badge-info" >' + record.ContactNo + '</button></div>';
+                    }
+                },
+                //{ field: "Cash", minWidth: 40, priority: 5, title: "AMOUNT", sortable: false, align: "right" },
+                 {
+                     field: "Cash", minWidth: 40, title: "AMOUNT", sortable: false, align: "center", renderer: function (value, record) {
+                         if (record.CashInHand != 1 && record.Cash != null) {
+                             return '<div class="text-center">' + record.Cash + ' [COLLECT CASH]</div>';
+                        }
+                        else {
+                            return '';
+                        }
+                    }
+                },
+                //{
+                //    field: "JobStatus", minWidth: 90,  title: "STATUS", sortable: false, align: "center", renderer: function (value, record) {
+                //        if (record.JobStatus != 'Job Completed') {
+                //            return '<div class="text-center"><button onclick="PendingClick(' + "'" + record.JobCode + "'" + ', ' + "'" + record.JobStatus + "'" + ')" class="badge badge-info" data-toggle="modal" data-target="#myModal1">' + record.JobStatus + '</button></div>';
+                //        }
+                //        else {
+                //            return '<div class="text-center"><button class="badge badge-success" >Job Completed</button></div>';
+                //        }
+                //    }
+                //},
+                {
+                    field: "JobStatus", minWidth: 90, title: "STATUS", sortable: false, align: "center", renderer: function (value, record) {
+                        var _class = (record.JobStatus == "Cancelled") ? 'badge badge-danger' : (record.JobStatus == "Assigned") ? 'badge badge-info' :
+                            (record.JobStatus == "Job Started") ? 'badge badge-primary' : (record.JobStatus == "Waiting for Customer") ? 'badge badge-warning' : (record.JobStatus == "No Show") ? 'badge badge-danger' :
+                                (record.JobStatus == "Passenger on board") ? 'badge badge-secondary' : 'badge badge-success';
+
+                        if (record.JobStatus == 'Cancelled' || record.JobStatus == 'Job Completed' || record.JobStatus == 'No Show') {
+                            return '<div class="text-center"><button class= ' + "'" + _class + "'" + ' >' + record.JobStatus + '</button></div>';
+                        }
+                        else {
+                            return '<div class="text-center"><button onclick="PendingClick(' + "'" + record.JobCode + "'" + ', ' + "'" + record.JobStatus + "'" + ', ' + "'" + record.CashInHand + "'" + ')" class= ' + "'" + _class + "'" + ' data-toggle="modal" data-target="#myModal1">' + record.JobStatus + '</button></div>';
+                        }
+                    }
+                },
+
+                //{
+                //    field: "JobCode", minWidth: 55, priority: 6, title: "View", sortable: true, renderer: function (value, record) {
+
+                //        return '<div class="text-center"><button onclick="ViewClick(' + "'" + record.JobCode + "'" + ')" class="badge badge-info" data-toggle="modal" data-target="#myModal">History</button></div>';
+
+                //    }
+                //}
+
+            ],
+            pager: { enable: true, limit: 50, sizes: ArrPaging }
+        });
+
+        GrdMyJobStatus = $("#GrdMyJobStatus").grid({
+            primaryKey: "JobStatusCode",
+            uiLibrary: "bootstrap4",
+            responsive: true,
+            dataSource: '@Url.Action("JobStatus_FindAll", "Job")',
+            columns: [
+                { field: "JobStatus", title: 'Status', width: 100, align: "left" },
+                { field: "DisplayLastModifiedBy", title: 'Updated By', width: 100, align: "left" },
+                { field: "DisplayLastModifiedDate", title: 'Date & Time', width: 175, align: "left" },
+            ]
+        });
+
+        function ViewClick(trxnid) {
+            GrdMyJobStatus.clear();
+            GrdMyJobStatus.reload({ JobCode: trxnid });
+        }
+
+        function SendWhatsApp(_number, _name) {
+            var _link = 'https://api.whatsapp.com/send?phone=' + _number + '&text=Hi ' + _name + ', I am on the way to pickup you!';
+            console.log(_link);
+            window.open(_link, "_blank");
+        }
+
+        $(document).ready(function () {
+
+
+        });
+
+        function SaveStatus(clicked_id) {
+
+            var jobcode = $('#jobidmodal').val();
+            var status = clicked_id == "btnupdatestatus1" ? $('#btnupdatestatus1').val() : $('#btnupdatestatus').val();
+            //console.log($('#btnupdatestatus').val());
+            //console.log($('#btnupdatestatus').text());
+            //alert(status);
+
+            $.ajax({
+                url: '@Url.Content("~/Job/UpdateJobStatus")',
+                type: 'POST',
+                data: JSON.stringify({ JobCode: jobcode, Status: status }),
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function (result) {
+                    if (result.success === true) {
+                        //GrdMyJob.reload({ });
+                        $('#myModal1').modal('hide');
+
+                        window.location.href = "/Home/SalesIndex";
+                    }
+                    if (result.success === false) {
+                        $('#myModal1').modal('show');
+                    }
+                }
+            });
+        }
+
+        function SaveCashInHand() {
+
+            var _JobCode = $('#jobidmodal').val();
+
+            $.ajax({
+                url: '@Url.Content("~/Job/UpdateCashInHand")',
+                type: 'POST',
+                data: JSON.stringify({ JobCode: _JobCode, CashInHand: $('#ddlCashInHand').val() }),
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function (result) {
+                    if (result.success === true) {
+                        //SucessAlert("Successfully updated!");
+                        $('#myModal1').modal('hide');
+                        window.location.href = "/Home/SalesIndex";
+                    }
+                    if (result.success === false) {
+                        $('#myModal1').modal('show');
+                        ErrorAlert(result.response);
+                    }
+                }
+            });
+        }
+
+
+        function PendingClick(trxnid, jobstatus, CashInHand) {
+            $('#myModal1').find('#jobidmodal').val(trxnid);
+            $('#myModal1').find('#ddlCashInHand').val(CashInHand);
+            if (jobstatus == "Assigned") {
+                $('#myModal1').find('#btnupdatestatus').prop('value', 'Job Started');
+                $('#myModal1').find('#btnupdatestatus').prop('class', 'btn btn-primary');
+                $('#myModal1').find('#btnupdatestatus').html('Job Started');
+                $('#myModal1').find('#btnupdatestatus1').prop('style', 'display:none');
+            }
+            if (jobstatus == "Job Started") {
+                $('#myModal1').find('#btnupdatestatus').prop('value', 'Waiting for Customer');
+                $('#myModal1').find('#btnupdatestatus').prop('class', 'btn btn-warning');
+                $('#myModal1').find('#btnupdatestatus').html('Waiting for Customer');
+                $('#myModal1').find('#btnupdatestatus1').prop('style', 'display:none');
+            }
+            if (jobstatus == "Waiting for Customer") {
+                $('#myModal1').find('#btnupdatestatus').prop('value', 'Passenger on board');
+                $('#myModal1').find('#btnupdatestatus').prop('class', 'btn btn-secondary');
+                $('#myModal1').find('#btnupdatestatus').html('Passenger on board');
+                $('#myModal1').find('#btnupdatestatus1').prop('style', 'display:');
+                $('#myModal1').find('#btnupdatestatus1').prop('value', 'No Show');
+                $('#myModal1').find('#btnupdatestatus1').prop('class', 'btn btn-danger');
+                $('#myModal1').find('#btnupdatestatus1').html('No Show');
+            }
+            if (jobstatus == "Passenger on board") {
+                $('#myModal1').find('#btnupdatestatus').prop('value', 'Job Completed');
+                $('#myModal1').find('#btnupdatestatus').prop('class', 'btn btn-success');
+                $('#myModal1').find('#btnupdatestatus').html('Job Completed');
+                $('#myModal1').find('#btnupdatestatus1').prop('style', 'display:none');
+            }
+
+        }
+    </script>
+    
+    <style>
+        ul.ui-autocomplete {
+            z-index: 1100;
+        }
+    </style>
+</head>
+<body>
+    <div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"></h4>
+                    <input type="hidden" id="jobidmodal" name="jobidmodal" />
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="control-label">Update Status : </label><br>
+                                <button type="button" id="btnupdatestatus" onclick="SaveStatus(this.id);"></button><br><br>
+                                <button type="button" id="btnupdatestatus1" onclick="SaveStatus(this.id);"></button><br><br>
+                                <div>
+                                    <label class="control-label">Cash In Hand : </label><br>
+                                    @Html.DropDownList("ddlCashInHand", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @width = "100%" })<br>
+                                    <button type="button" id="btnupdatecashinhand" onclick="SaveCashInHand();">Update</button>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content" style="width:850px">
+
+                <div class="modal-body">
+                    <div class="box-body">
+                        <div class="box-body table-responsive no-padding">
+                            <table id="GrdMyJobStatus" class="table table-hover"></table>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label class="control-label">Cash In Hand</label>
+                                @Html.DropDownList("ddlCashInHand", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @width = "100%" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" id="btnupdatecreditstatus" onclick="SaveCreditStatus();" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content">
+        <!-- Content Header (Page header) -->
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card card-pd">
+
+                        <div class="card-header">
+                            <span style="font-size: 18px;" class="m-0"><i class="fab fa-hornbill"></i></span>
+                            <span style="font-size: 18px; border-left: 1px solid #ccc; padding-left: 10px;"> My Jobs</span>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="box-body table-responsive no-padding">
+                                        <table id="GrdMyJob" class="table table-hover"></table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /.content-wrapper -->
+        </div>
+    </div>
+
+</body>

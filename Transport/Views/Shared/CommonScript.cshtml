@@ -1,0 +1,134 @@
+﻿@using Transport.Repository.Resource;
+<div id="DivLoading" width="220" height="160" style="display:none;border:1px solid #000">
+  <center><img src="~/Images/Loading.gif" /></center>  
+</div>
+ 
+<script>
+
+    var ArrPaging = [50, 100, 250, 500];
+    var GridRowsDisplayLimit = 250;
+    var GridRowsDisplayPOSLimit = 10;
+    var GridRowsDisplayPopupLimit = 5;
+    var ConfirmAlert_SuccessMessage = '<b class=Common-Error-ConfirmMessage><i class="fa fa-warning" style="color:Green"></i>@SYSTitle.Title_Confirmation_Message</b>'
+    var Alert_ErrorMessage = '<b class=Common-Error-Message> <i class="fa fa-exclamation-triangle" style="color:Red"></i>@SYSTitle.Title_Warning_Message</b>'
+    var Alert_SuccessMessage = '<b class=Common-Success-Message> <i class="fa fa-exclamation-triangle" style="color:green"></i> @SYSTitle.Title_Success_Message</b>'
+    var Alert_OKMessage = '<i class="fa fa-check" style="color:#FFFFFF"></i> <b class=Common-Error-OKMessage>@Button.Button_Ok</b> ';
+    var Alert_NoMessage = '<i class="fa fa-close" style="color:#FFFFFF"></i> <b class=Common-Error-OKMessage>@Button.Button_No</b>';
+    var Alert_YesMessage = '<i class="fa fa-check" style="color:#FFFFFF"></i> <b class=Common-Error-OKMessage>@Button.Button_Yes</b>';
+    var Alert_ErrorMessage_Content = "<div class=docs-callout><b class=Common-DisplayMessage>{0}</b></div><br/>";
+    var Alert_SuccessMessage_Content = "<div class=docs-callout><b class=Common-DisplayMessage>{0}</b></div><br/>";
+    var ConfirmAlert_Message_Content = "<div class=docs-callout><b class=Common-DisplayMessage>{0}</b></div><br/>";
+    var Alert_Button_Style = 'btn-primary btn-xs';
+     
+    var ConfirmAlert_SaveMessage_Content = '@PROMessage.Common_WantToSave'; 
+    var ConfirmAlert_UpdateMessage_Content = '@PROMessage.Common_WantToUpdate'; 
+    var ConfirmAlert_DeleteMessage_Content = '@PROMessage.Common_WantToDelete'; 
+    var ConfirmAlert_InactivateMessage_Content = '@PROMessage.Common_WantToInactivate'; 
+    var ConfirmAlert_UploadMessage_Content = '@PROMessage.Common_WantToUpload';  
+    var ConfirmAlert_CancelMessage_Content = '@PROMessage.Common_WantToCancel'; 
+    var ConfirmAlert_ApprovalUpdateMessage_Content = "@PROMessage.Common_WantToApprovalUpdate"; 
+
+    var Popup_CommonTitle = '<span class="docs-callout-Title"><i class="fa fa-book" style="font-size:16px;color:#f0ad4e"></i>&nbsp;<label ID="LblPopupTitle">{0}</label></span>'
+    var Popup_CommonTitleHeader = '<span class="docs-callout-Title"><i class="fa fa-book" style="font-size:16px;color:#f0ad4e"></i>&nbsp;<label ID="LblPopupTitleHeader">{0}</label></span>'
+    var Common_Date_Format = 'dd-mmm-yyyy';
+    var Common_DateTime_Format = 'yyyy-mm-dd HH:mm tt';
+    var CommonHtmlToolBar= [
+       ['style', ['style']],
+       ['font', ['bold', 'italic', 'underline', 'clear', 'strikethrough', 'superscript', 'subscript']],
+       ['fontname', ['fontname']],
+       ['fontsize', ['fontsize']],
+       ['color', ['color']],
+       ['para', ['ul', 'ol', 'paragraph']],
+       ['height', ['height']],
+       ['table', ['table']],
+       ['insert', ['ajaximageupload', 'link', 'picture', 'hr', "video"]],
+       ['view', ['fullscreen', 'codeview', 'undo', 'redo']],
+       ['help', ['help']],
+       ['misc', ['print']]
+    ]
+
+   function GetParseJsonDateTime(jsonDateString) { 
+       var date = new Date(Number(jsonDateString.replace(/\D/g, '')));
+       return CommonDateToString(date);
+       
+   }
+   function CommonDateToString(myDate) {
+       var month = new Array();
+       month[0] = "Jan";
+       month[1] = "Feb";
+       month[2] = "Mar";
+       month[3] = "Apr";
+       month[4] = "May";
+       month[5] = "Jun";
+       month[6] = "Jul";
+       month[7] = "Aug";
+       month[8] = "Sep";
+       month[9] = "Oct";
+       month[10] = "Nov";
+       month[11] = "Dec";
+       var hours = myDate.getHours();
+       var minutes = myDate.getMinutes();
+       var ampm = hours >= 12 ? ' PM' : ' AM';
+       hours = hours % 12;
+       hours = hours ? hours : 12;
+       minutes = minutes < 10 ? '0' + minutes : minutes;
+       var strTime = (hours < 10 ? '0' + hours : hours) + ':' + minutes + ampm;
+       return myDate.getDate() + "-" + month[myDate.getMonth()] + "-" + myDate.getFullYear() + " " + strTime;
+   }
+
+
+
+    function ErrorAlert(strmessage) {
+        $.alert({
+            title: Alert_ErrorMessage, content: Alert_ErrorMessage_Content.replace("{0}", strmessage), animation: 'zoom', closeAnimation: 'zoom',
+            buttons: { okay: { text: Alert_OKMessage, btnClass: Alert_Button_Style, keys: ['enter', 'shift'] } }
+        });
+    }
+
+    function InfoAlert(strmessage) {
+        $.alert({
+            title: ConfirmAlert_SuccessMessage, content: ConfirmAlert_Message_Content.replace("{0}", strmessage), animation: 'zoom', closeAnimation: 'zoom',
+            buttons: { okay: { text: Alert_OKMessage, btnClass: Alert_Button_Style, keys: ['enter', 'shift'] } }
+        });
+    }
+
+    function SucessAlert(strmessage) {
+        var AlertSucess = $.alert({
+            title: Alert_SuccessMessage, content: Alert_SuccessMessage_Content.replace("{0}", strmessage), animation: 'zoom', closeAnimation: 'zoom',
+            buttons: { okay: { text: Alert_OKMessage, btnClass: Alert_Button_Style } }
+        });
+        setTimeout(function () { AlertSucess.close(); }, 1000);
+    }
+     
+
+    $("#DivLoading").dialog({
+        title: '<b style=font-size:14px>Loading...</b>',
+        content: 'Simple modal!',
+        autoOpen: false,
+        modal: true,
+        height: 100,
+        overlay: {
+            opacity: 0.5,
+            background: "black"
+        },
+
+        uiLibrary: 'bootstrap',
+        closeOnEscape: false,
+        beforeClose: function (event, ui) { return false; },
+        dialogClass: "noclose"
+    });
+
+    function RoundOff(number) {
+        var parts = number.split('.');
+        var Dec_Amount = parseFloat(parts[0] + ".00");
+        if (parseFloat(parts[1]) > 0) {
+            var Dec_Point = parseFloat("0." + parts[1]);
+            if (parseFloat(0.5) <= Dec_Point) {
+                Dec_Amount += 1;
+            }
+        }
+        return Dec_Amount.toFixed(2);
+    }
+   
+</script>
+

@@ -1,0 +1,489 @@
+﻿@using Transport.Repository.Resource;
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+
+</head>
+<body>
+
+    <input type="hidden" id="HtnDefaultDetailID" />
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content">
+        <!-- Content Header (Page header) -->
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                   <div class="card card-pd">
+                    
+                        <div class="card-header">
+                            <span style="font-size: 18px;" class="m-0"><i class="fa fa-cog"></i></span>
+                            <span style="font-size: 18px; border-left: 1px solid #ccc; padding-left: 10px;"> @PROTitle.Title_Master_Setup_Search </span>
+                        </div>
+
+                        <div class="card-body">
+
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <div class="form-group required">
+                                        <label class="control-label">@PROPageModel.DefaultMaster_MasterType</label>
+                                        <div>
+                                            @Html.DropDownList("DdlSearchDefaultType", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @tabindex = 3, @width = "100%" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label>@PROPageModel.Common_Status</label>
+                                        <div>
+                                            @Html.DropDownList("DdlSearchDefaultStatus", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @tabindex = 3, @width = "100%" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="pdt-25">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <button type="button" id="btnDefaultHeaderSearch" class="btn btn-primary btn-block"><i class="fa fa-search"></i> @Transport.Repository.WEBPAGEBUTTON.SEARCH</button>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <button type="button" id="btnDefaultHeaderSearchClear" class="btn btn-primary btn-block"><i class="fa fa-paint-brush"></i> @Transport.Repository.WEBPAGEBUTTON.CLEAR</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <span style="font-size: 18px;" class="m-0"><i class="fa fa-cog"></i></span>
+                            <span style="font-size: 18px; border-left: 1px solid #ccc; padding-left: 10px;"> @PROTitle.Title_Master_Setup_View </span>
+                        </div>
+
+                        <div class="card-body">
+
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <div class="form-group required">
+                                        <label class="control-label">@PROPageModel.DefaultMaster_MasterText</label>
+                                        <div>
+                                            <input type="text" id="txtDefaultTextField" maxlength="200" placeholder="@PROPageModel.ToolTip_DefaultText" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label>@PROPageModel.DefaultDetail_OrderBy</label>
+                                        <div>
+                                            <input type="number" id="txtDefaultOrderBy" maxlength="4" placeholder="@PROPageModel.ToolTip_OrderBy" class="form-control" min="0" onkeyup="if(this.value<0){this.value =this.value * -1}">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="pdt-25">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <button type="button" id="btnAddDefaultDetail" class="btn btn-primary btn-block"><i class="fa fa-plus"></i> @Transport.Repository.WEBPAGEBUTTON.ADD</button>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <button type="button" id="btnDefaultHeaderClear" class="btn btn-primary btn-block"><i class="fa fa-paint-brush"></i> @Transport.Repository.WEBPAGEBUTTON.CLEAR</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="box-body table-responsive no-padding">
+                                        <table id="GridDefaultDetail" class="table table-hover"></table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+
+            </div><!-- /.content-wrapper -->
+        </div>
+    </div>
+   
+
+    <script>
+        var GridDefaultDetail;
+        var DefaultStatus;
+        ShowCommonBack();
+
+        $.ajax({
+            type: "GET",
+            url: BaseURL + "Common/Load_Status",
+            datatype: "Json",
+            success: function (data) {
+                $("#DdlSearchDefaultStatus option").remove();
+                $.each(data, function (index, value) {
+                    $('#DdlSearchDefaultStatus').append('<option value="' + value.ID + '">' + value.Name + '</option>');
+                });
+            }
+        }).done(function (result) {
+
+            if (DefaultStatus == 0 || DefaultStatus == 1) {
+                $("#DdlSearchDefaultStatus").val(DefaultStatus);
+            }
+            else {
+                $("#DdlSearchDefaultStatus").val(-1);
+            }
+        });
+
+
+        document.onkeydown = function (evt) {
+            var keyCode = evt ? (evt.which ? evt.which : evt.keyCode) : event.keyCode;
+            if (keyCode == 13) {
+                DefaultHeaderSearch();
+                return false;
+            }
+        }
+
+        $.ajax({
+            type: "GET",
+            url: BaseURL + "Common/Load_CommonDefaultHeaderDetails",
+            datatype: "Json",
+            success: function (data) {
+                $("#DdlSearchDefaultType option").remove();
+                $.each(data, function (index, value) {
+                    $('#DdlSearchDefaultType').append('<option value="' + value.DefaultID + '">' + value.DefaultName + '</option>');
+                });
+            }
+        });
+
+
+        renderer = function (value, record, $cell, $displayEl, id) {
+            var $editBtn = "";
+            var $deleteBtn = "";
+            var $updateBtn = "";
+
+            if ("@Model.IsEdit" == 'True') {
+                $editBtn = $('<a data-key="' + id + '"><i class="fas fa-edit Form-GridEditButton" ></i> </a>'),
+                $updateBtn = $('<a data-key="' + id + '"><i class="fa fa-save Form-GridEditButton" ></i> </a>').hide();
+
+                $editBtn.on('click', function (e) {
+                    GridDefaultDetail.edit($(this).data('key'));
+                    $editBtn.hide();
+                    $updateBtn.show();
+                });
+
+                $updateBtn.on('click', function (e) {
+                    GridDefaultDetail.update($(this).data('key'));
+                    $editBtn.show();
+
+                    $updateBtn.hide();
+                    var DefaultDetail = {
+                        DefaultHeaderID: record.DefaultHeaderID,
+                        DefaultDetailID: record.DefaultDetailID,
+                        DefaultTextField: record.DefaultTextField,
+                        DefaultOrder: record.DefaultOrder,
+
+                    };
+
+
+                    $.confirm({
+                        title: ConfirmAlert_SuccessMessage,
+                        content: ConfirmAlert_Message_Content.replace("{0}", ConfirmAlert_UpdateMessage_Content),
+                        animation: 'zoom',
+                        closeAnimation: 'zoom',
+                        buttons: {
+                            'confirm': {
+                                text: Alert_YesMessage,
+                                btnClass: Alert_Button_Style,
+                                action: function () {
+                                    $.ajax({ url: BaseURL + "ProjectMaster/DefaultMasterDetail_Save", type: "POST", data: { objDefaultDetailModel: DefaultDetail } })
+                                        .done(function (result) {
+                                            if (result.Result == true) {
+                                                $("#DefaultDetaildialog").dialog("close");
+                                                GridDefaultDetail.reload();
+                                                SucessAlert(result.Message);
+                                                ClearDefaultDetail();
+                                            }
+                                            else if (result.Result == false) {
+                                                ErrorAlert(result.Message);
+                                            }
+                                        })
+                                        .fail(function () {
+                                            ErrorAlert(result.Message);
+                                        });
+                                }
+                            },
+                            cancel: {
+                                text: Alert_NoMessage,
+                                btnClass: Alert_Button_Style
+                            }
+                        }
+                    });
+
+                });
+            }
+            if ("@Model.IsDelete" == 'True') {
+                $deleteBtn = $('<a tabindex="-1" onclick="DeleteDefaultDetail(' + "'" + id + "'" + ')" style="cursor:pointer"><i class="far fa-trash-alt Form-GridDeleteButton"></i></a>')
+            }
+
+
+            $displayEl.html("");
+            $displayEl.append($editBtn).append($updateBtn).append($deleteBtn);
+
+
+
+        }
+
+
+
+
+        GridDefaultDetail = $('#GridDefaultDetail').grid({
+            primaryKey: 'DefaultDetailID',
+            uiLibrary: "bootstrap4",
+            autoLoad: false,
+            dataSource: '@Url.Action("DefaultMasterDetail_FindAll", "ProjectMaster")',
+            inlineEditing: { mode: 'command', managementColumn: false },
+            resizableColumns: true,
+            columns: [
+                { field: "DefaultTextField", title: "@PROPageModel.DefaultDetail_DefaultText", align: "left", sortable: true, editor: true },
+                { field: "DefaultOrder", title: "@PROPageModel.DefaultMaster_DisplayOrder", align: "right", width: 100, sortable: true, editor: true },
+              {
+                    field: '@PROPageModel.Common_Status', width: 75, align: "center", editor: false, sortable: true, renderer: function (value, record) {
+
+
+                        return record.Status == true ?'<span class="badge badge-success" style=font-size:12px>@Button.Button_Active</span>' : '<span class="badge badge-danger" style=font-size:12px>@Button.Button_Inactive</span>';
+                    }
+                },
+                { field: '@Button.Button_Action', width: 90, align: "center", renderer: renderer }
+
+                ],
+                pager: { enable: true, limit: GridRowsDisplayLimit, sizes: ArrPaging }
+            });
+
+        GridDefaultDetail.on('rowSelect', function (e, $row, id, record) {
+            $("#HtnDefaultDetailID").val(id);
+        });
+
+
+        //Detail grid operations
+
+        function DefaultDetailValidate() {
+            var Result = true;
+
+            if ($("#DdlSearchDefaultType").val() == "") {
+                $("#DdlSearchDefaultType").focus();
+                ErrorAlert("@PROMessage.DefaultMaster_PleaseSelectDefaultHeader");
+                Result = false;
+                return false;
+            }
+            else if ($("#txtDefaultTextField").val() == "") {
+                $("#txtDefaultTextField").focus();
+                ErrorAlert("@PROMessage.DefaultDetail_EnterDefaultText");
+                Result = false;
+                return false;
+            }
+
+            else if ($("#txtDefaultOrderBy").val() == "") {
+                $("#txtDefaultOrderBy").focus();
+                ErrorAlert("@PROMessage.DefaultDetail_EnterDefaultOrder");
+                Result = false;
+                return false;
+            }
+            return Result;
+        }
+
+        function ClearDefaultDetail() {
+
+            $("#HtnDefaultDetailID").val("");
+            $("#txtDefaultTextField").val("");
+            $("#txtDefaultOrderBy").val("");
+        }
+
+
+        $("#btnResetDefaultDetail").click(function () {
+            ClearDefaultDetail();
+        });
+
+        $('#btnAddDefaultDetail').click(function () {
+            if (DefaultDetailValidate() == true) {
+
+                var DefaultDetail = {
+                    DefaultHeaderID: $("#DdlSearchDefaultType").val(),
+                    DefaultTextField: $("#txtDefaultTextField").val(),
+                    DefaultOrder: $("#txtDefaultOrderBy").val(),
+                    ActionMode: "ADD"
+                };
+
+                $.confirm({
+                    title: ConfirmAlert_SuccessMessage,
+                    content: ConfirmAlert_Message_Content.replace("{0}", ConfirmAlert_SaveMessage_Content),
+                    animation: 'zoom',
+                    closeAnimation: 'zoom',
+                    buttons: {
+                        'confirm': {
+                            text: Alert_YesMessage,
+                            btnClass: Alert_Button_Style,
+                            action: function () {
+                                $.ajax({ url: BaseURL + "ProjectMaster/DefaultMasterDetail_Save", type: "POST", data: { objDefaultDetailModel: DefaultDetail } })
+                                    .done(function (result) {
+                                        if (result.Result == true) {
+                                            $("#DefaultDetaildialog").dialog("close");
+
+                                            GridDefaultDetail.reload();
+                                            SucessAlert(result.Message);
+                                            ClearDefaultDetail();
+                                        }
+                                        else if (result.Result == false) {
+                                            ErrorAlert(result.Message);
+                                        }
+                                    })
+                                    .fail(function () {
+                                        ErrorAlert(result.Message);
+                                    });
+                            }
+                        },
+                        cancel: {
+                            text: Alert_NoMessage,
+                            btnClass: Alert_Button_Style
+                        }
+                    }
+                });
+            }
+        });
+
+
+
+        function DeleteDefaultDetail(DefaultHeaderID) {
+
+            $.confirm({
+                title: ConfirmAlert_SuccessMessage,
+                content: ConfirmAlert_Message_Content.replace("{0}", ConfirmAlert_DeleteMessage_Content),
+                animation: 'zoom',
+                closeAnimation: 'zoom',
+                buttons: {
+                    'confirm': {
+                        text: Alert_YesMessage,
+                        btnClass: Alert_Button_Style,
+                        action: function () {
+                            $.ajax({ url: BaseURL + "ProjectMaster/DefaultMasterDetail_Delete", type: "POST", data: { DefaultDetailID: DefaultHeaderID} })
+                                .done(function (result) {
+                                    if (result.Result == true) {
+                                        GridDefaultDetail.reload();
+                                        SucessAlert(result.Message);
+                                    }
+                                    else {
+                                        ErrorAlert(result.Message);
+                                    }
+                                })
+                                .fail(function () {
+                                    ErrorAlert("@PROMessage.Common_UnableToRemove");
+                                });
+                        }
+                    },
+                    cancel: {
+                        text: Alert_NoMessage,
+                        btnClass: Alert_Button_Style
+                    }
+                }
+            });
+        }
+
+
+
+
+        function DefaultOrderChangeToDown(DefaultID, DefaultOrder) {
+
+            var DefaultOrder = {
+                DefaultHeaderID: DefaultID,
+                DefaultOrder: DefaultOrder,
+                ChangeDefaultOrder: 'DOWN'
+            };
+            $.ajax({ url: BaseURL + "ProjectMaster/DefaultOrder_Change", type: "POST", data: { ObjDefaultOrder: DefaultOrder } })
+                .done(function (result) {
+                    if (result.Result == true) {
+                        GridDefaultDetail.reload();
+                    }
+                    else if (result.Result == false) {
+                        ErrorAlert(result.Message);
+                    }
+                })
+                .fail(function () {
+                    ErrorAlert("@PROMessage.Common_Unabletochange");
+                });
+        }
+
+        function DefaultOrderChangeToUP(DefaultID, DefaultOrder) {
+            var DefaultOrder = {
+                DefaultHeaderID: DefaultID,
+                DefaultOrder: DefaultOrder,
+                ChangeDefaultOrder: 'UP'
+            };
+            $.ajax({ url: BaseURL + "ProjectMaster/DefaultOrder_Change", type: "POST", data: { ObjDefaultOrder: DefaultOrder } })
+                .done(function (result) {
+                    if (result.Result == true) {
+                        GridDefaultDetail.reload();
+                    }
+                    else if (result.Result == false) {
+                        ErrorAlert(result.Message);
+                    }
+                })
+                .fail(function () {
+                    ErrorAlert("@PROMessage.Common_Unabletochange");
+                });
+        }
+
+        function DefaultHeaderSearch() {
+            var searchDefaultType = '';
+            var searchDefaultStatus = null;
+            searchDefaultType = $("#DdlSearchDefaultType").val();
+            if (searchDefaultType == "") {
+                ErrorAlert("@PROMessage.DefaultMaster_PleaseSelectDefaultHeader");
+                return false;
+            }
+            if ($("#DdlSearchDefaultStatus").val() == 0) {
+                searchDefaultStatus = false;
+            }
+            else if ($("#DdlSearchDefaultStatus").val() == 1) {
+                searchDefaultStatus = true;
+            }
+             GridDefaultDetail.reload({ DefaultHeaderID: searchDefaultType, Status: searchDefaultStatus });
+        }
+
+        //Search filter methods
+        $("#btnDefaultHeaderSearch").click(function () {
+            DefaultHeaderSearch();
+        });
+        $("#btnDefaultHeaderClear").click(function () {
+            $("#txtDefaultTextField").val("");
+            $("#txtDefaultOrderBy").val('');
+            //GridDefaultDetail.reload({ DefaultTextField: '', DefaultOrder: 0 });
+        });
+
+
+        $("#btnDefaultHeaderSearchClear").click(function () {
+            $("#DdlSearchDefaultType").val("");
+            $("#DdlSearchDefaultStatus").val(-1);
+            GridDefaultDetail.reload({ DefaultHeaderID: '', Status: true });
+        });
+
+
+        $('#btnAddDefaultDetail').hide();
+
+        if ("@Model.IsAdd" == 'True') {
+            $("#btnAddDefaultDetail").show();
+        }
+
+        if ("@Model.IsEdit" == 'False' && "@Model.IsDelete" =='False') {
+            GridDefaultDetail.hideColumn("Action");
+        }
+
+    </script>
+</body>
+</html>

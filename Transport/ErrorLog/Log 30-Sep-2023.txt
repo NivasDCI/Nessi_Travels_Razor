@@ -1,0 +1,14 @@
+Page Name          :Global Error
+Date and Time      :30 Sep 2023 1:22 PM
+Error Message      :Conversion failed when converting the varchar value 'TTS5QKQB0YTL' to data type int.
+Stack Trace        :   at System.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at System.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)
+   at System.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
+   at System.Data.SqlClient.SqlDataReader.TryHasMoreRows(Boolean& moreRows)
+   at System.Data.SqlClient.SqlDataReader.TryReadInternal(Boolean setTimeout, Boolean& more)
+   at System.Data.SqlClient.SqlDataReader.Read()
+   at System.Data.Entity.Core.Common.Internal.Materialization.Shaper`1.StoreRead()
+Error Source       :.Net SqlClient Data Provider
+Target Site        :Void OnError(System.Data.SqlClient.SqlException, Boolean, System.Action`1[System.Action])
+
+----------------------------------------------------------------

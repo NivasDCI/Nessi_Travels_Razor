@@ -1,0 +1,2975 @@
+﻿@using Distributor.Repository.Resource;
+
+
+@{
+    Layout = "";
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <style>
+        a.adisabled {
+            cursor: not-allowed;
+            opacity: .65;
+        }
+    </style>
+
+    <script>
+        var vEditDistributor = 0, vEditStore = "", _errorMsg = '', vEditCompany = 0;
+        var GrdProductDistributor;
+        var GrdProductCompany;
+
+        $(".NumericOnly").on("keypress keyup blur paste drop", function (event) {
+            AllowNumeric(event);
+        });
+        $('input[type="file"]').on('change', function () {
+            var val = $(this).val();
+            $(this).siblings('label').text(val);
+        });
+
+        function upperCaseF(a) {
+            setTimeout(function () {
+                a.value = a.value.toUpperCase();
+            }, 1);
+        }
+
+        ShowCommonBack();
+
+        EditProduct();
+        function LoadDistributor(DistributorID) {
+
+            $.ajax({
+                type: "GET",
+                url: BaseURL + "Common/Load_Distributor",
+                datatype: "Json",
+                success: function (data) {
+                    $("#DdlDistributor option").remove();
+                    $.each(data, function (index, value) {
+                        $('#DdlDistributor').append('<option value="' + value.ID + '">' + value.Name + '</option>');
+                    });
+                }
+            }).done(function (result) {
+
+                if (DistributorID != 0) {
+                    $("#DdlDistributor").val(DistributorID);
+                }
+                else {
+                    $("#DdlDistributor").val(0);
+                }
+            });
+        }
+        function LoadCompany(CompanyID) {
+
+            $.ajax({
+                type: "GET",
+                url: BaseURL + "Common/Load_Company",
+                datatype: "Json",
+                success: function (data) {
+                    $("#DdlCompany option").remove();
+                    $.each(data, function (index, value) {
+                        $('#DdlCompany').append('<option value="' + value.ID + '">' + value.Name + '</option>');
+                    });
+                }
+            }).done(function (result) {
+
+                if (CompanyID != 0) {
+                    $("#DdlCompany").val(CompanyID);
+                }
+                else {
+                    $("#DdlCompany").val(0);
+                }
+            });
+        }
+
+        function LoadProductType(ProductType) {
+
+            $.ajax({
+                type: "GET",
+                url: BaseURL + "Common/Load_DefaultType",
+                data: { DefaultType: "@Distributor.Repository.DEFAULTMASTER.DefaultHeaderMaster_ProductType_ViewID" },
+                datatype: "Json",
+                success: function (data) {
+                    $("#DdlProductType option").remove();
+                    $.each(data, function (index, value) {
+                        $('#DdlProductType').append('<option value="' + value.DefaultID + '">' + value.DefaultName + '</option>');
+                    });
+                }
+            }).done(function (result) {
+
+                if (ProductType != "" ) {
+                    $("#DdlProductType").val(ProductType);
+                }
+                else {
+                    $("#DdlProductType").val("@Distributor.Repository.DEFAULTMASTER.DefaultHeaderMaster_StandardProductType_ViewID");
+                }
+            });
+        }
+
+        function LoadMaker(MakerID) {
+
+            $.ajax({
+                type: "GET",
+                url: BaseURL + "Common/Load_DefaultType",
+                data: { DefaultType: "@Distributor.Repository.DEFAULTMASTER.DefaultHeaderMaster_Maker_ViewID" },
+                datatype: "Json",
+                success: function (data) {
+                    $("#DdlMaker option").remove();
+                    $.each(data, function (index, value) {
+                        $('#DdlMaker').append('<option value="' + value.DefaultID + '">' + value.DefaultName + '</option>');
+                    });
+                }
+            }).done(function (result) {
+
+                if (MakerID != "") {
+                    $("#DdlMaker").val(MakerID);
+                }
+                else {
+                    $("#DdlMaker").val("");
+                }
+                 $('#DdlBrand').append('<option value=0>@Distributor.Repository.Resource.PROMessage.ProductMaster_PleaseSelectBrand</option>');
+            });
+        }
+
+        function LoadStore(StoreID) {
+            $.ajax({
+                type: "GET",
+                url: BaseURL + "Common/Load_DefaultType",
+                data: { DefaultType: "@Distributor.Repository.DEFAULTMASTER.DefaultHeaderMaster_Store_ViewID" },
+                datatype: "Json",
+                success: function (data) {
+                    $("#DdlWareHouse option").remove();
+                    $.each(data, function (index, value) {
+                        $('#DdlWareHouse').append('<option value="' + value.DefaultID + '">' + value.DefaultName + '</option>');
+                    });
+                }
+            }).done(function (result) {
+
+                if (StoreID != "") {
+                    $("#DdlWareHouse").val(StoreID);
+                }
+                else {
+                    $("#DdlWareHouse").val("");
+                }
+            });
+        }
+
+        function LoadCategory(CategoryID) {
+
+            $.ajax({
+                type: "GET",
+                url: BaseURL + "Common/Load_DefaultType",
+                data: { DefaultType: "@Distributor.Repository.DEFAULTMASTER.DefaultHeaderMaster_Category_ViewID" },
+                datatype: "Json",
+                success: function (data) {
+                    $("#DdlCategory option").remove();
+                    $.each(data, function (index, value) {
+                        $('#DdlCategory').append('<option value="' + value.DefaultID + '">' + value.DefaultName + '</option>');
+                    });
+                }
+            }).done(function (result) {
+                if (CategoryID != "") {
+                    $("#DdlCategory").val(CategoryID);
+                }
+                else {
+                    $("#DdlCategory").val("");
+                }
+                 $('#DdlSubCategory').append('<option value=0>@Distributor.Repository.Resource.PROMessage.ProductMaster_PleaseSelectSubCategory</option>');
+            });
+        }
+
+        $('#DdlCategory').change(function () {
+            SubCategoryLoad($('#DdlCategory').val(),0);
+        });
+
+        $("#btnAddBrand").click(function () {
+
+
+            if ($('#DdlMaker').val() != "") {
+                $('#ModalBrand').modal('show');
+            }
+            else {
+                ErrorAlert("Select Maker Name");
+            }
+
+        });
+
+        $('#BtnSaveBrand').click(function () {
+            SubBrand_Save();
+
+        });
+
+        function SubBrand_Save(e) {
+            if ($(this).hasClass("unclickable")) {
+                e.preventDefault();
+            } else {
+
+                var _errorMsg = "";
+
+                if ($("#DdlMaker").val() == "") {
+                    _errorMsg += "@PROMessage.Err_Maker";
+                }
+                if ($("#TxtBrandName").val() == "") {
+                    _errorMsg += '<br />' + "@PROMessage.Err_BrandName";
+                }
+
+                if (_errorMsg.length > 0) {
+                    ErrorAlert(_errorMsg);
+                    return false;
+                }
+
+                $.confirm({
+                    title: ConfirmAlert_SuccessMessage,
+                    content: ConfirmAlert_Message_Content.replace("{0}", ConfirmAlert_SaveMessage_Content),
+                    animation: 'zoom',
+                    closeAnimation: 'zoom',
+                    buttons: {
+                        'confirm': {
+                            text: Alert_YesMessage,
+                            btnClass: Alert_Button_Style,
+                            keys: ['enter'],
+                            action: function () {
+
+                                var BrandDetail = {
+
+                                    BrandID: 0,
+                                    MakerID: $('#DdlMaker').val(),
+                                    BrandName: $("#TxtBrand").val(),
+                                    Status: true
+                                }
+                                $.ajax({
+                                    url: BaseURL + "ProjectMaster/BrandMaster_LookUp", type: "POST", data: { objBrandMaster: BrandDetail }
+
+                                }).done(function (result) {
+                                    if (result.Result == true) {
+                                        $("#ModalBrand").modal("hide");
+                                        SucessAlert(result.Message);
+                                        $("#TxtBrand").val();
+                                        BrandLoad($('#DdlMaker').val(), result.UniqueID);
+                                    }
+                                    else if (result.Result == false) {
+                                        ErrorAlert(result.Message);
+                                    }
+                                })
+                                    .fail(function () {
+                                        ErrorAlert(result.Message);
+                                    });
+                            }
+                        },
+                        cancel: {
+                            text: Alert_NoMessage,
+                            btnClass: Alert_Button_Style
+                        }
+                    }
+                });
+            }
+        }
+
+        $('#DdlMaker').change(function () {
+            BrandLoad($('#DdlMaker').val(), 0);
+        });
+
+        $('#TxtProductCode').change(function () {
+            if (GetParamValue("ProductID") == 0) {
+                ProductCodeDupCheck();
+            }
+        });
+
+
+        $('#TxtDistributorMargin').change(function () {
+            RateCalculate();
+        });
+
+
+        function RateCalculate() {
+            var vRate = 0;
+            if ($('#TxtDistributorMargin').val() != "" && $('#TxtDistributorMargin').val() != 0) {
+                vRate = DistributionMarginSplit();
+                CalculateSellingPrice();
+            }
+            else {
+                //ErrorAlert('Please Enter Distributor Price and Margin and Proceed');
+            }
+            $('#TxtRate').val(vRate);
+        }
+
+        function DistributionMarginSplit() {
+            var result = 0;
+            var vDistMargin = "";
+            vDistMargin = $('#TxtDistributorMargin').val();
+            alert(vDistMargin);
+            $.ajax({
+                cache: false,
+                async: false,
+                type: "GET",
+                url: BaseURL + "Common/DistributionMarginSplit",
+                data: { distributionmargin: vDistMargin, DistributionPrice: $('#TxtDistributorPrice').val()},
+                success: function (data) {
+                    if (data != 0) {
+                        result = data;
+                    }
+                }
+            });
+            return result;
+        }
+
+        $('#TxtRate').change(function () {
+            CalculateSellingPrice();
+        });
+
+        function CalculateSellingPrice() {
+            var vhsnPercentage = 0, vSellingPrice = 0, vTaxPercentage = 0;
+            var vPurchasePrice = parseFloat($('#TxtDistributorPrice').val());
+            var vRate = (parseFloat($('#TxtDistributorPrice').val()) * (parseFloat($('#TxtDistributorMargin').val()) / 100));
+            $('#TxtRate').val((vPurchasePrice + vRate).toFixed(2));
+
+            if ($("input:radio[name='RadioTaxType']:checked").val() == "I") {
+
+                if ($('#HdnHSNID').val() != 0) {
+                    vhsnPercentage = GetHSNPercentage($('#HdnHSNID').val());
+                    vTaxPercentage = 1 + (parseFloat(vhsnPercentage) / 100)
+                    var vPer = (parseFloat($('#TxtRate').val()) / vTaxPercentage);
+                    vSellingPrice = vPer.toFixed(2);
+                }
+                else {
+                    ErrorAlert('Please Select Hsn and Proceed');
+                }
+            }
+            else {
+                vSellingPrice = $('#TxtRate').val();
+            }
+            if (vSellingPrice != 0) {
+                $('#TxtWareHouseSellingPrice').val(vSellingPrice.toFixed(2))
+             }
+            else {
+                $('#TxtWareHouseSellingPrice').val(0);
+            }
+        }
+
+
+        @*$('#TxtDistributorMargin').change(function () {
+            CalculateDistributorMargin();
+            var vhsnPercentage = 0,vSellingPrice =0;
+            var vPurchasePrice = parseFloat($('#TxtDistributorPrice').val());
+            var vRate = (parseFloat($('#TxtDistributorPrice').val()) * (parseFloat($('#TxtDistributorMargin').val()) / 100));
+            $('#TxtRate').val((vPurchasePrice + vRate).toFixed(2));
+
+            if ($("input:radio[name='RadioTaxType']:checked").val() == "@Distributor.Repository.WEBCONSTANTMESSAGECODE.InclusiveTax") {
+                vhsnPercentage = GetHSNPercentage($('#HdnHSNID').val());
+                var vPer = (parseFloat($('#TxtRate').val()) * (parseFloat(vhsnPercentage) / 100));
+                vSellingPrice = (parseFloat($('#TxtRate').val())) - vPer;
+            }
+            else {
+                vSellingPrice = $('#TxtRate').val();
+            }
+
+            $('#TxtWareHouseSellingPrice').val((vSellingPrice).toFixed(2));
+
+        });
+
+        $('#TxtRate').change(function () {
+            var vhsnPercentage = 0, vSellingPrice = 0,vTaxPercentage=0;
+             if ($("input:radio[name='RadioTaxType']:checked").val() == "I") {
+                vhsnPercentage = GetHSNPercentage($('#HdnHSNID').val());
+                //var vPer = (parseFloat($('#TxtRate').val()) * (parseFloat(vhsnPercentage) / 100));
+                // vSellingPrice = (parseFloat($('#TxtRate').val())) - vPer;
+
+                 vTaxPercentage = 1 + (parseFloat(vhsnPercentage) / 100)
+                 var vPer = (parseFloat($('#TxtRate').val()) / vTaxPercentage);
+                 //vSellingPrice = (parseFloat($('#TxtRate').val())) - vPer;
+                 vSellingPrice = vPer.toFixed(2);
+
+
+            }
+            else {
+                vSellingPrice = $('#TxtRate').val();
+            }
+
+            $('#TxtWareHouseSellingPrice').val((vSellingPrice).toFixed(2));
+        });
+
+
+        function CalculateDistributorMargin() {
+            var vhsnPercentage = 0, vSellingPrice = 0, vTaxPercentage=0;
+            var vPurchasePrice = parseFloat($('#TxtDistributorPrice').val());
+            var vRate = (parseFloat($('#TxtDistributorPrice').val()) * (parseFloat($('#TxtDistributorMargin').val()) / 100));
+            $('#TxtRate').val((vPurchasePrice + vRate).toFixed(2));
+
+            if ($("input:radio[name='RadioTaxType']:checked").val() == "I") {
+
+                if ($('#HdnHSNID').val() != 0) {
+                    vhsnPercentage = GetHSNPercentage($('#HdnHSNID').val());
+                    vTaxPercentage = 1 + (parseFloat(vhsnPercentage) / 100)
+                    var vPer = (parseFloat($('#TxtRate').val()) / vTaxPercentage);
+                    //vSellingPrice = (parseFloat($('#TxtRate').val())) - vPer;
+                    vSellingPrice = vPer.toFixed(2);
+                }
+                else {
+                    ErrorAlert('Please Select Hsn and Proceed');
+                }
+            }
+            else {
+                vSellingPrice = $('#TxtRate').val();
+            }
+            $('#TxtWareHouseSellingPrice').val(vSellingPrice);
+
+        }*@
+
+
+        $('#TxtSupplierSellingPrice').change(function () {
+            $('#TxtWareHouseMRP').val($('#TxtSupplierSellingPrice').val());
+        });
+
+        $('#TxtWareHouseMRP').change(function () {
+            $('#TxtSupplierSellingPrice').val($('#TxtWareHouseMRP').val());
+        });
+
+        function ProductCodeDupCheck() {
+               $.ajax({
+                cache: false,
+                async: false,
+                 type: "GET",
+                 url: BaseURL + "Common/ProductCodeDupCheck",
+                   data: { "ProductCode": $('#TxtProductCode').val(), "StoreID": $(DdlWareHouse).val() },
+                 success: function (data) {
+                    if (data != 0) {
+                        ErrorAlert("@PROMessage.Err_ProductCodeDuplicate");
+                        $('#TxtProductCode').val("");
+                    }
+                }
+            });
+        }
+
+        function CheckBarCodeExists() {
+            var result = false;
+            $.ajax({
+                cache: false,
+              async: false,
+                type: "GET",
+                url: BaseURL + "Common/CheckBarcodeExists",
+                data: { "BarCode": $('#TxtBarCode').val(), "RunningNo": $("#HdnRunningNo").val()},
+                success: function (data) {
+                    if (data != 0) {
+                        result = true;
+                    }
+                }
+            });
+            return result;
+        }
+
+        $('#DdlHSN').change(function () {
+            var vhsnid = $('#DdlHSN').val();
+            $('#HdnHSNID').val(vhsnid);
+            //CalculateDistributorMargin();
+            RateCalculate();
+        });
+
+
+        function GetHSNPercentage() {
+            var result = false;
+            $.ajax({
+                cache: false,
+                async: false,
+                type: "GET",
+                url: BaseURL + "Common/GetHSNPercentage",
+                data: { "hsnid": $('#HdnHSNID').val() },
+
+                success: function (data) {
+                    if (data != 0) {
+                        result = data;
+                    }
+                }
+            });
+            return result;
+        }
+
+        function CheckPrintNameExists() {
+            var result = false;
+            $.ajax({
+                cache: false,
+                async: false,
+                type: "GET",
+                url: BaseURL + "Common/CheckPrintNameExists",
+                data: { "PrintName": $('#TxtPrintName').val() },
+                success: function (data) {
+                    if (data != 0) {
+                        result = true;
+                    }
+                }
+            });
+            return result;
+        }
+
+        function LoadAuthor(authorID) {
+
+            $.ajax({
+                type: "GET",
+                url: BaseURL + "Common/Load_DefaultType",
+                data: { DefaultType: "@Distributor.Repository.DEFAULTMASTER.DefaultHeaderMaster_Author_ViewID" },
+                datatype: "Json",
+                success: function (data) {
+                    $("#DdlAuthor option").remove();
+                    $.each(data, function (index, value) {
+                        $('#DdlAuthor').append('<option value="' + value.DefaultID + '">' + value.DefaultName + '</option>');
+                    });
+                }
+            }).done(function (result) {
+
+                if (authorID != "") {
+                    $("#DdlAuthor").val(authorID);
+                }
+                else {
+                    $("#DdlAuthor").val("");
+                }
+            });
+        }
+
+        function SubCategoryLoad(CategoryID,SubCategoryID) {
+            $.ajax({
+                type: "GET",
+                url: BaseURL + "Common/Load_SubCategory",
+                data: { CategoryID: CategoryID},
+                datatype: "Json",
+                success: function (data) {
+                    $("#DdlSubCategory option").remove();
+
+                    $.each(data, function (index, value) {
+                        $('#DdlSubCategory').append('<option value="' + value.ID + '">' + value.Name + '</option>');
+                    });
+                }
+            }).done(function (result) {
+
+                if (SubCategoryID != 0) {
+                    $("#DdlSubCategory").val(SubCategoryID);
+                }
+            });
+
+        }
+
+        function BrandLoad(MakerID, BrandID) {
+            $.ajax({
+                type: "GET",
+                url: BaseURL + "Common/Load_Brand",
+                data: { MakerID: MakerID },
+                datatype: "Json",
+                success: function (data) {
+                    $("#DdlBrand option").remove();
+
+                    $.each(data, function (index, value) {
+                        $('#DdlBrand').append('<option value="' + value.ID + '">' + value.Name + '</option>');
+                    });
+                }
+            }).done(function (result) {
+
+                if (BrandID != 0) {
+                    $("#DdlBrand").val(BrandID);
+                }
+            });
+
+        }
+
+        function LoadHSN(HSNID) {
+
+            $.ajax({
+                type: "GET",
+                url: BaseURL + "Common/Load_HSN",
+                datatype: "Json",
+                success: function (data) {
+                    $("#DdlHSN option").remove();
+                    $.each(data, function (index, value) {
+                        $('#DdlHSN').append('<option value="' + value.ID + '">' + value.Name + '</option>');
+                    });
+                }
+            }).done(function (result) {
+
+                if (HSNID != 0) {
+                    $("#DdlHSN").val(HSNID);
+                }
+            });
+        }
+
+        function LoadPublication(PublicationID) {
+
+            $.ajax({
+                type: "GET",
+                url: BaseURL + "Common/Load_Publication",
+
+                datatype: "Json",
+                success: function (data) {
+                    $("#DdlPublication option").remove();
+                    $.each(data, function (index, value) {
+                        $('#DdlPublication').append('<option value="' + value.ID + '">' + value.Name + '</option>');
+                    });
+                }
+            }).done(function (result) {
+
+                if (PublicationID != 0) {
+                    $("#DdlPublication").val(PublicationID);
+                }
+            });
+        }
+
+        function LoadDistributor(DistributorID) {
+
+            $.ajax({
+                type: "GET",
+                url: BaseURL + "Common/Load_Distributor",
+                datatype: "Json",
+                success: function (data) {
+                    $("#DdlDistributor option").remove();
+                    $.each(data, function (index, value) {
+                        $('#DdlDistributor').append('<option value="' + value.ID + '">' + value.Name + '</option>');
+                    });
+                }
+            }).done(function (result) {
+
+                if (DistributorID != 0) {
+                    $("#DdlDistributor").val(DistributorID);
+                }
+                else {
+                    $("#DdlDistributor").val(0);
+                }
+            });
+        }
+
+        Distributorrenderer = function (value, record, $cell, $displayEl, id) {
+            var vDisabled = '', vStyle = '', vlink = "";
+
+            if (record.ModeType == "DB") {
+                vDisabled = "adisabled";
+            }
+            else if (record.ModeType == "TP") {
+
+                vDisabled = '';
+                vStyle = 'style="cursor: pointer"';
+                vlink = 'onclick = "DeleteDistributor(' + id + ')"';
+            }
+
+            var HTMLContent = '<table style=width:100%><tr>';
+            HTMLContent += '<td style="border:0px solid #FFF;"><a tabindex="-1" onclick="EditDistributor(' + id + ',' + "'" + record.DistributorID + "'" + ',' + record.CostPrice + "," +record.ProductID + ')" style="cursor:pointer"><i class="fas fa-edit Form-GridEditButton"></i></a></td>';
+            HTMLContent += '<td style="border:0px solid #FFF;"><a tabindex="-1" class=' + "'" + vDisabled + "'" + vlink + vStyle + '><i class="far fa-trash-alt Form-GridDeleteButton"></i></a></td>';
+           // HTMLContent += '<td style="border:0px solid #FFF;" title="Print Barcode"><a tabindex="-1" onclick="BarcodeClick(' + record.ProductID + ', ' + record.DistributorID + ')" style="cursor:pointer"><i class="fas fa-barcode"></i></a></td>';
+            $displayEl.html("</tr></table>");
+            $displayEl.append(HTMLContent);
+        }
+        Companyrenderer = function (value, record, $cell, $displayEl, id) {
+            var vDisabled = '', vStyle = '', vlink = "";
+
+            if (record.ModeType == "DB") {
+                vDisabled = "adisabled";
+            }
+            else if (record.ModeType == "TP") {
+
+                vDisabled = '';
+                vStyle = 'style="cursor: pointer"';
+                vlink = 'onclick = "DeleteCompany(' + id + ')"';
+            }
+
+            var HTMLContent = '<table style=width:100%><tr>';
+            HTMLContent += '<td style="border:0px solid #FFF;"><a tabindex="-1" onclick="EditCompany(' + id + ',' + "'" + record.CompanyID + "'" + ',' + record.CostPrice + "," + record.ProductID + ')" style="cursor:pointer"><i class="fas fa-edit Form-GridEditButton"></i></a></td>';
+            HTMLContent += '<td style="border:0px solid #FFF;"><a tabindex="-1" class=' + "'" + vDisabled + "'" + vlink + vStyle + '><i class="far fa-trash-alt Form-GridDeleteButton"></i></a></td>';
+            // HTMLContent += '<td style="border:0px solid #FFF;" title="Print Barcode"><a tabindex="-1" onclick="BarcodeClick(' + record.ProductID + ', ' + record.DistributorID + ')" style="cursor:pointer"><i class="fas fa-barcode"></i></a></td>';
+            $displayEl.html("</tr></table>");
+            $displayEl.append(HTMLContent);
+        }
+
+        Storerenderer = function (value, record, $cell, $displayEl, id) {
+            var vDisabled = '', vStyle = '', vlink = "";
+
+            if (record.ModeType == "DB") {
+                vDisabled = "adisabled";
+            }
+            else if  (record.ModeType == "TP") {
+
+                vDisabled = '';
+                vStyle = 'style="cursor: pointer"';
+                vlink = 'onclick = "DeleteWarehouse(' + id+ ')"';
+            }
+
+            var HTMLContent = '<table style=width:100%><tr>';
+
+            $displayEl.html("</tr></table>");
+            $displayEl.append(HTMLContent);
+        }
+
+        var GrdProductWarehouse = $("#GrdProductWarehouse").grid({
+            primaryKey: "ProductWarehouseID",
+            uiLibrary: "bootstrap4",
+            autoLoad: true,
+            columns: [
+                { field: "WareHouseID", title: "@PROPageModel.Common_Store", hidden: true,  align: "left" },
+                { field: "ProductID", title: "@PROPageModel.Product_ProductID", hidden:true, align: "left" },
+                { field: "WarehouseName", title: "@PROPageModel.Common_WareHouseName", width: 70,  align: "left" },
+                { field: "MRPPrice", width: 60, title: "@PROPageModel.Product_SupplierMRPPrice", sortable: true, align: "right" },
+                { field: "DistributorPrice", width: 60, title: "@PROPageModel.Product_DistributorPrice", sortable: true, align: "right" },
+                { field: "SellingPrice", width: 60, title: "@PROPageModel.Product_SupplierSellingPrice", sortable: true, align: "right" },
+                { field: "Quantity", width: 40, title: "@PROPageModel.Product_Quantity", align: "right" },
+                { field: "ModeType",title:"@PROPageModel.Product_ModeType",hidden:true},
+                { field: '@Button.Button_Action', width: 80, align: "center", renderer: Storerenderer }
+            ],
+        });
+
+        function EditWareHouse(ProductWareHouseID, WareHouseID, SellingPrice, MRPPrice, DistributorPrice, Quantity, ProductID) {
+            $('#HdnProductWarehouseID').val(ProductWareHouseID);
+            $('#HdnProductQuantity').val(Quantity);
+            $('#HdnProductID').val(ProductID);
+            vEditStore = 1;
+        }
+
+        function BarcodeClick(productid, StoreID) {
+            var url = '@Url.Content("~/ProjectMaster/BarcodeMaster")' + '?ProductId=' + productid + '&WarehouseID=' + StoreID;
+            window.open(url, window,'dialogHeight:450px;dialogWidth:300px;edge:Raised;center:Yes;help:No;resizable:No;status:No;scroll:Yes;');
+        }
+
+        function DeleteWarehouse(ProductWareHouseID) {
+            GrdProductWarehouse.removeRow(ProductWareHouseID);
+            GrdProductWarehouse.reload();
+        }
+
+        function DeleteSupplier(ProductDistributorID) {
+            GrdProductDistributor.removeRow(ProductDistributorID);
+            GrdProductDistributor.reload();
+        }
+        function DeleteCompany(ProductCompanyID) {
+            GrdProductCompany.removeRow(ProductCompanyID);
+            GrdProductCompany.reload();
+        }
+        function DistributorValidate() {
+            var result = true;
+            _errorMsg = '';
+
+            if ($("#DdlDistributor").val() == 0) {
+                 result = false;
+                _errorMsg = "@PROMessage.Err_ProductMaster_Distributor";
+            }
+
+             if ($("#TxtCostPrice").val() == "" || $("#TxtCostPrice").val() ==0) {
+                result = false;
+                _errorMsg += '<br />' + "@PROMessage.Err_ProductMaster_CostPrice";
+            }
+
+            return result;
+        }
+        function CompanyValidate() {
+            var result = true;
+            _errorMsg = '';
+
+            if ($("#DdlCompany").val() == 0) {
+                 result = false;
+                _errorMsg = "@PROMessage.Err_ProductMaster_Company";
+            }
+
+            if ($("#TxtCompanyCostPrice").val() == "" || $("#TxtCompanyCostPrice").val() ==0) {
+                result = false;
+                _errorMsg += '<br />' + "@PROMessage.Err_ProductMaster_CostPrice";
+            }
+
+            return result;
+        }
+        function WareHouseValidate() {
+            var result = true;
+            _errorMsg = '';
+
+            if ($("#DdlWareHouse").val() == "") {
+                 result = false;
+                _errorMsg = "@PROMessage.Err_ProductMaster_Store";
+            }
+
+            if ($("#TxtWareHouseSellingPrice").val() == "" || $("#TxtWareHouseSellingPrice").val() ==0) {
+                result = false;
+                _errorMsg += '<br />' + "@PROMessage.Err_ProductMaster_SellingPrice";
+            }
+            if ($("#TxtRate").val() == "" || $("#TxtRate").val() ==0) {
+                result = false;
+                _errorMsg += '<br />' + "@PROMessage.Err_ProductMaster_Rate";
+            }
+            if ($("#TxtWareHouseMRP").val() == "" || $("#TxtWareHouseMRP").val() ==0) {
+                result = false;
+                _errorMsg += '<br />' + "@PROMessage.Err_ProductMaster_MRP";
+            }
+            if ($("#TxtDistributorPrice").val() == "" || $("#TxtDistributorPrice").val() ==0) {
+                result = false;
+                _errorMsg += '<br />' + "@PROMessage.Err_ProductMaster_DistributionPrice";
+            }
+
+            @*if ($("#TxtDistributorMargin").val() == "" || $("#TxtDistributorMargin").val() ==0) {
+                result = false;
+                _errorMsg += '<br />' + "@PROMessage.Err_ProductMaster_DistributorMargin";
+            }*@
+
+            return result;
+        }
+
+        $('#btnWareHouseAdd').on('click', function () {
+            if (WareHouseValidate()) //Empty check
+            {
+                if (vEditStore == 0) {
+                    if (IsWareHouseCheck($("#DdlWareHouse").val())) {//duplicate warehouse check
+                        GrdProductWarehouse.addRow({
+                            'ProductWarehouseID': (1000 + (GrdProductWarehouse.count(true) + 1)), 'WareHouseID': $("#DdlWareHouse").val(), 'WarehouseName': $("#DdlWareHouse option:selected").text(), 'ProductID': 0, 'ProductCode': $("#TxtProductCode").val(), 'Quantity': 0, 'SellingPrice': $("#TxtWareHouseSellingPrice").val(), 'Rate': $("#TxtRate").val(), 'MRPPrice': $("#TxtWareHouseMRP").val(), 'DistributorPrice': $("#TxtDistributorPrice").val(), 'DistributorMargin': $("#TxtDistributorMargin").val(),  'ModeType': 'TP'
+                        });
+                    }
+                }
+                else {
+                    GrdProductWarehouse.updateRow($('#HdnProductWarehouseID').val(), { 'ProductWarehouseID': $('#HdnProductWarehouseID').val(), 'WareHouseID': $("#DdlWareHouse").val(), 'WarehouseName': $("#DdlWareHouse option:selected").text(), 'ProductID': $('#HdnProductID').val(), 'ProductCode': $("#TxtProductCode").val(), 'Quantity': $('#HdnProductQuantity').val(), 'Rate': $("#TxtRate").val(), 'SellingPrice': $("#TxtWareHouseSellingPrice").val(), 'MRPPrice': $("#TxtWareHouseMRP").val(), 'DistributorPrice': $("#TxtDistributorPrice").val(), 'DistributorMargin': $("#TxDistributorMargin").val(),  'ModeType': 'DB' });
+                }
+                WareHouseClear();
+
+            }
+            else {
+                ErrorAlert(_errorMsg);
+            }
+        });
+
+        $('#btnWareHouseClear').click(function () {
+            WareHouseClear();
+        });
+
+        function WareHouseClear() {
+            $("#DdlWareHouse").val("");
+            $("#TxtWareHouseSellingPrice").val(0);
+            $("#TxtRate").val(0);
+            $("#TxtWareHouseMRP").val(0);
+            $("#TxtDistributorPrice").val(0);
+            $("#TxtDistributorMargin").val(0);
+
+            vEditStore = 0;
+        }
+
+        function IsWareHouseCheck(WareHouseID) {
+
+            var Result = true;
+            var dataSupplier = GrdProductWarehouse.getAll();
+            for (var i = 1; i <= dataSupplier.length; i++) {
+                var Recorddata = GrdProductWarehouse.get(i);
+
+                if (Recorddata.WareHouseID == WareHouseID) {
+                    Result = false;
+                    ErrorAlert("@PROMessage.SameWareHouseSelect")
+                    break;
+                }
+            }
+            return Result;
+        }
+
+        function IsDistributorCheck(DistributorID) {
+
+            var Result = true;
+            var dataSupplier = GrdProductDistributor.getAll();
+            for (var i = 1; i <= dataSupplier.length; i++) {
+                var Recorddata = GrdProductDistributor.get(i);
+
+                if (Recorddata.DistributorID == DistributorID) {
+                    Result = false;
+                    ErrorAlert("@PROMessage.SameDistributorSelect")
+                    break;
+                }
+            }
+            return Result;
+        }
+
+        $('#btnDistributorClear').click(function () {
+            DistributorClear();
+        });
+
+        function DistributorClear() {
+            $("#DdlDistributor").val(0);
+            $("#TxtCostPrice").val(0);
+            vEditDistributor = 0;
+        }
+        $('#btnCompanyAdd').on('click', function () {
+            if (CompanyValidate()) //Empty check
+            {
+                if (vEditCompany == 0) {
+                    if (IsCompanyCheck($("#DdlCompany").val())) {//duplicate company check
+                        GrdProductCompany.addRow({
+                            'ProductCompanyID': (1000 + (GrdProductCompany.count(true) + 1)), 'CompanyID': $("#DdlCompany").val(), 'CompanyName': $("#DdlCompany option:selected").text(), 'ProductID': 0, 'CostPrice': $("#TxtCompanyCostPrice").val(),'ModeType': 'TP'
+                        });
+                    }
+                }
+                else {
+                    GrdProductCompany.updateRow($('#HdnProductCompanyID').val(), { 'ProductCompanyIID': $('#HdnProductCompanyID').val(), 'CompanyID': $("#DdlCompany").val(), 'CompanyName': $("#DdlCompany option:selected").text(), 'ProductID': $('#HdnProductID').val(), 'CostPrice': $("#TxtCompanyCostPrice").val(),'ModeType': 'DB' });
+                }
+               CompanyClear();
+
+            }
+            else {
+                ErrorAlert(_errorMsg);
+            }
+        });
+
+        function IsCompanyCheck(CompanyID) {
+
+            var Result = true;
+            var dataCompany = GrdProductCompany.getAll();
+            for (var i = 1; i <= dataCompany.length; i++) {
+                var Recorddata = GrdProductCompany.get(i);
+
+                if (Recorddata.CompanyID == CompanyID) {
+                    Result = false;
+                    ErrorAlert("@PROMessage.SameCompanySelect")
+                    break;
+                }
+            }
+            return Result;
+        }
+
+        $('#btnCompanyClear').click(function () {
+            CompanyClear();
+        });
+
+        function CompanyClear() {
+            $("#DdlCompany").val(0);
+            $("#TxtCompanyCostPrice").val(0);
+            vEditCompany = 0;
+        }
+
+
+        /*::::::::::::::::::::::::::::::::::::::::::::::::: Add AUTHOR::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
+
+        function DefaultClear() {
+            $("#TxtAuthor").val("");
+            $("#TxtCategory").val("");
+            $("#TxtBrand").val("");
+            $("#TxtMaker").val("");
+        }
+
+        $("#btnAddAuthor").click(function () {
+            $('#ModalAuthor').modal('show');
+        });
+
+        $('#BtnSaveAuthor').click(function () {
+            DefaultDetail_Save("@Distributor.Repository.DEFAULTMASTER.DefaultHeaderMaster_Author_ViewID","", $("#TxtAuthor").val(), 0);
+        });
+
+        function DefaultDetail_Save(DefaultHeaderID, DefaultDetailID, DefaultTextField, DefaultOrder) {
+            var DefaultDetail = {
+                DefaultHeaderID: DefaultHeaderID,
+                DefaultDetailID: DefaultDetailID,
+                DefaultTextField: DefaultTextField,
+                DefaultOrder: DefaultOrder
+            };
+
+            $.confirm({
+                title: ConfirmAlert_SuccessMessage,
+                content: DefaultDetailID == "" ? ConfirmAlert_Message_Content.replace("{0}", ConfirmAlert_SaveMessage_Content) : ConfirmAlert_Message_Content.replace("{0}", ConfirmAlert_UpdateMessage_Content),
+                animation: 'zoom',
+                closeAnimation: 'zoom',
+                buttons: {
+                    'confirm': {
+                        text: Alert_YesMessage,
+                        btnClass: Alert_Button_Style,
+                        action: function () {
+                            $.ajax({ url: BaseURL + "ProjectMaster/DefaultMasterDetail_LookUp", type: "POST", data: { objDefaultDetailModel: DefaultDetail } })
+                                .done(function (result) {
+                                    if (result.Result == true) {
+                                        $("#ModalAuthor").modal("hide");
+                                        SucessAlert(result.Message);
+                                        LoadAuthor(result.DefaultUniqueID);
+                                        DefaultClear();
+                                    }
+                                    else if (result.Result == false) {
+                                        ErrorAlert(result.Message);
+                                    }
+                                })
+                                .fail(function () {
+                                    ErrorAlert(result.Message);
+                                });
+                        }
+                    },
+                    cancel: {
+                        text: Alert_NoMessage,
+                        btnClass: Alert_Button_Style
+                    }
+                }
+            });
+        }
+
+        /*::::::::::::::::::::::::::::::::::::::::::::::::: Add Category::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
+
+        $("#btnAddCategory").click(function () {
+            $('#ModalCategory').modal('show');
+        });
+
+        $('#BtnSaveCategory').click(function () {
+            DefaultDetailCategory_Save("@Distributor.Repository.DEFAULTMASTER.DefaultHeaderMaster_Category_ViewID", "", $("#TxtCategory").val(), 0 );
+        });
+
+        function DefaultDetailCategory_Save(DefaultHeaderID, DefaultDetailID, DefaultTextField, DefaultOrder) {
+            var DefaultDetail = {
+                DefaultHeaderID: DefaultHeaderID,
+                DefaultDetailID: DefaultDetailID,
+                DefaultTextField: DefaultTextField,
+                DefaultOrder: DefaultOrder
+            };
+
+            $.confirm({
+                title: ConfirmAlert_SuccessMessage,
+                content: DefaultDetailID == "" ? ConfirmAlert_Message_Content.replace("{0}", ConfirmAlert_SaveMessage_Content) : ConfirmAlert_Message_Content.replace("{0}", ConfirmAlert_UpdateMessage_Content),
+                animation: 'zoom',
+                closeAnimation: 'zoom',
+                buttons: {
+                    'confirm': {
+                        text: Alert_YesMessage,
+                        btnClass: Alert_Button_Style,
+                        action: function () {
+                            $.ajax({ url: BaseURL + "ProjectMaster/DefaultMasterDetail_LookUp", type: "POST", data: { objDefaultDetailModel: DefaultDetail } })
+                                .done(function (result) {
+                                    if (result.Result == true) {
+                                        $("#ModalCategory").modal("hide");
+                                        SucessAlert(result.Message);
+                                        LoadCategory(result.DefaultUniqueID);
+                                        DefaultClear();
+                                    }
+                                    else if (result.Result == false) {
+                                        ErrorAlert(result.Message);
+                                    }
+                                })
+                                .fail(function () {
+                                    ErrorAlert(result.Message);
+                                });
+                        }
+                    },
+                    cancel: {
+                        text: Alert_NoMessage,
+                        btnClass: Alert_Button_Style
+                    }
+                }
+            });
+        }
+
+        /*::::::::::::::::::::::::::::::::::::::::::::::::: Add Sub Category::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
+        $("#btnSubCategory").click(function () {
+            if ($('#DdlCategory').val() != "") {
+                $('#ModalSubCategory').modal('show');
+            }
+            else {
+                ErrorAlert("@PROMessage.Err_ProductMaster_Category");
+            }
+        });
+
+        $('#BtnSaveSubCategory').click(function () {
+            subCategory_Save();
+
+        });
+
+        function subCategory_Save() {
+            var _errorMsg = "";
+
+            if ($("#TxtSubCategory").val() == "") {
+                _errorMsg += "Select Category Name";
+            }
+
+            if (_errorMsg.length > 0) {
+                ErrorAlert(_errorMsg);
+                return false;
+            }
+            $.confirm({
+                title: ConfirmAlert_SuccessMessage,
+                content:  ConfirmAlert_Message_Content.replace("{0}", ConfirmAlert_SaveMessage_Content),
+                animation: 'zoom',
+                closeAnimation: 'zoom',
+                buttons: {
+                    'confirm': {
+                        text: Alert_YesMessage,
+                        btnClass: Alert_Button_Style,
+                        keys: ['enter'],
+                        action: function () {
+
+                            var SubCategoryDetail = {
+                                SubCategoryID: 0,
+                                CategoryID: $("#DdlCategory").val(),
+                                SubCategoryName: $("#TxtSubCategory").val(),
+                                Status: true
+                            };
+
+                            $.ajax({
+                                url: BaseURL + "ProjectMaster/SubCategoryMaster_LookUp", type: "POST", data: { ObjSubCategoryModel: SubCategoryDetail }
+                            })
+                                .done(function (result) {
+                                    if (result.Result == true) {
+                                        $("#ModalSubCategory").modal("hide");
+                                        SucessAlert(result.Message);
+                                        $("#TxtCategory").val("");
+                                        SubCategoryLoad($('#DdlCategory').val(), result.UniqueID);
+                                    }
+                                    else if (result.Result == false) {
+                                        ErrorAlert(result.Message);
+                                    }
+                                })
+                                .fail(function () {
+                                    ErrorAlert(result.Message);
+                                });
+                        }
+                    },
+                    cancel: {
+                        text: Alert_NoMessage,
+                        btnClass: Alert_Button_Style
+                    }
+                }
+            });
+        }
+
+        /*::::::::::::::::::::::::::::::::::::::::::::::::: Add Publication::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
+
+        $("#btnAddPublication").click(function () {
+            $('#ModalPublication').modal('show');
+        });
+
+        $('#BtnSavePublication').click(function () {
+            Publication_Save();
+
+        });
+        function Publication_Save() {
+             var _errorMsg = "";
+            if ($("#TxtPublicationName").val() == "") {
+                _errorMsg +=  "@PROMessage.Err_PublicationMaster_PublicationName";
+                }
+
+            var ArrPublicationAddress = new Array();
+
+            var Obj = new Object();
+            Obj.PublicationID = 0;
+            Obj.Address1 = $("#TxtPublicationName").val() ;
+            Obj.Address2 = $("#TxtPublicationName").val();
+            Obj.Address3 = $("#TxtPublicationName").val();
+            ArrPublicationAddress[0] = Obj;
+
+
+            if (_errorMsg.length > 0) {
+                ErrorAlert(_errorMsg);
+                return false;
+            }
+            $.confirm({
+                title: ConfirmAlert_SuccessMessage,
+                content: ConfirmAlert_Message_Content.replace("{0}", ConfirmAlert_SaveMessage_Content),
+                animation: 'zoom',
+                closeAnimation: 'zoom',
+                buttons: {
+                    'confirm': {
+                        text: Alert_YesMessage,
+                        btnClass: Alert_Button_Style,
+                        keys: ['enter'],
+                        action: function () {
+
+                            var PublicationDetail = {
+                                PublicationID: 0,
+                                PublicationName: $("#TxtPublicationName").val(),
+                                Alias1: $("#TxtAlias1").val(),
+
+                                Status: true
+                            }
+
+                            $.ajax({
+                                url: BaseURL + "ProjectMaster/PublicationMaster_Lookup ", type: "POST", data: { ObjPublicationModel: PublicationDetail, PublicationAddressDetail: ArrPublicationAddress}
+                             })
+                                .done(function (result) {
+                                    if (result.Result == true) {
+                                        $("#ModalPublication").modal("hide");
+                                        SucessAlert(result.Message);
+                                        LoadPublication(result.UniqueID);
+                                    }
+                                    else if (result.Result == false) {
+                                        ErrorAlert(result.Message);
+                                    }
+                                })
+                                .fail(function () {
+                                    ErrorAlert(result.Message);
+                                });
+                        }
+                    },
+                    cancel: {
+                        text: Alert_NoMessage,
+                        btnClass: Alert_Button_Style
+                    }
+                }
+            });
+        }
+
+        /*::::::::::::::::::::::::::::::::::::::::::::::::: Add Maker::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
+
+        $("#btnAddMaker").click(function () {
+            $('#ModalMaker').modal('show');
+        });
+
+        $('#BtnSaveMaker').click(function () {
+             DefaultDetailMaker_Save("@Distributor.Repository.DEFAULTMASTER.DefaultHeaderMaster_Maker_ViewID", "", $("#TxtMaker").val(), 0);
+        });
+
+        function DefaultDetailMaker_Save(DefaultHeaderID, DefaultDetailID, DefaultTextField, DefaultOrder) {
+            var DefaultDetail = {
+                DefaultHeaderID: DefaultHeaderID,
+                DefaultDetailID: DefaultDetailID,
+                DefaultTextField: DefaultTextField,
+                DefaultOrder: DefaultOrder
+            };
+
+            $.confirm({
+                title: ConfirmAlert_SuccessMessage,
+                content: DefaultDetailID == "" ? ConfirmAlert_Message_Content.replace("{0}", ConfirmAlert_SaveMessage_Content) : ConfirmAlert_Message_Content.replace("{0}", ConfirmAlert_UpdateMessage_Content),
+                animation: 'zoom',
+                closeAnimation: 'zoom',
+                buttons: {
+                    'confirm': {
+                        text: Alert_YesMessage,
+                        btnClass: Alert_Button_Style,
+                        action: function () {
+                            $.ajax({ url: BaseURL + "ProjectMaster/DefaultMasterDetail_LookUp", type: "POST", data: { objDefaultDetailModel: DefaultDetail } })
+                                .done(function (result) {
+                                    if (result.Result == true) {
+                                        $("#ModalMaker").modal("hide");
+                                        SucessAlert(result.Message);
+                                        LoadMaker(result.DefaultUniqueID);
+                                        DefaultClear();
+                                    }
+                                    else if (result.Result == false) {
+                                        ErrorAlert(result.Message);
+                                    }
+                                })
+                                .fail(function () {
+                                    ErrorAlert(result.Message);
+                                });
+                        }
+                    },
+                    cancel: {
+                        text: Alert_NoMessage,
+                        btnClass: Alert_Button_Style
+                    }
+                }
+            });
+        }
+
+        $('#btnProductSave').click(function () {
+
+            var _errorMsg = "";
+            if ($("#DdlProductType").val() == "") {
+                _errorMsg += '<br />' + "@PROMessage.Err_ProductMaster_ProductType";
+            }
+            if ($("#TxtBarCode").val() == "") {
+                _errorMsg += '<br />' + "@PROMessage.Err_ProductMaster_BarCode";
+            }
+            if ($("#TxtPrintName").val() == "") {
+                _errorMsg += '<br />' + "@PROMessage.Err_ProductMaster_PrintName";
+            }
+            if ($("#DdlCategory").val() == "") {
+                _errorMsg += '<br />' + "@PROMessage.Err_ProductMaster_Category";
+            }
+            if ($("#DdlHSN").val() == "") {
+                _errorMsg += '<br />' + "@PROMessage.Err_ProductMaster_HSN";
+            }
+            if ($("#TxtRate").val() == "" || $("#TxtRate").val() ==0) {
+                _errorMsg += '<br />' + "@PROMessage.Err_ProductMaster_Rate";
+            }
+            if ($("#TxtWareHouseSellingPrice").val() == "" || $("#TxtWareHouseSellingPrice").val() ==0) {
+                _errorMsg += '<br />' + "@PROMessage.Err_ProductMaster_SellingPrice";
+            }
+            if ($("#TxtWareHouseMRP").val() == "" || $("#TxtWareHouseMRP").val() ==0) {
+                _errorMsg += '<br />' + "@PROMessage.Err_ProductMaster_MRP";
+            }
+            if ($("#TxtDistributorPrice").val() == "" || $("#TxtDistributorPrice").val() ==0) {
+                _errorMsg += '<br />' + "@PROMessage.Err_ProductMaster_DistributionPrice";
+            }
+            @*if ($("#TxtDistributorMargin").val() == "" || $("#TxtDistributorMargin").val() ==0) {
+                _errorMsg += '<br />' + "@PROMessage.Err_ProductMaster_DistributorMargin";
+            }*@
+
+            //Barcode & PrintName check
+            var Editflag = 0;
+            if ($("#ExistProductID").val() == 0) {
+                //Add
+                if (CheckPrintNameExists()) {
+                    _errorMsg += '<br />' + "@PROMessage.Err_PrintNameDuplicate";
+                }
+            }
+            //Update
+            else {
+                Editflag = 1;
+                if ($("#HdnBarCode").val() != $("#TxtBarCode").val()) {
+                    Editflag = 0;
+                }
+                if ($("#HdnPrintName").val().toUpperCase() != $("#TxtPrintName").val().toUpperCase() ) {
+                    if (CheckPrintNameExists()) {
+                        _errorMsg += '<br />' + "@PROMessage.Err_PrintNameDuplicate";
+                    }
+                }
+            }
+
+            var vBarcodeValid = false;
+            if (Editflag == 0) {
+                if (CheckBarCodeExists()) {
+
+                    $.confirm({
+                        title: "BarCodeDuplicate",
+                        content: "@PROMessage.Err_BarCodeDuplicate",
+                        animation: 'zoom',
+                        closeAnimation: 'zoom',
+                        keys: ['enter'],
+                        buttons: {
+                            'confirm': {
+                                text: Alert_YesMessage,
+                                btnClass: Alert_Button_Style,
+                                action: function () {
+                                    $.ajax({
+                                        url: BaseURL + "ProjectMaster/ProductMaster_BarcodeRunningNumber", type: "GET",
+                                        datatype: "Json",
+                                        success: function (data) {
+                                            $("#TxtBarCode").val(data.ReferenceNo);
+                                            $("#HdnBarCode").val(data.ReferenceNo);
+                                            $("#HdnRunningNo").val(data.RunningNo);
+                                            vBarcodeValid = true;
+                                        }
+                                    });
+                                }
+
+                            },
+                            cancel: {
+                                text: Alert_NoMessage,
+                                btnClass: Alert_Button_Style
+                            }
+                        }
+                    });
+
+                }
+                else {
+                    vBarcodeValid = true;
+                }
+            }
+            else {
+                vBarcodeValid = true;
+            }
+
+            if (_errorMsg.length > 0 || vBarcodeValid == false) {
+                if (_errorMsg.length > 0) {
+                    ErrorAlert(_errorMsg);
+                }
+                return false;
+            }
+
+            if (vBarcodeValid = true) {
+
+            var fileData = new FormData();
+
+            var fileUpload = $("#TxtProductImage").get(0);
+            var files = fileUpload.files;
+
+
+            // Looping over all files and add it to FormData object
+            for (var i = 0; i < files.length; i++) {
+                fileData.append(files[i].name, files[i]);
+            }
+            fileData.append("ProductID", GetParamValue("ProductID"));
+            fileData.append("ProductCode", $("#TxtProductCode").val());
+            fileData.append("BarCode", $("#TxtBarCode").val());
+            fileData.append("RunningNo", $("#HdnRunningNo").val());
+            fileData.append("ProductType", $("#DdlProductType").val());
+            fileData.append("BrandID", $("#DdlBrand").val());
+            fileData.append("MakerID", $("#DdlMaker").val());
+            fileData.append("CategoryID", $("#DdlCategory").val());
+            fileData.append("SubCategoryID", $("#DdlSubCategory").val());
+            fileData.append("HSNID", $("#DdlHSN").val());
+            fileData.append("AuthorID", $("#DdlAuthor").val());
+            fileData.append("PublicationID", $("#DdlPublication").val());
+            fileData.append("ReleaseYear", $("#TxtReleaseYear").val());
+            fileData.append("LongName", $("#TxtLongName").val());
+            fileData.append("Edition", $("#TxtEdition").val());
+            fileData.append("Volume", $("#TxtVolume").val());
+            fileData.append("AlertQty", $("#TxtAlertQty").val());
+            fileData.append("PrintName", $("#TxtPrintName").val());
+            fileData.append("Status", $("#ProductStatus").val());
+            fileData.append("Rate", $("#TxtRate").val());
+            fileData.append("SellingPrice", $("#TxtWareHouseSellingPrice").val());
+            fileData.append("MRPPrice", $("#TxtWareHouseMRP").val());
+            fileData.append("DistributorPrice", $("#TxtDistributorPrice").val());
+            fileData.append("DistributorMargin", $("#TxtDistributorMargin").val());
+            fileData.append("TaxType", $("input:radio[name='RadioTaxType']:checked").val());
+
+                $.confirm({
+
+                    title: ConfirmAlert_SuccessMessage,
+                    content: GetParamValue("ProductID") == 0 ? ConfirmAlert_Message_Content.replace("{0}", ConfirmAlert_SaveMessage_Content) : ConfirmAlert_Message_Content.replace("{0}", ConfirmAlert_UpdateMessage_Content),
+                    animation: 'zoom',
+                    closeAnimation: 'zoom',
+                    keys: ['enter'],
+                    buttons: {
+                        'confirm': {
+                            text: Alert_YesMessage,
+                            btnClass: Alert_Button_Style,
+                            action: function () {
+                                $.ajax({
+                                    url: BaseURL + "ProjectMaster/ProductMaster_Save", type: "POST",
+                                    contentType: false, // Not to set any content header
+                                    processData: false,
+                                    data: fileData
+                                }).done(function (result) {
+                                    if (result.Result == true) {
+                                        SucessAlert(result.Message);
+                                        ProductClear();
+                                        BackFunction();
+                                    }
+                                    else if (result.Result == false) {
+                                        ErrorAlert(result.Message);
+                                    }
+                                })
+                                    .fail(function () {
+                                        ErrorAlert(result.Message);
+                                    });
+                            }
+
+                        },
+                        cancel: {
+                            text: Alert_NoMessage,
+                            btnClass: Alert_Button_Style
+                        }
+                    }
+                });
+            }
+
+        });
+
+        function ProductClear() {
+            $("#TxtBarCode").val("");
+            $("#TxtProductCode").val("");
+            $("#DdlProductType").val("");
+            $("#DdlWareHouse").val("");
+            $("#DdlBrand").val(0);
+            $("#DdlMaker").val("");
+            $("#DdlCategory").val("");
+            $("#DdlSubCategory").val(0);
+            $("#DdlHSN").val(0);
+            $("#DdlAuthor").val("");
+            $("#DdlPublication").val(0);
+            $("#TxtReleaseYear").val("");
+            $("#TxtLongName").val("");
+            $("#TxtEdition").val("");
+            $("#TxtVolume").val("");
+            $("#TxtAlertQty").val("");
+            $("#TxtPrintName").val("");
+            $('#ProductStatus').prop('checked', true);
+            DistributorClear();
+            CompanyClear();
+        }
+
+        $("#btnProductReset").click(function (e) {
+            if ($(this).hasClass("unclickable")) {
+                e.preventDefault();
+            } else {
+
+                $(this).addClass("unclickable");
+                ResetProduct();
+            }
+        });
+
+        function ResetProduct() {
+            if (GetParamValue("ProductID") != 0) {
+                GridClear();
+                EditProduct();
+            }
+            else {
+                ProductClear();
+            }
+        }
+
+        function BarcodeGenerate() {
+                $.ajax({
+                    type: "GET",
+                    url: BaseURL + "ProjectMaster/ProductMaster_BarcodeRunningNumber",
+                    datatype: "Json",
+                    success: function (data) {
+                        $("#TxtBarCode").val(data.ReferenceNo);
+                        $("#HdnBarCode").val(data.ReferenceNo);
+                        $("#HdnRunningNo").val(data.RunningNo);
+                    }
+                });
+            }
+
+        function EditProduct() {
+            var vWarehouseID = "";
+            var vDistributorID = 0;
+            var vCompanyID = 0;
+            if (GetParamValue("ProductID") != 0) {
+                $.ajax({
+                    type: "GET",
+                    url: BaseURL + "ProjectMaster/ProductMaster_Edit",
+                    data: { ProductID: GetParamValue("ProductID") },
+                    datatype: "Json",
+                    success: function (data) {
+
+                        $("#TxtProductCode").val(data.ProductCode);
+                        $("#TxtBarCode").val(data.BarCode);
+                        $("#HdnBarCode").val(data.BarCode);
+                        $("#HdnHSNID").val(data.HSNID);
+                        LoadProductType(data.ProductType);
+                        LoadStore(data.WarehouseID);
+                        LoadMaker(data.MakerID);
+                        BrandLoad(data.MakerID, data.BrandID);
+                        LoadCategory(data.CategoryID);
+                        SubCategoryLoad(data.CategoryID, data.SubCategoryID);
+                        LoadHSN(data.HSNID);
+                        LoadAuthor(data.AuthorID);
+                        LoadPublication(data.PublicationID);
+                        $('input[name="RadioTaxType"][value="' + data.TaxType + '"]').prop('checked', true);
+                        $("#TxtReleaseYear").val(data.ReleaseYear);
+                        $("#TxtLongName").val(data.LongName);
+                        $("#TxtEdition").val(data.Edition);
+                        $("#TxtVolume").val(data.Volume);
+                        $("#TxtAlertQty").val(data.AlertQty);
+                        $("#TxtPrintName").val(data.PrintName);
+                        $("#ExistProductID").val(data.ProductID);
+                        if ($("#TxtBarCode").val() == "") {
+                            BarcodeGenerate();
+                        }
+                        $("#HdnPrintName").val(data.PrintName);
+                        if (data.Status) {
+                            $('#ProductStatus').prop('checked', true);
+                        }
+                        else {
+                            $('#ProductStatus').prop('checked', false);
+                        }
+                        $("#TxtWareHouseSellingPrice").val(data.SellingPrice);
+                        $("#TxtWareHouseMRP").val(data.MRPPrice);
+                        $("#TxtRate").val(data.Rate);
+                        $("#TxtDistributorPrice").val(data.DistributorPrice);
+                        $("#TxtDistributorMargin").val(data.DistributorMargin);
+
+
+                        vWarehouseID = data.WarehouseID;
+                        vDistributorID = data.DistributorID;
+                        vCompanyID = data.CompanyID;
+
+                    }
+                });
+
+                LoadDistributor(0);
+                DistributorClear();
+                LoadCompany(0);
+                CompanyClear();
+                //$.ajax({
+                //    type: "GET",
+                //    data: { ProductID: GetParamValue("ProductID"), DistributorID: vDistributorID},
+                //    url: BaseURL + "ProjectMaster/ProductDistributorMaster_FindAll",
+                //    datatype: "Json",
+                //    success: function (data) {
+                //        $.each(data.records, function (index, value) {
+                //            GrdProductDistributor.addRow({
+                //                'ProductDistributorID': value.ProductDistributorID,
+                //                'ProductID': value.ProductID, 'DistributorID': value.DistributorID, 'DistributorName': value.DistributorName,
+                //                'CostPrice': value.CostPrice,'ModeType': 'DB'
+                //            });
+                //        });
+                //    }
+                //});
+
+               // if (vWarehouseID != "") {
+                    $.ajax({
+                        type: "GET",
+                        data: { ProductID: GetParamValue("ProductID"), WarehouseID: vWarehouseID },
+                        url: BaseURL + "ProjectMaster/ProductWarehouseMaster_FindAll",
+                        datatype: "Json",
+                        success: function (data) {
+                            $.each(data.records, function (index, value) {
+                                GrdProductWarehouse.addRow({
+                                    'ProductWarehouseID': value.ProductWarehouseID,
+                                    'ProductID': value.ProductID, 'WareHouseID': value.WareHouseID, 'WarehouseName': value.WarehouseName,
+                                    'BarCode': value.BarCode, 'Quantity': value.Quantity, 'SellingPrice': value.SellingPrice, 'MRPPrice': value.MRPPrice, 'DistributorPrice': value.DistributorPrice,  'ModeType': 'DB'
+                                });
+                            });
+                        }
+                    });
+             //  }
+                //$.ajax({
+                //    type: "GET",
+                //    data: { ProductID: GetParamValue("ProductID"), CompanyID: vCompanyID },
+                //    url: BaseURL + "ProjectMaster/ProductCompanyMaster_FindAll",
+                //    datatype: "Json",
+                //    success: function (data) {
+                //        $.each(data.records, function (index, value) {
+                //            GrdProductCompany.addRow({
+                //                'ProductCompanyID': value.ProductCompanyID,
+                //                'ProductID': value.ProductID, 'CompanyID': value.CompanyID, 'CompanyName': value.CompanyName,
+                //                'CostPrice': value.CostPrice, 'ModeType': 'DB'
+                //            });
+                //        });
+                //    }
+                //});
+
+            }
+            else {
+                LoadProductType("");
+                LoadMaker("");
+                LoadCategory("");
+                LoadStore("@SessionExpire.GetStoreID()");
+                LoadHSN(0);
+                LoadAuthor("");
+                LoadPublication(0);
+                LoadDistributor(0);
+                LoadCompany(0);
+                $('#ProductStatus').prop('checked', true);
+                DistributorClear();
+                CompanyClear();
+                DefaultClear();
+                BarcodeGenerate();
+            }
+
+          /*  $('#TxtBarCode').attr('disabled', true);*/
+        }
+
+        /*::::::::::::::::::::::::::::::::::::::::::::::::: Add HSN::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
+
+        $("#btnAddHSN").click(function () {
+            $('#TxtIGST').attr('disabled', true);
+            $('#TxtIGST').val(0);
+            $('#ModalHSN').modal('show');
+
+        });
+
+        $("#btnHSNClear").click(function () {
+            HSNClear();
+        });
+
+        $('#TxtSGST').change(function () {
+            var VSGST = 0;
+             if ($("input[name='RadioHSN']:checked").val() == "@Distributor.Repository.WEBCONSTANTMESSAGECODE.HSNLocal") {
+                 VSGST = parseFloat($("#TxtSGST").val());
+                 $("#TxtCGST").val(VSGST);
+
+            }
+        });
+
+        $('#TxtCGST').change(function () {
+            var VCGST = 0;
+             if ($("input[name='RadioHSN']:checked").val() == "@Distributor.Repository.WEBCONSTANTMESSAGECODE.HSNLocal") {
+                 VCGST = parseFloat($("#TxtCGST").val());
+                 $("#TxtSGST").val(VCGST);
+
+            }
+        });
+
+        function ValidateCGST() {
+            var result = true;
+            SCGST = $("#TxtCGST").val();
+            SSGST = $("#TxtSGST").val();
+            IGST = (parseFloat($("#TxtIGST").val()));
+
+            var sum;
+            sum = ((parseFloat(SCGST)) + (parseFloat(SSGST)));
+            if (parseFloat(SCGST) != parseFloat(SSGST)) {
+                result = false;
+                ErrorAlert("@PROMessage.Err_SGSTEqualtoCGST");
+
+            }
+            return result;
+        }
+
+        $("input:radio[name='RadioHSN']").click(function () {
+            if ($("input[name='RadioHSN']:checked").val() == "@Distributor.Repository.WEBCONSTANTMESSAGECODE.HSNLocal") {
+
+                $('label[for="RadioHSN"]').css('visibility', 'visible');
+                $('#TxtCGST').removeAttr('disabled');
+                $('#TxtSGST').removeAttr('disabled');
+                $('#TxtIGST').attr('disabled', true);
+                $('#TxtIGST').val(0);
+            }
+           if ($("input[name='RadioHSN']:checked").val() == "@Distributor.Repository.WEBCONSTANTMESSAGECODE.HSNInternational") {
+
+
+               $('label[for="error"]').css('visibility', 'hidden');
+               $('#TxtIGST').removeAttr('disabled');
+               $('#TxtCGST').val(0);
+               $('#TxtCGST').attr('disabled', true);
+               $('#TxtSGST').val(0);
+               $('#TxtSGST').attr('disabled', true);
+            }
+        });
+
+        $('#btnHSNSave').click(function () {
+            var _errorMsg = "";
+            if ($("#TxtHSNCode").val() == "") {
+                _errorMsg += "@PROMessage.Err_HSNMaster_HSNCode";
+            }
+            if ($("#TxtHSNDescription").val() == "") {
+                _errorMsg += '<br />' + "@PROMessage.Err_HSNMaster_Description";
+            }
+            if ($("#TxtSGST").val() == "") {
+                _errorMsg += '<br />' + "@PROMessage.Err_HSNMaster_SGST";
+                $("#TxtSGST").val(0);
+            }
+            if ($("#TxtCGST").val() == "") {
+                _errorMsg += '<br />' + "@PROMessage.Err_HSNMaster_CGST";
+                $("#TxtCGST").val(0);
+            }
+
+            if (_errorMsg.length > 0) {
+                ErrorAlert(_errorMsg);
+                return false;
+            }
+
+            var IsCGSTValid = true;
+
+            if ($("input[name='RadioHSN']:checked").val() == "@Distributor.Repository.WEBCONSTANTMESSAGECODE.HSNLocal") {
+                IsCGSTValid =ValidateCGST();
+            }
+
+            var ArrSupplier = new Array();
+
+
+            if (IsCGSTValid == true) {
+
+
+                $.confirm({
+                    title: ConfirmAlert_SuccessMessage,
+                    content: GetParamValue("HSNID") == 0 ? ConfirmAlert_Message_Content.replace("{0}", ConfirmAlert_SaveMessage_Content) : ConfirmAlert_Message_Content.replace("{0}", ConfirmAlert_UpdateMessage_Content),
+                    animation: 'zoom',
+                    closeAnimation: 'zoom',
+                    buttons: {
+                        'confirm': {
+                            text: Alert_YesMessage,
+                            btnClass: Alert_Button_Style,
+                            keys: ['enter'],
+                            action: function () {
+
+                                var HSNDetail = {
+                                    HSNID: GetParamValue("HSNID"),
+                                    Code: $("#TxtHSNCode").val(),
+                                    HSNType: $("input:radio[name='RadioHSN']:checked").val(),
+                                    Description: $("#TxtHSNDescription").val(),
+                                    IGST: $("#TxtIGST").val(),
+                                    SGST: $("#TxtSGST").val(),
+                                    CGST: $("#TxtCGST").val(),
+                                    Status: true
+                                };
+
+                                $.ajax({
+                                    url: BaseURL + "ProjectMaster/HSNMaster_Save", type: "POST", data: { ObjHSNModel: HSNDetail, ObjSupplier:ArrSupplier }
+                                })
+                                    .done(function (result) {
+                                        if (result.Result == true) {
+                                            $("#ModalHSN").modal("hide");
+                                            SucessAlert(result.Message);
+                                            HSNClear();
+                                            LoadHSN(result.UniqueID);
+
+                                        }
+                                        else if (result.Result == false) {
+                                            ErrorAlert(result.Message);
+                                        }
+                                    })
+                                    .fail(function () {
+                                        ErrorAlert(result.Message);
+                                    });
+                            }
+                        },
+                        cancel: {
+                            text: Alert_NoMessage,
+                            btnClass: Alert_Button_Style
+                        }
+                    }
+                });
+
+            }
+        });
+
+        function HSNClear() {
+            $("#TxtHSNCode").val("");
+            $("#TxtHSNDescription").val("");
+            $("#TxtSGST").val("");
+            $("#TxtCGST").val("");
+            $("#TxtIGST").val("");
+            $('#HSNStatus').prop('checked', true);
+        }
+
+        function GridClear() {
+            var ArrJob = new Array();
+
+            var dataJob = GrdProductDistributor.getAll();
+            if (dataJob != null) {
+                for (var i = 0; i < dataJob.length; i++) {
+                    var ObjParam = new Object();
+                    ObjParam.ProductDistributorID = dataJob[i].ProductDistributorID;
+                    ArrJob[i] = ObjParam;
+                }
+                for (i = 0; i < ArrJob.length; i++) {
+                    GrdProductDistributor.removeRow(ArrJob[i].ProductDistributorID);
+                }
+            }
+        }
+
+        /*::::::::::::::::::::::::::::::::::::::::::::::::: Add Distributor::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
+
+        function LoadDistributorType(DistributorType) {
+
+            $.ajax({
+                type: "GET",
+                url: BaseURL + "Common/Load_DefaultType",
+                data: { DefaultType: "@Distributor.Repository.DEFAULTMASTER.DefaultHeaderMaster_SupplierType_ViewID" },
+                datatype: "Json",
+                success: function (data) {
+                    $("#DdlDistributorType option").remove();
+                    $.each(data, function (index, value) {
+                        $('#DdlDistributorType').append('<option value="' + value.DefaultID + '">' + value.DefaultName + '</option>');
+                    });
+                }
+            }).done(function (result) {
+
+                if (DistributorType != "" ) {
+                    $("#DdlDistributorType").val(DistributorType);
+                }
+                else {
+                    $("#DdlDistributorType").val("");
+                }
+            });
+        }
+        $("#btnAddDistributorModel").click(function () {
+            ClearDistributor();
+            $('#ModalDistributorDetails').modal('show');
+            LoadDistributorType("");
+        })
+
+        $("#btnAddDistributor").click(function () {
+               ClearDistributor();
+               LoadDistributorType("");
+                $('#ModalDistributorDetails').modal('show');
+
+            })
+
+        $("#btnClearDistributor").click(function () {
+                ClearDistributor();
+            })
+
+        function ClearDistributor() {
+            $("#TxtDistributorName").val("");
+            $("#TxtDistributorCode").val("");
+            $("#TxtMobileNo").val("");
+            $("#TxtEmailID").val("");
+            $("#DdlDistributorType").val("");
+            $("#TxtGSTNumber").val("");
+            $("#TxtPANNumber").val("");
+            $("#TxtSupplierAddressLine1").val("");
+            $("#TxtSupplierAddressLine2").val("");
+            $("#TxtSupplierAddressLine3").val("");
+            }
+
+        $("#btnDistributorSave").click(function () {
+                var _errorMsg = "";
+
+                if ($("#TxtDistributorName").val() == "") {
+                        _errorMsg += '<br />' + "@PROMessage.Err_DistributorMaster_DistributorName";
+                }
+                else if ($("#TxtMobileNo").val() == "") {
+                        _errorMsg += '<br />' + "@PROMessage.Err_SupplierMaster_MobileNo";
+                }
+                else if ($("#TxtEmailID").val() != "") {
+                    if (!isValidEmail($("#TxtEmailID").val()))
+                        _errorMsg += '<br />' + "@PROMessage.Common_EnterValidEmailAddress";
+                }
+
+                if (_errorMsg.length > 0) {
+                    ErrorAlert(_errorMsg);
+                    return false;
+                }
+
+            var DistributorDetail = {
+                    DistributorID: 0,
+                    DistributorName: $("#TxtDistributorName").val(),
+                    DistributorCode: $("#TxtDistributorCode").val(),
+                    DistributorType: $("#DdlDistributorType").val(),
+                    MobileNo: $("#TxtMobileNo").val(),
+                    PhoneNo: $("#TxtPhoneNo").val(),
+                    EmailID: $("#TxtEmailID").val(),
+                    GSTNumber: $("#TxtGSTNumber").val(),
+                    PANNumber: $("#TxtPANNumber").val(),
+                    AddressLine1: $("#TxtSupplierAddressLine1").val(),
+                    AddressLine2: $("#TxtSupplierAddressLine2").val(),
+                    AddressLine3: $("#TxtSupplierAddressLine3").val(),
+                    Status:true
+                };
+
+            $.ajax({ url: BaseURL + "ProjectMaster/DistributorMaster_Save", type: "POST", data: { ObjDistributorModel: DistributorDetail } })
+                .done(function (result) {
+                    if (result.Result == true) {
+                        ErrorAlert(result.Message);
+                        $("#ModalDistributorDetails").modal("hide");
+                        ClearDistributor();
+                        LoadDistributor(result.UniqueID);
+                    }
+                    else if (result.Result == false) {
+                        ErrorAlert(result.Message);
+                    }
+                })
+                .fail(function () {
+                    ErrorAlert(result.Message);
+                });
+        });
+
+        function LoadDistributorType(DistributorType) {
+
+            $.ajax({
+                type: "GET",
+                url: BaseURL + "Common/Load_DefaultType",
+                data: { DefaultType: "@Distributor.Repository.DEFAULTMASTER.DefaultHeaderMaster_DistributorType_ViewID" },
+                datatype: "Json",
+                success: function (data) {
+                    $("#DdlDistributorType option").remove();
+                    $.each(data, function (index, value) {
+                        $('#DdlDistributorType').append('<option value="' + value.DefaultID + '">' + value.DefaultName + '</option>');
+                    });
+                }
+            }).done(function (result) {
+
+                if (DistributorType != "" ) {
+                    $("#DdlDistributorType").val(DistributorType);
+                }
+                else {
+                    $("#DdlDistributorType").val("");
+                }
+            });
+        }
+          /*::::::::::::::::::::::::::::::::::::::::::::::::: Add Company::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
+
+        function LoadCompanyType(CompanyType) {
+
+            $.ajax({
+                type: "GET",
+                url: BaseURL + "Common/Load_DefaultType",
+                data: { DefaultType: "@Distributor.Repository.DEFAULTMASTER.DefaultHeaderMaster_CompanyType_ViewID" },
+                datatype: "Json",
+                success: function (data) {
+                    $("#DdlCompanyType option").remove();
+                    $.each(data, function (index, value) {
+                        $('#DdlCompanyType').append('<option value="' + value.DefaultID + '">' + value.DefaultName + '</option>');
+                    });
+                }
+            }).done(function (result) {
+
+                if (CompanyType != "" ) {
+                    $("#DdlCompanyType").val(CompanyType);
+                }
+                else {
+                    $("#DdlCompanyType").val("");
+                }
+            });
+        }
+ //$("#btnAddCompanyModel").click(function () {
+        //    ClearCompany();
+        //    $('#ModalCompanyDetails').modal('show');
+        //    LoadCompanyType("");
+        //})
+
+        //$("#btnAddDistributorClear").click(function () {
+        //    ClearPurchaseSDistributor();
+        //})
+        $("#btnAddCompanyModel").click(function () {
+            ClearCompany();
+            $('#ModalCompanyDetails').modal('show');
+            LoadCompanyType("");
+        })
+
+        $("#btnAddCompany").click(function () {
+            ClearCompany();
+               LoadCompanyType("");
+            $('#ModalCompanyDetails').modal('show');
+
+            })
+
+        $("#btnClearCompany").click(function () {
+            ClearCompany();
+            })
+
+        function ClearCompany() {
+            $("#TxtCompanyName").val("");
+            $("#TxtCompanyCode").val("");
+            $("#TxtCompanyMobileNo").val("");
+            $("#TxtCompanyEmailID").val("");
+            $("#DdlCompanyType").val("");
+            $("#TxtCompanyGSTNumber").val("");
+            $("#TxtCompanyPANNumber").val("");
+            $("#TxtCompanyAddressLine1").val("");
+            $("#TxtCompanyAddressLine2").val("");
+            $("#TxtCompanyAddressLine3").val("");
+            }
+
+        $("#btnCompanySave").click(function () {
+                var _errorMsg = "";
+
+            if ($("#TxtCompanyName").val() == "") {
+                        _errorMsg += '<br />' + "@PROMessage.Err_SupplierMaster_CompanyName";
+                }
+            else if ($("#TxtCompanyMobileNo").val() == "") {
+                        _errorMsg += '<br />' + "@PROMessage.Err_SupplierMaster_MobileNo";
+                }
+            else if ($("#TxtCompanyEmailID").val() != "") {
+                if (!isValidEmail($("#TxtCompanyEmailID").val()))
+                        _errorMsg += '<br />' + "@PROMessage.Common_EnterValidEmailAddress";
+                }
+
+                if (_errorMsg.length > 0) {
+                    ErrorAlert(_errorMsg);
+                    return false;
+                }
+
+            var CompanyDetail = {
+                    CompanyID: 0,
+                    CompanyName: $("#TxtCompanyName").val(),
+                    CompanyCode: $("#TxtCompanyCode").val(),
+                    CompanyType: $("#DdlCompanyType").val(),
+                    MobileNo: $("#TxtCompanyMobileNo").val(),
+                    PhoneNo: $("#TxtCompanyPhoneNo").val(),
+                    EmailID: $("#TxtCompanyEmailID").val(),
+                    GSTNumber: $("#TxtCompanyGSTNumber").val(),
+                    PANNumber: $("#TxtCompanyPANNumber").val(),
+                    AddressLine1: $("#TxtCompanyAddressLine1").val(),
+                    AddressLine2: $("#TxtCompanyAddressLine2").val(),
+                    AddressLine3: $("#TxtCompanyAddressLine3").val(),
+                    Status:true
+                };
+
+            $.ajax({ url: BaseURL + "ProjectMaster/CompanyMaster_Save", type: "POST", data: { ObjCompanyModel: CompanyDetail } })
+                .done(function (result) {
+                    if (result.Result == true) {
+                        ErrorAlert(result.Message);
+                        $("#ModalCompanyDetails").modal("hide");
+                        ClearCompany();
+                        LoadCompany(result.UniqueID);
+                    }
+                    else if (result.Result == false) {
+                        ErrorAlert(result.Message);
+                    }
+                })
+                .fail(function () {
+                    ErrorAlert(result.Message);
+                });
+        });
+
+        @*function LoadCompanyType(CompanyType) {
+
+            $.ajax({
+                type: "GET",
+                url: BaseURL + "Common/Load_DefaultType",
+                data: { DefaultType: "@Distributor.Repository.DEFAULTMASTER.DefaultHeaderMaster_CompanyType_ViewID" },
+                datatype: "Json",
+                success: function (data) {
+                    $("#DdlCompanyType option").remove();
+                    $.each(data, function (index, value) {
+                        $('#DdlCompanyype').append('<option value="' + value.DefaultID + '">' + value.DefaultName + '</option>');
+                    });
+                }
+            }).done(function (result) {
+
+                if (CompanyType != "" ) {
+                    $("#DdlCompanyType").val(CompanyType);
+                }
+                else {
+                    $("#DdlCompanyType").val("");
+                }
+            });
+        }*@
+        @*/*:::::::::::::::::::::::::::::::::::::::::::::::::: Distributor - Add ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
+
+        $("#btnAddDistributorModel").click(function () {
+                ClearPurchaseSDistributor();
+                $('#ModalDistributorDetails').modal('show');
+                LoadDistributorType("");
+            })
+
+        $("#btnAddDistributorClear").click(function () {
+                ClearPurchaseSDistributor();
+            })
+
+        function ClearPurchaseSDistributor() {
+            $("#TxtPurchaseDistributorName").val("");
+            $("#TxtPurchaseSupplierCode").val("");
+            $("#TxtpurchaseMobileNo").val("");
+            $("#TxtPurchaseEmailID").val("");
+
+            $("#TxtPurchaseGSTNumber").val("");
+            $("#TxtPurchasePANNumber").val("");
+            $("#TxtPurchaseAddressLine1").val("");
+            $("#TxtPurchaseAddressLine2").val("");
+            $("#TxtPurchaseAddressLine3").val("");
+               // $('#CustomerMasterIsPoints').prop('checked', true);
+            }
+
+        $("#btnPurchaseSupplierSave").click(function () {
+                var _errorMsg = "";
+                if ($("#TxtPurchaseEmailID").val() != "") {
+                    if (!isValidEmail($("#TxtPurchaseEmailID").val()))
+                        _errorMsg += '<br />' + "@PROMessage.Common_EnterValidEmailAddress";
+                }
+
+                if (_errorMsg.length > 0) {
+                    ErrorAlert(_errorMsg);
+                    return false;
+                }
+
+            var DistributorDetail = {
+                    DistributorID: 0,
+                    DistributorName: $("#TxtPurchaseDistributorName").val(),
+                    DistributorCode: $("#TxtPurchaseDistributorCode").val(),
+                    DistributorType: $("#DdlDistributorType").val(),
+                    MobileNo: $("#TxtpurchaseMobileNo").val(),
+                    PhoneNo: $("#TxtPhoneNo").val(),
+                    EmailID: $("#TxtPurchaseEmailID").val(),
+                    GSTNumber: $("#TxtPurchaseGSTNumber").val(),
+                    PANNumber: $("#TxtPurchasePANNumber").val(),
+                    AddressLine1: $("#TxtPurchaseAddressLine1").val(),
+                    AddressLine2: $("#TxtPurchaseAddressLine2").val(),
+                    AddressLine3: $("#TxtPurchaseAddressLine3").val(),
+                    Status:true,
+
+                };
+
+            $.ajax({ url: BaseURL + "ProjectMaster/DistributorMaster_Save", type: "POST", data: { ObjDistributorModel: DistributorDetail } })
+                .done(function (result) {
+                    if (result.Result == true) {
+                        ErrorAlert(result.Message);
+                        $("#ModalDistributorDetails").modal("hide");
+                        ClearPurchaseSDistributor();
+                            LoadDistributor(result.UniqueID);
+                    }
+                    else if (result.Result == false) {
+                        ErrorAlert(result.Message);
+                    }
+                })
+                .fail(function () {
+                    ErrorAlert(result.Message);
+                });
+            });*@
+
+        var tabindex = 1;
+        $('[tabindex=' + tabindex + ']').focus();
+
+        $("input:radio[name='RadioTaxType']").click(function () {
+
+            if ($("input[name='RadioTaxType']:checked").val() == "I") {
+
+                $('label[for="RadioTaxType"]').css('visibility', 'visible');
+
+            }
+            if ($("input[name='RadioTaxType']:checked").val() == "E") {
+
+                $('label[for="error"]').css('visibility', 'hidden');
+
+            }
+            RateCalculate();
+            //CalculateDistributorMargin();
+        });
+    </script>
+</head>
+<body>
+    <input type="hidden" id="HdnProductDistributorID" value="0" />
+    <input type="hidden" id="HdnProductCompanyID" value="0" />
+
+    <input type="hidden" id="HdnProductID" value="0" />
+    <input type="hidden" id="HdnProductQuantity" value="0" />
+    <input type="hidden" id="HdnProductWarehouseID" value="" />
+    <input type="hidden" id="HdnBarCode" value="0" />
+    <input type="hidden" id="HdnRunningNo" value="0" />
+    <input type="hidden" id="HdnHSNID" value="0" />
+    <input type="hidden" id="HdnPrintName" value="0" />
+    <input type="hidden" id="ExistProductID" value="0" />
+
+    <!-- Main content -->
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- /.col-md-12 -->
+                <div class="col-lg-12">
+                    <div class="card card-pd">
+                        <div class="card-header">
+                            <span style="font-size: 18px;" class="m-0"><i class="fa fa-barcode"></i></span>
+                            <span style="font-size: 18px; border-left: 1px solid #ccc; padding-left: 10px;"> @PROTitle.Title_ProductMaster_AddEdit </span>
+                        </div>
+                        <div class="card-body">
+
+                            <p class="introtext">@SYSPageModel.Common_Hint</p>
+
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <div class="form-group required">
+                                        <label class="control-label">@PROPageModel.Product_Type</label>
+                                        @Html.DropDownList("DdlProductType", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @width = "100%" })
+                                    </div>
+                                    <div class="form-group required">
+                                        <label class="control-label">@PROPageModel.Product_BarCode</label>
+                                        <input type="text" class="form-control" id="TxtBarCode" maxlength="50" placeholder="@PROPageModel.Product_BarCode">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label">@PROPageModel.Product_Code</label>
+                                        <input type="text" class="form-control" id="TxtProductCode" maxlength="50" placeholder="@PROPageModel.Product_Code">
+                                    </div>
+                                    <div class="form-group required">
+                                        <label class="control-label">@PROPageModel.Product_PrintName</label>
+                                        <input type="text" class="form-control" id="TxtPrintName" maxlength="100" placeholder="@PROPageModel.Product_PrintName" onkeydown="upperCaseF(this)">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>@PROPageModel.Product_LongName</label>
+                                        <input type="text" class="form-control" id="TxtLongName" maxlength="50" placeholder="@PROPageModel.Product_LongName">
+                                    </div>
+                                    <div class="form-group required">
+                                        <label class="control-label">@PROPageModel.Common_TaxType</label><br>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="RadioTaxType" id="RadioTaxType" value="E" checked="checked">
+                                            <label class="form-check-label">@PROPageModel.Common_ExclusiveTax</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="RadioTaxType" id="RadioTaxType" value="I">
+                                            <label class="form-check-label">@PROPageModel.Common_InclusiveTax</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group required">
+                                        <label class="control-label">@PROPageModel.Product_CategoryName</label>
+                                        <a href="#" data-toggle="tooltip" data-placement="bottom" title="Add Category" id="btnAddCategory"><i class="fas fa-plus-circle"></i> </a>
+                                        @Html.DropDownList("DdlCategory", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @width = "100%" })
+                                    </div>
+                                    <div class="form-group">
+                                        <label>@PROPageModel.Product_SubCategoryName</label>
+                                        <a href="#" data-toggle="tooltip" data-placement="bottom" title="Add SubCategory" id="btnSubCategory"><i class="fas fa-plus-circle"></i> </a>
+
+                                        @Html.DropDownList("DdlSubCategory", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @width = "100%" })
+                                    </div>
+                                    <div class="form-group">
+                                        <label>@PROPageModel.Product_MakerName</label>
+
+                                        <a href="#" data-toggle="tooltip" data-placement="bottom" title="Add Maker" id="btnAddMaker"><i class="fas fa-plus-circle"></i> </a>
+
+                                        @Html.DropDownList("DdlMaker", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @width = "100%" })
+                                    </div>
+                                    <div class="form-group">
+                                        <label>@PROPageModel.Product_BrandName</label>
+                                        <a href="#" data-toggle="tooltip" data-placement="bottom" title="Add Brand" id="btnAddBrand"><i class="fas fa-plus-circle"></i> </a>
+
+                                        @Html.DropDownList("DdlBrand", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @width = "100%" })
+
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label">@PROPageModel.Product_HSNName</label>
+                                        <a href="#" data-toggle="tooltip" data-placement="bottom" title="Add HSN" id="btnAddHSN"><i class="fas fa-plus-circle"></i> </a>
+
+                                        @Html.DropDownList("DdlHSN", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @width = "100%" })
+
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label>@PROPageModel.Product_Author</label>
+                                        <a href="#" data-toggle="tooltip" data-placement="bottom" title="Add Author" id="btnAddAuthor"><i class="fas fa-plus-circle"></i> </a>
+                                        @Html.DropDownList("DdlAuthor", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @width = "100%" })
+                                    </div>
+                                    <div class="form-group">
+                                        <label>@PROPageModel.Product_Publication</label>
+                                        <a href="#" data-toggle="tooltip" data-placement="bottom" title="Add Publication" id="btnAddPublication"><i class="fas fa-plus-circle"></i> </a>
+                                        @Html.DropDownList("DdlPublication", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @width = "100%" })
+                                    </div>
+                                    <div class="form-group">
+                                        <label>@PROPageModel.Product_ReleaseYear</label>
+                                        <input type="number" class="form-control" id="TxtReleaseYear" placeholder="@PROPageModel.Product_ReleaseYear" min="0" onkeyup="if(this.value<0){this.value =this.value * -1}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>@PROPageModel.Product_Edition</label>
+                                        <input type="text" class="form-control" id="TxtEdition" maxlength="50" placeholder="@PROPageModel.Product_Edition">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>@PROPageModel.Product_Volume</label>
+                                        <input type="text" class="form-control" id="TxtVolume" maxlength="50" placeholder="@PROPageModel.Product_Volume">
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label>@PROPageModel.Product_AlertQty</label>
+                                        <input type="number" class="form-control" id="TxtAlertQty" min="0" onkeyup="if(this.value<0){this.value =this.value * -1}" maxlength="10" placeholder="@PROPageModel.Product_AlertQty">
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label id="lblFileName">@PROPageModel.Product_Image</label>
+                                        <div class="custom-file">
+                                            <input type="file" class="form-control" name="TxtProductImage" id="TxtProductImage">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="pdt-25">
+                                        <div class="row">
+                                            <div class="col-sm-3">
+                                                <div class="form-group clearfix">
+                                                    <div class="icheck-primary">
+                                                        @Html.CheckBox("ProductStatus")
+                                                        <label for="ProductStatus">
+                                                            @PROPageModel.Common_Status
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <br />
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <p class="introsubtext">
+                                            @PROTitle.Title_ProductPriceDetails
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                
+                                <div class="col-sm-4">
+                                    <div class="form-group required">
+                                        <label class="control-label">@PROPageModel.Product_MRP</label>
+                                        <input type="number" class="form-control" id="TxtWareHouseMRP" min="0" onkeyup="if(this.value<0){this.value =this.value * -1}" maxlength="10" placeholder="@PROPageModel.Product_MRP">
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group required">
+                                        <label class="control-label">@PROPageModel.Product_DistributorPrice</label>
+                                        <input type="number" class="form-control" id="TxtDistributorPrice" min="0" onkeyup="if(this.value<0){this.value =this.value * -1}" maxlength="10" placeholder="@PROPageModel.Product_CostPrice">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label class="control-label">@PROPageModel.Product_DistributorMargin</label>
+                                        <input type="number" class="form-control" id="TxtDistributorMargin" min="0" onkeyup="if(this.value<0){this.value =this.value * -1}" maxlength="10" placeholder="@PROPageModel.Product_DistributorMargin">
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group required">
+                                        <label class="control-label">@PROPageModel.Product_Rate</label>
+                                        <input type="number" class="form-control" id="TxtRate" min="0" onkeyup="if(this.value<0){this.value =this.value * -1}" maxlength="10" placeholder="@PROPageModel.Product_DistributorMargin">
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group required">
+                                        <label class="control-label">@PROPageModel.Product_SellingPrice</label>
+                                        <input type="number" class="form-control" id="TxtWareHouseSellingPrice" min="0" onkeyup="if(this.value<0){this.value =this.value * -1}" maxlength="10" placeholder="@PROPageModel.Product_SellingPrice">
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <br />
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="box-body table-responsive no-padding">
+                                <table id="GrdProductWarehouse" class="table table-hover"></table>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <br />
+
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="pdt-25">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <button type="button" id="btnProductReset" class="btn btn-secondary btn-block"><i class="fa fa-undo"></i> @Distributor.Repository.WEBPAGEBUTTON.RESET</button>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <button type="button" id="btnProductSave" class="btn btn-primary btn-block"><i class="fa fa-save"></i> @Distributor.Repository.WEBPAGEBUTTON.SAVE</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.col-md-12 -->
+    <!-- /.row -->
+
+    <div class="modal" id="ModalAuthor" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Add Author</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group" style="padding-bottom: 15px;">
+                                <div style="padding: 15px; background-color: #f6f6f6;">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <label>@PROPageModel.Product_Author</label>
+                                            <input type="text" class="form-control" id="TxtAuthor">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <label></label>
+                                            <button type="button" id="BtnSaveAuthor" class="btn btn-primary btn-block"><i class="fa fa-save"></i> @Distributor.Repository.WEBPAGEBUTTON.SAVE</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <!-- /.modal-content -->
+                        </div>
+                        <!-- /.modal-dialog -->
+                    </div>
+                </div>
+                <!-- /.modal -->
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="ModalCategory" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Add Category</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group" style="padding-bottom: 15px;">
+                                <div style="padding: 15px; background-color: #f6f6f6;">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <label>@PROPageModel.Product_CategoryName</label>
+                                            <input type="text" class="form-control" id="TxtCategory">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <label></label>
+                                            <button type="button" id="BtnSaveCategory" class="btn btn-primary btn-block"><i class="fa fa-save"></i> @Distributor.Repository.WEBPAGEBUTTON.SAVE</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <!-- /.modal-content -->
+                        </div>
+                        <!-- /.modal-dialog -->
+                    </div>
+                </div>
+                <!-- /.modal -->
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="ModalSubCategory" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Add SubCategory</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group" style="padding-bottom: 15px;">
+                                <div style="padding: 15px; background-color: #f6f6f6;">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <label>@PROPageModel.Product_SubCategoryName</label>
+                                            <input type="text" class="form-control" id="TxtSubCategory">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <label></label>
+                                            <button type="button" id="BtnSaveSubCategory" class="btn btn-primary btn-block"><i class="fa fa-save"></i> @Distributor.Repository.WEBPAGEBUTTON.SAVE</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <!-- /.modal-content -->
+                        </div>
+                        <!-- /.modal-dialog -->
+                    </div>
+                </div>
+                <!-- /.modal -->
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="ModalMaker" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Add Maker</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group" style="padding-bottom: 15px;">
+                                <div style="padding: 15px; background-color: #f6f6f6;">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <label>@PROPageModel.Product_MakerName</label>
+                                            <input type="text" class="form-control" id="TxtMaker">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <label></label>
+                                            <button type="button" id="BtnSaveMaker" class="btn btn-primary btn-block"><i class="fa fa-save"></i> @Distributor.Repository.WEBPAGEBUTTON.SAVE</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <!-- /.modal-content -->
+                        </div>
+                        <!-- /.modal-dialog -->
+                    </div>
+                </div>
+                <!-- /.modal -->
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="ModalBrand" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Add Brand</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group" style="padding-bottom: 15px;">
+                                <div style="padding: 15px; background-color: #f6f6f6;">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <label>@PROPageModel.Product_BrandName</label>
+                                            <input type="text" class="form-control" id="TxtBrand">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <label></label>
+                                            <button type="button" id="BtnSaveBrand" class="btn btn-primary btn-block"><i class="fa fa-save"></i> @Distributor.Repository.WEBPAGEBUTTON.SAVE</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <!-- /.modal-content -->
+                        </div>
+                        <!-- /.modal-dialog -->
+                    </div>
+                </div>
+                <!-- /.modal -->
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="ModalPublication" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Add Publication</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group" style="padding-bottom: 15px;">
+                                <div style="padding: 15px; background-color: #f6f6f6;">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <label class="control-label">@PROPageModel.PublicationMaster_PublicationName</label>
+                                            <input type="text" class="form-control" id="TxtPublicationName">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <label>@PROPageModel.PublicationMaster_Alias1</label>
+                                            <input type="text" class="form-control" id="TxtAlias1">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <label>@PROPageModel.PublicationMaster_AddressLine1</label>
+                                            <input type="text" class="form-control" id="TxtAddressLine1">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <label>@PROPageModel.PublicationMaster_AddressLine2</label>
+                                            <input type="text" class="form-control" id="TxtAddressLine2">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <label>@PROPageModel.PublicationMaster_AddressLine3</label>
+                                            <input type="text" class="form-control" id="TxtAddressLine3">
+                                        </div>
+                                    </div>
+
+                                </div>
+
+
+                                <div class="row">
+
+                                    <div class="col-sm-12">
+                                        <label></label>
+                                        <button type="button" id="BtnSavePublication" class="btn btn-primary btn-block"><i class="fa fa-save"></i> @Distributor.Repository.WEBPAGEBUTTON.SAVE</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.modal-content -->
+                </div>
+                <!-- /.modal-dialog -->
+            </div>
+        </div>
+        <!-- /.modal -->
+    </div>
+
+    <div class="modal" id="ModalHSN" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Add HSN</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="row">
+                        <div class="col-sm-5">
+                            <div class="form-group required">
+                                <label class="control-label">@PROPageModel.HSN_Code</label>
+                                <input type="text" autofocus class="form-control" id="TxtHSNCode" maxlength="50" placeholder="@PROPageModel.HSN_Code">
+                            </div>
+                            <div class="form-group required">
+                                <label class="control-label">@PROPageModel.HSN_Local</label><br>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="RadioHSN" id="RadioHSN" value="L" checked="checked">
+                                    <label class="form-check-label">@PROPageModel.Common_HSNLocal</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="RadioHSN" id="RadioHSN" value="I">
+                                    <label class="form-check-label">@PROPageModel.Common_HSNInternational</label>
+                                </div>
+                            </div>
+
+
+
+                            <div class="form-group required">
+                                <label class="control-label">@PROPageModel.HSN_CGST</label>
+                                <input type="number" class="form-control" id="TxtCGST" maxlength="18" placeholder="@PROPageModel.HSN_CGST" min="0" onkeyup="if(this.value<0){this.value =this.value * -1}">
+                            </div>
+                            <div class="form-group required">
+                                <label class="control-label">@PROPageModel.HSN_SGST</label>
+                                <input type="number" class="form-control" id="TxtSGST" maxlength="18" placeholder="@PROPageModel.HSN_SGST" min="0" onkeyup="if(this.value<0){this.value =this.value * -1}">
+                            </div>
+
+
+                        </div>
+                        <div class="col-sm-2">
+                        </div>
+                        <div class="col-sm-5">
+                            <div class="form-group required">
+                                <label class="control-label">@PROPageModel.HSN_Description</label>
+                                <input type="text" class="form-control" id="TxtHSNDescription" maxlength="200" placeholder="@PROPageModel.HSN_Description">
+                            </div>
+                            <div class="form-group required">
+                                <label class="control-label">@PROPageModel.HSN_IGST</label>
+                                <input type="number" class="form-control" id="TxtIGST" maxlength="18" placeholder="@PROPageModel.HSN_IGST" min="0" onkeyup="if(this.value<0){this.value =this.value * -1}">
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="pdt-30">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <button type="button" id="btnHSNClear" class="btn btn-secondary btn-block"><i class="fa fa-undo"></i> @Distributor.Repository.WEBPAGEBUTTON.CLEAR</button>
+                            </div>
+                            <div class="col-sm-3">
+                                <button type="button" id="btnHSNSave" class="btn btn-primary btn-block"><i class="fa fa-save"></i> @Distributor.Repository.WEBPAGEBUTTON.SAVE</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.modal-content -->
+                </div>
+                <!-- /.modal-dialog -->
+            </div>
+        </div>
+        <!-- /.modal -->
+    </div>
+
+
+    <div class="modal fade" id="ModalDistributorDetails" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Add Distributor details</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group required">
+                                <label class="control-label">@PROPageModel.DistributorMaster_DistributorName</label>
+                                <div>
+                                    <input type="text" id="TxtDistributorName" autocomplete="off" placeholder="@PROPageModel.DistributorMaster_DistributorName" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>@PROPageModel.DistributorMaster_DistributorCode</label>
+                                <div>
+                                    <input type="text" id="TxtDistributorCode" autocomplete="off" placeholder="@PROPageModel.DistributorMaster_DistributorCode" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>@PROPageModel.DistributorMaster_DistributorType</label>
+                                @Html.DropDownList("DdlDistributorType", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @width = "100%" })
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group required">
+                                <label class="control-label">@PROPageModel.SupplierMaster_MobileNo</label>
+                                <div>
+                                    <input type="text" id="TxtMobileNo" autocomplete="off" placeholder="@PROPageModel.SupplierMaster_MobileNo" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>@PROPageModel.SupplierMaster_EmailID</label>
+                                <div>
+                                    <input type="text" id="TxtEmailID" autocomplete="off" placeholder="@PROPageModel.SupplierMaster_EmailID" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>@PROPageModel.SupplierMaster_GSTNumber</label>
+                                <div>
+                                    <input type="text" id="TxtGSTNumber" autocomplete="off" placeholder="@PROPageModel.SupplierMaster_GSTNumber" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>@PROPageModel.SupplierMaster_PANNumber</label>
+                                <div>
+                                    <input type="text" id="TxtPANNumber" autocomplete="off" placeholder="@PROPageModel.SupplierMaster_PANNumber" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>@PROPageModel.SupplierMaster_AddressLine1</label>
+                                <div>
+                                    <input type="text" id="TxtSupplierAddressLine1" autocomplete="off" placeholder="@PROPageModel.SupplierMaster_AddressLine1" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>@PROPageModel.SupplierMaster_AddressLine2</label>
+                                <div>
+                                    <input type="text" id="TxtSupplierAddressLine2" autocomplete="off" placeholder="@PROPageModel.SupplierMaster_AddressLine2" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>@PROPageModel.SupplierMaster_AddressLine3</label>
+                                <div>
+                                    <input type="text" id="TxtSupplierAddressLine3" autocomplete="off" placeholder="@PROPageModel.SupplierMaster_AddressLine3" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pdt-30">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <button type="button" class="btn btn-primary btn-block" id="btnDistributorSave" style="padding: 15px;">@Distributor.Repository.WEBPAGEBUTTON.SAVE</button>
+                                </div>
+                                <div class="col-sm-6">
+                                    <button type="button" class="btn btn-primary btn-block" id="btnClearDistributor" style="padding: 15px;">@Distributor.Repository.WEBPAGEBUTTON.CLEAR</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+        <!-- /.modal -->
+    </div>
+    <div class="modal fade" id="ModalCompanyDetails" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Add Company details</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group required">
+                                <label class="control-label">@PROPageModel.CompanyMaster_CompanyName</label>
+                                <div>
+                                    <input type="text" id="TxtCompanyName" autocomplete="off" placeholder="@PROPageModel.CompanyMaster_CompanyName" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>@PROPageModel.CompanyMaster_CompanyCode</label>
+                                <div>
+                                    <input type="text" id="TxtCompanyCode" autocomplete="off" placeholder="@PROPageModel.CompanyMaster_CompanyCode" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>@PROPageModel.CompanyMaster_CompanyType</label>
+                                @Html.DropDownList("DdlCompanyType", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @width = "100%" })
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group required">
+                                <label class="control-label">@PROPageModel.SupplierMaster_MobileNo</label>
+                                <div>
+                                    <input type="text" id="TxtCompanyMobileNo" autocomplete="off" placeholder="@PROPageModel.SupplierMaster_MobileNo" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>@PROPageModel.SupplierMaster_EmailID</label>
+                                <div>
+                                    <input type="text" id="TxtCompanyEmailID" autocomplete="off" placeholder="@PROPageModel.SupplierMaster_EmailID" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>@PROPageModel.SupplierMaster_GSTNumber</label>
+                                <div>
+                                    <input type="text" id="TxtCompanyGSTNumber" autocomplete="off" placeholder="@PROPageModel.SupplierMaster_GSTNumber" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>@PROPageModel.SupplierMaster_PANNumber</label>
+                                <div>
+                                    <input type="text" id="TxtCompanyPANNumber" autocomplete="off" placeholder="@PROPageModel.SupplierMaster_PANNumber" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>@PROPageModel.SupplierMaster_AddressLine1</label>
+                                <div>
+                                    <input type="text" id="TxtCompanyAddressLine1" autocomplete="off" placeholder="@PROPageModel.SupplierMaster_AddressLine1" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>@PROPageModel.SupplierMaster_AddressLine2</label>
+                                <div>
+                                    <input type="text" id="TxtCompanyAddressLine2" autocomplete="off" placeholder="@PROPageModel.SupplierMaster_AddressLine2" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>@PROPageModel.SupplierMaster_AddressLine3</label>
+                                <div>
+                                    <input type="text" id="TxtCompanyAddressLine3" autocomplete="off" placeholder="@PROPageModel.SupplierMaster_AddressLine3" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pdt-30">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <button type="button" class="btn btn-primary btn-block" id="btnCompanySave" style="padding: 15px;">@Distributor.Repository.WEBPAGEBUTTON.SAVE</button>
+                                </div>
+                                <div class="col-sm-6">
+                                    <button type="button" class="btn btn-primary btn-block" id="btnClearCompany" style="padding: 15px;">@Distributor.Repository.WEBPAGEBUTTON.CLEAR</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+        <!-- /.modal -->
+    </div>
+
+
+
+
+</body>
+</html>

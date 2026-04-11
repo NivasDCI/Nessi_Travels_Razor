@@ -1,0 +1,232 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Nissi Travels Invoice</title>
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+            text-indent: 0;
+        }
+
+        h1 {
+            color: #F00;
+            font-family: Arial, sans-serif;
+            font-style: normal;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 20pt;
+        }
+
+        p {
+            color: black;
+            font-family: Arial, sans-serif;
+            font-style: normal;
+            font-weight: normal;
+            text-decoration: none;
+            font-size: 10pt;
+            margin: 0pt;
+        }
+
+        a {
+            color: black;
+            font-family: Arial, sans-serif;
+            font-style: normal;
+            font-weight: normal;
+            text-decoration: none;
+            font-size: 10pt;
+        }
+
+        .s1 {
+            color: black;
+            font-family: Arial, sans-serif;
+            font-style: normal;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 10pt;
+        }
+
+        .s2 {
+            color: black;
+            font-family: Arial, sans-serif;
+            font-style: normal;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 12pt;
+        }
+
+        .s3 {
+            color: black;
+            font-family: Arial, sans-serif;
+            font-style: normal;
+            font-weight: normal;
+            text-decoration: none;
+            font-size: 10pt;
+        }
+
+        .s4 {
+            color: black;
+            font-family: "Times New Roman", serif;
+            font-style: normal;
+            font-weight: normal;
+            text-decoration: none;
+            font-size: 10pt;
+        }
+
+        .s5 {
+            color: black;
+            font-family: Arial, sans-serif;
+            font-style: normal;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 11pt;
+        }
+
+        table, tbody {
+            vertical-align: top;
+            overflow: visible;
+        }
+    </style>
+</head>
+<body>
+    <p style="text-indent: 0pt;text-align: left;"><span>
+        <table border="0" cellspacing="0" cellpadding="0">
+            <tr>
+                <td>
+                    <img width="103" height="106" src="data:image/jpg;base64,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" />
+                </td>
+                <td>
+                    <h1 style="padding-top: 2pt;padding-left: 112pt;text-indent: 0pt;text-align: left;">
+                        NISSI TOURS AND TRAVELS PTE. LTD
+                    </h1>
+                    <p style="padding-left: 75pt;text-indent: 0pt;text-align: center;">291 SERANGOON ROAD, SINGAPORE 218107</p>
+                    <p style="padding-top: 2pt;padding-left: 75pt;text-indent: 0pt;text-align: center;">TEL NO +65 62920521, HP NO. +65 90686384</p>
+                    <p style="padding-top: 2pt;padding-left: 75pt;text-indent: 0pt;text-align: center;">
+                        <a href="mailto:Booking@nissitravels.com">Booking@nissitravels.com</a>
+                    </p>
+                </td>
+            </tr>
+        </table>
+        </span>
+    </p>
+    
+    <p style="padding-top: 9pt;text-indent: 0pt;text-align: left;"><br /></p>
+    <table style="border-collapse:collapse;margin-left:6.9895pt" cellspacing="0">
+        <tr style="height:21pt">
+            <td style="width:315pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt" colspan="3" rowspan="2">
+                <p class="s1" style="padding-top: 5pt;padding-left: 16pt;text-indent: 0pt;text-align: left;">
+                    @ViewBag.CustomerName
+                </p>
+            </td>
+            <td style="width:185pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt" colspan="3">
+                <p class="s2" style="padding-top: 3pt;padding-left: 74pt;text-indent: 0pt;text-align: left;">INVOICE</p>
+            </td>
+        </tr>
+
+        <tr style="height:65pt">
+            <td style="width:37pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt">
+                <p class="s3" style="padding-top: 4pt;padding-left: 14pt;text-indent: 0pt;line-height: 123%;text-align: left;"></p>
+            </td>
+            <td style="width:43pt;border-top-style:solid;border-top-width:1pt;border-bottom-style:solid;border-bottom-width:1pt">
+                <p class="s3" style="padding-top: 4pt;padding-right: 5pt;text-indent: 0pt;text-align: left;">Invoice No:</p>
+                <p class="s3" style="padding-top: 2pt; padding-right: 5pt; text-indent: 0pt; text-align: left;">Date:</p>
+                <p class="s3" style="padding-top: 2pt; padding-right: 5pt; text-indent: 0pt; text-align: left;">Staff:</p>
+                <p class="s3" style="padding-top: 2pt; padding-right: 5pt; text-indent: 0pt; text-align: left;">Terms:</p>
+            </td>
+            <td style="width: 43pt; border-top-style: solid; border-top-width: 1pt; border-bottom-style: solid; border-bottom-width: 1pt; border-right-style: solid; border-right-width: 1pt">
+                <p class="s3" style="padding-top: 4pt; padding-right: 5pt; text-indent: 0pt; text-align: left;">@ViewBag.InvoiceNo</p>
+                <p class="s3" style="padding-top: 2pt; padding-right: 5pt; text-indent: 0pt; text-align: left;">@ViewBag.InvoiceDate</p>
+                <p class="s3" style="padding-top: 2pt; padding-right: 5pt; text-indent: 0pt; text-align: left;">@HttpContext.Current.Session["USER_NAME"]</p>
+                <p class="s3" style="padding-top: 2pt; padding-right: 5pt; text-indent: 0pt; text-align: left;">Credit</p>
+            </td>
+            @*<td style="width:105pt;border-top-style:solid;border-top-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt">
+                <p class="s1" style="padding-top: 4pt;padding-left: 5pt;padding-right: 36pt;text-indent: 0pt;line-height: 123%;text-align: left;">NTT-C5025 <span class="s3">24 May 2024 ADMIN</span></p>
+                <p class="s3" style="padding-left: 5pt;text-indent: 0pt;text-align: left;">Credit</p>
+            </td>*@
+        </tr>
+        <tr style="height:22pt">
+            <td style="width:32pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt">
+                <p class="s3" style="padding-top: 4pt;padding-left: 5pt;text-indent: 0pt;text-align: left;">S.No</p>
+            </td>
+            <td style="width:49pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt">
+                <p class="s3" style="padding-top: 4pt;padding-left: 5pt;text-indent: 0pt;text-align: left;">Job Date</p>
+            </td>
+            <td style="width:41pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt">
+                <p class="s3" style="padding-top: 4pt;padding-left: 5pt;text-indent: 0pt;text-align: left;">Job Time</p>
+            </td>
+            <td style="width:73pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt">
+                <p class="s3" style="padding-top: 4pt;padding-left: 5pt;text-indent: 0pt;text-align: left;">Pickup</p>
+            </td>
+            <td style="width:78pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt">
+                <p class="s3" style="padding-top: 4pt;padding-left: 5pt;text-indent: 0pt;text-align: left;">Dropoff</p>
+            </td>
+            <td style="width:57pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt">
+                <p class="s3" style="padding-top: 4pt;padding-right: 5pt;text-indent: 0pt;text-align: right;">Amount</p>
+            </td>
+        </tr>
+        @{int idx = 1;}
+        @foreach (Transport.Model.JobModel mod in ViewBag.details)
+        {
+            <tr style="height:18pt">
+                <td style="width:32pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-right-style:solid;border-right-width:1pt">
+                    <p class="s3" style="padding-top: 4pt;padding-left: 5pt;text-indent: 0pt;text-align: left;">@idx</p>
+                </td>
+                <td style="width:49pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-right-style:solid;border-right-width:1pt">
+                    <p class="s3" style="padding-top: 4pt;padding-left: 5pt;text-indent: 0pt;text-align: left;">@mod.JobDate</p>
+                </td>
+                <td style="width:41pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-right-style:solid;border-right-width:1pt">
+                    <p class="s3" style="padding-top: 4pt;padding-left: 5pt;text-indent: 0pt;text-align: left;">@mod.JobTime</p>
+                </td>
+                <td style="width:73pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-right-style:solid;border-right-width:1pt">
+                    <p class="s3" style="padding-top: 4pt; padding-right: 4pt; text-indent: 0pt; text-align: left;">@mod.JobFrom</p>
+                </td>
+                <td style="width:78pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-right-style:solid;border-right-width:1pt">
+                    <p class="s3" style="padding-top: 4pt; padding-right: 4pt; text-indent: 0pt; text-align: left;">@mod.JobTo</p>
+                </td>
+                <td style="width:57pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-right-style:solid;border-right-width:1pt">
+                    <p class="s3" style="padding-top: 4pt; padding-right: 4pt; text-indent: 0pt; text-align: left;">@mod.Credit</p>
+                </td>
+            </tr>
+            idx++;
+        }
+
+
+            <tr style="height:82pt">
+                <td style="width:352pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt" colspan="3" rowspan="2">
+                    <p class="s1" style="padding-top: 4pt;padding-left: 8pt;text-indent: 0pt;text-align: left;">Amount in words :</p>
+                    <p class="s3" style="padding-top: 8pt;padding-left: 16pt;text-indent: 0pt;text-align: left;">@ViewBag.AmountinWords</p>
+                    <p class="s1" style="padding-top: 8pt;padding-left: 8pt;text-indent: 0pt;text-align: left;">Payment transfer to :</p>
+                    <p class="s3" style="padding-top: 2pt;padding-left: 16pt;text-indent: 0pt;text-align: left;">Paynow: 201710306R</p>
+                    <p class="s3" style="padding-top: 2pt;padding-left: 16pt;text-indent: 0pt;text-align: left;">DBS current Account: 107 - 903506 - 0</p>
+                </td>
+                <td style="width:91pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt" colspan="2">
+                    <p class="s3" style="padding-top: 4pt;padding-left: 8pt;text-indent: 0pt;text-align: left;">Gross Amount</p>
+                </td>
+                <td style="width:57pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt">
+                    <p class="s3" style="padding-top: 4pt;padding-right: 4pt;text-indent: 0pt;text-align: right;">$ @String.Format("{0:n}", ViewBag.GrossAmount)</p>
+                </td>
+            </tr>
+            <tr style="height:22pt">
+                <td style="width:91pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt" colspan="2">
+                    <p class="s1" style="padding-top: 4pt;padding-left: 8pt;text-indent: 0pt;text-align: left;">NET Amount</p>
+                </td>
+                <td style="width:57pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt">
+                    <p class="s1" style="padding-top: 4pt;padding-right: 4pt;text-indent: 0pt;text-align: right;">$ @String.Format("{0:n}", ViewBag.NetAmount)</p>
+                </td>
+            </tr>
+            <tr style="height:114pt">
+                <td style="width:500pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt" colspan="6">
+                    <p class="s5" style="padding-top: 11pt;padding-left: 259pt;text-indent: 0pt;text-align: left;">for NISSI TOURS AND TRAVELS PTE. LTD</p>
+                    <p style="text-indent: 0pt;text-align: left;"><br /></p>
+                    <p class="s3" style="padding-left: 87pt;text-indent: 0pt;text-align: left;">This is computer generated invoice signature not required.</p>
+                </td>
+            </tr>
+        </table>
+</body>
+</html>
+

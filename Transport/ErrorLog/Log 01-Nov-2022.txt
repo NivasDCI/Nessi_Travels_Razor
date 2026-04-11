@@ -1,0 +1,205 @@
+Page Name          :GetPasswordAttemptCount
+Date and Time      :01 Nov 2022 1:25 PM
+Error Message      :No connection string named 'SpareProEntities' could be found in the application config file.
+Stack Trace        :   at System.Data.Entity.Internal.LazyInternalConnection.get_ConnectionHasModel()
+   at System.Data.Entity.Internal.LazyInternalContext.InitializeContext()
+   at System.Data.Entity.Internal.InternalContext.GetEntitySetAndBaseTypeForType(Type entityType)
+   at System.Data.Entity.Internal.Linq.InternalSet`1.Initialize()
+   at System.Data.Entity.Internal.Linq.InternalSet`1.get_InternalContext()
+   at System.Data.Entity.Infrastructure.DbQuery`1.System.Linq.IQueryable.get_Provider()
+   at System.Linq.Queryable.Join[TOuter,TInner,TKey,TResult](IQueryable`1 outer, IEnumerable`1 inner, Expression`1 outerKeySelector, Expression`1 innerKeySelector, Expression`1 resultSelector)
+   at SparePro.Repository.CommonRepository.GetPasswordAttemptCount(String LoginName) in C:\Users\P0105443\source\repos\SparePro\SparePro.Repository\CommonRepository.cs:line 584
+Error Source       :EntityFramework
+Target Site        :Boolean get_ConnectionHasModel()
+
+----------------------------------------------------------------
+Page Name          :IsRoleMapInvalidPassword
+Date and Time      :01 Nov 2022 1:25 PM
+Error Message      :No connection string named 'SpareProEntities' could be found in the application config file.
+Stack Trace        :   at System.Data.Entity.Internal.LazyInternalConnection.get_ConnectionHasModel()
+   at System.Data.Entity.Internal.LazyInternalContext.InitializeContext()
+   at System.Data.Entity.Internal.InternalContext.GetEntitySetAndBaseTypeForType(Type entityType)
+   at System.Data.Entity.Internal.Linq.InternalSet`1.Initialize()
+   at System.Data.Entity.Internal.Linq.InternalSet`1.get_InternalContext()
+   at System.Data.Entity.Infrastructure.DbQuery`1.System.Linq.IQueryable.get_Provider()
+   at System.Linq.Queryable.Where[TSource](IQueryable`1 source, Expression`1 predicate)
+   at SparePro.Repository.CommonRepository.IsRoleMapInvalidPassword(String LoginName, String Password) in C:\Users\P0105443\source\repos\SparePro\SparePro.Repository\CommonRepository.cs:line 617
+Error Source       :EntityFramework
+Target Site        :Boolean get_ConnectionHasModel()
+
+----------------------------------------------------------------
+Page Name          :GetPasswordAttemptCount
+Date and Time      :01 Nov 2022 1:31 PM
+Error Message      :No connection string named 'SpareProEntities' could be found in the application config file.
+Stack Trace        :   at System.Data.Entity.Internal.LazyInternalConnection.get_ConnectionHasModel()
+   at System.Data.Entity.Internal.LazyInternalContext.InitializeContext()
+   at System.Data.Entity.Internal.InternalContext.GetEntitySetAndBaseTypeForType(Type entityType)
+   at System.Data.Entity.Internal.Linq.InternalSet`1.Initialize()
+   at System.Data.Entity.Internal.Linq.InternalSet`1.get_InternalContext()
+   at System.Data.Entity.Infrastructure.DbQuery`1.System.Linq.IQueryable.get_Provider()
+   at System.Linq.Queryable.Join[TOuter,TInner,TKey,TResult](IQueryable`1 outer, IEnumerable`1 inner, Expression`1 outerKeySelector, Expression`1 innerKeySelector, Expression`1 resultSelector)
+   at SparePro.Repository.CommonRepository.GetPasswordAttemptCount(String LoginName) in C:\Users\P0105443\source\repos\SparePro\SparePro.Repository\CommonRepository.cs:line 584
+Error Source       :EntityFramework
+Target Site        :Boolean get_ConnectionHasModel()
+
+----------------------------------------------------------------
+Page Name          :IsRoleMapInvalidPassword
+Date and Time      :01 Nov 2022 1:31 PM
+Error Message      :No connection string named 'SpareProEntities' could be found in the application config file.
+Stack Trace        :   at System.Data.Entity.Internal.LazyInternalConnection.get_ConnectionHasModel()
+   at System.Data.Entity.Internal.LazyInternalContext.InitializeContext()
+   at System.Data.Entity.Internal.InternalContext.GetEntitySetAndBaseTypeForType(Type entityType)
+   at System.Data.Entity.Internal.Linq.InternalSet`1.Initialize()
+   at System.Data.Entity.Internal.Linq.InternalSet`1.get_InternalContext()
+   at System.Data.Entity.Infrastructure.DbQuery`1.System.Linq.IQueryable.get_Provider()
+   at System.Linq.Queryable.Where[TSource](IQueryable`1 source, Expression`1 predicate)
+   at SparePro.Repository.CommonRepository.IsRoleMapInvalidPassword(String LoginName, String Password) in C:\Users\P0105443\source\repos\SparePro\SparePro.Repository\CommonRepository.cs:line 617
+Error Source       :EntityFramework
+Target Site        :Boolean get_ConnectionHasModel()
+
+----------------------------------------------------------------
+Page Name          :GetPasswordAttemptCount
+Date and Time      :01 Nov 2022 1:42 PM
+Error Message      :No connection string named 'SpareProEntities' could be found in the application config file.
+Stack Trace        :   at System.Data.Entity.Internal.LazyInternalConnection.get_ConnectionHasModel()
+   at System.Data.Entity.Internal.LazyInternalContext.InitializeContext()
+   at System.Data.Entity.Internal.InternalContext.GetEntitySetAndBaseTypeForType(Type entityType)
+   at System.Data.Entity.Internal.Linq.InternalSet`1.Initialize()
+   at System.Data.Entity.Internal.Linq.InternalSet`1.get_InternalContext()
+   at System.Data.Entity.Infrastructure.DbQuery`1.System.Linq.IQueryable.get_Provider()
+   at System.Linq.Queryable.Join[TOuter,TInner,TKey,TResult](IQueryable`1 outer, IEnumerable`1 inner, Expression`1 outerKeySelector, Expression`1 innerKeySelector, Expression`1 resultSelector)
+   at SparePro.Repository.CommonRepository.GetPasswordAttemptCount(String LoginName) in C:\Users\P0105443\source\repos\SparePro\SparePro.Repository\CommonRepository.cs:line 584
+Error Source       :EntityFramework
+Target Site        :Boolean get_ConnectionHasModel()
+
+----------------------------------------------------------------
+Page Name          :IsRoleMapInvalidPassword
+Date and Time      :01 Nov 2022 1:42 PM
+Error Message      :No connection string named 'SpareProEntities' could be found in the application config file.
+Stack Trace        :   at System.Data.Entity.Internal.LazyInternalConnection.get_ConnectionHasModel()
+   at System.Data.Entity.Internal.LazyInternalContext.InitializeContext()
+   at System.Data.Entity.Internal.InternalContext.GetEntitySetAndBaseTypeForType(Type entityType)
+   at System.Data.Entity.Internal.Linq.InternalSet`1.Initialize()
+   at System.Data.Entity.Internal.Linq.InternalSet`1.get_InternalContext()
+   at System.Data.Entity.Infrastructure.DbQuery`1.System.Linq.IQueryable.get_Provider()
+   at System.Linq.Queryable.Where[TSource](IQueryable`1 source, Expression`1 predicate)
+   at SparePro.Repository.CommonRepository.IsRoleMapInvalidPassword(String LoginName, String Password) in C:\Users\P0105443\source\repos\SparePro\SparePro.Repository\CommonRepository.cs:line 617
+Error Source       :EntityFramework
+Target Site        :Boolean get_ConnectionHasModel()
+
+----------------------------------------------------------------
+Page Name          :GetPasswordAttemptCount
+Date and Time      :01 Nov 2022 1:43 PM
+Error Message      :No connection string named 'SpareProEntities' could be found in the application config file.
+Stack Trace        :   at System.Data.Entity.Internal.LazyInternalConnection.get_ConnectionHasModel()
+   at System.Data.Entity.Internal.LazyInternalContext.InitializeContext()
+   at System.Data.Entity.Internal.InternalContext.GetEntitySetAndBaseTypeForType(Type entityType)
+   at System.Data.Entity.Internal.Linq.InternalSet`1.Initialize()
+   at System.Data.Entity.Internal.Linq.InternalSet`1.get_InternalContext()
+   at System.Data.Entity.Infrastructure.DbQuery`1.System.Linq.IQueryable.get_Provider()
+   at System.Linq.Queryable.Join[TOuter,TInner,TKey,TResult](IQueryable`1 outer, IEnumerable`1 inner, Expression`1 outerKeySelector, Expression`1 innerKeySelector, Expression`1 resultSelector)
+   at SparePro.Repository.CommonRepository.GetPasswordAttemptCount(String LoginName) in C:\Users\P0105443\source\repos\SparePro\SparePro.Repository\CommonRepository.cs:line 584
+Error Source       :EntityFramework
+Target Site        :Boolean get_ConnectionHasModel()
+
+----------------------------------------------------------------
+Page Name          :IsRoleMapInvalidPassword
+Date and Time      :01 Nov 2022 1:43 PM
+Error Message      :No connection string named 'SpareProEntities' could be found in the application config file.
+Stack Trace        :   at System.Data.Entity.Internal.LazyInternalConnection.get_ConnectionHasModel()
+   at System.Data.Entity.Internal.LazyInternalContext.InitializeContext()
+   at System.Data.Entity.Internal.InternalContext.GetEntitySetAndBaseTypeForType(Type entityType)
+   at System.Data.Entity.Internal.Linq.InternalSet`1.Initialize()
+   at System.Data.Entity.Internal.Linq.InternalSet`1.get_InternalContext()
+   at System.Data.Entity.Infrastructure.DbQuery`1.System.Linq.IQueryable.get_Provider()
+   at System.Linq.Queryable.Where[TSource](IQueryable`1 source, Expression`1 predicate)
+   at SparePro.Repository.CommonRepository.IsRoleMapInvalidPassword(String LoginName, String Password) in C:\Users\P0105443\source\repos\SparePro\SparePro.Repository\CommonRepository.cs:line 617
+Error Source       :EntityFramework
+Target Site        :Boolean get_ConnectionHasModel()
+
+----------------------------------------------------------------
+Page Name          :GetPasswordAttemptCount
+Date and Time      :01 Nov 2022 1:43 PM
+Error Message      :No connection string named 'SpareProEntities' could be found in the application config file.
+Stack Trace        :   at System.Data.Entity.Internal.LazyInternalConnection.get_ConnectionHasModel()
+   at System.Data.Entity.Internal.LazyInternalContext.InitializeContext()
+   at System.Data.Entity.Internal.InternalContext.GetEntitySetAndBaseTypeForType(Type entityType)
+   at System.Data.Entity.Internal.Linq.InternalSet`1.Initialize()
+   at System.Data.Entity.Internal.Linq.InternalSet`1.get_InternalContext()
+   at System.Data.Entity.Infrastructure.DbQuery`1.System.Linq.IQueryable.get_Provider()
+   at System.Linq.Queryable.Join[TOuter,TInner,TKey,TResult](IQueryable`1 outer, IEnumerable`1 inner, Expression`1 outerKeySelector, Expression`1 innerKeySelector, Expression`1 resultSelector)
+   at SparePro.Repository.CommonRepository.GetPasswordAttemptCount(String LoginName) in C:\Users\P0105443\source\repos\SparePro\SparePro.Repository\CommonRepository.cs:line 584
+Error Source       :EntityFramework
+Target Site        :Boolean get_ConnectionHasModel()
+
+----------------------------------------------------------------
+Page Name          :Global Error
+Date and Time      :01 Nov 2022 12:34 PM
+Error Message      :The controller for path '/Sales/POSSales' was not found or does not implement IController.
+Stack Trace        :   at System.Web.Mvc.DefaultControllerFactory.GetControllerInstance(RequestContext requestContext, Type controllerType)
+   at System.Web.Mvc.DefaultControllerFactory.CreateController(RequestContext requestContext, String controllerName)
+   at System.Web.Mvc.MvcHandler.ProcessRequestInit(HttpContextBase httpContext, IController& controller, IControllerFactory& factory)
+   at System.Web.Mvc.MvcHandler.BeginProcessRequest(HttpContextBase httpContext, AsyncCallback callback, Object state)
+   at System.Web.Mvc.MvcHandler.BeginProcessRequest(HttpContext httpContext, AsyncCallback callback, Object state)
+   at System.Web.Mvc.MvcHandler.System.Web.IHttpAsyncHandler.BeginProcessRequest(HttpContext context, AsyncCallback cb, Object extraData)
+   at System.Web.HttpApplication.CallHandlerExecutionStep.System.Web.HttpApplication.IExecutionStep.Execute()
+   at System.Web.HttpApplication.ExecuteStepImpl(IExecutionStep step)
+   at System.Web.HttpApplication.ExecuteStep(IExecutionStep step, Boolean& completedSynchronously)
+Error Source       :System.Web.Mvc
+Target Site        :System.Web.Mvc.IController GetControllerInstance(System.Web.Routing.RequestContext, System.Type)
+
+----------------------------------------------------------------
+Page Name          :Global Error
+Date and Time      :01 Nov 2022 12:36 PM
+Error Message      :Cannot perform runtime binding on a null reference
+Stack Trace        :   at CallSite.Target(Closure , CallSite , Object )
+   at System.Dynamic.UpdateDelegates.UpdateAndExecute1[T0,TRet](CallSite site, T0 arg0)
+   at ASP._Page_Views_Home_AdminIndex_cshtml.Execute() in C:\Users\P0105443\source\repos\SparePro\SparePro\Views\Home\AdminIndex.cshtml:line 79
+   at System.Web.WebPages.WebPageBase.ExecutePageHierarchy()
+   at System.Web.Mvc.WebViewPage.ExecutePageHierarchy()
+   at System.Web.WebPages.StartPage.RunPage()
+   at System.Web.WebPages.StartPage.ExecutePageHierarchy()
+   at System.Web.WebPages.WebPageBase.ExecutePageHierarchy(WebPageContext pageContext, TextWriter writer, WebPageRenderingBase startPage)
+   at System.Web.Mvc.RazorView.RenderView(ViewContext viewContext, TextWriter writer, Object instance)
+   at System.Web.Mvc.BuildManagerCompiledView.Render(ViewContext viewContext, TextWriter writer)
+   at System.Web.Mvc.ViewResultBase.ExecuteResult(ControllerContext context)
+   at System.Web.Mvc.ControllerActionInvoker.InvokeActionResult(ControllerContext controllerContext, ActionResult actionResult)
+   at System.Web.Mvc.ControllerActionInvoker.InvokeActionResultFilterRecursive(IList`1 filters, Int32 filterIndex, ResultExecutingContext preContext, ControllerContext controllerContext, ActionResult actionResult)
+   at System.Web.Mvc.ControllerActionInvoker.InvokeActionResultFilterRecursive(IList`1 filters, Int32 filterIndex, ResultExecutingContext preContext, ControllerContext controllerContext, ActionResult actionResult)
+   at System.Web.Mvc.ControllerActionInvoker.InvokeActionResultFilterRecursive(IList`1 filters, Int32 filterIndex, ResultExecutingContext preContext, ControllerContext controllerContext, ActionResult actionResult)
+   at System.Web.Mvc.ControllerActionInvoker.InvokeActionResultFilterRecursive(IList`1 filters, Int32 filterIndex, ResultExecutingContext preContext, ControllerContext controllerContext, ActionResult actionResult)
+   at System.Web.Mvc.ControllerActionInvoker.InvokeActionResultWithFilters(ControllerContext controllerContext, IList`1 filters, ActionResult actionResult)
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.<>c__DisplayClass21.<>c__DisplayClass2b.<BeginInvokeAction>b__1c()
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.<>c__DisplayClass21.<BeginInvokeAction>b__1e(IAsyncResult asyncResult)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResult`1.CallEndDelegate(IAsyncResult asyncResult)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.End()
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.EndInvokeAction(IAsyncResult asyncResult)
+   at System.Web.Mvc.Controller.<BeginExecuteCore>b__1d(IAsyncResult asyncResult, ExecuteCoreState innerState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncVoid`1.CallEndDelegate(IAsyncResult asyncResult)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.End()
+   at System.Web.Mvc.Controller.EndExecuteCore(IAsyncResult asyncResult)
+   at System.Web.Mvc.Controller.<BeginExecute>b__15(IAsyncResult asyncResult, Controller controller)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncVoid`1.CallEndDelegate(IAsyncResult asyncResult)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.End()
+   at System.Web.Mvc.Controller.EndExecute(IAsyncResult asyncResult)
+   at System.Web.Mvc.Controller.System.Web.Mvc.Async.IAsyncController.EndExecute(IAsyncResult asyncResult)
+   at System.Web.Mvc.MvcHandler.<BeginProcessRequest>b__5(IAsyncResult asyncResult, ProcessRequestState innerState)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncVoid`1.CallEndDelegate(IAsyncResult asyncResult)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.End()
+   at System.Web.Mvc.MvcHandler.EndProcessRequest(IAsyncResult asyncResult)
+   at System.Web.Mvc.MvcHandler.System.Web.IHttpAsyncHandler.EndProcessRequest(IAsyncResult result)
+   at System.Web.HttpApplication.CallHandlerExecutionStep.System.Web.HttpApplication.IExecutionStep.Execute()
+   at System.Web.HttpApplication.ExecuteStepImpl(IExecutionStep step)
+   at System.Web.HttpApplication.ExecuteStep(IExecutionStep step, Boolean& completedSynchronously)
+Error Source       :Anonymously Hosted DynamicMethods Assembly
+Target Site        :System.Object CallSite.Target(System.Runtime.CompilerServices.Closure, System.Runtime.CompilerServices.CallSite, System.Object)
+
+----------------------------------------------------------------
+Page Name          :UserMaster_Update
+Date and Time      :01 Nov 2022 1:05 PM
+Error Message      :Object reference not set to an instance of an object.
+Stack Trace        :   at SparePro.Repository.SystemMasterRepository.UserMaster_Update(UserMasterModel ObjUserModel) in C:\Users\P0105443\source\repos\SparePro\SparePro.Repository\SystemMasterRepository.cs:line 315
+Error Source       :SparePro.Repository
+Target Site        :SparePro.Model.ReturnMessageModel UserMaster_Update(SparePro.Model.UserMasterModel)
+
+----------------------------------------------------------------

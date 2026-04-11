@@ -1,0 +1,141 @@
+﻿@using Transport.Repository.Resource;
+
+@{
+    Layout = "";
+}
+
+<head>  
+    <script>
+        var GrdJobHistory;
+
+        $('body').on('click', function (e) {
+            if ($(e.target).data('toggle') !== 'popover' && $(e.target).parents('.popover.in').length === 0) {
+                $('.popover').popover('hide');
+            }
+        });
+
+        GrdJobHistory = $("#GrdJobHistory").grid({
+            primaryKey: "JobCode",
+            uiLibrary: "bootstrap4",
+            detailTemplate: '<div class="docs-callout"><div class="row"></div></div>',
+            responsive: true,
+            showHiddenColumnsAsDetails: true,
+            dataSource: '@Url.Action("JobHistory_FindAll", "Job")',
+            columns: [
+
+                { field: "JobDate", width: 62, title: "DATE", type: "date", format: Common_Date_Format, sortable: false, align: "left" },
+                { field: "JobTime", width: 50, title: "TIME", sortable: false, align: "left" },
+                {
+                    field: "VehicleName", minWidth: 70, priority: 1, title: "VEHICLE", sortable: false, align: "center", renderer: function (value, record) {
+                        var _class = (record.VehicleName == "PC5148U") ? 'badge badge-primary' : (record.VehicleName == "PC7219K") ? 'badge badge-info' : (record.VehicleName == "PD5148P") ? 'badge badge-warning' : 'badge badge-dark';
+                        return '<div class="text-center" ><span class= ' + "'" + _class + "'" + '>' + record.VehicleName + '</span></div >';
+                    }
+                },
+                { field: "JobFrom", minWidth: 120, priority: 2, title: "FROM", sortable: false, align: "left" },
+                { field: "JobTo", minWidth: 120, priority: 3, title: "TO", sortable: false, align: "left" },
+                { field: "CustomerName", minWidth: 70, priority: 4, title: "NAME", sortable: false, align: "left" },
+                //{ field: "ContactNo", minWidth: 50, title: "CONTACT NO", sortable: false, align: "left" },
+                { field: "Cash", minWidth: 40, priority: 5, title: "AMOUNT", sortable: false, align: "right" },
+                //{
+                //    field: "JobStatus", width: 82, title: "STATUS", sortable: false, align: "center", renderer: function (value, record) {
+                //        if (record.JobStatus != 'Job Completed') {
+                //            return '<div class="text-center"><button onclick="PendingClick(' + "'" + record.JobCode + "'" + ', ' + "'" + record.JobStatus + "'" + ')" class="badge badge-info" data-toggle="modal" data-target="#myModal1">' + record.JobStatus + '</button></div>';
+                //        }
+                //        else {
+                //            return '<div class="text-center"><button class="badge badge-success" >Job Completed</button></div>';
+                //        }
+                //    }
+                //},
+                //{ field: "JobStatus", width: 82, title: "STATUS", sortable: false, align: "center" },
+                {
+                    field: "JobCode", width: 45, title: "View", sortable: true, renderer: function (value, record) {
+
+                        return '<div class="text-center"><button onclick="ViewClick(' + "'" + record.JobCode + "'" + ')" class="badge badge-info" data-toggle="modal" data-target="#myModal">History</button></div>';
+
+                    }
+                }
+
+            ],
+            pager: { enable: true, limit: 50, sizes: ArrPaging }
+        });
+
+        GrdJobHistoryStatus = $("#GrdJobHistoryStatus").grid({
+            primaryKey: "JobStatusCode",
+            uiLibrary: "bootstrap4",
+            responsive: true,
+            dataSource: '@Url.Action("JobStatus_FindAll", "Job")',
+            columns: [
+                { field: "JobStatus", title: 'Status', width: 100, align: "left" },
+                { field: "DisplayLastModifiedBy", title: 'Updated By', width: 100, align: "left" },
+                { field: "DisplayLastModifiedDate", title: 'Date & Time', width: 175, align: "left" },
+            ]
+        });
+
+        function ViewClick(trxnid) {
+            GrdJobHistoryStatus.clear();
+            GrdJobHistoryStatus.reload({ JobCode: trxnid });
+        }
+
+        $(document).ready(function () {
+
+
+        });
+       
+    </script>
+    
+    <style>
+        ul.ui-autocomplete {
+            z-index: 1100;
+        }
+    </style>
+</head>
+<body>    
+
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content" style="width:850px">
+
+                <div class="modal-body">
+                    <div class="box-body">
+                        <div class="box-body table-responsive no-padding">
+                            <table id="GrdJobHistoryStatus" class="table table-hover"></table>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content">
+        <!-- Content Header (Page header) -->
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card card-pd">
+
+                        <div class="card-header">
+                            <span style="font-size: 18px;" class="m-0"><i class="fab fa-hornbill"></i></span>
+                            <span style="font-size: 18px; border-left: 1px solid #ccc; padding-left: 10px;"> Jobs History</span>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="box-body table-responsive no-padding">
+                                        <table id="GrdJobHistory" class="table table-hover"></table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /.content-wrapper -->
+        </div>
+    </div>
+
+</body>

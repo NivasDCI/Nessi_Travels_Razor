@@ -1,0 +1,826 @@
+﻿@using Transport.Repository.Resource;
+
+@{
+    Layout = "";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+   
+    <script type="text/javascript">
+        var GrdJobAddJob;
+
+        jQuery(document).ready(function () {
+            var tabindex = 1;
+            $('[tabindex=' + tabindex + ']').focus();
+
+            $('#txtCredit').add('#txtCash').add('#txtOutSourceAmount').add('#txtOutSourceAmountGiven').on('keydown', function (e) {
+                // Allow: backspace, delete, tab, escape, enter and .
+                if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+                    // Allow: Ctrl+A, Command+A
+                    (e.keyCode == 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                    // Allow: home, end, left, right, down, up
+                    (e.keyCode >= 35 && e.keyCode <= 40)) {
+                    // let it happen, don't do anything
+                    return;
+                }
+                // Ensure that it is a number and stop the keypress
+                if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                    e.preventDefault();
+                }
+            });
+
+            document.getElementById("copyButton").addEventListener("click", function () {
+                var _number = prompt("Please Enter WhatsApp Number", "");
+                if (_number != null) {
+                    console.log(_number);
+                    $.ajax({
+                        url: '@Url.Content("~/Job/GenerateOutSourceLink")',
+                        type: "POST",
+                        data: JSON.stringify({ JobCode: $('#hdnJobCode').val() }),
+                        datatype: "Json",
+                        contentType: 'application/json',
+                        success: function (result) {
+                            console.log(result.data);
+                            var _link = 'https://wa.me/' + _number + '?text=' + encodeURIComponent(result.data) + '';
+                            console.log(_link);
+                            window.open(_link, "_blank");
+                        }
+                    });
+                }
+            });
+
+            $("[name=txtContactNo]").val("+65");
+            //var instance = $("[name=txtContactNo]")
+            //instance.intlTelInput({ initialCountry: "SG", showFlags: false });
+
+            $("[name=txtContactNo]").on("blur", function () {
+                $(this).val($(this).val().replace(/\s/g, ""));
+                $('#HdnContactNo').val($("[name=txtContactNo]").val());
+            });
+           
+
+            GrdJobAddJob = $("#GrdJobAddJob").grid({
+            primaryKey: "JobCode",
+            uiLibrary: "bootstrap4",
+            responsive: true,
+            resizableColumns: true,
+            dataSource: '@Url.Action("Job_FindAll", "Job")',
+            columns: [
+                { field: "JobCode", width: 51, title: "CODE", sortable: false, align: "left" },
+                { field: "JobDate", width: 60, title: "DATE", type: "date", format: Common_Date_Format, sortable: false, align: "left" },
+                { field: "JobTime", width: 47, title: "TIME", sortable: false, align: "left" },
+                {
+                    field: "VehicleName", width: 49, title: "VEHICLE", sortable: false, align: "center", renderer: function (value, record) {
+                        var _class = (record.VehicleName == "PC5148U") ? 'badge badge-primary' : (record.VehicleName == "PC7219K") ? 'badge badge-info' : (record.VehicleName == "PD5148P") ? 'badge badge-warning' : 'badge badge-dark';
+                        return '<div class="text-center" ><span class= ' + "'" + _class + "'" + '>' + record.VehicleName + '</span></div >';
+                    }
+                },
+                { field: "JobFrom", width: 150, title: "FROM", sortable: false, align: "left" },
+                { field: "JobTo", width: 160, title: "TO", sortable: false, align: "left" },
+                { field: "CustomerName", width: 95, title: "NAME", sortable: false, align: "left" },
+                { field: "ContactNo", width: 75, title: "CONTACT", sortable: false, align: "right" },
+
+            ],
+                pager: { enable: true, limit: 50, sizes: ArrPaging }
+                
+            });           
+
+        });
+
+
+        function titleCase(str) {
+            var splitStr = str.toLowerCase().split(' ');
+            for (var i = 0; i < splitStr.length; i++) {
+                // You do not need to check if i is larger than splitStr length, as your for does that for you
+                // Assign it back to the array
+                splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);
+            }
+            // Directly return the joined string
+            return splitStr.join(' ');
+        }
+
+        function LoadJobVendors(JobVendorCode) {
+
+            $.ajax({
+                type: "GET",
+                url: BaseURL + "Common/Load_JobVendors",
+                datatype: "Json",
+                success: function (data) {
+                    $("#ddlJobVendorCode option").remove();
+                    $.each(data, function (index, value) {
+                        $('#ddlJobVendorCode').append('<option value="' + value.ID + '">' + value.Name + '</option>');
+                    });
+                }
+            }).done(function (result) {
+
+                if (JobVendorCode != 0) {
+                    $("#ddlJobVendorCode").val(JobVendorCode);
+                }
+                else {
+                    $("#ddlJobVendorCode").val(0);
+                }
+            });
+        }
+
+        function LoadVehicles(VehicleCode) {
+
+            $.ajax({
+                type: "GET",
+                url: BaseURL + "Common/Load_Vehicles",
+                datatype: "Json",
+                success: function (data) {
+                    $("#ddlVehicleCode option").remove();
+                    $.each(data, function (index, value) {
+                        $('#ddlVehicleCode').append('<option value="' + value.ID + '">' + value.Name + '</option>');
+                    });
+                }
+            }).done(function (result) {
+
+                if (VehicleCode != 0) {
+                    $("#ddlVehicleCode").val(VehicleCode);
+                }
+                else {
+                    $("#ddlVehicleCode").val(0);
+                }
+            });
+        }
+
+        function LoadDrivingBy(DrivingBy) {
+
+            $.ajax({
+                type: "GET",
+                url: BaseURL + "Common/Load_SystemUserDetail",
+                datatype: "Json",
+                success: function (data) {
+                    $("#ddlDrivingBy option").remove();
+                    $.each(data, function (index, value) {
+                        $('#ddlDrivingBy').append('<option value="' + value.ID + '">' + value.Name + '</option>');
+                    });
+                }
+            }).done(function (result) {
+
+                if (DrivingBy != 0) {
+                    $("#ddlDrivingBy").val(DrivingBy);
+                }
+                else {
+                    $("#ddlDrivingBy").val(0);
+                }
+            });
+        }
+
+        function LoadCashInHand(CashInHand) {
+
+            $.ajax({
+                type: "GET",
+                url: BaseURL + "Common/Load_SystemUserDetail",
+                datatype: "Json",
+                success: function (data) {
+                    $("#ddlCashInHand option").remove();
+                    $.each(data, function (index, value) {
+                        $('#ddlCashInHand').append('<option value="' + value.ID + '">' + value.Name + '</option>');
+                    });
+                }
+            }).done(function (result) {
+
+                if (CashInHand != 0) {
+                    $("#ddlCashInHand").val(CashInHand);
+                }
+                else {
+                    $("#ddlCashInHand").val(0);
+                }
+            });
+        }
+
+        ShowCommonBack();
+
+        function FormValidate() {
+            var Result = true;
+
+            if ($("#txtJobDate").val() == "") {
+                ErrorAlert("Please Select Job Date");
+                Result = false;
+                return false
+            }
+            if ($("#txtJobTime").val() == "") {
+                ErrorAlert("Please Select Job Time");
+                Result = false;
+                return false
+            }
+            if ($("#txtJobFrom").val() == "") {
+                ErrorAlert("Please Select Job From");
+                Result = false;
+                return false
+            }
+            if ($("#txtJobTo").val() == "") {
+                ErrorAlert("Please Select Job To");
+                Result = false;
+                return false
+            }
+
+            if ($("#txtCash").val()) {
+                if ($("#ddlCashInHand").val() == 0 || $("#ddlCashInHand").val() == null) {
+                    ErrorAlert("CashInHand is required!");
+                    Result = false;
+                    return false
+                }
+            }
+
+            if ($("#ddlVehicleCode").val() != 0) {
+                if ($("#ddlDrivingBy").val() == 0 || $("#ddlDrivingBy").val() == null) {
+                    ErrorAlert("DrivingBy is required!");
+                    Result = false;
+                    return false
+                }
+            }
+            console.log($("#ddlVehicleCode").val());
+            if ($("#ddlVehicleCode").val() != 0) {
+                if ($("#ddlVehicleCode :selected").text() == "OUTSOURCE") {
+                    if ($("#txtOutSource").val() == "" || $("#txtOutSourceAmount").val() == "") {
+                        ErrorAlert("OutSource and OutSource Amount is required!");
+                        Result = false;
+                        return false
+                    }
+                }
+            }
+
+            //if ($("#ddlVehicleCode").val() == 0 || $("#ddlVehicleCode").val() == null) {
+            //    ErrorAlert("Please Select Vehicle");
+            //    Result = false;
+            //    return false
+            //}
+            //if ($("#ddlDrivingBy").val() == 0 || $("#ddlDrivingBy").val() == null) {
+            //    ErrorAlert("Please Select Driving By");
+            //    Result = false;
+            //    return false
+            //}
+            //if ($("#ddlJobVendorCode").val() == 0 || $("#ddlJobVendorCode").val() == null) {
+            //    ErrorAlert("Please Select Job Given By");
+            //    Result = false;
+            //    return false
+            //}
+
+            if ($("#txtContactNo").val() == "") {
+                ErrorAlert("Please Enter Contact No");
+                Result = false;
+                return false
+            }
+
+            return Result;
+        }
+
+        $('#btnSaveJobs').click(function (e) {
+            if ($(this).hasClass("unclickable")) {
+                e.preventDefault();
+            } else {
+
+                if (FormValidate() == true) {
+
+                    var fileData = new FormData();
+
+                    fileData.append("JobCode", $('#hdnJobCode').val());
+                    fileData.append("JobDate", $('#txtJobDate').val());
+                    fileData.append("JobTime", $('#txtJobTime').val());
+                    fileData.append("JobFrom", titleCase($('#txtJobFrom').val()));
+                    fileData.append("JobTo", titleCase($('#txtJobTo').val()));
+                    fileData.append("JobVendorCode", $('#ddlJobVendorCode').val());
+                    fileData.append("JobRequestCode", $('#hdnRequestCode').val());
+                    fileData.append("VehicleCode", $('#ddlVehicleCode').val());
+                    fileData.append("DrivingBy", $('#ddlDrivingBy').val());
+                    fileData.append("OutSource", titleCase(($('#txtOutSource').val() || "").toUpperCase()));
+                    fileData.append("CustomerName", titleCase(($('#txtCustomerName').val() || "").toUpperCase()));
+                    fileData.append("ContactNo", $("#HdnContactNo").val());
+                    //fileData.append("Cost", $('#txtCost').val());
+                    fileData.append("Credit", $('#txtCredit').val());
+                    fileData.append("Cash", $('#txtCash').val());
+                    fileData.append("OutSourceAmount", $('#txtOutSourceAmount').val());
+                    fileData.append("OutSourceAmountGiven", $('#txtOutSourceAmountGiven').val());
+                    fileData.append("Remarks", $('#txtRemarks').val());
+                    fileData.append("CashInHand", $('#ddlCashInHand').val());
+
+                    $.ajax({
+                        url: BaseURL + "Job/Job_Save", type: "POST",
+                        contentType: false, // Not to set any content header
+                        processData: false,
+                        data: fileData
+
+                    }).done(function (result) {
+                        if (result.Result == true) {
+                            SucessAlert(result.Message);
+                            ClearJobs();
+                            GetMenu('@Url.Action("ListJobs", "Job")' + '?HeaderViewID=PURCMASTER6 & DetailViewID=18UG35XQZNWT');
+                            //BackFunction();
+                        }
+                        else if (result.Result == false) {
+                            ErrorAlert(result.Message);
+                        }
+                    })
+                    .fail(function (result) {
+                        ErrorAlert(result.Message);
+                    });
+                }
+            }
+        });
+
+        $("#btnJobReset").click(function () {
+            if ($(this).hasClass("unclickable")) {
+                e.preventDefault();
+            } else {
+                $(this).addClass("unclickable");
+                ResetJob();
+            }
+        });
+
+        $('#btnJobReAssign').click(function (e) {
+            if ($(this).hasClass("unclickable")) {
+                e.preventDefault();
+            } else {
+                var _errorMsg = "";
+                if ($('#hdnJobCode').val() == 0) {
+                    _errorMsg += '<br />' + "Job Code Empty!";
+                }
+                if (_errorMsg.length > 0) {
+                    ErrorAlert(_errorMsg);
+                    return false;
+                }
+
+                $.confirm({
+                    title: "Re Assign?",
+                    content: ConfirmAlert_Message_Content.replace("{0}", "Re Assign will clear all the history and Set the Job Status to Assigned. Do you want to Continue?"),
+                    animation: 'zoom',
+                    closeAnimation: 'zoom',
+                    buttons: {
+                        'confirm': {
+                            text: Alert_YesMessage,
+                            btnClass: Alert_Button_Style,
+                            keys: ['enter'],
+                            action: function () {
+                                $.ajax({
+                                    url: '@Url.Content("~/Job/ReAssignJobStatus")',
+                                    type: 'POST',
+                                    data: JSON.stringify({ JobCode: $('#hdnJobCode').val() }),
+                                    dataType: 'json',
+                                    contentType: 'application/json',
+                                    success: function (result) {
+                                        if (result.success === true) {
+                                            SucessAlert("Re Assign completed. Make your Changes and Save the Job!");
+                                        }
+                                        if (result.success === false) {
+                                            ErrorAlert(result.response);
+                                        }
+                                    }
+                                });
+                            },
+                            cancel: {
+                                text: Alert_NoMessage,
+                                btnClass: Alert_Button_Style
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
+        $('#btnJobCancel').click(function (e) {
+            if ($(this).hasClass("unclickable")) {
+                e.preventDefault();
+            } else {
+                var _errorMsg = "";
+                if ($('#hdnJobCode').val() == 0) {
+                    _errorMsg += '<br />' + "Job Code Empty!";
+                }
+                if (_errorMsg.length > 0) {
+                    ErrorAlert(_errorMsg);
+                    return false;
+                }
+
+                $.confirm({
+                    title: "Cancel Job?",
+                    content: ConfirmAlert_Message_Content.replace("{0}", "Do you want to Cancel this Job?"),
+                    animation: 'zoom',
+                    closeAnimation: 'zoom',
+                    buttons: {
+                        'confirm': {
+                            text: Alert_YesMessage,
+                            btnClass: Alert_Button_Style,
+                            keys: ['enter'],
+                            action: function () {
+                                $.ajax({
+                                    url: '@Url.Content("~/Job/CancelJob")',
+                                    type: 'POST',
+                                    data: JSON.stringify({ JobCode: $('#hdnJobCode').val() }),
+                                    dataType: 'json',
+                                    contentType: 'application/json',
+                                    success: function (result) {
+                                        if (result.success === true) {
+                                            InfoAlert("Re Assign completed. Make your Changes and Save the Job!");
+                                        }
+                                        if (result.success === false) {
+                                            ErrorAlert(result.response);
+                                        }
+                                    }
+                                });
+                            },
+                            cancel: {
+                                text: Alert_NoMessage,
+                                btnClass: Alert_Button_Style
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
+        function ResetJob() {
+            if (GetParamValue("JobCode") != 0) {
+                EditJobs();
+            }
+            else {
+                ClearJobs();
+            }
+        }
+
+        function ClearJobs() {
+            $('#ddlVehicleCode').val(0); $('#ddlJobVendorCode').val(0); $('#ddlDrivingBy').val(0); $('#ddlCashInHand').val(0);
+            $('#txtJobDate').text(''); $('#txtJobTime').val(''); $('#txtJobFrom').val(''); $('#txtJobTo').val(''); //$('#txtCost').val('');
+            $('#txtCredit').val(''); $('#txtCash').val(''); $('#txtOutSourceAmount').val(''); $('#txtOutSourceAmountGiven').val(''); $('#txtRemarks').val('');
+            $('#txtContactNo').val(''); $('#txtCustomerName').val(''); $('#txtOutSource').val(''); $("#HdnContactNo").val("");
+        }
+
+        $('#txtJobDate').datepicker({
+            format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small', todayHighlight: true
+        }).on("change", function () {
+            LoadJobs();
+        });
+
+        $('input[id="txtJobDate"]').val(TodayDateRange);
+
+        function TodayDateRange() {
+            let monthNames = ["Jan", "Feb", "Mar", "Apr",
+                "May", "Jun", "Jul", "Aug",
+                "Sep", "Oct", "Nov", "Dec"];
+
+            var today = new Date();
+            var dd = today.getDate();
+            var mm = today.getMonth(); //January is 0!
+            var yyyy = today.getFullYear();
+
+            if (dd < 10) {
+                dd = '0' + dd
+            }
+
+            let monthName = monthNames[mm];
+
+            return dd + '-' + monthName + '-' + yyyy;
+        }
+
+        EditJobs();
+
+        function EditJobs() {
+
+            if (GetParamValue("JobCode") != 0) {
+                $.ajax({
+                    type: "GET",
+                    url: BaseURL + "Job/Job_Edit",
+                    data: { JobCode: GetParamValue("JobCode") },
+                    datatype: "Json",
+                    success: function (data) {
+                        $('#hdnJobCode').val(GetParamValue("JobCode"));
+                        //$("#txtJobDate").val(data.JobDate);
+                        $("#txtJobDate").val(GetParseJsonDate(data.JobDate));
+                        $("#txtJobTime").val(data.JobTime);
+                        $("#txtJobFrom").val(data.JobFrom);
+                        $("#txtJobTo").val(data.JobTo);
+                        $("#ddlJobVendorCode").val(data.JobVendorCode);
+                        $("#ddlVehicleCode").val(data.VehicleCode);
+                        $("#ddlDrivingBy").val(data.DrivingBy);
+                        $("#ddlCashInHand").val(data.CashInHand);
+                        $("#txtOutSource").val(data.OutSource);
+                        $("#txtCustomerName").val(data.CustomerName);
+                        $("#txtRemarks").val(data.Remarks);
+                        $("#txtContactNo").val(data.ContactNo);
+                        $("#HdnContactNo").val(data.ContactNo);
+
+                        //$("#txtCost").val(data.Cost);
+                        $("#txtCredit").val(data.Credit);
+                        $("#txtCash").val(data.Cash);
+                        $("#txtOutSourceAmount").val(data.OutSourceAmount);
+                        $("#txtOutSourceAmountGiven").val(data.OutSourceAmountGiven);
+                        LoadJobVendors(data.JobVendorCode);
+                        LoadVehicles(data.VehicleCode);
+                        LoadDrivingBy(data.DrivingBy);
+                        LoadCashInHand(data.CashInHand);
+                        if (data.OutSource) { $('#divcopylink').show(); }
+                        $('#btnJobReAssign').show();
+                        if (data.JobStatus != "Cancelled") { $('#btnJobCancel').show(); }
+                    }
+                });
+                LoadJobs();
+            }
+            else {
+                $('#divcopylink').hide();
+                $('#btnJobReAssign').hide(); $('#btnJobCancel').hide();
+                LoadJobVendors(0);
+                LoadVehicles(0);
+                LoadDrivingBy(0);
+                LoadCashInHand(0);
+            }
+
+            if (GetParamValue("JobRequestCode") != 0) {
+                $('#hdnRequestCode').val(GetParamValue("JobRequestCode"));
+                FetchRecord();
+                $('#btnJobReAssign').hide(); $('#btnJobCancel').hide();
+                LoadJobs();
+            }
+        }
+
+        function FetchRecord() {
+            $.ajax({
+                type: "GET",
+                url: BaseURL + "Job/GetRequest",
+                data: { JobRequestCode: $('#hdnRequestCode').val() },
+                datatype: "Json",
+                success: function (data) {
+                    //$('#hdnRequestCode').val($('#hdnRequestCode').val());
+                    $("#txtJobDate").val(GetParseJsonDate(data.JobRequestDate));
+                    $("#txtJobTime").val(data.JobRequestTime);
+                    $("#txtJobFrom").val(data.JobRequestFrom);
+                    $("#txtJobTo").val(data.JobRequestTo);
+                    $("#txtCustomerName").val(data.CustomerName);
+                    $("#HdnContactNo").val(data.ContactNo);
+                    $("#txtContactNo").val(data.ContactNo);
+                    $('#txtCash').val(data.Cost);
+                }
+            });
+        }
+
+        function FetchJobRecord() {
+            $.ajax({
+                type: "GET",
+                url: BaseURL + "Job/Job_Edit",
+                data: { JobCode: $('#txtJobCode').val() },
+                datatype: "Json",
+                success: function (data) {
+                    $("#txtJobDate").val(GetParseJsonDate(data.JobDate));
+                    $("#txtJobTime").val(data.JobTime);
+                    $("#txtJobFrom").val(data.JobFrom);
+                    $("#txtJobTo").val(data.JobTo);
+                    $("#txtCustomerName").val(data.CustomerName);
+                    $("#txtRemarks").val(data.Remarks);
+                    $('#ddlJobVendorCode').val(data.JobVendorCode);
+                    $('#txtOutSource').val(data.OutSource);
+                    $("#txtOutSourceAmount").val(data.OutSourceAmount);
+                    $('#ddlVehicleCode').val(data.VehicleCode);
+                    $('#ddlDrivingBy').val(data.DrivingBy);
+                    //$('#txtCost').val(data.Cost);
+                    $('#txtCredit').val(data.Credit);
+                    $('#txtCash').val(data.Cash);
+                    $("#HdnContactNo").val(data.ContactNo);
+                    $("#txtContactNo").val(data.ContactNo);
+                }
+            });
+        }
+
+        $('[data-widget="pushmenu"]').PushMenu("collapse");
+
+        $(function () {
+            $('#txtJobTime').timepicker({
+                'scrollDefault': 'now',
+                'step': 10,
+                'forceRoundTime': true,
+                //'timeFormat': 'h:i A'
+                'timeFormat': 'H:i'
+            });
+        });
+
+        function LoadJobs() {
+            GrdJobAddJob.clear();
+            GrdJobAddJob.reload({ StartDate: $('#txtJobDate').val(), EndDate: $('#txtJobDate').val(), JobVendorCode: null, DrivingBy: null, VehicleCode: null });
+        }
+       
+    </script>
+
+</head>
+<body>
+    <input type="hidden" id="hdnJobCode" name="hdnJobCode" />
+    <input type="hidden" id="hdnRequestCode" name="hdnRequestCode" />
+    <input type="text" style="display:none" id="copyTarget" name="copyTarget" />
+    <input type="hidden" id="HdnContactNo" />
+    <!-- Main content -->
+    <div class="content" id="contentdiv">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- /.col-md-12 -->
+                <div class="col-lg-12">
+                    <div class="card card-pd">
+                        <div class="card-header">
+                            <span style="font-size: 18px;" class="m-0"><i class="fab fa-hornbill"></i></span>
+                            <span style="font-size: 18px; border-left: 1px solid #ccc; padding-left: 10px;"> Job - [Add/Edit] </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                @*<div class="col-sm-2">
+                                <div class="form-group">
+                                    <label>Request Code</label>
+                                    <input type="text" autocomplete="off" class="form-control" id="txtRequestCode">
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="pdt-25">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <button type="button" id="btnFetch" onclick="FetchRecord()" class="btn btn-primary btn-block"><i class="fa fa-search"></i> Fetch</button>
+                                        </div>
+                                        <div class="col-sm-6">
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>*@
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label>Job Code</label>
+                                        <input type="text" autocomplete="off" class="form-control" id="txtJobCode">
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="pdt-25">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <button type="button" id="btnFetch" onclick="FetchJobRecord()" class="btn btn-primary btn-block"><i class="fa fa-search"></i> Fetch</button>
+                                            </div>
+                                            <div class="col-sm-6">
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-2">
+                                    <div class="form-group required">
+                                        <label class="control-label">Job Date</label>
+                                        <input type="text" tabindex="1" autocomplete="off" class="form-control" id="txtJobDate">
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="form-group required">
+                                        <label class="control-label">Job Time</label>
+                                        <input type="text" tabindex="2" style="text-transform:uppercase" autocomplete="off" class="form-control time ui-timepicker-input" placeholder="HH:MM" id="txtJobTime">
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label class="control-label">Job Given By</label>
+                                        @Html.DropDownList("ddlJobVendorCode", new SelectList(string.Empty, "Value", "Text"), new { @tabindex = 3, @class = "form-control select2", @width = "100%" })
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label class="control-label">Out Source Name / Vehicle No</label>
+                                        <input type="text" tabindex="4" autocomplete="off" class="form-control" style="text-transform: capitalize" id="txtOutSource">
+                                    </div>
+                                </div>
+                                <div class="col-sm-2" id="divcopylink">
+                                    <div class="form-group">
+                                        <label class="control-label"></label>
+                                        <button type="button" id="copyButton" class="form-control btn-primary btn-sm">Send Link</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label class="control-label">Customer Name</label>
+                                        <input type="text" tabindex="5" autocomplete="off" class="form-control" style="text-transform: capitalize" id="txtCustomerName">
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="form-group required">
+                                        <label class="control-label">Contact No</label>
+                                        <input type="text" tabindex="6" class="form-control" id="txtContactNo" name="txtContactNo" autocomplete="off">
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group required">
+                                        <label class="control-label">From</label>
+                                        <input type="text" tabindex="7" class="form-control" style="text-transform: capitalize" id="txtJobFrom">
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group required">
+                                        <label class="control-label">To</label>
+                                        <input type="text" tabindex="8" class="form-control" style="text-transform: capitalize" id="txtJobTo">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label class="control-label">Vehicle</label>
+                                        @Html.DropDownList("ddlVehicleCode", new SelectList(string.Empty, "Value", "Text"), new { @tabindex = 9, @class = "form-control select2", @width = "100%" })
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label class="control-label">Driving By</label>
+                                        @Html.DropDownList("ddlDrivingBy", new SelectList(string.Empty, "Value", "Text"), new { @tabindex = 10, @class = "form-control select2", @width = "100%" })
+                                    </div>
+                                </div>
+                                <div class="col-sm-2" style="display:none">
+                                    <div class="form-group">
+                                        <label class="control-label">Cost</label>
+                                        <input type="text" tabindex="11" class="form-control" id="txtCost">
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label class="control-label">Credit</label>
+                                        <input type="text" tabindex="11" class="form-control" id="txtCredit">
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="form-group ">
+                                        <label class="control-label">Cash</label>
+                                        <input type="text" tabindex="12" class="form-control" id="txtCash">
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="form-group ">
+                                        <label class="control-label">OutSource Amt</label>
+                                        <input type="text" tabindex="12" class="form-control" id="txtOutSourceAmount">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label>Cash In Hand</label>
+                                        @Html.DropDownList("ddlCashInHand", new SelectList(string.Empty, "Value", "Text"), new { @tabindex = 13, @class = "form-control select2", @width = "100%" })
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label>Remarks</label>
+                                        <input type="text" tabindex="14" class="form-control" id="txtRemarks">
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="form-group ">
+                                        <label class="control-label">OutSource Amt Given</label>
+                                        <input type="text" tabindex="15" class="form-control" id="txtOutSourceAmountGiven">
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="pdt-25">
+                                        <div class="row">
+                                            <div class="col-sm-2">
+                                                <button type="button" tabindex="16" id="btnSaveJobs" class="btn btn-primary btn-block"><i class="fa fa-save"></i> Save</button>
+                                            </div>
+                                            <div class="col-sm-2">
+                                                <button type="button" tabindex="17" id="btnJobReset" class="btn btn-secondary btn-block"><i class="fa fa-undo"></i> @Transport.Repository.WEBPAGEBUTTON.RESET</button>
+                                            </div>
+                                            <div class="col-sm-2">
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <button type="button" tabindex="18" id="btnJobReAssign" class="btn btn-warning btn-block"><i class="fa fa-undo"></i> Re Assign Job</button>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <button type="button" tabindex="19" id="btnJobCancel" class="btn btn-danger btn-block"><i class="fa fa-trash"></i> Cancel Job</button>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+                <!-- /.col-md-12 -->
+            </div>
+            <!-- /.row -->
+            <br />
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="box-body table-responsive no-padding">
+                        <table id="GrdJobAddJob" class="table table-hover"></table>
+                    </div>
+                </div>
+            </div>
+        </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content -->
+
+</body>
+
+</html>
+

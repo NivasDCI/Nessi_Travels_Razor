@@ -1,0 +1,373 @@
+﻿@using Transport.Repository.Resource;
+
+@{
+    Layout = "";
+}
+
+<head>  
+    <script>
+        var GrdJobRequest;
+
+        $('body').on('click', function (e) {
+            if ($(e.target).data('toggle') !== 'popover' && $(e.target).parents('.popover.in').length === 0) {
+                $('.popover').popover('hide');
+            }
+        });
+
+        document.onkeydown = function (evt) {
+            var keyCode = evt ? (evt.which ? evt.which : evt.keyCode) : event.keyCode;
+            if (keyCode == 13) {
+                JobRequestSearch();
+                return false;
+            }
+        }
+
+        function IsRequestedCheck() {
+
+            GrdJobRequest.reload({ CustomerName: $("#txtCustomerName").val(), ContactNo: $("#txtContactNo").val() });
+            var Result = false
+            var dataRequest = GrdJobRequest.getAll();
+           
+            for (var i = 1; i <= dataRequest.length; i++) {
+                var Recorddata = GrdJobRequest.get(i);
+
+                if (Recorddata.JobRequestStatus == "Requested") {
+                    Result = true;
+                    break;
+                }
+            }
+            if (Result) {
+                console.log('Playing Audio');
+                var x = document.getElementById("myAudio");
+                x.play();
+            }
+        }
+
+        GrdJobRequest = $("#GrdJobRequest").grid({
+            primaryKey: "JobRequestCode",
+            uiLibrary: "bootstrap4",
+            detailTemplate: '<div class="docs-callout"><div class="row"></div></div>',
+            responsive: true,
+            showHiddenColumnsAsDetails: true,
+            resizableColumns: true,
+            dataSource: '@Url.Action("JobRequest_FindAll", "Job")',
+            columns: [
+                {
+                    field: "JobRequestCode", width: 52, title: "Code", sortable: false, align: "center", renderer: function (value, record) {
+                        if (record.JobRequestStatus == 'Job Accepted') {
+                            return '<div class="text-center"><button onclick="AssignJob(' + "'" + record.JobRequestCode + "'" + ')" class="badge badge-info">Add Job</button></div>';
+                        }
+                        else {
+                            return '<div class="text-center"><span class="badge badge-success" >' + record.JobRequestCode  + '</span></div>';
+                        }
+                    }
+                },
+                { field: "JobRequestDate", width: 50, title: "DATE", type: "date", format: Common_Date_Format, sortable: false, align: "left" },
+                { field: "JobRequestTime", width: 40, title: "TIME", sortable: false, align: "left" },
+                { field: "DisplayCreatedDate", width: 87, title: "SUBMISSION", sortable: false, align: "left" },
+                { field: "JobRequestFrom", width: 151, title: "FROM", sortable: false, align: "left" },
+                { field: "JobRequestTo", width: 151, title: "TO", sortable: false, align: "left" },
+                { field: "CustomerName", width: 85, title: "NAME", sortable: true, align: "left" },
+                { field: "ContactNo", width: 65, title: "CONTACT NO", sortable: false, align: "left" },
+                { field: "NoOfPaxs", width: 65, title: "NO OF PAXS", sortable: false, align: "left" },
+                { field: "NoOfBags", width: 65, title: "NO OF BAGS", sortable: false, align: "left" },
+                {
+                    field: "Cost", width: 39, title: "COST", sortable: false, align: "center", renderer: function (value, record) {
+                        if (intVal(value).toFixed(2) == 0.00) {
+                            return '';
+                        }
+                        else {
+                            return intVal(value).toFixed(2);
+                        }
+                    }
+                },
+                {
+                    field: "JobRequestStatus", width: 82, title: "STATUS", sortable: true, align: "center", renderer: function (value, record) {
+                        if (record.JobRequestStatus != 'Completed') {
+                            //var icon = (area == 1) ? icon1 : (area == 2) ? icon2 : icon0;
+                            var _class = (record.JobRequestStatus == "Requested") ? 'badge badge-primary' : (record.JobRequestStatus == "Job Accepted") ? 'badge badge-info' : (record.JobRequestStatus == "Pending") ? 'badge badge-warning' : 'badge badge-danger';
+
+                            return '<div class="text-center"><button onclick="PendingClick(' + "'" + record.JobRequestCode + "'" + ', ' + "'" + record.JobRequestStatus + "'" + ', ' + "'" + record.Cost + "'" + ')" class= ' + "'" + _class + "'" +' data-toggle="modal" data-target="#myModal1">' + record.JobRequestStatus + '</button ></div>';
+                        }
+                        else {
+                            return '<div class="text-center"><span class="badge badge-success" >Completed</span></div>';
+                        }
+                    }
+                },
+                {
+                    field: "JobRequestCode", width: 82, title: "Notify", sortable: false, align: "center", renderer: function (value, record) {
+                        if (record.JobRequestStatus == 'Job Accepted' || record.JobRequestStatus == 'Not Available' || record.JobRequestStatus == 'Cancelled') {
+                            return '<div class="text-center"><button onclick="LinkClick(' + record.JobRequestCode + ', ' + "'" + record.JobRequestStatus + "'" + ')" class="badge badge-info">Notify</button></div>';
+                        }
+                        else {
+                            return '<div class="text-center"><span class="badge badge-success" ></span></div>';
+                        }
+                    }
+                }
+            ],
+            pager: { enable: true, limit: 50, sizes: ArrPaging }
+        });
+
+        function JobRequestSearch() {
+            GrdJobRequest.clear();
+            GrdJobRequest.reload({ CustomerName: $("#txtCustomerName").val(), ContactNo: $("#txtContactNo").val() });
+        }
+
+        $('#btnJobRequestSearch').click(function () {
+            JobRequestSearch();
+        });
+
+        $('#btnJobRequestSearchClear').click(function () {
+            $("#txtCustomerName").val(''); $("#txtContactNo").val('');
+            GrdJobRequest.reload({ CustomerName: $("#txtCustomerName").val(), ContactNo: $("#txtContactNo").val() });
+        });
+
+        $(document).ready(function () {
+            LoadJobRequestStatus();
+            GrdJobRequest.clear();
+            GrdJobRequest.reload({ CustomerName: $("#txtCustomerName").val(), ContactNo: $("#txtContactNo").val() });
+            IsRequestedCheck();
+            setInterval(IsRequestedCheck, 60000); // 60 secs
+        });        
+
+        function SaveStatus() {
+            var jobrequestcode = $('#jobidmodal').val();
+            var jobstatus = $('#ddlJobRequestStatus').val();
+
+            $.ajax({
+                url: '@Url.Content("~/Job/UpdateRequestStatus")',
+                type: 'POST',
+                data: JSON.stringify({ JobRequestCode: jobrequestcode, JobStatus: jobstatus, Cost: $('#txtCost').val() }),
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function (result) {
+                    if (result.success === true) {
+                        GrdJobRequest.reload({ CustomerName: $("#txtCustomerName").val(), ContactNo: $("#txtContactNo").val() });
+                        $('#myModal1').modal('hide');
+
+                    }
+                    if (result.success === false) {
+                        $('#myModal1').modal('show');
+                    }
+                }
+            });
+            if (jobstatus == 'Job Accepted') {
+                GetMenu('@Url.Action("AddJob", "Job")' + '?JobRequestCode=' + jobrequestcode + '&HeaderViewID=' + GetParamValue("HeaderViewID") + '&DetailViewID=' + GetParamValue("DetailViewID"));
+            }
+        }
+
+        function PendingClick(trxnid, jobstatus, cost) {
+            $('#myModal1').find('#jobidmodal').val(trxnid);
+            $('#txtCost').val('');
+            
+            if (jobstatus == 'Requested') {
+                $('#ddlJobRequestStatus').val('Job Accepted');
+            }
+            else {
+                $('#ddlJobRequestStatus').val(jobstatus);
+            }
+            if (cost != null && cost != 'null') {
+                $('#txtCost').val(cost);
+            }
+            //$('#ddlJobRequestStatus option[value="' + jobstatus + '"]').attr('selected', 'selected').addClass('active');
+        }
+
+        function LinkClick(jobcode, jobstatus) {
+            var jobrequestcode = jobcode;
+            var jobstatus = jobstatus;
+
+            $.ajax({
+                url: '@Url.Content("~/Job/GenerateLinkContent")',
+                type: "POST",
+                data: JSON.stringify({ JobRequestCode: jobrequestcode, RequestStatus: jobstatus }),
+                datatype: "Json",
+                contentType: 'application/json',
+                success: function (result) {
+                    if (result.number) {
+                        var _link = 'https://wa.me/' + result.number + '?text=' + encodeURIComponent(result.data) + '';
+                        console.log(_link);
+                        window.open(_link, "_blank");
+                    }
+                    else {
+                        ErrorAlert(result.data);
+                        //$('#myModal2').find('#linkcontent').html(result.data);
+                    }
+                }
+            });
+        }
+
+        function AssignJob(ID) {
+
+            var ParamData = [
+                { ParameterName: "CustomerName", ParameterValue: $("#txtCustomerName").val() },
+                { ParameterName: "ContactNo", ParameterValue: $("#txtContactNo").val() }
+            ]
+
+            AddBackURLStore(JSON.stringify(ParamData));
+
+            GetMenu('@Url.Action("AddJob", "Job")' + '?JobRequestCode=' + ID + '&HeaderViewID=' + GetParamValue("HeaderViewID") + '&DetailViewID=' + GetParamValue("DetailViewID"));
+
+        }
+
+        function LoadJobRequestStatus() {
+
+            $.ajax({
+                type: "GET",
+                url: BaseURL + "Common/Load_JobRequestStatus",
+                datatype: "Json",
+                success: function (data) {
+                    $("#ddlJobRequestStatus option").remove();
+                    $.each(data, function (index, value) {
+                        $('#ddlJobRequestStatus').append('<option value="' + value.Text + '">' + value.Value + '</option>');
+                    });
+                }
+            });
+        }
+
+        function intVal(i) {
+            return typeof i === 'string' ?
+                i.replace(/[\$,]/g, '') * 1 :
+                typeof i === 'number' ?
+                    i : 0;
+        };
+    </script>
+    
+    <style>
+        ul.ui-autocomplete {
+            z-index: 1100;
+        }
+    </style>
+</head>
+<body>
+    <audio id="myAudio">
+        <source src="~/bell.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    @*<h4 class="modal-title" id="InvoiceNoPending"></h4>*@
+                    <input type="hidden" id="jobidmodal" name="jobidmodal" />
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label class="control-label">Cost</label>
+                                <input type="text" class="form-control" id="txtCost">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="control-label">Update Status</label>
+                                @Html.DropDownList("ddlJobRequestStatus", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @width = "100%" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" id="btnupdatestatus" onclick="SaveStatus();" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <input type="hidden" id="jobidmodal" name="jobidmodal" />
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div class="row">
+                            <div>
+                                <h4 id="linkcontent" class="responsive-font-example text-info"></h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content">
+        <!-- Content Header (Page header) -->
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card card-pd">
+
+                        <div class="card-header">
+                            <span style="font-size: 18px;" class="m-0"><i class="fab fa-hornbill"></i></span>
+                            <span style="font-size: 18px; border-left: 1px solid #ccc; padding-left: 10px;"> Job Requests</span>
+                            <div style="float: right;">
+                                <span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px;">
+                                    <a href="#" data-toggle="tooltip" data-placement="bottom" title="Show Form" onclick="showForm()"><i class="fas fa-caret-square-down"></i></a>
+                                </span><span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px;">
+                                    <a href="#" data-toggle="tooltip" data-placement="bottom" title="Hide Form" onclick="hideForm()"><i class="fas fa-caret-square-up"></i></a>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <div id="hidden-form">
+                                <div class="row">
+
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>Customer Name</label>
+                                            <div>
+                                                <input type="text" autocomplete="off" class="form-control" id="txtCustomerName">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>Contact No</label>
+                                            <div>
+                                                <input type="text" autocomplete="off" class="form-control" id="txtContactNo">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-4">
+                                        <div class="pdt-25">
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <button type="button" id="btnJobRequestSearch" class="btn btn-primary btn-block"><i class="fa fa-search"></i> @Transport.Repository.WEBPAGEBUTTON.SEARCH</button>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <button type="button" id="btnJobRequestSearchClear" class="btn btn-primary btn-block"><i class="fa fa-paint-brush"></i> @Transport.Repository.WEBPAGEBUTTON.CLEAR</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="box-body table-responsive no-padding">
+                                        <table id="GrdJobRequest" class="table table-hover"></table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div><!-- /.content-wrapper -->
+        </div>
+    </div>
+
+</body>
