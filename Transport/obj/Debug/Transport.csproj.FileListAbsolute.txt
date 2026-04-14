@@ -206,3 +206,7 @@ C:\Users\HP\Documents\repos\Transport\Transport\bin\ta\Transport.Repository.reso
 C:\Users\HP\Documents\repos\Transport\Transport\obj\Debug\Transport.csproj.Up2Date
 C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Travals_Booking_Old_Source\Nessi_Travels_Razor\Transport\obj\Debug\Transport.dll
 C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Travals_Booking_Old_Source\Nessi_Travels_Razor\Transport\obj\Debug\Transport.pdb
+C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Nessi_Travels_Razor\Transport\obj\Debug\Transport.csproj.AssemblyReference.cache
+C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Nessi_Travels_Razor\Transport\obj\Debug\Transport.csproj.CoreCompileInputs.cache
+C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Nessi_Travels_Razor\Transport\obj\Debug\Transport.dll
+C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Nessi_Travels_Razor\Transport\obj\Debug\Transport.pdb
