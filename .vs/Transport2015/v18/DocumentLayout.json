@@ -1,7 +1,12 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{2ED5E85A-48D0-4792-9218-68E6C0781A51}|Transport\\Transport.csproj|c:\\users\\dell\\desktop\\project-folder\\jjk_info\\nessi\\nessi_travels_razor\\transport\\web.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{2ED5E85A-48D0-4792-9218-68E6C0781A51}|Transport\\Transport.csproj|solutionrelative:transport\\web.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -9,8 +14,21 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": -1,
+          "SelectedChildIndex": 0,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Web.config",
+              "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Web.config",
+              "RelativeDocumentMoniker": "Transport\\Web.config",
+              "ToolTip": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Web.config",
+              "RelativeToolTip": "Transport\\Web.config",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAjAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000601|",
+              "WhenOpened": "2026-04-14T16:17:45.068Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Bookmark",
               "Name": "ST:128:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
