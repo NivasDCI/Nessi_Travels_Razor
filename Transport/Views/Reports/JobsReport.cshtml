@@ -1,12 +1,10 @@
-﻿
-@using Transport.Repository.Resource;
+﻿@using Transport.Repository.Resource;
 
 @{
     Layout = "";
 }
- 
+
 <head>
-    
     <script>
 
         $("#TxtFromDate").datepicker({
@@ -18,8 +16,6 @@
         });
 
         $(document).ready(function () {
-
-
         });
 
         $.ajax({
@@ -84,56 +80,30 @@
                 { field: "JobVendorName", width: 93, title: "JOB GIVEN BY", sortable: true, align: "right" },
                 { field: "DrivingByName", width: 87, title: "DRIVING BY", sortable: false, align: "right" },
                 { field: "ContactNo", width: 65, title: "CONTACT NO", sortable: false, align: "left" },
-                //{
-                //    field: "Cost", width: 39, title: "COST", sortable: false, align: "center", renderer: function (value, record) {
-                //        return intVal(value).toFixed(2);
-                //    }
-                //},
                 {
                     field: "Credit", width: 39, title: "CREDIT", sortable: false, align: "center", renderer: function (value, record) {
-                        if (intVal(value).toFixed(2) == 0.00) {
-                            return '';
-                        }
-                        else {
-                            return '<div class="text-center" ><span class="badge badge-danger">' + intVal(value).toFixed(2) + '</span></div >';
-                        }
+                        if (intVal(value).toFixed(2) == 0.00) { return ''; }
+                        else { return '<div class="text-center" ><span class="badge badge-danger">' + intVal(value).toFixed(2) + '</span></div >'; }
                     }
                 },
                 {
                     field: "Cash", width: 39, title: "CASH", sortable: false, align: "center", renderer: function (value, record) {
-                        if (intVal(value).toFixed(2) == 0.00) {
-                            return '';
-                        }
-                        else {
-                            return intVal(value).toFixed(2);
-                        }                        
+                        if (intVal(value).toFixed(2) == 0.00) { return ''; }
+                        else { return intVal(value).toFixed(2); }
                     }
                 },
                 { field: "CashInHandName", width: 87, title: "CASH IN HAND", sortable: false, align: "left" },
-                //{
-                //    field: "OutSourceAmount", width: 39, title: "OUT AMT", sortable: false, align: "center", renderer: function (value, record) {
-                //        if (intVal(value).toFixed(2) == 0.00) {
-                //            return '';
-                //        }
-                //        else {
-                //            return intVal(value).toFixed(2);
-                //        }
-                //    }
-                //},
                 {
                     field: "JobStatus", width: 82, title: "STATUS", sortable: false, align: "center", renderer: function (value, record) {
                         var _class = (record.JobStatus == "Cancelled") ? 'badge badge-danger' : (record.JobStatus == "Assigned") ? 'badge badge-info' :
                             (record.JobStatus == "Job Started") ? 'badge badge-primary' : (record.JobStatus == "Waiting for Customer") ? 'badge badge-warning' : (record.JobStatus == "No Show") ? 'badge badge-danger' :
                                 (record.JobStatus == "Passenger on board") ? 'badge badge-secondary' : 'badge badge-success';
-
-                            return '<div class="text-center"><button class= ' + "'" + _class + "'" + ' >' + record.JobStatus + '</button></div>';
+                        return '<div class="text-center"><button class= ' + "'" + _class + "'" + ' >' + record.JobStatus + '</button></div>';
                     }
                 },
                 {
                     field: "JobCode", width: 45, title: "View", sortable: true, renderer: function (value, record) {
-
                         return '<div class="text-center"><button onclick="ViewClick(' + "'" + record.JobCode + "'" + ')" class="badge badge-info" data-toggle="modal" data-target="#myModal">History</button></div>';
-
                     }
                 }
             ],
@@ -142,14 +112,9 @@
 
         GrdJobsReport.on('dataBound', function (e, records, totalRecords) {
             var costamt = 0, creditamt = 0, cashamt = 0, $tfoot;
-            // Remove the formatting to get integer data for summation
             var intVal = function (i) {
-                return typeof i === 'string' ?
-                    i.replace(/[\$,]/g, '') * 1 :
-                    typeof i === 'number' ?
-                        i : 0;
+                return typeof i === 'string' ? i.replace(/[\$,]/g, '') * 1 : typeof i === 'number' ? i : 0;
             };
-
             $.each(records, function () {
                 costamt += intVal(this.Cost);
                 creditamt += intVal(this.Credit);
@@ -157,8 +122,7 @@
             });
             $tfoot = GrdJobsReport.children('tfoot');
             $tfoot.children('tr[data-role="summary"]').remove();
-            $tfoot.prepend('<tr data-role="summary" style="text-align:right"><th></th><th></th><th></th><th></th><th></th><th></th><th>Total</th><th>' + costamt.toFixed(2) + '</th><th>' + creditamt.toFixed(2) + '</th><th>' + cashamt.toFixed(2) + '</th>' +
-                '</th><th></th><th></tr > ');
+            $tfoot.prepend('<tr data-role="summary" style="text-align:right"><th></th><th></th><th></th><th></th><th></th><th></th><th>Total</th><th>' + costamt.toFixed(2) + '</th><th>' + creditamt.toFixed(2) + '</th><th>' + cashamt.toFixed(2) + '</th></th><th></th><th></tr > ');
         });
 
         GrdJobReportStatus = $("#GrdJobReportStatus").grid({
@@ -181,39 +145,81 @@
         function JobSearch() {
             var searchFromDate = '';
             var searchToDate = '';
-
-            if ($("#TxtFromDate").val() != 0) {
-                searchFromDate = $('#TxtFromDate').val();
-            }
-
-            if ($("#TxtToDate").val() != "") {
-                searchToDate = $('#TxtToDate').val();
-            }
-
+            if ($("#TxtFromDate").val() != 0) { searchFromDate = $('#TxtFromDate').val(); }
+            if ($("#TxtToDate").val() != "") { searchToDate = $('#TxtToDate').val(); }
             GrdJobsReport.clear();
             GrdJobsReport.reload({ StartDate: searchFromDate, EndDate: searchToDate, VehicleCode: $("#ddlVehicleCode").val(), JobVendorCode: $("#ddlJobVendorCode").val(), CustomerName: $("#txtCustomerName").val(), ContactNo: $("#txtContactNo").val(), DrivingBy: $("#ddlDrivingBy").val(), CashInHand: $("#ddlCashInHand").val() });
         }
 
-        //Search filter methods
-        $('#btnJobSearch').click(function () {
-            JobSearch();
+        // =============================================
+        // GENERATE INVOICE - save to DB then open
+        // =============================================
+        $('#btnGenerateInvoice').click(function () {
+            var fromDate    = $('#TxtFromDate').val();
+            var toDate      = $('#TxtToDate').val();
+            var customerName= $('#txtCustomerName').val();
+            var jobVendorCode = $('#ddlJobVendorCode').val();
+            var drivingBy   = $('#ddlDrivingBy').val();
+            var vehicleCode = $('#ddlVehicleCode').val();
+            var cashInHand  = $('#ddlCashInHand').val();
+
+            if (!fromDate && !toDate && !customerName && (!jobVendorCode || jobVendorCode == '0')) {
+                alert('Please apply at least one filter (date range, customer, or job given by) before generating an invoice.');
+                return;
+            }
+
+            $('#btnGenerateInvoice').prop('disabled', true).text('Generating...');
+
+            $.ajax({
+                url: '@Url.Content("~/Invoice/GenerateInvoice")',
+                type: 'POST',
+                data: JSON.stringify({
+                    CustomerName:  customerName,
+                    StartDate:     fromDate,
+                    EndDate:       toDate,
+                    JobVendorCode: jobVendorCode && jobVendorCode != '0' ? jobVendorCode : null,
+                    DrivingBy:     drivingBy && drivingBy != '0' ? drivingBy : null,
+                    VehicleCode:   vehicleCode && vehicleCode != '0' ? vehicleCode : null,
+                    CashInHand:    cashInHand && cashInHand != '0' ? cashInHand : null,
+                    CreditCash:    ''
+                }),
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function (result) {
+                    $('#btnGenerateInvoice').prop('disabled', false).html('<i class="fa fa-file-invoice"></i> Generate Invoice');
+                    if (result.success) {
+                        // Open invoice + receipt in new windows
+                        var w = $(window).width() - 100, h = $(window).height() - 70;
+                        window.open('@Url.Content("~/Invoice/ViewInvoice")?invoiceId=' + result.invoiceId, 'inv_' + result.invoiceId, 'width=' + w + ',height=' + h);
+                        // Small delay then open receipt
+                        setTimeout(function () {
+                            window.open('@Url.Content("~/Invoice/ViewReceipt")?invoiceId=' + result.invoiceId, 'rec_' + result.invoiceId, 'width=' + w + ',height=' + h);
+                        }, 600);
+                    } else {
+                        alert('Error: ' + result.message);
+                    }
+                },
+                error: function () {
+                    $('#btnGenerateInvoice').prop('disabled', false).html('<i class="fa fa-file-invoice"></i> Generate Invoice');
+                    alert('Server error. Please try again.');
+                }
+            });
         });
+
+        $('#btnJobSearch').click(function () { JobSearch(); });
 
         $('#btnJobSearchClear').click(function () {
             $("#TxtFromDate").val(""); $("#TxtToDate").val(""); $("#txtCustomerName").val(""); $("#txtContactNo").val("");
-            $("#ddlJobVendorCode").val(0); $("#ddlDrivingBy").val(0); $("#ddlVehicleCode").val(0); $("#ddlCashInHand").val(0)
-
-            GrdJobsReport.reload({ StartDate: null, EndDate: null, VehicleCode: $("#ddlVehicleCode").val(), JobVendorCode: $("#ddlJobVendorCode").val(), CustomerName: $("#txtCustomerName").val(), ContactNo: $("#txtContactNo").val(), DrivingBy: $("#ddlDrivingBy").val(), CashInHand: $("#ddlCashInHand").val() });
+            $("#ddlJobVendorCode").val(0); $("#ddlDrivingBy").val(0); $("#ddlVehicleCode").val(0); $("#ddlCashInHand").val(0);
+            GrdJobsReport.reload({ StartDate: null, EndDate: null, VehicleCode: 0, JobVendorCode: 0, CustomerName: '', ContactNo: '', DrivingBy: 0, CashInHand: 0 });
         });
 
         function OnIndexCall(elem) {
             $(elem).attr('href', $(elem).attr('href') + '?Length=1&VehicleCode=' + $("#ddlVehicleCode").val() + '&JobVendorCode=' + $("#ddlJobVendorCode").val() + '&CustomerName=' + $("#txtCustomerName").val() + '&ContactNo=' + $("#txtContactNo").val() + '&DrivingBy=' + $("#ddlDrivingBy").val() + '&StartDate=' + $("#TxtFromDate").val() + '&EndDate=' + $('#TxtToDate').val() + '&CashInHand=' + $("#ddlCashInHand").val());
         }
+
         function intVal(i) {
-            return typeof i === 'string' ?
-                i.replace(/[\$,]/g, '') * 1 :
-                typeof i === 'number' ?
-                    i : 0;
+            return typeof i === 'string' ? i.replace(/[\$,]/g, '') * 1 : typeof i === 'number' ? i : 0;
         };
     </script>
 </head>
@@ -221,14 +227,12 @@
     <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content" style="width:850px">
-
                 <div class="modal-body">
                     <div class="box-body">
                         <div class="box-body table-responsive no-padding">
                             <table id="GrdJobReportStatus" class="table table-hover"></table>
                         </div>
                     </div>
-
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -236,32 +240,29 @@
             </div>
         </div>
     </div>
-    <!-- Content Wrapper. Contains page content -->
+
     <div class="content">
-        <!-- Content Header (Page header) -->
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-12">
                     <div class="card card-pd">
-
                         <div class="card-header">
                             <span style="font-size: 18px;" class="m-0"><i class="fa fa-random"></i></span>
                             <span style="font-size: 18px; border-left: 1px solid #ccc; padding-left: 10px;"> Jobs Report</span>
                             <div style="float: right;">
                                 <button onclick="GrdJobsReport.downloadCSV('JobsReport.csv', true)" class="btn btn-primary">Download Current Page</button>
                                 @Html.ActionLink("Download All", "JobsExcelExport", "Reports", new { @onclick = "OnIndexCall(this)", @class = "btn btn-primary" })
-
-                                <span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px; ">
+                                <span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px;">
                                     <a href="#" data-toggle="tooltip" data-placement="bottom" title="Show Form" onclick="showForm()"><i class="fas fa-caret-square-down"></i></a>
-                                </span><span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px;">
+                                </span>
+                                <span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px;">
                                     <a href="#" data-toggle="tooltip" data-placement="bottom" title="Hide Form" onclick="hideForm()"><i class="fas fa-caret-square-up"></i></a>
                                 </span>
                             </div>
                         </div>
-                       
+
                         <div class="card-body">
                             <div id="hidden-form" style="display: none;">
-
                                 <div class="row">
                                     <div class="col-sm-2">
                                         <div class="form-group">
@@ -271,7 +272,6 @@
                                             </div>
                                         </div>
                                     </div>
-
                                     <div class="col-sm-2">
                                         <div class="form-group">
                                             <label>Driving By</label>
@@ -280,7 +280,6 @@
                                             </div>
                                         </div>
                                     </div>
-
                                     <div class="col-sm-3">
                                         <div class="form-group">
                                             <label>Job Given By</label>
@@ -304,7 +303,6 @@
                                             <input type="text" id="txtCustomerName" maxlength="75" placeholder="Customer Name" class="form-control">
                                         </div>
                                     </div>
-
                                     <div class="col-sm-2">
                                         <div class="form-group">
                                             <label class="control-label">From</label>
@@ -313,7 +311,6 @@
                                             </div>
                                         </div>
                                     </div>
-
                                     <div class="col-sm-2">
                                         <div class="form-group">
                                             <label>To</label>
@@ -333,19 +330,23 @@
                                     <div class="col-sm-4">
                                         <div class="pdt-25">
                                             <div class="row">
-                                                <div class="col-sm-6">
+                                                <div class="col-sm-4">
                                                     <button type="button" id="btnJobSearch" class="btn btn-primary btn-block"><i class="fa fa-search"></i> @Transport.Repository.WEBPAGEBUTTON.SEARCH</button>
                                                 </div>
-                                                <div class="col-sm-6">
+                                                <div class="col-sm-4">
                                                     <button type="button" id="btnJobSearchClear" class="btn btn-primary btn-block"><i class="fa fa-paint-brush"></i> @Transport.Repository.WEBPAGEBUTTON.CLEAR</button>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <button type="button" id="btnGenerateInvoice" class="btn btn-warning btn-block" title="Save filtered jobs as a new invoice">
+                                                        <i class="fa fa-file-invoice"></i> Generate Invoice
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-
                                 </div>
-
                             </div>
+
                             <div class="row">
                                 <div class="col-lg-12">
                                     <div class="box-body table-responsive no-padding">
@@ -353,15 +354,10 @@
                                     </div>
                                 </div>
                             </div>
-
                         </div>
-
                     </div>
                 </div>
-            </div><!-- /.content-wrapper -->
+            </div>
         </div>
     </div>
-
 </body>
-
-    

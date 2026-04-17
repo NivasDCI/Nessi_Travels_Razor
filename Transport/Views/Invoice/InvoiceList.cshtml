@@ -1,0 +1,186 @@
+@using Transport.Repository.Resource;
+@{
+    Layout = "";
+}
+<head>
+    <script>
+        var GrdInvoice;
+
+        $("#TxtFromDate").datepicker({ format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small' });
+        $("#TxtToDate").datepicker({ format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small' });
+
+        GrdInvoice = $("#GrdInvoice").grid({
+            primaryKey: "InvoiceID",
+            uiLibrary: "bootstrap4",
+            responsive: true,
+            dataSource: '@Url.Action("Invoice_FindAll", "Invoice")',
+            columns: [
+                { field: "InvoiceNo",      width: 130, title: "INVOICE NO",   sortable: false, align: "left" },
+                { field: "DisplayInvoiceDate", width: 90, title: "DATE",      sortable: false, align: "left" },
+                { field: "CustomerName",   width: 120, title: "CUSTOMER",      sortable: false, align: "left" },
+                { field: "JobVendorName",  width: 110, title: "JOB GIVEN BY",  sortable: false, align: "left" },
+                { field: "DrivingByName",  width: 100, title: "DRIVING BY",    sortable: false, align: "left" },
+                { field: "VehicleName",    width: 80,  title: "VEHICLE",       sortable: false, align: "left" },
+                { field: "DisplayStartDate", width: 85, title: "FROM",         sortable: false, align: "left" },
+                { field: "DisplayEndDate",   width: 85, title: "TO",           sortable: false, align: "left" },
+                { field: "TotalJobs",      width: 55,  title: "JOBS",          sortable: false, align: "center" },
+                {
+                    field: "TotalAmount", width: 80, title: "TOTAL (SGD)", sortable: false, align: "right",
+                    renderer: function (value, record) {
+                        return '<strong style="color:darkgreen;">$ ' + parseFloat(value).toFixed(2) + '</strong>';
+                    }
+                },
+                {
+                    field: "IsCredit", width: 60, title: "TYPE", sortable: false, align: "center",
+                    renderer: function (value, record) {
+                        return value
+                            ? '<span class="badge badge-danger">Credit</span>'
+                            : '<span class="badge badge-success">Cash</span>';
+                    }
+                },
+                {
+                    field: "InvoiceID", width: 70, title: "Invoice", sortable: false, align: "center",
+                    renderer: function (value, record) {
+                        return '<button onclick="OpenInvoice(' + value + ')" class="badge badge-primary" style="cursor:pointer;"><i class="fa fa-file-invoice"></i> View</button>';
+                    }
+                },
+                {
+                    field: "InvoiceID", width: 70, title: "Receipt", sortable: false, align: "center",
+                    renderer: function (value, record) {
+                        return '<button onclick="OpenReceipt(' + value + ')" class="badge badge-info" style="cursor:pointer;"><i class="fa fa-list-alt"></i> View</button>';
+                    }
+                },
+                {
+                    field: "InvoiceID", width: 60, title: "Delete", sortable: false, align: "center",
+                    renderer: function (value, record) {
+                        return '<button onclick="DeleteInvoice(' + value + ',\'' + record.InvoiceNo + '\')" class="badge badge-danger" style="cursor:pointer;"><i class="fa fa-trash"></i></button>';
+                    }
+                }
+            ],
+            pager: { enable: true, limit: 50, sizes: ArrPaging }
+        });
+
+        function InvoiceSearch() {
+            GrdInvoice.clear();
+            GrdInvoice.reload({
+                CustomerName: $('#txtCustomerName').val(),
+                InvoiceNo: $('#txtInvoiceNo').val(),
+                FromDate: $('#TxtFromDate').val(),
+                ToDate: $('#TxtToDate').val()
+            });
+        }
+
+        function OpenInvoice(invoiceId) {
+            var url = '@Url.Content("~/Invoice/ViewInvoice")' + '?invoiceId=' + invoiceId;
+            var w = $(window).width() - 100, h = $(window).height() - 70;
+            window.open(url, 'invoice_' + invoiceId, 'width=' + w + ',height=' + h);
+        }
+
+        function OpenReceipt(invoiceId) {
+            var url = '@Url.Content("~/Invoice/ViewReceipt")' + '?invoiceId=' + invoiceId;
+            var w = $(window).width() - 100, h = $(window).height() - 70;
+            window.open(url, 'receipt_' + invoiceId, 'width=' + w + ',height=' + h);
+        }
+
+        function DeleteInvoice(invoiceId, invoiceNo) {
+            if (!confirm('Delete invoice ' + invoiceNo + '? This cannot be undone.')) return;
+            $.ajax({
+                url: '@Url.Content("~/Invoice/DeleteInvoice")',
+                type: 'POST',
+                data: JSON.stringify({ invoiceId: invoiceId }),
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function (result) {
+                    if (result.success) {
+                        GrdInvoice.reload();
+                    } else {
+                        alert('Failed to delete invoice.');
+                    }
+                }
+            });
+        }
+
+        $('#btnSearch').click(function () { InvoiceSearch(); });
+        $('#btnClear').click(function () {
+            $('#txtCustomerName').val('');
+            $('#txtInvoiceNo').val('');
+            $('#TxtFromDate').val('');
+            $('#TxtToDate').val('');
+            GrdInvoice.reload({});
+        });
+    </script>
+</head>
+<body>
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card card-pd">
+                        <div class="card-header">
+                            <span style="font-size:18px;" class="m-0"><i class="fa fa-file-invoice"></i></span>
+                            <span style="font-size:18px; border-left:1px solid #ccc; padding-left:10px;"> Invoice List</span>
+                            <div style="float:right;">
+                                <span style="border-left:1px solid #ccc; padding-left:15px; padding-right:15px;">
+                                    <a href="#" onclick="showForm()" title="Show Form"><i class="fas fa-caret-square-down"></i></a>
+                                </span>
+                                <span style="border-left:1px solid #ccc; padding-left:15px; padding-right:15px;">
+                                    <a href="#" onclick="hideForm()" title="Hide Form"><i class="fas fa-caret-square-up"></i></a>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="hidden-form">
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>From Date</label>
+                                            <input type="text" id="TxtFromDate" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>To Date</label>
+                                            <input type="text" id="TxtToDate" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>Customer Name</label>
+                                            <input type="text" id="txtCustomerName" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>Invoice No</label>
+                                            <input type="text" id="txtInvoiceNo" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="pdt-25">
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <button type="button" id="btnSearch" class="btn btn-primary btn-block"><i class="fa fa-search"></i> Search</button>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <button type="button" id="btnClear" class="btn btn-primary btn-block"><i class="fa fa-paint-brush"></i> Clear</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="box-body table-responsive no-padding">
+                                        <table id="GrdInvoice" class="table table-hover"></table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>

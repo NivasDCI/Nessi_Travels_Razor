@@ -161,6 +161,7 @@
     <Compile Include="ExpenseRepository.cs" />
     <Compile Include="IExpenseRepository.cs" />
     <Compile Include="IJobRepository.cs" />
+    <Compile Include="InvoiceRepository.cs" />
     <Compile Include="IReportsRepository.cs" />
     <Compile Include="ReportsRepository.cs" />
     <Compile Include="System\Configuration\ConfigurationManager.cs" />

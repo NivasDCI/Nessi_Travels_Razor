@@ -106,9 +106,9 @@
                 $.each(data, function (index, value) {
                     $('#ddlCashInHand').append('<option value="' + value.ID + '">' + value.Name + '</option>');
                 });
-            }       
+            }
         });
-        
+
 
         var caseSensitiveFilter = function (value, searchStr) {
             return value.indexOf(searchStr) > -1;
@@ -128,10 +128,8 @@
                         return '<div class="text-center"><span class= ' + "'" + _class + "'" + ' >' + record.JobCode + '</span></div>';
                     }
                 },
-                //{ field: "JobCode", width: 41, title: "CODE", sortable: false, align: "left" },
                 { field: "JobDate", width: 70, title: "DATE", type: "date", format: Common_Date_Format, sortable: false, align: "left" },
                 { field: "JobTime", width: 47, title: "TIME", sortable: false, align: "left" },
-                //{ field: "VehicleName", width: 49, title: "VEHICLE", sortable: true, align: "left" },
                 {
                     field: "VehicleName", width: 49, title: "VEHICLE", sortable: false, align: "center", renderer: function (value, record) {
                         var _class = (record.VehicleName == "PD7219E") ? 'badge bg-warning' : (record.VehicleName == "PC7219K") ? 'badge badge-success' : (record.VehicleName == "PC5148U") ? 'badge badge-primary' : (record.VehicleName == "PD5148P") ? 'badge badge-danger' : (record.VehicleName == "PD1359Z") ? 'badge bg-purple' : 'badge badge-dark';
@@ -155,27 +153,11 @@
                         return '<div class="text-center" ><span class= ' + "'" + _class1 + "'" + '>' + _vehiclename1 + '</span></div >';
                     }
                 },
-                //{ field: "DrivingByName", width: 87, title: "DRIVING BY", sortable: false, align: "left" },
                 { field: "JobFrom", width: 150, title: "FROM", sortable: false, align: "left" },
                 { field: "JobTo", width: 160, title: "TO", sortable: false, align: "left" },
                 { field: "JobVendorName", width: 93, title: "JOB GIVEN BY", sortable: true, align: "left", filterable: true },
                 { field: "CustomerName", width: 95, title: "NAME", sortable: false, align: "left" },
                 { field: "ContactNo", width: 75, title: "CONTACT", sortable: false, align: "right" },
-
-                //{ field: "Cost", width: 39, title: "COST", sortable: false, align: "right" },
-                //{ field: "Credit", width: 39, title: "CREDIT", sortable: false, align: "right" },
-                //{ field: "Cash", width: 39, title: "CASH", sortable: false, align: "right" },
-
-                //{
-                //    field: "Cost", width: 39, title: "COST", sortable: false, align: "center", renderer: function (value, record) {
-                //        if (intVal(value).toFixed(2) == 0.00) {
-                //            return '';
-                //        }
-                //        else {
-                //            return intVal(value).toFixed(2);
-                //        }
-                //    }
-                //},
                 {
                     field: "Credit", width: 39, title: "CREDIT", sortable: false, align: "center", renderer: function (value, record) {
                         if (intVal(value).toFixed(2) == 0.00) {
@@ -211,26 +193,14 @@
                         }
                     }
                 },
-                //{ field: "DisplayCreatedBy", width: 82, title: "CREATED BY", sortable: false, align: "right" },
-                //{
-                //    field: "JobCode", width: 45, title: "View", sortable: true, renderer: function (value, record) {
-
-                //        return '<div class="text-center"><button onclick="ViewClick(' + "'" + record.JobCode + "'" + ')" class="badge badge-info" data-toggle="modal" data-target="#myModal2">View</button></div>';
-
-                //    }
-                //},
                 {
                     field: "JobCode", width: 45, title: "Notify", sortable: true, align: "center", renderer: function (value, record) {
-
                         return '<div class="text-center"><button onclick="LinkClick(' + "'" + record.JobCode + "'" + ', ' + "'" + record.JobStatus + "'" + ')" class="badge badge-info">Notify</button></div>';
-
                     }
                 },
                 {
                     field: "JobCode", width: 45, title: "History", sortable: true, renderer: function (value, record) {
-
                         return '<div class="text-center"><button onclick="HistoryClick(' + "'" + record.JobCode + "'" + ')" class="badge badge-info" data-toggle="modal" data-target="#myModal">History</button></div>';
-
                     }
                 },
                 {
@@ -239,36 +209,15 @@
                             return '<select id="divprint" onchange="printchange(' + "'" + record.JobCode + "'" + ', this)" class="form-select form-select-sm" aria-label=".form-select-sm example"><option selected ></option><option value="1">Receipt</option><option value="2">Invoice</option></select>';
                         }
                         else {
-                        return '';
+                            return '';
                         }
                     }
                 },
-                //{
-                //    field: "JobCode", width: 42, title: "REC", sortable: true, renderer: function (value, record) {
-
-                //        return '<div class="text-center"><a tabindex="-1" onclick="ViewReceipt(' + "'" + record.JobCode + "'" + ')" style="cursor:pointer"><i class="fa fa-eye"></i></a></div>';
-
-                //    }
-                //},
-                //{
-                //    field: "JobCode", width: 30, title: "INV", sortable: true, renderer: function (value, record) {
-                //        if (record.Credit || record.Cash)
-                //            return '<div class="text-center"><a tabindex="-1" onclick="ViewInvoice(' + "'" + record.JobCode + "'" + ', this.value)" style="cursor:pointer"><i class="fa fa-eye"></i></a></div>';
-                //        else
-                //            return '';
-                //    }
-                //},
                 {
                     field: "JobCode", width: 30, title: "Edit", sortable: true, renderer: function (value, record) {
-                        //if (record.JobStatus == 'Cancelled') {
-                        //    return '';
-                        //}
-                        //else {
-                            return '<div class="text-center"><a tabindex="-1" onclick="EditJob(' + "'" + record.JobCode + "'" + ')" style="cursor:pointer"><i class="fas fa-edit"></i></a></div>';
-                        //}
+                        return '<div class="text-center"><a tabindex="-1" onclick="EditJob(' + "'" + record.JobCode + "'" + ')" style="cursor:pointer"><i class="fas fa-edit"></i></a></div>';
                     }
                 }
-
             ],
             pager: { enable: true, limit: 50, sizes: ArrPaging },
             filter: caseSensitiveFilter
@@ -276,7 +225,6 @@
 
         GrdJob.on('dataBound', function (e, records, totalRecords) {
             var creditamt = 0, cashamt = 0, $tfoot;
-            // Remove the formatting to get integer data for summation
             var intVal = function (i) {
                 return typeof i === 'string' ?
                     i.replace(/[\$,]/g, '') * 1 :
@@ -285,7 +233,6 @@
             };
 
             $.each(records, function () {
-               
                 creditamt += intVal(this.Credit);
                 cashamt += intVal(this.Cash);
             });
@@ -305,20 +252,7 @@
             }
         }
 
-        //$('#divprint').on('change', function (ID) {
-        //    var value = $(this).val();
-        //    alert(ID);
-        //    alert(value);
-        //    if (value == 1) {
-        //        ViewReceipt(ID);
-        //    }
-        //    if (value == 2) {
-        //        ViewInvoice(ID);
-        //    }
-        //});
-
         $("#txtJobVendorName").on("keyup", function () {
-            console.log($('#txtJobVendorName').val());
             GrdJob.reload({ JobVendorName: $('#txtJobVendorName').val() });
         });
 
@@ -340,7 +274,6 @@
                 { ParameterName: "DrivingBy", ParameterValue: $("#ddlDrivingBy").val() },
                 { ParameterName: "VehicleCode", ParameterValue: $("#ddlVehicleCode").val() }
             ]
-
             AddBackURLStore(JSON.stringify(ParamData));
             GetMenu('@Url.Action("AddJob", "Job")' + '?JobCode=0' + '&HeaderViewID=' + GetParamValue("HeaderViewID") + '&DetailViewID=' + GetParamValue("DetailViewID"));
         });
@@ -364,35 +297,26 @@
                         $('#myModal2').find('#JobVendorName').val(model.JobVendorName);
                         $('#myModal2').find('#DrivingByName').val(model.DrivingByName);
                         $('#myModal2').find('#OutSource').val(model.OutSource);
-
-                    }
-                    if (result.success === false) {
-
                     }
                 }
             });
         }
 
         function ViewReceipt(ID) {
-            var url = "";
-
-            url = '@Url.Content("~/Job/Receipt")' + '?JobCode=' + ID;
+            var url = '@Url.Content("~/Job/Receipt")' + '?JobCode=' + ID;
             var varheight = $(window).height() - 70;
             var varWidth = $(window).width() - 100;
             window.open(url, 'window', 'width=' + varWidth + ',height=' + varheight + ';');
-
         }
 
         function ViewInvoice(ID) {
-            var url = "";
-            url = '@Url.Content("~/Job/Invoice")' + '?JobCode=' + ID;
+            var url = '@Url.Content("~/Job/Invoice")' + '?JobCode=' + ID;
             var varheight = $(window).height() - 70;
             var varWidth = $(window).width() - 100;
             window.open(url, 'window', 'width=' + varWidth + ',height=' + varheight + ';');
         }
 
         function LinkClick(jobcode, jobstatus) {
-
             $.ajax({
                 url: '@Url.Content("~/Job/GenerateLinkContentJob")',
                 type: "POST",
@@ -401,9 +325,7 @@
                 contentType: 'application/json',
                 success: function (result) {
                     if (result.number) {
-
                         var _link = 'https://wa.me/' + result.number + '?text=' + encodeURIComponent(result.data) + '';
-                        console.log(_link);
                         window.open(_link, "_blank");
                     }
                     else {
@@ -414,21 +336,7 @@
         }
 
         function EditJob(ID) {
-           
-            //var ParamData = [
-            //    { ParameterName: "JobVendorCode", ParameterValue: $("#ddlJobVendorCode").val() },
-            //    { ParameterName: "DrivingBy", ParameterValue: $("#ddlDrivingBy").val() },
-            //    { ParameterName: "VehicleCode", ParameterValue: $("#ddlVehicleCode").val() },
-            //    { ParameterName: "CreditCash", ParameterValue: $("#ddlCreditCash").val() },
-            //    { ParameterName: "CustomerName", ParameterValue: $("#txtCustomerName").val() },
-            //    { ParameterName: "FromDate", ParameterValue: $("#TxtFromDate").val() },
-            //    { ParameterName: "ToDate", ParameterValue: $("#TxtToDate").val() }
-            //]
-
-            //AddBackURLStore(JSON.stringify(ParamData));
-            //console.log("post" + JSON.stringify(ParamData));
             GetMenu('@Url.Action("AddJob", "Job")' + '?JobCode=' + ID + '&HeaderViewID=' + GetParamValue("HeaderViewID") + '&DetailViewID=' + GetParamValue("DetailViewID"));
-
         }
 
         function JobSearch() {
@@ -438,13 +346,33 @@
             if ($("#TxtFromDate").val() != 0) {
                 searchFromDate = $('#TxtFromDate').val();
             }
-
             if ($("#TxtToDate").val() != "") {
                 searchToDate = $('#TxtToDate').val();
             }
             GrdJob.clear();
             GrdJob.reload({ StartDate: searchFromDate, EndDate: searchToDate, CustomerName: $('#txtCustomerName').val(), JobVendorCode: $("#ddlJobVendorCode").val(), DrivingBy: $("#ddlDrivingBy").val(), VehicleCode: $("#ddlVehicleCode").val(), CreditCash: $("#ddlCreditCash").val(), CashInHand: $("#ddlCashInHand").val() });
         }
+
+        // =============================================
+        // CUSTOMER INVOICE - Combined invoice button
+        // =============================================
+        $("#btnCustomerInvoice").click(function () {
+
+    var data = {
+        CustomerName: $("#txtCustomerName").val(),
+        StartDate: $("#TxtFromDate").val(),
+        EndDate: $("#TxtToDate").val(),
+        VehicleCode: $("#ddlVehicle").val(),
+        JobVendorCode: $("#ddlVendor").val(),
+        DrivingBy: $("#ddlDriver").val(),
+        CreditCash: $("#ddlCreditCash").val(),
+        CashInHand: $("#ddlCashInHand").val()
+    };
+
+    var url = '/Job/CustomerInvoiceAll?' + $.param(data);
+
+    window.open(url, '_blank');
+});
 
         $('#btnJobSearch').click(function () {
             JobSearch();
@@ -458,14 +386,12 @@
         $(document).ready(function () {
             $('input[id="TxtFromDate"]').val(TodayDateRange);
             $('input[id="TxtToDate"]').val(TodayDateRange);
-
             IsRequestedCheck();
             setInterval(IsRequestedCheck, 60000); // 60 secs
         });
 
         function IsRequestedCheck() {
-
-           $.ajax({
+            $.ajax({
                 url: '@Url.Content("~/Job/IsRequestedCheck")',
                 type: 'POST',
                 data: JSON.stringify(),
@@ -484,9 +410,7 @@
         }
 
         function JobRequests() {
-            var ParamData = [
-            ]
-
+            var ParamData = []
             $("#txtSessionURL").val("Home/AdminIndex");
             AddBackURLStore(JSON.stringify(ParamData));
             GetMenu('@Url.Action("ListJobRequests", "Job")' + '?HeaderViewID=JOBS&DetailViewID=JOBN037');
@@ -495,7 +419,6 @@
         function SaveStatus() {
             var jobcode = $('#jobidmodal').val();
             var status = $('#btnupdatestatus').val();
-
             $.ajax({
                 url: '@Url.Content("~/Job/UpdateJobStatus")',
                 type: 'POST',
@@ -541,9 +464,8 @@
                     i : 0;
         };
 
-      
     </script>
-   
+
     <style>
         ul.ui-autocomplete {
             z-index: 1100;
@@ -551,7 +473,7 @@
     </style>
 </head>
 <body>
-   
+
     <div class="group pull-right " id="divnotify" style="text-align:right;">
         <span id="group" onclick="JobRequests()">
             <button type="button" class="blink">
@@ -577,9 +499,7 @@
                                     <label class="control-label">Update Status : </label>
                                     <button type="button" id="btnupdatestatus" onclick="SaveStatus();" class="btn btn-primary"></button>
                                 </div>
-
                             </div>
-
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -593,14 +513,12 @@
     <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content" style="width:850px">
-
                 <div class="modal-body">
                     <div class="box-body">
                         <div class="box-body table-responsive no-padding">
                             <table id="GrdJobStatus" class="table table-hover"></table>
                         </div>
                     </div>
-
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -622,7 +540,6 @@
                                 <label class="control-label">VEHICLE</label>
                                 <input type="text" class="form-control" disabled="disabled" id="VehicleName" />
                             </div>
-
                             <div class="col-md-8">
                                 <label class="control-label">JOB GIVEN BY</label>
                                 <input type="text" class="form-control" disabled="disabled" id="JobVendorName" />
@@ -634,7 +551,6 @@
                                 <label class="control-label">DRIVING BY</label>
                                 <input type="text" class="form-control" disabled="disabled" id="DrivingByName" />
                             </div>
-
                             <div class="col-md-8">
                                 <label class="control-label">OUT SOURCE</label>
                                 <input type="text" class="form-control" disabled="disabled" id="OutSource" />
@@ -673,7 +589,6 @@
 
     <!-- Content Wrapper. Contains page content -->
     <div class="content">
-        <!-- Content Header (Page header) -->
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-12">
@@ -688,7 +603,8 @@
                                 </span>
                                 <span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px;">
                                     <a href="#" data-toggle="tooltip" data-placement="bottom" title="Show Form" onclick="showForm()"><i class="fas fa-caret-square-down"></i></a>
-                                </span><span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px;">
+                                </span>
+                                <span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px;">
                                     <a href="#" data-toggle="tooltip" data-placement="bottom" title="Hide Form" onclick="hideForm()"><i class="fas fa-caret-square-up"></i></a>
                                 </span>
                             </div>
@@ -739,7 +655,6 @@
                                             </div>
                                         </div>
                                     </div>
-
                                     <div class="col-sm-2">
                                         <div class="form-group">
                                             <label>Driving By</label>
@@ -748,7 +663,6 @@
                                             </div>
                                         </div>
                                     </div>
-
                                     <div class="col-sm-2">
                                         <div class="form-group">
                                             <label>Job Given By</label>
@@ -757,14 +671,12 @@
                                             </div>
                                         </div>
                                     </div>
-
                                     <div class="col-sm-2">
                                         <div class="form-group">
                                             <label>Cash In Hand</label>
                                             @Html.DropDownList("ddlCashInHand", new SelectList(string.Empty, "Value", "Text"), new { @tabindex = 13, @class = "form-control select2", @width = "100%" })
                                         </div>
                                     </div>
-
                                     <div class="col-sm-3">
                                         <div class="pdt-25">
                                             <div class="row">
@@ -775,14 +687,19 @@
                                                     <button type="button" id="btnJobSearchClear" class="btn btn-primary btn-block"><i class="fa fa-paint-brush"></i> @Transport.Repository.WEBPAGEBUTTON.CLEAR</button>
                                                 </div>
                                             </div>
+                                            <div class="row" style="margin-top:6px;">
+                                                <div class="col-sm-12">
+                                                    <button type="button" id="btnCustomerInvoice" class="btn btn-warning btn-block" title="Generate combined invoice for current search filters">
+                                                        <i class="fa fa-file-invoice"></i> Customer Invoice
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-
                                 </div>
                                 <div class="row">
                                     <input type="text" class="form-control" name="txtJobVendorName" id="txtJobVendorName" />
                                 </div>
-
                             </div>
                             <br />
                             <div class="row">
@@ -796,74 +713,26 @@
 
                     </div>
                 </div>
-            </div><!-- /.content-wrapper -->
+            </div>
         </div>
     </div>
+
     <script type="text/javascript">
         function JobRequests() {
-    var ParamData = [
-        ]
-
-        $("#txtSessionURL").val("Home/AdminIndex");
-        AddBackURLStore(JSON.stringify(ParamData));
-        GetMenu('@Url.Action("ListJobRequests", "Job")' + '?HeaderViewID=JOBS&DetailViewID=JOBN037');
-    }
-        @*$('#ddlJobVendorCode').val('@TempData.Peek("JobVendorCode")');
-        console.log('@TempData.Peek("JobVendorCode")');
-                console.log("loading.....");*@
-                //if (ArrParameterData[GetBackURLCount()] != null) {
-
-
-                //    GrdJob.reload({ StartDate: $("#FromDate").val(), EndDate: $("#TxtToDate").val(), CustomerName: $('#txtCustomerName').val(), JobVendorCode: $("#ddlJobVendorCode").val(), DrivingBy: $("#ddlDrivingBy").val(), VehicleCode: $("#ddlVehicleCode").val(), CreditCash: $("#ddlCreditCash").val() });
-                //    //var ParamData = [
-                //    //    { ParameterName: "JobVendorCode", ParameterValue: JobVendorCode },
-                //    //    { ParameterName: "DrivingBy", ParameterValue: DrivingBy },
-                //    //    { ParameterName: "VehicleCode", ParameterValue: VehicleCode },
-                //    //    { ParameterName: "CreditCash", ParameterValue: CreditCash },
-                //    //    { ParameterName: "CustomerName", ParameterValue: $("#txtCustomerName").val() },
-                //    //    { ParameterName: "FromDate", ParameterValue: $("#TxtFromDate").val() },
-                //    //    { ParameterName: "ToDate", ParameterValue: $("#TxtToDate").val() }
-
-                //    //]
-
-                //    //AddBackURLStore(JSON.stringify(ParamData));
-
-                //    if (ArrParameterData[GetBackURLCount()][0].ParameterName == "JobVendorCode") {
-                //        $('#ddlJobVendorCode').val(ArrParameterData[1][0].ParameterValue);
-                //    }
-                //    if (ArrParameterData[GetBackURLCount()][1].ParameterName == "DrivingBy") {
-                //        $('#ddlDrivingBy').val(ArrParameterData[1][1].ParameterValue);
-                //    }
-                //    if (ArrParameterData[GetBackURLCount()][2].ParameterName == "VehicleCode") {
-                //        $('#ddlVehicleCode').val(ArrParameterData[1][2].ParameterValue);
-                //    }
-                //    if (ArrParameterData[GetBackURLCount()][3].ParameterName == "CreditCash") {
-                //        $('#ddlVehicleCode').val(ArrParameterData[1][3].ParameterValue);
-                //    }
-                //    if (ArrParameterData[GetBackURLCount()][4].ParameterName == "CustomerName") {
-                //        $('#txtCustomerName').val(ArrParameterData[1][4].ParameterValue);
-                //    }
-                //    if (ArrParameterData[GetBackURLCount()][5].ParameterName == "FromDate") {
-                //        $('#TxtFromDate').val(ArrParameterData[1][5].ParameterValue);
-                //    }
-                //    if (ArrParameterData[GetBackURLCount()][6].ParameterName == "ToDate") {
-                //        $('#TxtToDate').val(ArrParameterData[1][6].ParameterValue);
-                //    }
-                //}
-
-
-    </script>
-    <style type="text/css">
-                .blink {
-          animation: blinker 1s linear infinite;
-          background:red;
-          color:white;
-          
-          font-weight:bold;
+            var ParamData = []
+            $("#txtSessionURL").val("Home/AdminIndex");
+            AddBackURLStore(JSON.stringify(ParamData));
+            GetMenu('@Url.Action("ListJobRequests", "Job")' + '?HeaderViewID=JOBS&DetailViewID=JOBN037');
         }
+    </script>
 
-        /* Add animation (fade in the popup) */
-      
+    <style type="text/css">
+        .blink {
+            animation: blinker 1s linear infinite;
+            background: red;
+            color: white;
+            font-weight: bold;
+        }
 
         @@keyframes blinker {
             50% {
