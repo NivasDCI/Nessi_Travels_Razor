@@ -1,0 +1,178 @@
+@using Transport.Repository.Resource;
+@{
+    Layout = "";
+}
+<head>
+    <script>
+        var GrdInvoice;
+
+        $("#TxtFromDate").datepicker({ format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small' });
+        $("#TxtToDate").datepicker({   format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small' });
+
+        GrdInvoice = $("#GrdInvoice").grid({
+            primaryKey: "InvoiceID",
+            uiLibrary: "bootstrap4",
+            responsive: true,
+            dataSource: BaseURL + "Reports/Invoice_FindAll",
+            columns: [
+                { field: "InvoiceNo",         width: 130, title: "INVOICE NO",   sortable: false, align: "left" },
+                { field: "DisplayInvoiceDate", width: 90,  title: "DATE",         sortable: false, align: "left" },
+                { field: "CustomerName",       width: 130, title: "CUSTOMER",     sortable: false, align: "left" },
+                { field: "JobVendorName",      width: 120, title: "JOB GIVEN BY", sortable: false, align: "left" },
+                { field: "DrivingByName",      width: 100, title: "DRIVING BY",   sortable: false, align: "left" },
+                { field: "VehicleName",        width: 80,  title: "VEHICLE",      sortable: false, align: "left" },
+                { field: "DisplayStartDate",   width: 85,  title: "FROM",         sortable: false, align: "left" },
+                { field: "DisplayEndDate",     width: 85,  title: "TO",           sortable: false, align: "left" },
+                { field: "TotalJobs",          width: 50,  title: "JOBS",         sortable: false, align: "center" },
+                {
+                    field: "TotalAmount", width: 90, title: "TOTAL (SGD)", sortable: false, align: "right",
+                    renderer: function (value) {
+                        return '<strong style="color:darkgreen;">$ ' + parseFloat(value).toFixed(2) + '</strong>';
+                    }
+                },
+                {
+                    field: "IsCredit", width: 60, title: "TYPE", sortable: false, align: "center",
+                    renderer: function (value) {
+                        return value
+                            ? '<span class="badge badge-danger">Credit</span>'
+                            : '<span class="badge badge-success">Cash</span>';
+                    }
+                },
+                {
+                    field: "InvoiceID", width: 140, title: "ACTION", sortable: false, align: "center",
+                    renderer: function (value, record) {
+                        return '<button onclick="OpenDocs(' + value + ')" class="btn btn-sm btn-primary" style="font-size:11px;"><i class="fa fa-print"></i> View / Print</button>';
+                    }
+                },
+                {
+                    field: "InvoiceID", width: 60, title: "DEL", sortable: false, align: "center",
+                    renderer: function (value, record) {
+                        return '<button onclick="DeleteInv(' + value + ',\'' + record.InvoiceNo + '\')" class="badge badge-danger" style="cursor:pointer;padding:5px;"><i class="fa fa-trash"></i></button>';
+                    }
+                }
+            ],
+            pager: { enable: true, limit: 50, sizes: ArrPaging }
+        });
+
+        function InvoiceSearch() {
+            GrdInvoice.clear();
+            GrdInvoice.reload({
+                CustomerName: $('#txtCustomerName').val(),
+                InvoiceNo:    $('#txtInvoiceNo').val(),
+                FromDate:     $('#TxtFromDate').val(),
+                ToDate:       $('#TxtToDate').val()
+            });
+        }
+
+        // Opens Receipt (Page 1) — which auto-opens Invoice (Page 2) via JS
+        function OpenDocs(invoiceId) {
+            var w = $(window).width() - 80;
+            var h = $(window).height() - 60;
+            window.open(BaseURL + 'Reports/ViewReceipt?invoiceId=' + invoiceId,
+                'receipt_' + invoiceId,
+                'width=' + w + ',height=' + h + ',scrollbars=yes');
+        }
+
+        function DeleteInv(invoiceId, invoiceNo) {
+            if (!confirm('Delete invoice ' + invoiceNo + '? This cannot be undone.')) return;
+            $.ajax({
+                url:      BaseURL + 'Reports/DeleteInvoice',
+                type:     'POST',
+                data:     { invoiceId: invoiceId },
+                dataType: 'json',
+                success:  function (result) {
+                    if (result.success) GrdInvoice.reload();
+                    else alert('Failed to delete invoice.');
+                }
+            });
+        }
+
+        $('#btnSearch').click(function () { InvoiceSearch(); });
+
+        $('#btnClear').click(function () {
+            $('#txtCustomerName').val('');
+            $('#txtInvoiceNo').val('');
+            $('#TxtFromDate').val('');
+            $('#TxtToDate').val('');
+            GrdInvoice.reload({});
+        });
+
+        document.onkeydown = function (evt) {
+            if ((evt ? evt.which : event.keyCode) == 13) { InvoiceSearch(); return false; }
+        };
+    </script>
+</head>
+<body>
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card card-pd">
+                        <div class="card-header">
+                            <span style="font-size:18px;" class="m-0"><i class="fa fa-file-invoice"></i></span>
+                            <span style="font-size:18px; border-left:1px solid #ccc; padding-left:10px;"> Invoice List</span>
+                            <div style="float:right;">
+                                <span style="border-left:1px solid #ccc; padding-left:15px; padding-right:15px;">
+                                    <a href="#" onclick="showForm()" title="Show Form"><i class="fas fa-caret-square-down"></i></a>
+                                </span>
+                                <span style="border-left:1px solid #ccc; padding-left:15px; padding-right:15px;">
+                                    <a href="#" onclick="hideForm()" title="Hide Form"><i class="fas fa-caret-square-up"></i></a>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="hidden-form">
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>Invoice No</label>
+                                            <input type="text" id="txtInvoiceNo" class="form-control" placeholder="e.g. NTT-INV-00001">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>Customer / Vendor</label>
+                                            <input type="text" id="txtCustomerName" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>From Date</label>
+                                            <input type="text" id="TxtFromDate" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>To Date</label>
+                                            <input type="text" id="TxtToDate" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="pdt-25">
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <button type="button" id="btnSearch" class="btn btn-primary btn-block"><i class="fa fa-search"></i> Search</button>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <button type="button" id="btnClear" class="btn btn-primary btn-block"><i class="fa fa-paint-brush"></i> Clear</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="box-body table-responsive no-padding">
+                                        <table id="GrdInvoice" class="table table-hover"></table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>

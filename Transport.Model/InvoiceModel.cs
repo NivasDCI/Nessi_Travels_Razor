@@ -24,14 +24,21 @@ namespace Transport.Model
         public bool IsCredit { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
-
-        // For display
-        public string DisplayInvoiceDate => InvoiceDate.ToString("dd-MMM-yyyy");
-        public string DisplayStartDate => StartDate.HasValue ? StartDate.Value.ToString("dd-MMM-yyyy") : "";
-        public string DisplayEndDate => EndDate.HasValue ? EndDate.Value.ToString("dd-MMM-yyyy") : "";
         public int TotalJobs { get; set; }
-
         public List<InvoiceDetailModel> Details { get; set; }
+
+        public string DisplayInvoiceDate
+        {
+            get { return InvoiceDate.ToString("dd-MMM-yyyy"); }
+        }
+        public string DisplayStartDate
+        {
+            get { return StartDate.HasValue ? StartDate.Value.ToString("dd-MMM-yyyy") : ""; }
+        }
+        public string DisplayEndDate
+        {
+            get { return EndDate.HasValue ? EndDate.Value.ToString("dd-MMM-yyyy") : ""; }
+        }
     }
 
     public class InvoiceDetailModel
@@ -51,6 +58,9 @@ namespace Transport.Model
         public decimal? Cash { get; set; }
         public decimal? Amount { get; set; }
 
-        public string DisplayJobDate => JobDate.HasValue ? JobDate.Value.ToString("dd-MMM-yyyy") : "";
+        public string DisplayJobDate
+        {
+            get { return JobDate.HasValue ? JobDate.Value.ToString("dd-MMM-yyyy") : ""; }
+        }
     }
 }

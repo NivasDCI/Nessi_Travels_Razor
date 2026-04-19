@@ -161,7 +161,6 @@
     <Compile Include="ExpenseRepository.cs" />
     <Compile Include="IExpenseRepository.cs" />
     <Compile Include="IJobRepository.cs" />
-    <Compile Include="InvoiceRepository.cs" />
     <Compile Include="IReportsRepository.cs" />
     <Compile Include="ReportsRepository.cs" />
     <Compile Include="System\Configuration\ConfigurationManager.cs" />
@@ -211,6 +210,7 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="CommonRepository.cs" />
+    <Compile Include="InvoiceRepository.cs" />
     <Compile Include="ICommonRepository.cs" />
     <Compile Include="IProjectMasterRepository.cs" />
     <Compile Include="ISystemMasterRepository.cs" />

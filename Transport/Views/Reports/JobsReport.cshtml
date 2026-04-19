@@ -155,53 +155,51 @@
         // GENERATE INVOICE - save to DB then open
         // =============================================
         $('#btnGenerateInvoice').click(function () {
-            var fromDate    = $('#TxtFromDate').val();
-            var toDate      = $('#TxtToDate').val();
-            var customerName= $('#txtCustomerName').val();
+            var fromDate     = $('#TxtFromDate').val();
+            var toDate       = $('#TxtToDate').val();
+            var customerName = $('#txtCustomerName').val();
             var jobVendorCode = $('#ddlJobVendorCode').val();
-            var drivingBy   = $('#ddlDrivingBy').val();
-            var vehicleCode = $('#ddlVehicleCode').val();
-            var cashInHand  = $('#ddlCashInHand').val();
+            var drivingBy    = $('#ddlDrivingBy').val();
+            var vehicleCode  = $('#ddlVehicleCode').val();
+            var cashInHand   = $('#ddlCashInHand').val();
 
             if (!fromDate && !toDate && !customerName && (!jobVendorCode || jobVendorCode == '0')) {
                 alert('Please apply at least one filter (date range, customer, or job given by) before generating an invoice.');
                 return;
             }
 
-            $('#btnGenerateInvoice').prop('disabled', true).text('Generating...');
+            $('#btnGenerateInvoice').prop('disabled', true).html('Generating...');
 
+            // Use plain form data (not JSON) so MVC model binding works correctly
             $.ajax({
-                url: '@Url.Content("~/Invoice/GenerateInvoice")',
+                url: BaseURL + 'Reports/GenerateInvoice',
                 type: 'POST',
-                data: JSON.stringify({
+                data: {
                     CustomerName:  customerName,
                     StartDate:     fromDate,
                     EndDate:       toDate,
-                    JobVendorCode: jobVendorCode && jobVendorCode != '0' ? jobVendorCode : null,
-                    DrivingBy:     drivingBy && drivingBy != '0' ? drivingBy : null,
-                    VehicleCode:   vehicleCode && vehicleCode != '0' ? vehicleCode : null,
-                    CashInHand:    cashInHand && cashInHand != '0' ? cashInHand : null,
+                    JobVendorCode: (jobVendorCode && jobVendorCode != '0') ? jobVendorCode : '',
+                    DrivingBy:     (drivingBy && drivingBy != '0') ? drivingBy : '',
+                    VehicleCode:   (vehicleCode && vehicleCode != '0') ? vehicleCode : '',
+                    CashInHand:    (cashInHand && cashInHand != '0') ? cashInHand : '',
                     CreditCash:    ''
-                }),
+                },
                 dataType: 'json',
-                contentType: 'application/json',
                 success: function (result) {
                     $('#btnGenerateInvoice').prop('disabled', false).html('<i class="fa fa-file-invoice"></i> Generate Invoice');
                     if (result.success) {
-                        // Open invoice + receipt in new windows
                         var w = $(window).width() - 100, h = $(window).height() - 70;
-                        window.open('@Url.Content("~/Invoice/ViewInvoice")?invoiceId=' + result.invoiceId, 'inv_' + result.invoiceId, 'width=' + w + ',height=' + h);
-                        // Small delay then open receipt
+                        window.open(BaseURL + 'Reports/ViewInvoice?invoiceId=' + result.invoiceId, 'inv_' + result.invoiceId, 'width=' + w + ',height=' + h);
                         setTimeout(function () {
-                            window.open('@Url.Content("~/Invoice/ViewReceipt")?invoiceId=' + result.invoiceId, 'rec_' + result.invoiceId, 'width=' + w + ',height=' + h);
-                        }, 600);
+                            window.open(BaseURL + 'Reports/ViewReceipt?invoiceId=' + result.invoiceId, 'rec_' + result.invoiceId, 'width=' + w + ',height=' + h);
+                        }, 800);
                     } else {
                         alert('Error: ' + result.message);
                     }
                 },
-                error: function () {
+                error: function (xhr) {
                     $('#btnGenerateInvoice').prop('disabled', false).html('<i class="fa fa-file-invoice"></i> Generate Invoice');
-                    alert('Server error. Please try again.');
+                    alert('Error ' + xhr.status + ': ' + xhr.statusText + '\nURL tried: ' + BaseURL + 'Reports/GenerateInvoice');
                 }
             });
         });

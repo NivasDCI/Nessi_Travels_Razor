@@ -19,41 +19,31 @@ namespace Transport.Repository
 
     public class InvoiceRepository : IInvoiceRepository
     {
-        private string GetConnectionString()
+        private SqlConnection GetConnection()
         {
-            // Same pattern used by ReportsController - reads raw connection string from ConnectionString.txt
-            string txtpath = System.Web.Hosting.HostingEnvironment.MapPath("~/ConnectionString.txt");
-            string connectionValue = "";
-            using (System.IO.StreamReader sr = new System.IO.StreamReader(txtpath))
-            {
-                while (sr.Peek() >= 0)
-                    connectionValue = sr.ReadLine();
-            }
-            return connectionValue;
+            // Use the same TransportEntities EF context that all other repositories use
+            // This guarantees same DB connection with no path issues
+            var db = new Transport.Entity.TransportEntities();
+            var conn = (SqlConnection)db.Database.Connection;
+            return conn;
         }
 
         public long SaveInvoice(InvoiceHeaderModel header, List<InvoiceDetailModel> details)
         {
-            using (var conn = new SqlConnection(GetConnectionString()))
+            using (var conn = GetConnection())
             {
                 conn.Open();
                 using (var tran = conn.BeginTransaction())
                 {
                     try
                     {
-                        // Generate invoice number
-                        string invoiceNo = header.InvoiceNo;
-                        if (string.IsNullOrEmpty(invoiceNo))
-                        {
-                            var numCmd = new SqlCommand(
-                                "SELECT 'NTT-INV-' + RIGHT('00000' + CAST(ISNULL(MAX(InvoiceID),0)+1 AS VARCHAR), 5) FROM InvoiceHeaders",
-                                conn, tran);
-                            invoiceNo = numCmd.ExecuteScalar()?.ToString() ?? "NTT-INV-00001";
-                        }
+                        var numCmd = new SqlCommand(
+                            "SELECT 'NTT-INV-' + RIGHT('00000' + CAST(ISNULL(MAX(InvoiceID),0)+1 AS VARCHAR), 5) FROM InvoiceHeaders",
+                            conn, tran);
+                        string invoiceNo = numCmd.ExecuteScalar() != null ? numCmd.ExecuteScalar().ToString() : "NTT-INV-00001";
 
-                        // Insert header
                         var headerCmd = new SqlCommand(@"
-                            INSERT INTO InvoiceHeaders 
+                            INSERT INTO InvoiceHeaders
                                 (InvoiceNo, InvoiceDate, CustomerName, JobVendorCode, JobVendorName,
                                  DrivingBy, DrivingByName, VehicleCode, VehicleName, CashInHand, CashInHandName,
                                  StartDate, EndDate, CreditCash, TotalAmount, IsCredit, CreatedBy, CreatedDate)
@@ -83,7 +73,6 @@ namespace Transport.Repository
 
                         long newInvoiceId = Convert.ToInt64(headerCmd.ExecuteScalar());
 
-                        // Insert details
                         foreach (var detail in details)
                         {
                             var detailCmd = new SqlCommand(@"
@@ -127,18 +116,18 @@ namespace Transport.Repository
         public List<InvoiceHeaderModel> GetAllInvoices(string customerName, string invoiceNo, DateTime? fromDate, DateTime? toDate)
         {
             var list = new List<InvoiceHeaderModel>();
-            using (var conn = new SqlConnection(GetConnectionString()))
+            using (var conn = GetConnection())
             {
                 conn.Open();
                 var cmd = new SqlCommand(@"
-                    SELECT h.*, 
+                    SELECT h.*,
                            (SELECT COUNT(*) FROM InvoiceDetails d WHERE d.InvoiceID = h.InvoiceID) AS TotalJobs
                     FROM InvoiceHeaders h
                     WHERE 1=1
                       AND (@CustomerName IS NULL OR h.CustomerName LIKE '%' + @CustomerName + '%')
-                      AND (@InvoiceNo IS NULL OR h.InvoiceNo LIKE '%' + @InvoiceNo + '%')
-                      AND (@FromDate IS NULL OR CAST(h.InvoiceDate AS DATE) >= CAST(@FromDate AS DATE))
-                      AND (@ToDate IS NULL OR CAST(h.InvoiceDate AS DATE) <= CAST(@ToDate AS DATE))
+                      AND (@InvoiceNo    IS NULL OR h.InvoiceNo    LIKE '%' + @InvoiceNo    + '%')
+                      AND (@FromDate     IS NULL OR CAST(h.InvoiceDate AS DATE) >= CAST(@FromDate AS DATE))
+                      AND (@ToDate       IS NULL OR CAST(h.InvoiceDate AS DATE) <= CAST(@ToDate   AS DATE))
                     ORDER BY h.InvoiceID DESC", conn);
 
                 cmd.Parameters.AddWithValue("@CustomerName", string.IsNullOrEmpty(customerName) ? (object)DBNull.Value : customerName);
@@ -149,9 +138,7 @@ namespace Transport.Repository
                 using (var reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
-                    {
                         list.Add(MapHeader(reader));
-                    }
                 }
             }
             return list;
@@ -159,16 +146,15 @@ namespace Transport.Repository
 
         public InvoiceHeaderModel GetInvoiceById(long invoiceId)
         {
-            using (var conn = new SqlConnection(GetConnectionString()))
+            using (var conn = GetConnection())
             {
                 conn.Open();
                 var cmd = new SqlCommand(@"
-                    SELECT h.*, 
+                    SELECT h.*,
                            (SELECT COUNT(*) FROM InvoiceDetails d WHERE d.InvoiceID = h.InvoiceID) AS TotalJobs
-                    FROM InvoiceHeaders h 
+                    FROM InvoiceHeaders h
                     WHERE h.InvoiceID = @InvoiceID", conn);
                 cmd.Parameters.AddWithValue("@InvoiceID", invoiceId);
-
                 using (var reader = cmd.ExecuteReader())
                 {
                     if (reader.Read()) return MapHeader(reader);
@@ -180,13 +166,12 @@ namespace Transport.Repository
         public List<InvoiceDetailModel> GetInvoiceDetails(long invoiceId)
         {
             var list = new List<InvoiceDetailModel>();
-            using (var conn = new SqlConnection(GetConnectionString()))
+            using (var conn = GetConnection())
             {
                 conn.Open();
                 var cmd = new SqlCommand(
                     "SELECT * FROM InvoiceDetails WHERE InvoiceID = @InvoiceID ORDER BY JobDate, JobTime", conn);
                 cmd.Parameters.AddWithValue("@InvoiceID", invoiceId);
-
                 using (var reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
@@ -197,13 +182,13 @@ namespace Transport.Repository
                             InvoiceID = Convert.ToInt64(reader["InvoiceID"]),
                             JobCode = Convert.ToInt64(reader["JobCode"]),
                             JobDate = reader["JobDate"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(reader["JobDate"]),
-                            JobTime = reader["JobTime"]?.ToString(),
-                            JobFrom = reader["JobFrom"]?.ToString(),
-                            JobTo = reader["JobTo"]?.ToString(),
-                            CustomerName = reader["CustomerName"]?.ToString(),
-                            VehicleName = reader["VehicleName"]?.ToString(),
-                            DrivingByName = reader["DrivingByName"]?.ToString(),
-                            JobVendorName = reader["JobVendorName"]?.ToString(),
+                            JobTime = reader["JobTime"] == DBNull.Value ? null : reader["JobTime"].ToString(),
+                            JobFrom = reader["JobFrom"] == DBNull.Value ? null : reader["JobFrom"].ToString(),
+                            JobTo = reader["JobTo"] == DBNull.Value ? null : reader["JobTo"].ToString(),
+                            CustomerName = reader["CustomerName"] == DBNull.Value ? null : reader["CustomerName"].ToString(),
+                            VehicleName = reader["VehicleName"] == DBNull.Value ? null : reader["VehicleName"].ToString(),
+                            DrivingByName = reader["DrivingByName"] == DBNull.Value ? null : reader["DrivingByName"].ToString(),
+                            JobVendorName = reader["JobVendorName"] == DBNull.Value ? null : reader["JobVendorName"].ToString(),
                             Credit = reader["Credit"] == DBNull.Value ? (decimal?)null : Convert.ToDecimal(reader["Credit"]),
                             Cash = reader["Cash"] == DBNull.Value ? (decimal?)null : Convert.ToDecimal(reader["Cash"]),
                             Amount = reader["Amount"] == DBNull.Value ? (decimal?)null : Convert.ToDecimal(reader["Amount"]),
@@ -216,17 +201,21 @@ namespace Transport.Repository
 
         public bool DeleteInvoice(long invoiceId)
         {
-            using (var conn = new SqlConnection(GetConnectionString()))
+            using (var conn = GetConnection())
             {
                 conn.Open();
                 using (var tran = conn.BeginTransaction())
                 {
                     try
                     {
-                        new SqlCommand("DELETE FROM InvoiceDetails WHERE InvoiceID = @ID", conn, tran)
-                        { Parameters = { new SqlParameter("@ID", invoiceId) } }.ExecuteNonQuery();
-                        new SqlCommand("DELETE FROM InvoiceHeaders WHERE InvoiceID = @ID", conn, tran)
-                        { Parameters = { new SqlParameter("@ID", invoiceId) } }.ExecuteNonQuery();
+                        var cmd1 = new SqlCommand("DELETE FROM InvoiceDetails WHERE InvoiceID = @ID", conn, tran);
+                        cmd1.Parameters.AddWithValue("@ID", invoiceId);
+                        cmd1.ExecuteNonQuery();
+
+                        var cmd2 = new SqlCommand("DELETE FROM InvoiceHeaders WHERE InvoiceID = @ID", conn, tran);
+                        cmd2.Parameters.AddWithValue("@ID", invoiceId);
+                        cmd2.ExecuteNonQuery();
+
                         tran.Commit();
                         return true;
                     }
@@ -240,20 +229,20 @@ namespace Transport.Repository
             return new InvoiceHeaderModel
             {
                 InvoiceID = Convert.ToInt64(r["InvoiceID"]),
-                InvoiceNo = r["InvoiceNo"]?.ToString(),
+                InvoiceNo = r["InvoiceNo"].ToString(),
                 InvoiceDate = Convert.ToDateTime(r["InvoiceDate"]),
-                CustomerName = r["CustomerName"]?.ToString(),
+                CustomerName = r["CustomerName"] == DBNull.Value ? null : r["CustomerName"].ToString(),
                 JobVendorCode = r["JobVendorCode"] == DBNull.Value ? (int?)null : Convert.ToInt32(r["JobVendorCode"]),
-                JobVendorName = r["JobVendorName"]?.ToString(),
+                JobVendorName = r["JobVendorName"] == DBNull.Value ? null : r["JobVendorName"].ToString(),
                 DrivingBy = r["DrivingBy"] == DBNull.Value ? (int?)null : Convert.ToInt32(r["DrivingBy"]),
-                DrivingByName = r["DrivingByName"]?.ToString(),
+                DrivingByName = r["DrivingByName"] == DBNull.Value ? null : r["DrivingByName"].ToString(),
                 VehicleCode = r["VehicleCode"] == DBNull.Value ? (int?)null : Convert.ToInt32(r["VehicleCode"]),
-                VehicleName = r["VehicleName"]?.ToString(),
+                VehicleName = r["VehicleName"] == DBNull.Value ? null : r["VehicleName"].ToString(),
                 CashInHand = r["CashInHand"] == DBNull.Value ? (int?)null : Convert.ToInt32(r["CashInHand"]),
-                CashInHandName = r["CashInHandName"]?.ToString(),
+                CashInHandName = r["CashInHandName"] == DBNull.Value ? null : r["CashInHandName"].ToString(),
                 StartDate = r["StartDate"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(r["StartDate"]),
                 EndDate = r["EndDate"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(r["EndDate"]),
-                CreditCash = r["CreditCash"]?.ToString(),
+                CreditCash = r["CreditCash"] == DBNull.Value ? null : r["CreditCash"].ToString(),
                 TotalAmount = Convert.ToDecimal(r["TotalAmount"]),
                 IsCredit = Convert.ToBoolean(r["IsCredit"]),
                 CreatedDate = Convert.ToDateTime(r["CreatedDate"]),

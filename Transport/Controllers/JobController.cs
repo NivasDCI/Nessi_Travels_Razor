@@ -51,72 +51,33 @@ namespace Transport.Controllers
 
         private string NumberToWords(int number)
         {
-            if (number == 0)
-                return "Zero";
-
-            if (number < 0)
-                return "Minus " + NumberToWords(Math.Abs(number));
+            if (number == 0) return "Zero";
+            if (number < 0) return "Minus " + NumberToWords(Math.Abs(number));
 
             string words = "";
-
-            if ((number / 1000000) > 0)
-            {
-                words += NumberToWords(number / 1000000) + " Million ";
-                number %= 1000000;
-            }
-
-            if ((number / 1000) > 0)
-            {
-                words += NumberToWords(number / 1000) + " Thousand ";
-                number %= 1000;
-            }
-
-            if ((number / 100) > 0)
-            {
-                words += NumberToWords(number / 100) + " Hundred ";
-                number %= 100;
-            }
-
+            if ((number / 1000000) > 0) { words += NumberToWords(number / 1000000) + " Million "; number %= 1000000; }
+            if ((number / 1000) > 0) { words += NumberToWords(number / 1000) + " Thousand "; number %= 1000; }
+            if ((number / 100) > 0) { words += NumberToWords(number / 100) + " Hundred "; number %= 100; }
             if (number > 0)
             {
-                if (words != "")
-                    words += "and ";
-
+                if (words != "") words += "and ";
                 var unitsMap = new[] { "Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen" };
                 var tensMap = new[] { "Zero", "Ten", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety" };
-
-                if (number < 20)
-                    words += unitsMap[number];
-                else
-                {
-                    words += tensMap[number / 10];
-                    if ((number % 10) > 0)
-                        words += "-" + unitsMap[number % 10];
-                }
+                if (number < 20) words += unitsMap[number];
+                else { words += tensMap[number / 10]; if ((number % 10) > 0) words += "-" + unitsMap[number % 10]; }
             }
-
             return words;
         }
 
         public string DecimalToWords(decimal number)
         {
-            if (number == 0)
-                return "Zero";
+            if (number == 0) return "Zero";
+            if (number < 0) return "Minus " + DecimalToWords(Math.Abs(number));
 
-            if (number < 0)
-                return "Minus " + DecimalToWords(Math.Abs(number));
-
-            string words = "";
             int intPortion = (int)number;
-            decimal fraction = (number - intPortion) * 100;
-            int decPortion = (int)fraction;
-
-            words = NumberToWords(intPortion);
-            if (decPortion > 0)
-            {
-                words += " and ";
-                words += NumberToWords(decPortion);
-            }
+            int decPortion = (int)((number - intPortion) * 100);
+            string words = NumberToWords(intPortion);
+            if (decPortion > 0) { words += " and "; words += NumberToWords(decPortion); }
             return words;
         }
         #endregion
@@ -124,93 +85,66 @@ namespace Transport.Controllers
         #region "View Actions"
         public ActionResult ListJobs(string HeaderViewID, string DetailViewID)
         {
-            if (Request.Params["JobDate"] != string.Empty)
-            {
-                string jobdate = Request.Params["JobDate"];
-            }
+            if (Request.Params["JobDate"] != string.Empty) { string jobdate = Request.Params["JobDate"]; }
             return View();
         }
-
         public ActionResult AddJob(string JobCde, string HeaderViewID, string DetailViewID)
         {
             JobModel obj = new JobModel();
             return View(obj);
         }
-
-        public ActionResult MyJobs(string HeaderViewID, string DetailViewID)
-        {
-            return View();
-        }
-
-        public ActionResult JobHistory(string HeaderViewID, string DetailViewID)
-        {
-            return View();
-        }
-
-        public ActionResult ListJobRequests(string HeaderViewID, string DetailViewID)
-        {
-            return View();
-        }
-
-        public ActionResult CreditJobs(string HeaderViewID, string DetailViewID)
-        {
-            return View();
-        }
+        public ActionResult MyJobs(string HeaderViewID, string DetailViewID) { return View(); }
+        public ActionResult JobHistory(string HeaderViewID, string DetailViewID) { return View(); }
+        public ActionResult ListJobRequests(string HeaderViewID, string DetailViewID) { return View(); }
+        public ActionResult CreditJobs(string HeaderViewID, string DetailViewID) { return View(); }
         #endregion
 
         #region "Invoice & Receipt"
         public ActionResult CustomerInvoiceAll(string CustomerName, string StartDate, string EndDate,
-    int? JobVendorCode, int? DrivingBy, int? VehicleCode, string CreditCash, int? CashInHand)
+            int? JobVendorCode, int? DrivingBy, int? VehicleCode, string CreditCash, int? CashInHand)
         {
             try
             {
                 int TotalCount = 0;
-
                 DateTime? parsedStart = null;
                 DateTime? parsedEnd = null;
+                string[] fmts = new[] { "dd-MMM-yyyy", "dd/MM/yyyy", "MM/dd/yyyy", "yyyy-MM-dd" };
 
-                if (!string.IsNullOrEmpty(StartDate))
-                    parsedStart = Convert.ToDateTime(StartDate);
+                // FIX: declare variables separately before TryParseExact (C# 5/6 compatible)
+                DateTime s;
+                if (!string.IsNullOrEmpty(StartDate) &&
+                    DateTime.TryParseExact(StartDate, fmts, CultureInfo.InvariantCulture, DateTimeStyles.None, out s))
+                    parsedStart = s;
 
-                if (!string.IsNullOrEmpty(EndDate))
-                    parsedEnd = Convert.ToDateTime(EndDate);
+                DateTime e;
+                if (!string.IsNullOrEmpty(EndDate) &&
+                    DateTime.TryParseExact(EndDate, fmts, CultureInfo.InvariantCulture, DateTimeStyles.None, out e))
+                    parsedEnd = e;
 
-                if (parsedStart == null)
-                    parsedStart = DateTime.Now.Date;
+                if (parsedStart == null) parsedStart = DateTime.Now.Date;
+                if (parsedEnd == null) parsedEnd = parsedStart;
 
-                if (parsedEnd == null)
-                    parsedEnd = parsedStart;
-
-                // Clean values
                 if (JobVendorCode == 0) JobVendorCode = null;
                 if (DrivingBy == 0) DrivingBy = null;
                 if (VehicleCode == 0) VehicleCode = null;
                 if (CashInHand == 0) CashInHand = null;
                 if (string.IsNullOrWhiteSpace(CustomerName)) CustomerName = null;
 
-                // 🔥 GET ALL JOBS
                 List<JobModel> allJobs = _objJobsRepository.Job_FindAll(
                     1, parsedStart, parsedEnd, VehicleCode, JobVendorCode,
                     CashInHand, CustomerName, null, DrivingBy, 500, null, null, out TotalCount);
 
-                // Filter Credit/Cash
                 if (!string.IsNullOrEmpty(CreditCash))
                 {
-                    if (CreditCash == "Credit")
-                        allJobs = allJobs.Where(o => (o.Credit ?? 0) > 0).ToList();
-                    else if (CreditCash == "Cash")
-                        allJobs = allJobs.Where(o => (o.Cash ?? 0) > 0).ToList();
+                    if (CreditCash == "Credit") allJobs = allJobs.Where(o => (o.Credit ?? 0) > 0).ToList();
+                    else if (CreditCash == "Cash") allJobs = allJobs.Where(o => (o.Cash ?? 0) > 0).ToList();
                 }
 
                 if (allJobs == null || allJobs.Count == 0)
-                {
                     return Content("<script>alert('No jobs found');window.close();</script>");
-                }
 
-                // 🔥 CALCULATE TOTAL
                 decimal grossAmount = allJobs.Sum(o => (o.Credit ?? o.Cash ?? 0));
-
-                ViewBag.CustomerName = allJobs.FirstOrDefault()?.CustomerName ?? "Guest";
+                ViewBag.CustomerName = allJobs.FirstOrDefault() != null ? allJobs.FirstOrDefault().CustomerName : "Guest";
                 ViewBag.InvoiceNo = "INV-" + DateTime.Now.ToString("yyyyMMddHHmmss");
                 ViewBag.InvoiceDate = DateTime.Now.ToString("dd-MMM-yyyy");
                 ViewBag.details = allJobs;
@@ -218,8 +152,7 @@ namespace Transport.Controllers
                 ViewBag.NetAmount = grossAmount;
                 ViewBag.AmountinWords = ConvertToCamelCase(DecimalToWords(grossAmount));
                 ViewBag.IsCredit = allJobs.Any(o => (o.Credit ?? 0) > 0);
-
-                return View("Invoice"); // using same UI
+                return View("Invoice");
             }
             catch (Exception ex)
             {
@@ -232,35 +165,23 @@ namespace Transport.Controllers
             try
             {
                 JobModel model = _objJobsRepository.Job_Edit(JobCode);
-                if (model == null)
-                    return Content("Job not found.");
+                if (model == null) return Content("Job not found.");
 
                 ViewBag.CustomerName = model.CustomerName;
                 ViewBag.InvoiceNo = "NTT-T" + Shared.ToString(model.JobCode);
                 ViewBag.InvoiceDate = DateTime.Now.ToString("MMM dd yyyy");
 
                 List<JobModel> details = new List<JobModel>();
-                details.Add(new JobModel
-                {
-                    JobDate = model.JobDate,
-                    JobTime = model.JobTime,
-                    JobFrom = model.JobFrom,
-                    JobTo = model.JobTo,
-                    Credit = model.Credit
-                });
+                details.Add(new JobModel { JobDate = model.JobDate, JobTime = model.JobTime, JobFrom = model.JobFrom, JobTo = model.JobTo, Credit = model.Credit });
 
                 ViewBag.details = details;
                 ViewBag.GrossAmount = model.Credit ?? model.Cash;
                 ViewBag.NetAmount = model.Credit ?? model.Cash;
                 ViewBag.AmountinWords = ConvertToCamelCase(DecimalToWords(Convert.ToDecimal(model.Credit ?? model.Cash ?? 0)));
-                ViewBag.IsCredit = model.Credit.HasValue ? true : false;
-
+                ViewBag.IsCredit = model.Credit.HasValue;
                 return View();
             }
-            catch (Exception ex)
-            {
-                return Content("Error: " + ex.Message);
-            }
+            catch (Exception ex) { return Content("Error: " + ex.Message); }
         }
 
         public ActionResult Receipt(long? JobCode)
@@ -268,8 +189,7 @@ namespace Transport.Controllers
             try
             {
                 JobModel model = _objJobsRepository.Job_Edit(JobCode);
-                if (model == null)
-                    return Content("Job not found.");
+                if (model == null) return Content("Job not found.");
 
                 ViewBag.CustomerName = model.CustomerName;
                 ViewBag.InvoiceNo = "NTT-T" + Shared.ToString(model.JobCode);
@@ -280,19 +200,12 @@ namespace Transport.Controllers
                 ViewBag.JobTo = model.JobTo;
                 ViewBag.GrossAmount = model.Credit ?? model.Cash;
                 ViewBag.NetAmount = model.Credit ?? model.Cash;
-
                 return View();
             }
-            catch (Exception ex)
-            {
-                return Content("Error: " + ex.Message);
-            }
+            catch (Exception ex) { return Content("Error: " + ex.Message); }
         }
 
-        public ActionResult CustomerInvoice(long? JobCode)
-        {
-            return View();
-        }
+        public ActionResult CustomerInvoice(long? JobCode) { return View(); }
         #endregion
 
         #region "Job CRUD Operations"
@@ -300,30 +213,23 @@ namespace Transport.Controllers
         public ActionResult Job_FindAll(int? page, DateTime? StartDate, DateTime? EndDate, int? VehicleCode, int? JobVendorCode, int? CashInHand, string CustomerName, string ContactNo, int? DrivingBy, string CreditCash, int? limit, string sortBy, string direction)
         {
             int TotalCount = 0;
-
-            // Handle date from session
-            if (StartDate == null && Session["NewJobDate"] != null && !string.IsNullOrEmpty(Session["NewJobDate"].ToString()))
+            if (StartDate == null)
             {
                 DateTime sessionDate;
-                if (DateTime.TryParse(Session["NewJobDate"].ToString(), out sessionDate))
+                if (Session["NewJobDate"] != null && DateTime.TryParse(Session["NewJobDate"].ToString(), out sessionDate))
                     StartDate = sessionDate;
+                else
+                    StartDate = CommonRepository.GetTimeZoneDate();
             }
-            if (StartDate == null)
-                StartDate = CommonRepository.GetTimeZoneDate();
-
-            if (EndDate == null)
-                EndDate = StartDate;
+            if (EndDate == null) EndDate = StartDate;
 
             List<JobModel> Jobslist = _objJobsRepository.Job_FindAll(page, StartDate, EndDate, VehicleCode, JobVendorCode, CashInHand, CustomerName, ContactNo, DrivingBy, limit, sortBy, direction, out TotalCount);
 
             if (!string.IsNullOrEmpty(CreditCash))
             {
-                if (CreditCash == "Credit")
-                    Jobslist = Jobslist.Where(o => o.Credit.HasValue && o.Credit > 0).ToList();
-                else if (CreditCash == "Cash")
-                    Jobslist = Jobslist.Where(o => o.Cash.HasValue && o.Cash > 0).ToList();
+                if (CreditCash == "Credit") Jobslist = Jobslist.Where(o => o.Credit.HasValue && o.Credit > 0).ToList();
+                else if (CreditCash == "Cash") Jobslist = Jobslist.Where(o => o.Cash.HasValue && o.Cash > 0).ToList();
             }
-
             return Json(new { records = Jobslist.Take(500), total = TotalCount }, JsonRequestBehavior.AllowGet);
         }
 
@@ -333,11 +239,8 @@ namespace Transport.Controllers
             int TotalCount = 0;
             List<JobModel> Jobslist = _objJobsRepository.Job_FindAll(1, null, null, null, null, null, null, null, null, null, null, null, out TotalCount);
             JobModel model = Jobslist.Where(o => o.JobCode == JobCode).FirstOrDefault();
-
-            if (model != null)
-                return Json(new { success = true, response = model });
-            else
-                return Json(new { success = true, response = " " });
+            if (model != null) return Json(new { success = true, response = model });
+            else return Json(new { success = true, response = " " });
         }
 
         [HttpGet]
@@ -367,8 +270,7 @@ namespace Transport.Controllers
         [HttpPost]
         public JsonResult JobStatus_Delete(long? JobStatusCode)
         {
-            ReturnMessageModel ObjMessage = new ReturnMessageModel();
-            ObjMessage = _objJobsRepository.JobStatus_Delete(JobStatusCode);
+            ReturnMessageModel ObjMessage = _objJobsRepository.JobStatus_Delete(JobStatusCode);
             return Json(ObjMessage, JsonRequestBehavior.AllowGet);
         }
 
@@ -387,10 +289,7 @@ namespace Transport.Controllers
                 ReturnMessageModel ObjMessage = _objJobsRepository.JobStatus_Update(JobCode, Status, SessionExpire.GetUserID());
                 return Json(new { success = true, response = "" });
             }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, response = ex.Message });
-            }
+            catch (Exception ex) { return Json(new { success = false, response = ex.Message }); }
         }
 
         [HttpPost]
@@ -401,10 +300,7 @@ namespace Transport.Controllers
                 ReturnMessageModel ObjMessage = _objJobsRepository.JobStatus_ReAssign(JobCode, SessionExpire.GetUserID());
                 return Json(new { success = true, response = "" });
             }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, response = ex.Message });
-            }
+            catch (Exception ex) { return Json(new { success = false, response = ex.Message }); }
         }
 
         [HttpPost]
@@ -415,10 +311,7 @@ namespace Transport.Controllers
                 ReturnMessageModel ObjMessage = _objJobsRepository.JobStatus_Cancel(JobCode, SessionExpire.GetUserID());
                 return Json(new { success = true, response = "" });
             }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, response = ex.Message });
-            }
+            catch (Exception ex) { return Json(new { success = false, response = ex.Message }); }
         }
         #endregion
 
@@ -441,25 +334,20 @@ namespace Transport.Controllers
                     context.Database.ExecuteSqlCommand(
                         "UPDATE JobRequests SET JobRequestStatus = @status, Cost = @cost WHERE JobRequestCode = @code",
                         new System.Data.SqlClient.SqlParameter("@status", JobStatus),
-                        new System.Data.SqlClient.SqlParameter("@cost", Cost ?? (object)DBNull.Value),
+                        new System.Data.SqlClient.SqlParameter("@cost", Cost.HasValue ? (object)Cost.Value : DBNull.Value),
                         new System.Data.SqlClient.SqlParameter("@code", JobRequestCode));
                     context.SaveChanges();
                     return Json(new { success = true, response = "" });
                 }
-                catch (Exception ex)
-                {
-                    return Json(new { success = false, response = ex.Message });
-                }
+                catch (Exception ex) { return Json(new { success = false, response = ex.Message }); }
             }
         }
 
         [HttpPost]
         public ActionResult IsRequestedCheck()
         {
-            bool isRequested = false;
-            int _count = 0;
-            isRequested = _objJobsRepository.IsRequestedCheck();
-            _count = _objJobsRepository.IsRequestedCount();
+            bool isRequested = _objJobsRepository.IsRequestedCheck();
+            int _count = _objJobsRepository.IsRequestedCount();
             return Json(new { success = isRequested, count = _count }, JsonRequestBehavior.AllowGet);
         }
         #endregion
@@ -504,10 +392,7 @@ namespace Transport.Controllers
                     context.SaveChanges();
                     return Json(new { success = true, response = "" });
                 }
-                catch (Exception ex)
-                {
-                    return Json(new { success = false, response = ex.Message });
-                }
+                catch (Exception ex) { return Json(new { success = false, response = ex.Message }); }
             }
         }
 
@@ -525,10 +410,7 @@ namespace Transport.Controllers
                     context.SaveChanges();
                     return Json(new { success = true, response = "" });
                 }
-                catch (Exception ex)
-                {
-                    return Json(new { success = false, response = ex.Message });
-                }
+                catch (Exception ex) { return Json(new { success = false, response = ex.Message }); }
             }
         }
         #endregion
@@ -540,19 +422,13 @@ namespace Transport.Controllers
             using (TransportEntities context = new TransportEntities())
             {
                 JobRequestModel ObjJobRequestModel = _objJobsRepository.Job_RequestEdit(JobRequestCode);
-                string linkcontent = "";
-                string _number = "";
-
+                string linkcontent = ""; string _number = "";
                 if (RequestStatus == "Job Accepted")
                 {
                     linkcontent += "Dear " + Shared.ToString(ObjJobRequestModel.CustomerName) + " ,";
                     linkcontent += Environment.NewLine;
                     linkcontent += "We have accepted your trip Request.";
-                    if (ObjJobRequestModel.Cost != null)
-                    {
-                        linkcontent += Environment.NewLine;
-                        linkcontent += "The Price for your Trip is $" + Shared.ToString(ObjJobRequestModel.Cost);
-                    }
+                    if (ObjJobRequestModel.Cost != null) { linkcontent += Environment.NewLine; linkcontent += "The Price for your Trip is $" + Shared.ToString(ObjJobRequestModel.Cost); }
                     linkcontent += Environment.NewLine;
                     linkcontent += "We will send you the driver details Shortly!";
                     _number = Shared.ToString(ObjJobRequestModel.ContactNo);
@@ -574,76 +450,37 @@ namespace Transport.Controllers
             using (TransportEntities context = new TransportEntities())
             {
                 JobModel ObjJobModel = _objJobsRepository.Job_Edit(JobCode);
-                string linkcontent = "";
-                string _number = "";
-
+                string linkcontent = ""; string _number = "";
                 if (JobStatus == "Assigned")
                 {
                     linkcontent += "Dear " + Shared.ToString(ObjJobModel.CustomerName) + " ,";
-
                     if (Shared.ToString(ObjJobModel.OutSource) != string.Empty)
                     {
-                        linkcontent += Environment.NewLine;
-                        linkcontent += "Date : " + Shared.ToString(ObjJobModel.JobDate?.ToString("dd-MMM-yyyy"));
-                        linkcontent += Environment.NewLine;
-                        linkcontent += "Time : " + Shared.ToString(ObjJobModel.JobTime);
-                        linkcontent += Environment.NewLine;
-                        linkcontent += "Pickup : " + Shared.ToString(ObjJobModel.JobFrom);
-                        linkcontent += Environment.NewLine;
-                        linkcontent += "Dropoff : " + Shared.ToString(ObjJobModel.JobTo);
-                        linkcontent += Environment.NewLine;
-                        linkcontent += "Booking Status : Confirmed";
-                        linkcontent += Environment.NewLine;
-                        if (Shared.IsDecimal(ObjJobModel.Cash) == true)
-                        {
-                            linkcontent += "Price : $" + Shared.ToString(ObjJobModel.Cash);
-                            linkcontent += Environment.NewLine;
-                        }
-                        linkcontent += "Driver Name : " + Shared.ToString(ObjJobModel.OutSource);
-                        linkcontent += Environment.NewLine;
-                        linkcontent += "Contact No : ";
-                        linkcontent += Environment.NewLine;
+                        linkcontent += Environment.NewLine + "Date : " + Shared.ToString(ObjJobModel.JobDate.HasValue ? ObjJobModel.JobDate.Value.ToString("dd-MMM-yyyy") : "");
+                        linkcontent += Environment.NewLine + "Time : " + Shared.ToString(ObjJobModel.JobTime);
+                        linkcontent += Environment.NewLine + "Pickup : " + Shared.ToString(ObjJobModel.JobFrom);
+                        linkcontent += Environment.NewLine + "Dropoff : " + Shared.ToString(ObjJobModel.JobTo);
+                        linkcontent += Environment.NewLine + "Booking Status : Confirmed";
+                        if (Shared.IsDecimal(ObjJobModel.Cash)) { linkcontent += Environment.NewLine + "Price : $" + Shared.ToString(ObjJobModel.Cash); }
+                        linkcontent += Environment.NewLine + "Driver Name : " + Shared.ToString(ObjJobModel.OutSource);
+                        linkcontent += Environment.NewLine + "Contact No : ";
                     }
                     if (Shared.ToInt(ObjJobModel.DrivingBy) != 0)
                     {
                         UserMasterModel ObjUserModel = ObjSystemRepository.UserMaster_Edit(ObjJobModel.DrivingBy.Value);
-                        linkcontent += Environment.NewLine;
-                        linkcontent += "Date : " + Shared.ToString(ObjJobModel.JobDate?.ToString("dd-MMM-yyyy"));
-                        linkcontent += Environment.NewLine;
-                        linkcontent += "Time : " + Shared.ToString(ObjJobModel.JobTime);
-                        linkcontent += Environment.NewLine;
-                        linkcontent += "Pickup : " + Shared.ToString(ObjJobModel.JobFrom);
-                        linkcontent += Environment.NewLine;
-                        linkcontent += "Dropoff : " + Shared.ToString(ObjJobModel.JobTo);
-                        linkcontent += Environment.NewLine;
-                        linkcontent += "Booking Status : Confirmed";
-                        linkcontent += Environment.NewLine;
-                        if (Shared.IsDecimal(ObjJobModel.Cash) == true)
-                        {
-                            linkcontent += "Price : $" + Shared.ToString(ObjJobModel.Cash);
-                            linkcontent += Environment.NewLine;
-                        }
-                        linkcontent += "Driver Name : " + Shared.ToString(ObjUserModel.FirstName);
-                        linkcontent += Environment.NewLine;
-                        linkcontent += "Contact No : " + Shared.ToString(ObjUserModel.MobileNumber);
-                        linkcontent += Environment.NewLine;
+                        linkcontent += Environment.NewLine + "Date : " + Shared.ToString(ObjJobModel.JobDate.HasValue ? ObjJobModel.JobDate.Value.ToString("dd-MMM-yyyy") : "");
+                        linkcontent += Environment.NewLine + "Time : " + Shared.ToString(ObjJobModel.JobTime);
+                        linkcontent += Environment.NewLine + "Pickup : " + Shared.ToString(ObjJobModel.JobFrom);
+                        linkcontent += Environment.NewLine + "Dropoff : " + Shared.ToString(ObjJobModel.JobTo);
+                        linkcontent += Environment.NewLine + "Booking Status : Confirmed";
+                        if (Shared.IsDecimal(ObjJobModel.Cash)) { linkcontent += Environment.NewLine + "Price : $" + Shared.ToString(ObjJobModel.Cash); }
+                        linkcontent += Environment.NewLine + "Driver Name : " + Shared.ToString(ObjUserModel.FirstName);
+                        linkcontent += Environment.NewLine + "Contact No : " + Shared.ToString(ObjUserModel.MobileNumber);
                     }
                     _number = Shared.ToString(ObjJobModel.ContactNo);
                 }
-                else if (JobStatus == "Cancelled")
-                {
-                    linkcontent += "Dear " + Shared.ToString(ObjJobModel.CustomerName) + " ,";
-                    linkcontent += Environment.NewLine;
-                    linkcontent += "Sorry we cannot accept your trip Request!";
-                    _number = Shared.ToString(ObjJobModel.ContactNo);
-                }
-                else if (JobStatus == "Job Completed")
-                {
-                    linkcontent += "Dear " + Shared.ToString(ObjJobModel.CustomerName) + " ,";
-                    linkcontent += Environment.NewLine;
-                    linkcontent += "Thank you for choosing Nissi Travels! Have a safe Journey!";
-                    _number = Shared.ToString(ObjJobModel.ContactNo);
-                }
+                else if (JobStatus == "Cancelled") { linkcontent += "Dear " + Shared.ToString(ObjJobModel.CustomerName) + " ,"; linkcontent += Environment.NewLine + "Sorry we cannot accept your trip Request!"; _number = Shared.ToString(ObjJobModel.ContactNo); }
+                else if (JobStatus == "Job Completed") { linkcontent += "Dear " + Shared.ToString(ObjJobModel.CustomerName) + " ,"; linkcontent += Environment.NewLine + "Thank you for choosing Nissi Travels! Have a safe Journey!"; _number = Shared.ToString(ObjJobModel.ContactNo); }
                 return Json(new { data = linkcontent, number = _number });
             }
         }
@@ -654,24 +491,14 @@ namespace Transport.Controllers
             using (TransportEntities context = new TransportEntities())
             {
                 JobModel ObjJobModel = _objJobsRepository.Job_Edit(JobCode);
-                string linkcontent = "";
-                string _number = "+6562920521";
-
-                linkcontent += "Date : " + Shared.ToString(ObjJobModel.JobDate?.ToString("dd-MMM-yyyy"));
-                linkcontent += Environment.NewLine;
-                linkcontent += "Time : " + Shared.ToString(ObjJobModel.JobTime);
-                linkcontent += Environment.NewLine;
-                linkcontent += "Pickup : " + Shared.ToString(ObjJobModel.JobFrom);
-                linkcontent += Environment.NewLine;
-                linkcontent += "Dropoff : " + Shared.ToString(ObjJobModel.JobTo);
-                linkcontent += Environment.NewLine;
-                linkcontent += "Customer Name : " + Shared.ToString(ObjJobModel.CustomerName);
-                linkcontent += Environment.NewLine;
-                linkcontent += "Phone Number : " + Shared.ToString(ObjJobModel.ContactNo);
-                linkcontent += Environment.NewLine;
-                linkcontent += "Job Given By : " + Shared.ToString(ObjJobModel.JobVendorName);
-                linkcontent += Environment.NewLine;
-
+                string linkcontent = ""; string _number = "+6562920521";
+                linkcontent += "Date : " + Shared.ToString(ObjJobModel.JobDate.HasValue ? ObjJobModel.JobDate.Value.ToString("dd-MMM-yyyy") : "") + Environment.NewLine;
+                linkcontent += "Time : " + Shared.ToString(ObjJobModel.JobTime) + Environment.NewLine;
+                linkcontent += "Pickup : " + Shared.ToString(ObjJobModel.JobFrom) + Environment.NewLine;
+                linkcontent += "Dropoff : " + Shared.ToString(ObjJobModel.JobTo) + Environment.NewLine;
+                linkcontent += "Customer Name : " + Shared.ToString(ObjJobModel.CustomerName) + Environment.NewLine;
+                linkcontent += "Phone Number : " + Shared.ToString(ObjJobModel.ContactNo) + Environment.NewLine;
+                linkcontent += "Job Given By : " + Shared.ToString(ObjJobModel.JobVendorName) + Environment.NewLine;
                 return Json(new { data = linkcontent, number = _number });
             }
         }
@@ -681,17 +508,11 @@ namespace Transport.Controllers
         {
             string linkcontent = "";
             JobModel ObjJobModel = _objJobsRepository.Job_Edit(JobCode);
-
-            linkcontent += "Dear " + ObjJobModel.OutSource + ", ";
-            linkcontent += Environment.NewLine;
-            linkcontent += "You have received a Job Request!";
-            linkcontent += Environment.NewLine;
-            linkcontent += "Click the link to Start your Job!";
-            linkcontent += Environment.NewLine;
-
+            linkcontent += "Dear " + ObjJobModel.OutSource + ", " + Environment.NewLine;
+            linkcontent += "You have received a Job Request!" + Environment.NewLine;
+            linkcontent += "Click the link to Start your Job!" + Environment.NewLine;
             string url = System.Web.HttpContext.Current.Request.Url.GetLeftPart(UriPartial.Authority) + "/Login/Outsource?JobCode=" + Encode(Shared.ToString(JobCode));
             linkcontent += url;
-
             return Json(new { data = linkcontent });
         }
         #endregion
@@ -703,12 +524,7 @@ namespace Transport.Controllers
             int TotalCount = 0;
             List<JobModel> Jobslist = _objJobsRepository.Job_FindAll(1, StartDate, EndDate, null, null, SessionExpire.GetUserID(), null, null, null, null, null, null, out TotalCount);
             List<ExpenseModel> MyExpenseslist = _objExpensesRepository.MyExpense_FindAll(1, null, null, SessionExpire.GetUserID(), StartDate, EndDate, null, out TotalCount);
-
-            var data = new
-            {
-                CashInHand = Jobslist.Select(o => o.Cash).Sum(),
-                Expense = MyExpenseslist.Select(o => o.Charge).Sum()
-            };
+            var data = new { CashInHand = Jobslist.Select(o => o.Cash).Sum(), Expense = MyExpenseslist.Select(o => o.Charge).Sum() };
             return Json(data, JsonRequestBehavior.AllowGet);
         }
 
@@ -719,13 +535,8 @@ namespace Transport.Controllers
             List<JobModel> Jobslist = _objJobsRepository.Job_FindAll(1, StartDate, EndDate, null, null, PaymentBy, null, null, null, null, null, null, out TotalCount);
             List<ExpenseModel> MyExpenseslist = _objExpensesRepository.MyExpense_FindAll(1, null, null, PaymentBy, StartDate, EndDate, null, out TotalCount);
             List<ExpenseModel> Expenseslist = _objExpensesRepository.Expense_FindAll(1, null, null, StartDate, EndDate, null, out TotalCount);
-
             var _otherexpense = Expenseslist.Where(o => o.PaymentBy == PaymentBy).ToList();
-            var data = new
-            {
-                CashInHand = Jobslist.Select(o => o.Cash).Sum(),
-                Expense = MyExpenseslist.Select(o => o.Charge).Sum() + _otherexpense.Select(o => o.Charge).Sum(),
-            };
+            var data = new { CashInHand = Jobslist.Select(o => o.Cash).Sum(), Expense = MyExpenseslist.Select(o => o.Charge).Sum() + _otherexpense.Select(o => o.Charge).Sum() };
             return Json(data, JsonRequestBehavior.AllowGet);
         }
         #endregion

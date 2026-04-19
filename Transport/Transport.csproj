@@ -110,6 +110,7 @@
     <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -3784,7 +3785,6 @@
     <Compile Include="Controllers\CommonController.cs" />
     <Compile Include="Controllers\ExpenseController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\InvoiceController.cs" />
     <Compile Include="Controllers\LoginController.cs" />
     <Compile Include="Controllers\ReportsController.cs" />
     <Compile Include="Controllers\SystemMasterController.cs" />
@@ -4014,9 +4014,6 @@
     <Content Include="Views\Reports\MyJobsReport.cshtml" />
     <Content Include="Views\Reports\MyAccountsReport.cshtml" />
     <Content Include="Views\Reports\TransactionsReport.cshtml" />
-    <Content Include="Views\Invoice\InvoiceList.cshtml" />
-    <Content Include="Views\Invoice\ViewInvoice.cshtml" />
-    <Content Include="Views\Invoice\ViewReceipt.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
