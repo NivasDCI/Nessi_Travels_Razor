@@ -491,14 +491,25 @@ namespace Transport.Controllers
 
         private SqlConnection GetRawConnection()
         {
-            // Read connection string the same way FetchRS does - proven to work
-            string txtpath = System.Web.Hosting.HostingEnvironment.MapPath("~/ConnectionString.txt");
-            string connStr = "";
-            using (StreamReader sr = new StreamReader(txtpath, System.Text.Encoding.UTF8))
+            // Extract the raw SQL provider connection string from the EF connection string in Web.config
+            // This is guaranteed to work because it is exactly what Entity Framework uses
+            string efConnStr = System.Configuration.ConfigurationManager
+                                   .ConnectionStrings["TransportEntities"].ConnectionString;
+
+            // The EF connection string contains: provider connection string="..."
+            // We extract just the inner SQL Server connection string
+            int start = efConnStr.IndexOf("provider connection string=", System.StringComparison.OrdinalIgnoreCase);
+            string rawSqlConnStr = "";
+            if (start >= 0)
             {
-                connStr = sr.ReadToEnd().Trim().TrimStart('\uFEFF'); // strip BOM
+                start = efConnStr.IndexOf('"', start) + 1;
+                int end = efConnStr.IndexOf('"', start);
+                rawSqlConnStr = efConnStr.Substring(start, end - start)
+                                         .Replace("&quot;", """)
+                                         .Replace("&amp;", "&");
             }
-            return new SqlConnection(connStr);
+
+            return new SqlConnection(rawSqlConnStr);
         }
 
         private string GenerateInvoiceNo(SqlConnection conn, SqlTransaction tran)

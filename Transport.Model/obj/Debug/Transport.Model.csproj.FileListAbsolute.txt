@@ -43,3 +43,17 @@ C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Travals_Booking_Old_Source\T
 C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Travals_Booking_Old_Source\Transport_Copy\Transport.Model\obj\Debug\Transpor.62ABE127.Up2Date
 C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Travals_Booking_Old_Source\Transport_Copy\Transport.Model\obj\Debug\Transport.Model.dll
 C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Travals_Booking_Old_Source\Transport_Copy\Transport.Model\obj\Debug\Transport.Model.pdb
+C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Nessi_Travels_Razor\Transport.Model\bin\Debug\Transport.Model.dll
+C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Nessi_Travels_Razor\Transport.Model\bin\Debug\Transport.Model.pdb
+C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Nessi_Travels_Razor\Transport.Model\bin\Debug\JWT.dll
+C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Nessi_Travels_Razor\Transport.Model\bin\Debug\MiniExcel.dll
+C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Nessi_Travels_Razor\Transport.Model\bin\Debug\Newtonsoft.Json.dll
+C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Nessi_Travels_Razor\Transport.Model\bin\Debug\Twilio.dll
+C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Nessi_Travels_Razor\Transport.Model\bin\Debug\WhatsAppApi.dll
+C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Nessi_Travels_Razor\Transport.Model\bin\Debug\Newtonsoft.Json.xml
+C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Nessi_Travels_Razor\Transport.Model\bin\Debug\Twilio.xml
+C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Nessi_Travels_Razor\Transport.Model\obj\Debug\Transport.Model.csproj.AssemblyReference.cache
+C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Nessi_Travels_Razor\Transport.Model\obj\Debug\Transport.Model.csproj.CoreCompileInputs.cache
+C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Nessi_Travels_Razor\Transport.Model\obj\Debug\Transpor.62ABE127.Up2Date
+C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Nessi_Travels_Razor\Transport.Model\obj\Debug\Transport.Model.dll
+C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Nessi_Travels_Razor\Transport.Model\obj\Debug\Transport.Model.pdb

@@ -1,0 +1,20 @@
+# Visual Studio
+.vs/
+
+# Build folders
+bin/
+obj/
+
+# Node
+node_modules/
+npm-debug.log
+
+# Environment files
+.env
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
