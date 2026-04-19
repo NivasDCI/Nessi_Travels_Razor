@@ -491,22 +491,37 @@ namespace Transport.Controllers
 
         private SqlConnection GetRawConnection()
         {
-            // Extract the raw SQL provider connection string from the EF connection string in Web.config
-            // This is guaranteed to work because it is exactly what Entity Framework uses
+            // Extract raw SQL connection string from Web.config EF connection string
+            // Same connection Entity Framework uses - guaranteed to work
             string efConnStr = System.Configuration.ConfigurationManager
                                    .ConnectionStrings["TransportEntities"].ConnectionString;
 
-            // The EF connection string contains: provider connection string="..."
-            // We extract just the inner SQL Server connection string
-            int start = efConnStr.IndexOf("provider connection string=", System.StringComparison.OrdinalIgnoreCase);
-            string rawSqlConnStr = "";
-            if (start >= 0)
+            // EF stores the SQL connection inside: provider connection string="..."
+            // In Web.config it is HTML-encoded as &quot; so we handle both forms
+            string marker = "provider connection string=";
+            int markerIdx = efConnStr.IndexOf(marker, System.StringComparison.OrdinalIgnoreCase);
+            string rawSqlConnStr = string.Empty;
+
+            if (markerIdx >= 0)
             {
-                start = efConnStr.IndexOf('"', start) + 1;
-                int end = efConnStr.IndexOf('"', start);
-                rawSqlConnStr = efConnStr.Substring(start, end - start)
-                                         .Replace("&quot;", """)
-                                         .Replace("&amp;", "&");
+                // Move past the marker and the opening quote character
+                int openQuote = efConnStr.IndexOf('"', markerIdx) + 1;
+                int closeQuote = efConnStr.IndexOf('"', openQuote);
+                rawSqlConnStr = efConnStr.Substring(openQuote, closeQuote - openQuote);
+            }
+
+            // If the Web.config value was HTML-encoded (e.g. &quot; instead of ")
+            // the IndexOf above won't find quotes - fall back to &quot; delimiters
+            if (string.IsNullOrEmpty(rawSqlConnStr))
+            {
+                string marker2 = "provider connection string=&quot;";
+                int m2 = efConnStr.IndexOf(marker2, System.StringComparison.OrdinalIgnoreCase);
+                if (m2 >= 0)
+                {
+                    int open2 = m2 + marker2.Length;
+                    int close2 = efConnStr.IndexOf("&quot;", open2, System.StringComparison.OrdinalIgnoreCase);
+                    rawSqlConnStr = efConnStr.Substring(open2, close2 - open2);
+                }
             }
 
             return new SqlConnection(rawSqlConnStr);

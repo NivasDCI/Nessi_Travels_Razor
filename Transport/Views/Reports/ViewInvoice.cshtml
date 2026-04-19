@@ -119,11 +119,9 @@
                     }
                     @if (!string.IsNullOrEmpty(header.DrivingByName))
                     {
-                        <span>Driver: @header.DrivingByName</span>
-                        @if (!string.IsNullOrEmpty(header.VehicleName)) { <span> &nbsp;|&nbsp; Vehicle: @header.VehicleName</span> }
-                        <br/>
+                        <span>Driver: @header.DrivingByName &nbsp;|&nbsp; Vehicle: @header.VehicleName</span><br/>
                     }
-                    Period: @header.DisplayStartDate — @header.DisplayEndDate
+                    Period: @header.DisplayStartDate - @header.DisplayEndDate
                 </div>
             </div>
             <div class="inv-meta">
