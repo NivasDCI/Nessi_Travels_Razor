@@ -1,9 +1,14 @@
 @using Transport.Model
 @{
     Layout = null;
-    var header  = (InvoiceHeaderModel)ViewBag.Header;
-    var details = (List<InvoiceDetailModel>)ViewBag.Details;
+    var header = (InvoiceHeaderModel)ViewBag.Header;
     decimal gross = (decimal)ViewBag.GrossAmount;
+    string amountWords = (string)ViewBag.AmountInWords;
+    string periodShort = header.DisplayShortStartDate + " -" + header.DisplayShortEndDate;
+    string billToName  = !string.IsNullOrEmpty(header.BillToName)
+                         ? header.BillToName
+                         : (!string.IsNullOrEmpty(header.JobVendorName) ? header.JobVendorName : header.CustomerName);
+    string billToAddr  = header.BillToAddress ?? "";
 }
 <!DOCTYPE html>
 <html>
@@ -11,82 +16,299 @@
     <title>Invoice - @header.InvoiceNo</title>
     <meta charset="utf-8" />
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: Arial, Helvetica, sans-serif; font-size: 12px; background: #fff; color: #000; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family: Arial, Helvetica, sans-serif; font-size:10pt; background:#fff; color:#000; }
+        .page { padding:20px 25px; max-width:800px; margin:0 auto; }
 
-        .page { width: 100%; max-width: 900px; margin: 0 auto; padding: 20px; }
+        /* ── Company header ── */
+        .co-wrap { display:table; width:100%; margin-bottom:12px; }
+        .co-logo { display:table-cell; width:110px; vertical-align:middle; }
+        .co-logo img { width:100px; }
+        .co-text { display:table-cell; vertical-align:middle; padding-left:10px; }
+        .co-name { font-size:20pt; font-weight:900; color:#c0392b; line-height:1.1; }
+        .co-sub  { font-size:10pt; line-height:18px; color:#000; }
+        .co-sub a { color:#1a0dab; text-decoration:none; }
 
-        /* Company header */
-        .co-header { display: table; width: 100%; border-bottom: 3px solid #c0392b; padding-bottom: 10px; margin-bottom: 12px; }
-        .co-logo   { display: table-cell; width: 130px; vertical-align: middle; }
-        .co-logo img { width: 120px; }
-        .co-info   { display: table-cell; vertical-align: middle; padding-left: 15px; }
-        .co-name   { font-size: 22px; font-weight: 900; color: #c0392b; }
-        .co-sub    { font-size: 11px; line-height: 18px; color: #444; }
+        /* ── Bill To / Invoice block ── */
+        .top-table { width:100%; border-collapse:collapse; border:1px solid #000; margin-bottom:0; }
+        .top-table td { padding:8px 10px; vertical-align:top; }
+        .bill-cell { width:58%; border-right:1px solid #000; }
+        .inv-cell  { width:42%; }
 
-        /* Invoice title row */
-        .inv-title-row { display: table; width: 100%; margin-bottom: 12px; }
-        .bill-to       { display: table-cell; width: 60%; vertical-align: top; }
-        .bill-to-label { font-size: 10px; color: #777; text-transform: uppercase; margin-bottom: 4px; }
-        .bill-to-name  { font-size: 16px; font-weight: bold; color: #2c3e50; }
-        .bill-to-sub   { font-size: 11px; color: #555; margin-top: 3px; line-height: 17px; }
-        .inv-meta      { display: table-cell; width: 40%; vertical-align: top; }
-        .inv-meta table { width: 100%; border-collapse: collapse; }
-        .inv-meta table td { padding: 4px 8px; font-size: 11px; border: 1px solid #ddd; }
-        .inv-meta table td:first-child { background: #f5f5f5; font-weight: bold; width: 45%; }
-        .inv-meta .inv-no-val { font-size: 13px; font-weight: bold; color: #c0392b; }
+        .inv-label { font-size:13pt; font-weight:bold; text-align:center;
+                     border-bottom:1px solid #000; padding-bottom:5px; margin-bottom:5px; }
+        .inv-row   { display:table; width:100%; margin-bottom:3px; }
+        .inv-key   { display:table-cell; width:40%; font-size:10pt; }
+        .inv-val   { display:table-cell; width:60%; font-size:10pt; }
+        .inv-sep   { display:table-cell; width:8%; }
 
-        /* Items table */
-        .items-table { width: 100%; border-collapse: collapse; margin-bottom: 0; }
-        .items-table thead tr { background: #2c3e50; color: #fff; }
-        .items-table th { padding: 8px 10px; font-size: 11px; text-align: left; border: 1px solid #1a252f; }
-        .items-table th.r { text-align: right; }
-        .items-table td { padding: 7px 10px; border: 1px solid #ddd; font-size: 11px; vertical-align: top; }
-        .items-table tr:nth-child(even) td { background: #fafafa; }
-        .items-table td.r { text-align: right; }
-        .items-table td.sno { text-align: center; width: 4%; }
-        .items-table td.date { width: 10%; white-space: nowrap; }
-        .items-table td.time { width: 7%; }
-        .items-table td.amt  { text-align: right; width: 10%; font-weight: bold; }
+        .bill-name { font-size:11pt; font-weight:bold; margin-bottom:4px; }
+        .bill-addr { font-size:10pt; line-height:18px; white-space:pre-line; }
 
-        /* Totals section */
-        .totals-section { border: 1px solid #ddd; border-top: none; }
-        .totals-row { display: table; width: 100%; }
-        .totals-left  { display: table-cell; width: 55%; padding: 12px; vertical-align: top; border-right: 1px solid #ddd; }
-        .totals-right { display: table-cell; width: 45%; vertical-align: top; }
-        .totals-right table { width: 100%; border-collapse: collapse; }
-        .totals-right td { padding: 6px 10px; border-bottom: 1px solid #eee; font-size: 12px; }
-        .totals-right td:last-child { text-align: right; font-weight: bold; }
-        .totals-right .net-row td { background: #2c3e50; color: #fff; font-size: 14px; font-weight: bold; }
-        .totals-right .net-row td:last-child { font-size: 16px; }
+        /* ── Items table ── */
+        table.items { width:100%; border-collapse:collapse;
+                      border:1px solid #000; border-top:none; }
+        table.items th { padding:7px 6px; font-size:10pt; font-weight:bold;
+                         border:1px solid #000; text-align:center; }
+        table.items td { padding:7px 6px; border:1px solid #000; font-size:10pt;
+                         vertical-align:top; }
+        table.items td.c { text-align:center; }
+        table.items td.r { text-align:right; }
+        .desc-main { font-weight:bold; }
+        .desc-sub  { font-size:9pt; color:#333; margin-top:2px; }
 
-        .amount-words { font-size: 11px; color: #555; margin-top: 4px; }
-        .payment-info { font-size: 11px; line-height: 18px; color: #444; margin-top: 8px; }
-        .payment-info strong { color: #2c3e50; }
+        /* ── Footer totals ── */
+        table.footer { width:100%; border-collapse:collapse;
+                       border:1px solid #000; border-top:none; }
+        table.footer td { padding:7px 8px; border:1px solid #000; font-size:10pt;
+                          vertical-align:top; }
+        .words-cell { width:55%; }
+        .gross-cell { width:25%; font-weight:bold; text-align:right; }
+        .gross-val  { width:20%; font-weight:bold; text-align:right; }
+        .net-cell   { font-weight:bold; text-align:right; }
+        .net-val    { font-weight:bold; text-align:right; }
 
-        /* Signature */
-        .sig-section { border-top: 1px solid #ddd; padding: 16px 10px; display: table; width: 100%; margin-top: 0; }
-        .sig-left  { display: table-cell; width: 60%; padding-right: 20px; font-size: 11px; color: #777; }
-        .sig-right { display: table-cell; width: 40%; text-align: right; }
-        .sig-name  { font-size: 13px; font-weight: bold; color: #2c3e50; }
-        .sig-line  { border-top: 1px solid #000; width: 200px; margin: 40px 0 4px auto; }
+        /* ── Signature ── */
+        .sig-table { width:100%; border-collapse:collapse;
+                     border:1px solid #000; border-top:none; }
+        .sig-table td { padding:8px 10px; font-size:10pt; }
+        .sig-right { text-align:right; }
+        .sig-line  { border-top:1px solid #000; width:180px; margin:45px 0 4px auto; }
+        .sig-name  { font-size:10pt; font-weight:bold; }
 
-        /* Print button */
-        .no-print { position: fixed; top: 10px; right: 10px; z-index: 999; }
-        .no-print button { padding: 7px 16px; background: #c0392b; color: #fff;
-                           border: none; border-radius: 4px; cursor: pointer; font-size: 12px; margin-left: 6px; }
-        .no-print button.back-btn { background: #2c3e50; }
+        /* ── Print button ── */
+        .no-print { position:fixed; top:10px; right:10px; z-index:999; }
+        .no-print button { padding:7px 14px; border:none; border-radius:4px;
+                           cursor:pointer; font-size:12px; margin-left:5px; color:#fff; }
+        .btn-close { background:#555; }
+        .btn-print { background:#c0392b; }
 
         @@media print {
-            .no-print { display: none; }
-            .page { padding: 10px; }
+            .no-print { display:none; }
+            @@page { size: A4 portrait; margin:12mm; }
         }
     </style>
 </head>
 <body>
+
     <div class="no-print">
-        <button class="back-btn" onclick="window.history.back()">&#8592; Receipt</button>
-        <button onclick="window.print()">&#128438; Print Invoice</button>
+        <button class="btn-close" onclick="window.close()">Close</button>
+        <button class="btn-print" onclick="window.print()">Print Invoice</button>
+    </div>
+
+    <div class="page">
+
+        <!-- Company Header - logo left, name right -->
+        <div class="co-wrap">
+            <div class="co-logo">
+                <img src="@Url.Content("~/AppImages/logo_nissi_151.png")" onerror="this.style.display='none'" />
+            </div>
+            <div class="co-text">
+                <div class="co-name">NISSI TRANSPORT PTE.LTD</div>
+                <div class="co-sub">
+                    291 SERANGOON ROAD, SINGAPORE - 218107<br/>
+                    TEL NO +65 91000521, +65 88660521<br/>
+                    Email: <a href="mailto:nissi_transport@yahoo.com">nissi_transport@yahoo.com</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bill To (left) + INVOICE box (right) -->
+        <table class="top-table">
+            <tr>
+                <td class="bill-cell">
+                    <div class="bill-name">@billToName</div>
+                    <div class="bill-addr">@billToAddr</div>
+                </td>
+                <td class="inv-cell">
+                    <div class="inv-label">INVOICE</div>
+                    <div class="inv-row">
+                        <div class="inv-key">Inv No</div>
+                        <div class="inv-sep">:</div>
+                        <div class="inv-val"><strong>@header.InvoiceNo</strong></div>
+                    </div>
+                    <div class="inv-row">
+                        <div class="inv-key">Inv Date</div>
+                        <div class="inv-sep">:</div>
+                        <div class="inv-val">@header.InvoiceDate.ToString("d/M/yyyy")</div>
+                    </div>
+                    <div class="inv-row">
+                        <div class="inv-key">Terms</div>
+                        <div class="inv-sep">:</div>
+                        <div class="inv-val">@(header.IsCredit ? "Credit" : "Cash")</div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <!-- Items table - single summary row exactly like PDF 2 -->
+        <table class="items">
+            <thead>
+                <tr>
+                    <th style="width:6%">S.No</th>
+                    <th style="width:48%;text-align:left;">Product Description</th>
+                    <th style="width:12%">UOM</th>
+                    <th style="width:8%">Qty</th>
+                    <th style="width:13%">Rate</th>
+                    <th style="width:13%">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="height:180px; vertical-align:top;">
+                    <td class="c">1</td>
+                    <td>
+                        <div class="desc-main">TRANSPORT PROVIDED</div>
+                        <div class="desc-sub">Job Sheet attached (@periodShort)</div>
+                    </td>
+                    <td class="c">TRIP</td>
+                    <td class="c">1</td>
+                    <td class="r">@gross.ToString("N2")</td>
+                    <td class="r">@gross.ToString("N2")</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Footer totals -->
+        <table class="footer">
+            <tr>
+                <td class="words-cell" rowspan="2">
+                    <strong>Amount in words :</strong><br/>
+                    @amountWords.<br/><br/>
+                    <strong>Payment transfer to :</strong><br/>
+                    Paynow: 202604690W<br/>
+                    DBS current Account: 0721480042
+                </td>
+                <td class="gross-cell">Gross Amount</td>
+                <td class="gross-val">@gross.ToString("N2")</td>
+            </tr>
+            <tr>
+                <td class="net-cell"><strong>NET Amount</strong></td>
+                <td class="net-val"><strong>@gross.ToString("N2")</strong></td>
+            </tr>
+        </table>
+
+        <!-- Signature -->
+        <table class="sig-table">
+            <tr>
+                <td style="width:60%">
+                    for NISSI TRANSPORT PTE. LTD
+                </td>
+                <td class="sig-right" style="width:40%">
+                    <div class="sig-line"></div>
+                    <div class="sig-name"></div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align:center; font-size:9pt; color:#444;">
+                    This is computer generated invoice signature not required.
+                </td>
+            </tr>
+        </table>
+
+    </div>
+</body>
+</html>
+
+
+
+@* @using Transport.Model
+@{
+    Layout = null;
+    var header = (InvoiceHeaderModel)ViewBag.Header;
+    decimal gross = (decimal)ViewBag.GrossAmount;
+    string periodShort = header.DisplayShortStartDate + " -" + header.DisplayShortEndDate;
+    string amountWords = (string)ViewBag.AmountInWords;
+    string billToName  = string.IsNullOrEmpty(header.BillToName)
+                         ? (string.IsNullOrEmpty(header.JobVendorName) ? header.CustomerName : header.JobVendorName)
+                         : header.BillToName;
+    string billToAddr  = header.BillToAddress ?? "";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Invoice - @header.InvoiceNo</title>
+    <meta charset="utf-8" />
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family: Arial, Helvetica, sans-serif; font-size:11px; background:#fff; color:#000; }
+        .page { padding:20px 25px; max-width:860px; margin:0 auto; }
+
+        /* Header */
+        .co-header { display:table; width:100%; border-bottom:2px solid #c0392b;
+                     padding-bottom:10px; margin-bottom:14px; }
+        .co-logo   { display:table-cell; width:120px; vertical-align:middle; }
+        .co-logo img { width:110px; }
+        .co-info   { display:table-cell; vertical-align:middle; padding-left:14px; }
+        .co-name   { font-size:22px; font-weight:900; color:#c0392b; }
+        .co-sub    { font-size:11px; line-height:18px; color:#444; }
+
+        /* Bill To + Invoice Meta */
+        .top-row   { display:table; width:100%; margin-bottom:0; }
+        .bill-cell { display:table-cell; width:60%; vertical-align:top;
+                     border:1px solid #000; padding:12px 14px; border-right:none; }
+        .inv-cell  { display:table-cell; width:40%; vertical-align:top; border:1px solid #000; }
+        .inv-cell table { width:100%; border-collapse:collapse; }
+        .inv-cell table td { padding:5px 8px; border-bottom:1px solid #ddd; font-size:11px; }
+        .inv-cell table td:first-child { background:#f5f5f5; font-weight:bold; width:42%; }
+        .inv-title { background:#2c3e50; color:#fff; text-align:center;
+                     font-size:14px; font-weight:bold; padding:8px; }
+        .inv-no    { color:#c0392b; font-size:13px; font-weight:bold; }
+        .bill-name { font-size:14px; font-weight:bold; color:#2c3e50; margin-bottom:4px; }
+        .bill-addr { font-size:11px; color:#555; line-height:17px; white-space:pre-line; }
+
+        /* Items table */
+        table.items { width:100%; border-collapse:collapse; border:1px solid #000;
+                      border-top:none; }
+        table.items th { background:#f0f0f0; padding:7px 8px; font-size:11px;
+                         border:1px solid #ccc; text-align:center; font-weight:bold; }
+        table.items td { padding:8px; border:1px solid #ccc; font-size:11px;
+                         vertical-align:top; }
+        table.items td.c { text-align:center; }
+        table.items td.r { text-align:right; }
+        .desc-main { font-weight:bold; }
+        .desc-sub  { font-size:10px; color:#555; margin-top:3px; }
+
+        /* Totals */
+        table.totals { width:100%; border-collapse:collapse;
+                       border:1px solid #000; border-top:none; }
+        table.totals td { padding:8px 10px; font-size:11px; vertical-align:top; }
+        .words-cell { width:55%; border-right:1px solid #ccc; }
+        .amt-cell   { width:45%; }
+        .amt-row    { display:table; width:100%; border-top:1px solid #ccc; }
+        .amt-lbl    { display:table-cell; width:60%; padding:6px 10px;
+                      font-weight:bold; font-size:12px; }
+        .amt-val    { display:table-cell; width:40%; text-align:right;
+                      padding:6px 10px; font-size:12px; }
+        .net-lbl    { font-size:13px; background:#2c3e50; color:#fff;
+                      display:table-cell; width:60%; padding:8px 10px; font-weight:bold; }
+        .net-val    { font-size:14px; background:#2c3e50; color:#fff;
+                      display:table-cell; width:40%; text-align:right;
+                      padding:8px 10px; font-weight:bold; }
+
+        /* Signature */
+        .sig-row  { border:1px solid #000; border-top:none; padding:10px 14px;
+                    display:table; width:100%; }
+        .sig-left { display:table-cell; width:55%; vertical-align:bottom;
+                    font-size:10px; color:#777; font-style:italic; }
+        .sig-right{ display:table-cell; width:45%; text-align:right; }
+        .sig-line { border-top:1px solid #000; width:200px; margin:40px 0 4px auto; }
+        .sig-name { font-size:12px; font-weight:bold; color:#2c3e50; }
+
+        /* Print button */
+        .no-print { position:fixed; top:10px; right:10px; z-index:999; }
+        .no-print button { padding:7px 14px; border:none; border-radius:4px;
+                           cursor:pointer; font-size:12px; margin-left:5px; color:#fff; }
+        .btn-back  { background:#2c3e50; }
+        .btn-print { background:#c0392b; }
+
+        @@media print { .no-print { display:none; } .page { padding:10px; } }
+    </style>
+</head>
+<body>
+
+    <div class="no-print">
+        <button class="btn-back"  onclick="window.close()">&#8592; Close</button>
+        <button class="btn-print" onclick="window.print()">&#128438; Print Invoice</button>
     </div>
 
     <div class="page">
@@ -97,130 +319,110 @@
                 <img src="@Url.Content("~/AppImages/logo_nissi_151.png")" onerror="this.style.display='none'" />
             </div>
             <div class="co-info">
-                <div class="co-name">NISSI TOURS AND TRAVELS PTE. LTD</div>
+                <div class="co-name">NISSI TRANSPORT PTE.LTD</div>
                 <div class="co-sub">
-                    291 Serangoon Road, Singapore 218107<br/>
-                    Tel: +65 6292 0521 &nbsp;|&nbsp; HP: +65 9068 6384 &nbsp;|&nbsp; booking@nissitravels.com
+                    291 SERANGOON ROAD, SINGAPORE - 218107<br/>
+                    TEL NO +65 91000521, +65 88660521<br/>
+                    Email: nissi_transport@yahoo.com
                 </div>
             </div>
         </div>
 
-        <!-- Bill To + Invoice Meta -->
-        <div class="inv-title-row">
-            <div class="bill-to">
-                <div class="bill-to-label">Bill To</div>
-                <div class="bill-to-name">
-                    @(string.IsNullOrEmpty(header.JobVendorName) ? header.CustomerName : header.JobVendorName)
-                </div>
-                <div class="bill-to-sub">
-                    @if (!string.IsNullOrEmpty(header.CustomerName) && !string.IsNullOrEmpty(header.JobVendorName))
-                    {
-                        <span>Attn: @header.CustomerName</span><br/>
-                    }
-                    @if (!string.IsNullOrEmpty(header.DrivingByName))
-                    {
-                        <span>Driver: @header.DrivingByName &nbsp;|&nbsp; Vehicle: @header.VehicleName</span><br/>
-                    }
-                    Period: @header.DisplayStartDate - @header.DisplayEndDate
-                </div>
+        <!-- Bill To (left) + Invoice Meta (right) -->
+        <div class="top-row">
+            <div class="bill-cell">
+                <div class="bill-name">@billToName</div>
+                <div class="bill-addr">@billToAddr</div>
             </div>
-            <div class="inv-meta">
+            <div class="inv-cell">
+                <div class="inv-title">INVOICE</div>
                 <table>
                     <tr>
-                        <td>INVOICE</td>
-                        <td class="inv-no-val">@header.InvoiceNo</td>
+                        <td>Inv No</td>
+                        <td class="inv-no">@header.InvoiceNo</td>
                     </tr>
                     <tr>
-                        <td>Invoice Date</td>
-                        <td>@header.InvoiceDate.ToString("dd MMM yyyy")</td>
-                    </tr>
-                    <tr>
-                        <td>Staff</td>
-                        <td>@(HttpContext.Current.Session["USER_NAME"] ?? "Admin")</td>
+                        <td>Inv Date</td>
+                        <td>@header.InvoiceDate.ToString("d/M/yyyy")</td>
                     </tr>
                     <tr>
                         <td>Terms</td>
                         <td>@(header.IsCredit ? "Credit" : "Cash")</td>
                     </tr>
-                    <tr>
-                        <td>Total Jobs</td>
-                        <td>@details.Count</td>
-                    </tr>
                 </table>
             </div>
         </div>
 
-        <!-- Line Items Table -->
-        <table class="items-table">
+        <!-- Line Items — single summary row matching PDF 2 -->
+        <table class="items">
             <thead>
                 <tr>
-                    <th style="width:4%;text-align:center;">#</th>
-                    <th style="width:10%;">Date</th>
-                    <th style="width:7%;">Time</th>
-                    <th style="width:22%;">Pickup</th>
-                    <th style="width:22%;">Dropoff</th>
-                    <th style="width:14%;">Customer</th>
-                    <th style="width:11%;">Driver</th>
-                    <th class="r" style="width:10%;">Amount (SGD)</th>
+                    <th style="width:5%">S.No</th>
+                    <th style="width:49%;text-align:left;">Product Description</th>
+                    <th style="width:12%">UOM</th>
+                    <th style="width:8%">Qty</th>
+                    <th style="width:13%">Rate</th>
+                    <th style="width:13%">Amount</th>
                 </tr>
             </thead>
             <tbody>
-                @{ int idx = 1; }
-                @foreach (var d in details)
-                {
                 <tr>
-                    <td class="sno">@idx</td>
-                    <td class="date">@d.DisplayJobDate</td>
-                    <td class="time">@d.JobTime</td>
-                    <td>@d.JobFrom</td>
-                    <td>@d.JobTo</td>
-                    <td>@d.CustomerName</td>
-                    <td>@d.DrivingByName</td>
-                    <td class="amt">@String.Format("{0:N2}", d.Amount)</td>
+                    <td class="c">1</td>
+                    <td>
+                        <div class="desc-main">TRANSPORT PROVIDED</div>
+                        <div class="desc-sub">Job Sheet attached (@periodShort)</div>
+                    </td>
+                    <td class="c">TRIP</td>
+                    <td class="c">1</td>
+                    <td class="r">@gross.ToString("N2")</td>
+                    <td class="r">@gross.ToString("N2")</td>
                 </tr>
-                    idx++;
+                <!-- Empty rows to match PDF style -->
+                @for (int i = 0; i < 8; i++)
+                {
+                <tr style="height:22px;">
+                    <td></td><td></td><td></td><td></td><td></td><td></td>
+                </tr>
                 }
             </tbody>
         </table>
 
         <!-- Totals Section -->
-        <div class="totals-section">
-            <div class="totals-row">
-                <div class="totals-left">
-                    <div><strong>Amount in words:</strong></div>
-                    <div class="amount-words">@ViewBag.AmountInWords Dollars Only</div>
-                    <div class="payment-info">
-                        <strong>Payment Transfer To:</strong><br/>
-                        PayNow UEN: <strong>201710306R</strong><br/>
-                        DBS Current Account: <strong>107-903506-0</strong>
+        <table class="totals">
+            <tr>
+                <td class="words-cell">
+                    <strong>Amount in words :</strong><br/>
+                    <span style="font-size:12px;">@amountWords.</span>
+                    <br/><br/>
+                    <strong>Payment transfer to :</strong><br/>
+                    Paynow: 202604690W<br/>
+                    DBS current Account: 0721480042
+                </td>
+                <td class="amt-cell" style="padding:0; vertical-align:top;">
+                    <div class="amt-row">
+                        <div class="amt-lbl">Gross Amount</div>
+                        <div class="amt-val">@gross.ToString("N2")</div>
                     </div>
-                </div>
-                <div class="totals-right">
-                    <table>
-                        <tr>
-                            <td>Gross Amount</td>
-                            <td>SGD @String.Format("{0:N2}", gross)</td>
-                        </tr>
-                        <tr class="net-row">
-                            <td>NET Amount</td>
-                            <td>SGD @String.Format("{0:N2}", gross)</td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-        </div>
+                    <div class="amt-row" style="border-top:1px solid #ccc;">
+                        <div class="net-lbl">NET Amount</div>
+                        <div class="net-val">@gross.ToString("N2")</div>
+                    </div>
+                </td>
+            </tr>
+        </table>
 
         <!-- Signature -->
-        <div class="sig-section">
+        <div class="sig-row">
             <div class="sig-left">
-                <em>This is a computer generated invoice &mdash; signature not required.</em>
+                This is computer generated invoice signature not required.
             </div>
             <div class="sig-right">
                 <div class="sig-line"></div>
-                <div class="sig-name">for NISSI TOURS AND TRAVELS PTE. LTD</div>
+                <div class="sig-name">for NISSI TRANSPORT PTE. LTD</div>
             </div>
         </div>
 
     </div>
 </body>
 </html>
+ *@

@@ -7,70 +7,31 @@
 <head>
     <script>
 
-        $("#TxtFromDate").datepicker({
-            format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small'
-        });
-
-        $("#TxtToDate").datepicker({
-            format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small'
-        });
-
-        $(document).ready(function () {
-        });
+        $("#TxtFromDate").datepicker({ format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small' });
+        $("#TxtToDate").datepicker({ format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small' });
 
         $.ajax({
-            type: "GET",
-            url: BaseURL + "Common/Load_JobVendors",
-            datatype: "Json",
-            success: function (data) {
-                $("#ddlJobVendorCode option").remove();
-                $.each(data, function (index, value) {
-                    $('#ddlJobVendorCode').append('<option value="' + value.ID + '">' + value.Name + '</option>');
-                });
-            }
+            type: "GET", url: BaseURL + "Common/Load_JobVendors", datatype: "Json",
+            success: function (data) { $("#ddlJobVendorCode option").remove(); $.each(data, function (i, v) { $('#ddlJobVendorCode').append('<option value="' + v.ID + '">' + v.Name + '</option>'); }); }
         });
-
         $.ajax({
-            type: "GET",
-            url: BaseURL + "Common/Load_SystemUserDetail",
-            datatype: "Json",
-            success: function (data) {
-                $("#ddlDrivingBy option").remove();
-                $.each(data, function (index, value) {
-                    $('#ddlDrivingBy').append('<option value="' + value.ID + '">' + value.Name + '</option>');
-                });
-            }
+            type: "GET", url: BaseURL + "Common/Load_SystemUserDetail", datatype: "Json",
+            success: function (data) { $("#ddlDrivingBy option").remove(); $.each(data, function (i, v) { $('#ddlDrivingBy').append('<option value="' + v.ID + '">' + v.Name + '</option>'); }); }
         });
-
         $.ajax({
-            type: "GET",
-            url: BaseURL + "Common/Load_SystemUserDetail",
-            datatype: "Json",
-            success: function (data) {
-                $("#ddlCashInHand option").remove();
-                $.each(data, function (index, value) {
-                    $('#ddlCashInHand').append('<option value="' + value.ID + '">' + value.Name + '</option>');
-                });
-            }
+            type: "GET", url: BaseURL + "Common/Load_SystemUserDetail", datatype: "Json",
+            success: function (data) { $("#ddlCashInHand option").remove(); $.each(data, function (i, v) { $('#ddlCashInHand').append('<option value="' + v.ID + '">' + v.Name + '</option>'); }); }
         });
-
         $.ajax({
-            type: "GET",
-            url: BaseURL + "Common/Load_Vehicles",
-            datatype: "Json",
-            success: function (data) {
-                $("#ddlVehicleCode option").remove();
-                $.each(data, function (index, value) {
-                    $('#ddlVehicleCode').append('<option value="' + value.ID + '">' + value.Name + '</option>');
-                });
-            }
-        })
+            type: "GET", url: BaseURL + "Common/Load_Vehicles", datatype: "Json",
+            success: function (data) { $("#ddlVehicleCode option").remove(); $.each(data, function (i, v) { $('#ddlVehicleCode').append('<option value="' + v.ID + '">' + v.Name + '</option>'); }); }
+        });
 
         GrdJobsReport = $("#GrdJobsReport").grid({
             primaryKey: "JobCode",
             uiLibrary: "bootstrap4",
             resizableColumns: true,
-            dataSource: '@Url.Action("Job_FindAll", "Reports")',
+            dataSource: BaseURL + "Reports/Job_FindAll",
             columns: [
                 { field: "JobDate", width: 62, title: "DATE", type: "date", format: Common_Date_Format, sortable: false, align: "left" },
                 { field: "JobTime", width: 50, title: "TIME", sortable: false, align: "left" },
@@ -81,117 +42,149 @@
                 { field: "DrivingByName", width: 87, title: "DRIVING BY", sortable: false, align: "right" },
                 { field: "ContactNo", width: 65, title: "CONTACT NO", sortable: false, align: "left" },
                 {
-                    field: "Credit", width: 39, title: "CREDIT", sortable: false, align: "center", renderer: function (value, record) {
-                        if (intVal(value).toFixed(2) == 0.00) { return ''; }
-                        else { return '<div class="text-center" ><span class="badge badge-danger">' + intVal(value).toFixed(2) + '</span></div >'; }
+                    field: "Credit", width: 39, title: "CREDIT", sortable: false, align: "center",
+                    renderer: function (value) {
+                        if (intVal(value).toFixed(2) == 0.00) return '';
+                        return '<div class="text-center"><span class="badge badge-danger">' + intVal(value).toFixed(2) + '</span></div>';
                     }
                 },
                 {
-                    field: "Cash", width: 39, title: "CASH", sortable: false, align: "center", renderer: function (value, record) {
-                        if (intVal(value).toFixed(2) == 0.00) { return ''; }
-                        else { return intVal(value).toFixed(2); }
+                    field: "Cash", width: 39, title: "CASH", sortable: false, align: "center",
+                    renderer: function (value) {
+                        return intVal(value).toFixed(2) == 0.00 ? '' : intVal(value).toFixed(2);
                     }
                 },
                 { field: "CashInHandName", width: 87, title: "CASH IN HAND", sortable: false, align: "left" },
                 {
-                    field: "JobStatus", width: 82, title: "STATUS", sortable: false, align: "center", renderer: function (value, record) {
-                        var _class = (record.JobStatus == "Cancelled") ? 'badge badge-danger' : (record.JobStatus == "Assigned") ? 'badge badge-info' :
-                            (record.JobStatus == "Job Started") ? 'badge badge-primary' : (record.JobStatus == "Waiting for Customer") ? 'badge badge-warning' : (record.JobStatus == "No Show") ? 'badge badge-danger' :
-                                (record.JobStatus == "Passenger on board") ? 'badge badge-secondary' : 'badge badge-success';
-                        return '<div class="text-center"><button class= ' + "'" + _class + "'" + ' >' + record.JobStatus + '</button></div>';
+                    field: "JobStatus", width: 82, title: "STATUS", sortable: false, align: "center",
+                    renderer: function (value, record) {
+                        var c = (record.JobStatus == "Cancelled") ? 'badge badge-danger' :
+                            (record.JobStatus == "Assigned") ? 'badge badge-info' :
+                                (record.JobStatus == "Job Started") ? 'badge badge-primary' :
+                                    (record.JobStatus == "Waiting for Customer") ? 'badge badge-warning' :
+                                        (record.JobStatus == "No Show") ? 'badge badge-danger' :
+                                            (record.JobStatus == "Passenger on board") ? 'badge badge-secondary' : 'badge badge-success';
+                        return '<div class="text-center"><button class="' + c + '">' + record.JobStatus + '</button></div>';
                     }
                 },
                 {
-                    field: "JobCode", width: 45, title: "View", sortable: true, renderer: function (value, record) {
-                        return '<div class="text-center"><button onclick="ViewClick(' + "'" + record.JobCode + "'" + ')" class="badge badge-info" data-toggle="modal" data-target="#myModal">History</button></div>';
+                    field: "JobCode", width: 45, title: "View", sortable: true,
+                    renderer: function (value) {
+                        return '<div class="text-center"><button onclick="ViewClick(\'' + value + '\')" class="badge badge-info" data-toggle="modal" data-target="#myModal">History</button></div>';
                     }
                 }
             ],
             pager: { enable: true, limit: GridRowsDisplayLimit, sizes: ArrPaging }
         });
 
-        GrdJobsReport.on('dataBound', function (e, records, totalRecords) {
-            var costamt = 0, creditamt = 0, cashamt = 0, $tfoot;
-            var intVal = function (i) {
-                return typeof i === 'string' ? i.replace(/[\$,]/g, '') * 1 : typeof i === 'number' ? i : 0;
-            };
-            $.each(records, function () {
-                costamt += intVal(this.Cost);
-                creditamt += intVal(this.Credit);
-                cashamt += intVal(this.Cash);
-            });
-            $tfoot = GrdJobsReport.children('tfoot');
+        GrdJobsReport.on('dataBound', function (e, records) {
+            var creditamt = 0, cashamt = 0;
+            $.each(records, function () { creditamt += intVal(this.Credit); cashamt += intVal(this.Cash); });
+            var $tfoot = GrdJobsReport.children('tfoot');
             $tfoot.children('tr[data-role="summary"]').remove();
-            $tfoot.prepend('<tr data-role="summary" style="text-align:right"><th></th><th></th><th></th><th></th><th></th><th></th><th>Total</th><th>' + costamt.toFixed(2) + '</th><th>' + creditamt.toFixed(2) + '</th><th>' + cashamt.toFixed(2) + '</th></th><th></th><th></tr > ');
+            $tfoot.prepend('<tr data-role="summary" style="text-align:right"><th></th><th></th><th></th><th></th><th></th><th></th><th>Total</th><th></th><th>' + creditamt.toFixed(2) + '</th><th>' + cashamt.toFixed(2) + '</th><th></th><th></th></tr>');
         });
 
         GrdJobReportStatus = $("#GrdJobReportStatus").grid({
-            primaryKey: "JobStatusCode",
-            uiLibrary: "bootstrap4",
-            responsive: true,
-            dataSource: '@Url.Action("JobStatus_FindAll", "Job")',
+            primaryKey: "JobStatusCode", uiLibrary: "bootstrap4", responsive: true,
+            dataSource: BaseURL + "Job/JobStatus_FindAll",
             columns: [
                 { field: "JobStatus", title: 'Status', width: 100, align: "left" },
                 { field: "DisplayLastModifiedBy", title: 'Updated By', width: 100, align: "left" },
-                { field: "DisplayLastModifiedDate", title: 'Date & Time', width: 175, align: "left" },
+                { field: "DisplayLastModifiedDate", title: 'Date & Time', width: 175, align: "left" }
             ]
         });
 
-        function ViewClick(trxnid) {
-            GrdJobReportStatus.clear();
-            GrdJobReportStatus.reload({ JobCode: trxnid });
-        }
+        function ViewClick(trxnid) { GrdJobReportStatus.clear(); GrdJobReportStatus.reload({ JobCode: trxnid }); }
 
         function JobSearch() {
-            var searchFromDate = '';
-            var searchToDate = '';
-            if ($("#TxtFromDate").val() != 0) { searchFromDate = $('#TxtFromDate').val(); }
-            if ($("#TxtToDate").val() != "") { searchToDate = $('#TxtToDate').val(); }
             GrdJobsReport.clear();
-            GrdJobsReport.reload({ StartDate: searchFromDate, EndDate: searchToDate, VehicleCode: $("#ddlVehicleCode").val(), JobVendorCode: $("#ddlJobVendorCode").val(), CustomerName: $("#txtCustomerName").val(), ContactNo: $("#txtContactNo").val(), DrivingBy: $("#ddlDrivingBy").val(), CashInHand: $("#ddlCashInHand").val() });
+            GrdJobsReport.reload({
+                StartDate: $('#TxtFromDate').val(),
+                EndDate: $('#TxtToDate').val(),
+                VehicleCode: $("#ddlVehicleCode").val(),
+                JobVendorCode: $("#ddlJobVendorCode").val(),
+                CustomerName: $("#txtCustomerName").val(),
+                ContactNo: $("#txtContactNo").val(),
+                DrivingBy: $("#ddlDrivingBy").val(),
+                CashInHand: $("#ddlCashInHand").val()
+            });
         }
 
-        // =============================================
-        // GENERATE INVOICE - save to DB then open
-        // =============================================
-        $('#btnGenerateInvoice').click(function () {
-            var fromDate     = $('#TxtFromDate').val();
-            var toDate       = $('#TxtToDate').val();
-            var customerName = $('#txtCustomerName').val();
-            var jobVendorCode = $('#ddlJobVendorCode').val();
-            var drivingBy    = $('#ddlDrivingBy').val();
-            var vehicleCode  = $('#ddlVehicleCode').val();
-            var cashInHand   = $('#ddlCashInHand').val();
+        $('#btnJobSearch').click(function () { JobSearch(); });
+        $('#btnJobSearchClear').click(function () {
+            $("#TxtFromDate,#TxtToDate,#txtCustomerName,#txtContactNo").val("");
+            $("#ddlJobVendorCode,#ddlDrivingBy,#ddlVehicleCode,#ddlCashInHand").val(0);
+            GrdJobsReport.reload({ StartDate: null, EndDate: null });
+        });
 
-            if (!fromDate && !toDate && !customerName && (!jobVendorCode || jobVendorCode == '0')) {
-                alert('Please apply at least one filter (date range, customer, or job given by) before generating an invoice.');
+        function OnIndexCall(elem) {
+            $(elem).attr('href', $(elem).attr('href') + '?Length=1&VehicleCode=' + $("#ddlVehicleCode").val()
+                + '&JobVendorCode=' + $("#ddlJobVendorCode").val()
+                + '&CustomerName=' + $("#txtCustomerName").val()
+                + '&ContactNo=' + $("#txtContactNo").val()
+                + '&DrivingBy=' + $("#ddlDrivingBy").val()
+                + '&StartDate=' + $("#TxtFromDate").val()
+                + '&EndDate=' + $('#TxtToDate').val()
+                + '&CashInHand=' + $("#ddlCashInHand").val());
+        }
+
+        function intVal(i) {
+            return typeof i === 'string' ? i.replace(/[\$,]/g, '') * 1 : typeof i === 'number' ? i : 0;
+        }
+
+        // ── Generate Invoice: open Bill To modal first ──────────────────
+        $('#btnGenerateInvoice').click(function () {
+            var from = $('#TxtFromDate').val();
+            var to = $('#TxtToDate').val();
+            if (!from && !to && !$("#ddlJobVendorCode").val()) {
+                alert('Please apply at least a date range or Job Given By filter first.');
                 return;
             }
+            // Pre-fill Bill To name from Job Given By dropdown text
+            var vendorText = $('#ddlJobVendorCode option:selected').text().trim();
+            if (vendorText && vendorText !== 'Please Select' && vendorText !== '0') {
+                $('#txtBillToName').val(vendorText);
+            }
+            $('#modalBillTo').modal('show');
+        });
 
+        // ── Confirm Generate ─────────────────────────────────────────────
+        $('#btnConfirmGenerate').click(function () {
+            var billToName = $('#txtBillToName').val().trim();
+            var billToAddress = $('#txtBillToAddress').val().trim();
+            if (!billToName) { alert('Please enter Bill To Name.'); return; }
+
+            $('#modalBillTo').modal('hide');
             $('#btnGenerateInvoice').prop('disabled', true).html('Generating...');
 
-            // Use plain form data (not JSON) so MVC model binding works correctly
             $.ajax({
                 url: BaseURL + 'Reports/GenerateInvoice',
                 type: 'POST',
                 data: {
-                    CustomerName:  customerName,
-                    StartDate:     fromDate,
-                    EndDate:       toDate,
-                    JobVendorCode: (jobVendorCode && jobVendorCode != '0') ? jobVendorCode : '',
-                    DrivingBy:     (drivingBy && drivingBy != '0') ? drivingBy : '',
-                    VehicleCode:   (vehicleCode && vehicleCode != '0') ? vehicleCode : '',
-                    CashInHand:    (cashInHand && cashInHand != '0') ? cashInHand : '',
-                    CreditCash:    ''
+                    CustomerName: $("#txtCustomerName").val(),
+                    StartDate: $('#TxtFromDate').val(),
+                    EndDate: $('#TxtToDate').val(),
+                    JobVendorCode: ($("#ddlJobVendorCode").val() != '0') ? $("#ddlJobVendorCode").val() : '',
+                    DrivingBy: ($("#ddlDrivingBy").val() != '0') ? $("#ddlDrivingBy").val() : '',
+                    VehicleCode: ($("#ddlVehicleCode").val() != '0') ? $("#ddlVehicleCode").val() : '',
+                    CashInHand: ($("#ddlCashInHand").val() != '0') ? $("#ddlCashInHand").val() : '',
+                    CreditCash: '',
+                    BillToName: billToName,
+                    BillToAddress: billToAddress
                 },
                 dataType: 'json',
                 success: function (result) {
                     $('#btnGenerateInvoice').prop('disabled', false).html('<i class="fa fa-file-invoice"></i> Generate Invoice');
                     if (result.success) {
-                        var w = $(window).width() - 100, h = $(window).height() - 70;
-                        window.open(BaseURL + 'Reports/ViewInvoice?invoiceId=' + result.invoiceId, 'inv_' + result.invoiceId, 'width=' + w + ',height=' + h);
+                        var w = $(window).width() - 60, h = $(window).height() - 40;
+                        // Open Job Sheet (Report) first
+                        window.open(BaseURL + 'Reports/ViewReceipt?invoiceId=' + result.invoiceId,
+                            'receipt_' + result.invoiceId, 'width=' + w + ',height=' + h + ',scrollbars=yes');
+                        // Open Invoice after short delay
                         setTimeout(function () {
-                            window.open(BaseURL + 'Reports/ViewReceipt?invoiceId=' + result.invoiceId, 'rec_' + result.invoiceId, 'width=' + w + ',height=' + h);
+                            window.open(BaseURL + 'Reports/ViewInvoice?invoiceId=' + result.invoiceId,
+                                'invoice_' + result.invoiceId, 'width=' + w + ',height=' + h + ',scrollbars=yes');
                         }, 800);
                     } else {
                         alert('Error: ' + result.message);
@@ -199,37 +192,22 @@
                 },
                 error: function (xhr) {
                     $('#btnGenerateInvoice').prop('disabled', false).html('<i class="fa fa-file-invoice"></i> Generate Invoice');
-                    alert('Error ' + xhr.status + ': ' + xhr.statusText + '\nURL tried: ' + BaseURL + 'Reports/GenerateInvoice');
+                    alert('Server error ' + xhr.status + ': ' + xhr.statusText);
                 }
             });
         });
 
-        $('#btnJobSearch').click(function () { JobSearch(); });
-
-        $('#btnJobSearchClear').click(function () {
-            $("#TxtFromDate").val(""); $("#TxtToDate").val(""); $("#txtCustomerName").val(""); $("#txtContactNo").val("");
-            $("#ddlJobVendorCode").val(0); $("#ddlDrivingBy").val(0); $("#ddlVehicleCode").val(0); $("#ddlCashInHand").val(0);
-            GrdJobsReport.reload({ StartDate: null, EndDate: null, VehicleCode: 0, JobVendorCode: 0, CustomerName: '', ContactNo: '', DrivingBy: 0, CashInHand: 0 });
-        });
-
-        function OnIndexCall(elem) {
-            $(elem).attr('href', $(elem).attr('href') + '?Length=1&VehicleCode=' + $("#ddlVehicleCode").val() + '&JobVendorCode=' + $("#ddlJobVendorCode").val() + '&CustomerName=' + $("#txtCustomerName").val() + '&ContactNo=' + $("#txtContactNo").val() + '&DrivingBy=' + $("#ddlDrivingBy").val() + '&StartDate=' + $("#TxtFromDate").val() + '&EndDate=' + $('#TxtToDate').val() + '&CashInHand=' + $("#ddlCashInHand").val());
-        }
-
-        function intVal(i) {
-            return typeof i === 'string' ? i.replace(/[\$,]/g, '') * 1 : typeof i === 'number' ? i : 0;
-        };
     </script>
 </head>
 <body>
-    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+
+    <!-- History Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content" style="width:850px">
                 <div class="modal-body">
-                    <div class="box-body">
-                        <div class="box-body table-responsive no-padding">
-                            <table id="GrdJobReportStatus" class="table table-hover"></table>
-                        </div>
+                    <div class="box-body table-responsive no-padding">
+                        <table id="GrdJobReportStatus" class="table table-hover"></table>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -239,103 +217,124 @@
         </div>
     </div>
 
+    <!-- Bill To Modal — shown before generating invoice -->
+    <div class="modal fade" id="modalBillTo" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="background:#2c3e50; color:#fff;">
+                    <h4 class="modal-title"><i class="fa fa-file-invoice"></i> &nbsp;Enter Bill To Details</h4>
+                    <button type="button" class="close" data-dismiss="modal" style="color:#fff;">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted" style="font-size:12px;">These details will appear on the top-left of the invoice and are stored in the database.</p>
+                    <div class="form-group">
+                        <label><strong>Bill To Name *</strong> <small class="text-muted">(Company / Customer name)</small></label>
+                        <input type="text" id="txtBillToName" class="form-control"
+                               placeholder="e.g. ASIAN CLASSICAL TRAVELS" />
+                    </div>
+                    <div class="form-group">
+                        <label><strong>Bill To Address</strong></label>
+                        <textarea id="txtBillToAddress" class="form-control" rows="3"
+                                  placeholder="e.g. 101 KITCHENER ROAD, JLN BESAR, #03-32 A&#10;SINGAPORE - 208511"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="button" id="btnConfirmGenerate" class="btn btn-warning">
+                        <i class="fa fa-file-invoice"></i> Generate Invoice &amp; Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
     <div class="content">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-12">
                     <div class="card card-pd">
+
                         <div class="card-header">
-                            <span style="font-size: 18px;" class="m-0"><i class="fa fa-random"></i></span>
-                            <span style="font-size: 18px; border-left: 1px solid #ccc; padding-left: 10px;"> Jobs Report</span>
-                            <div style="float: right;">
+                            <span style="font-size:18px;" class="m-0"><i class="fa fa-random"></i></span>
+                            <span style="font-size:18px; border-left:1px solid #ccc; padding-left:10px;"> Jobs Report</span>
+                            <div style="float:right;">
                                 <button onclick="GrdJobsReport.downloadCSV('JobsReport.csv', true)" class="btn btn-primary">Download Current Page</button>
                                 @Html.ActionLink("Download All", "JobsExcelExport", "Reports", new { @onclick = "OnIndexCall(this)", @class = "btn btn-primary" })
-                                <span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px;">
-                                    <a href="#" data-toggle="tooltip" data-placement="bottom" title="Show Form" onclick="showForm()"><i class="fas fa-caret-square-down"></i></a>
+                                <span style="border-left:1px solid #ccc; padding-left:15px; padding-right:15px;">
+                                    <a href="#" onclick="showForm()" title="Show Form"><i class="fas fa-caret-square-down"></i></a>
                                 </span>
-                                <span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px;">
-                                    <a href="#" data-toggle="tooltip" data-placement="bottom" title="Hide Form" onclick="hideForm()"><i class="fas fa-caret-square-up"></i></a>
+                                <span style="border-left:1px solid #ccc; padding-left:15px; padding-right:15px;">
+                                    <a href="#" onclick="hideForm()" title="Hide Form"><i class="fas fa-caret-square-up"></i></a>
                                 </span>
                             </div>
                         </div>
 
                         <div class="card-body">
-                            <div id="hidden-form" style="display: none;">
+                            <div id="hidden-form" style="display:none;">
                                 <div class="row">
                                     <div class="col-sm-2">
                                         <div class="form-group">
                                             <label>Vehicle</label>
-                                            <div>
-                                                @Html.DropDownList("ddlVehicleCode", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @width = "100%" })
-                                            </div>
+                                            @Html.DropDownList("ddlVehicleCode", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @width = "100%" })
                                         </div>
                                     </div>
                                     <div class="col-sm-2">
                                         <div class="form-group">
                                             <label>Driving By</label>
-                                            <div>
-                                                @Html.DropDownList("ddlDrivingBy", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @width = "100%" })
-                                            </div>
+                                            @Html.DropDownList("ddlDrivingBy", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @width = "100%" })
                                         </div>
                                     </div>
                                     <div class="col-sm-3">
                                         <div class="form-group">
                                             <label>Job Given By</label>
-                                            <div>
-                                                @Html.DropDownList("ddlJobVendorCode", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @width = "100%" })
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-2">
-                                        <label>Contact No</label>
-                                        <div>
-                                            <input type="text" id="txtContactNo" maxlength="15" placeholder="Contact No" class="form-control">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-sm-2" style="display:none">
-                                        <label>Customer Name</label>
-                                        <div>
-                                            <input type="text" id="txtCustomerName" maxlength="75" placeholder="Customer Name" class="form-control">
+                                            @Html.DropDownList("ddlJobVendorCode", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @width = "100%" })
                                         </div>
                                     </div>
                                     <div class="col-sm-2">
                                         <div class="form-group">
-                                            <label class="control-label">From</label>
-                                            <div>
-                                                <input type="text" id="TxtFromDate" class="form-control">
-                                            </div>
+                                            <label>Contact No</label>
+                                            <input type="text" id="txtContactNo" maxlength="15" class="form-control" placeholder="Contact No">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-2" style="display:none;">
+                                        <input type="text" id="txtCustomerName" maxlength="75" class="form-control" placeholder="Customer Name">
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>From</label>
+                                            <input type="text" id="TxtFromDate" class="form-control">
                                         </div>
                                     </div>
                                     <div class="col-sm-2">
                                         <div class="form-group">
                                             <label>To</label>
-                                            <div>
-                                                <input type="text" id="TxtToDate" class="form-control">
-                                            </div>
+                                            <input type="text" id="TxtToDate" class="form-control">
                                         </div>
                                     </div>
                                     <div class="col-sm-2">
                                         <div class="form-group">
                                             <label>Cash In Hand</label>
-                                            <div>
-                                                @Html.DropDownList("ddlCashInHand", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @width = "100%" })
-                                            </div>
+                                            @Html.DropDownList("ddlCashInHand", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @width = "100%" })
                                         </div>
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="pdt-25">
                                             <div class="row">
                                                 <div class="col-sm-4">
-                                                    <button type="button" id="btnJobSearch" class="btn btn-primary btn-block"><i class="fa fa-search"></i> @Transport.Repository.WEBPAGEBUTTON.SEARCH</button>
+                                                    <button type="button" id="btnJobSearch" class="btn btn-primary btn-block">
+                                                        <i class="fa fa-search"></i> @Transport.Repository.WEBPAGEBUTTON.SEARCH
+                                                    </button>
                                                 </div>
                                                 <div class="col-sm-4">
-                                                    <button type="button" id="btnJobSearchClear" class="btn btn-primary btn-block"><i class="fa fa-paint-brush"></i> @Transport.Repository.WEBPAGEBUTTON.CLEAR</button>
+                                                    <button type="button" id="btnJobSearchClear" class="btn btn-primary btn-block">
+                                                        <i class="fa fa-paint-brush"></i> @Transport.Repository.WEBPAGEBUTTON.CLEAR
+                                                    </button>
                                                 </div>
                                                 <div class="col-sm-4">
-                                                    <button type="button" id="btnGenerateInvoice" class="btn btn-warning btn-block" title="Save filtered jobs as a new invoice">
+                                                    <button type="button" id="btnGenerateInvoice" class="btn btn-warning btn-block">
                                                         <i class="fa fa-file-invoice"></i> Generate Invoice
                                                     </button>
                                                 </div>
@@ -353,9 +352,11 @@
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
 </body>

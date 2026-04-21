@@ -25,6 +25,11 @@ namespace Transport.Model
         public int? CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
         public int TotalJobs { get; set; }
+
+        // Bill To — manually entered when generating invoice
+        public string BillToName { get; set; }
+        public string BillToAddress { get; set; }
+
         public List<InvoiceDetailModel> Details { get; set; }
 
         public string DisplayInvoiceDate
@@ -38,6 +43,14 @@ namespace Transport.Model
         public string DisplayEndDate
         {
             get { return EndDate.HasValue ? EndDate.Value.ToString("dd-MMM-yyyy") : ""; }
+        }
+        public string DisplayShortStartDate
+        {
+            get { return StartDate.HasValue ? StartDate.Value.ToString("d/M/yy") : ""; }
+        }
+        public string DisplayShortEndDate
+        {
+            get { return EndDate.HasValue ? EndDate.Value.ToString("d/M/yy") : ""; }
         }
     }
 
@@ -60,7 +73,11 @@ namespace Transport.Model
 
         public string DisplayJobDate
         {
-            get { return JobDate.HasValue ? JobDate.Value.ToString("dd-MMM-yyyy") : ""; }
+            get { return JobDate.HasValue ? JobDate.Value.ToString("d/M/yyyy") : ""; }
+        }
+        public string DisplayJobTime
+        {
+            get { return JobDate.HasValue ? JobDate.Value.ToString("HH:mm") : ""; }
         }
     }
 }

@@ -589,7 +589,9 @@ namespace Transport.Controllers
                                 TotalAmount = Convert.ToDecimal(reader["TotalAmount"]),
                                 IsCredit = Convert.ToBoolean(reader["IsCredit"]),
                                 CreatedDate = Convert.ToDateTime(reader["CreatedDate"]),
-                                TotalJobs = reader["TotalJobs"] == DBNull.Value ? 0 : Convert.ToInt32(reader["TotalJobs"])
+                                TotalJobs = reader["TotalJobs"] == DBNull.Value ? 0 : Convert.ToInt32(reader["TotalJobs"]),
+                                BillToName = reader["BillToName"] == DBNull.Value ? "" : reader["BillToName"].ToString(),
+                                BillToAddress = reader["BillToAddress"] == DBNull.Value ? "" : reader["BillToAddress"].ToString()
                             });
                         }
                     }
@@ -600,7 +602,8 @@ namespace Transport.Controllers
         }
 
         public JsonResult GenerateInvoice(string CustomerName, string StartDate, string EndDate,
-            int? JobVendorCode, int? DrivingBy, int? VehicleCode, string CreditCash, int? CashInHand)
+            int? JobVendorCode, int? DrivingBy, int? VehicleCode, string CreditCash, int? CashInHand,
+            string BillToName, string BillToAddress)
         {
             try
             {
@@ -652,11 +655,13 @@ namespace Transport.Controllers
                                 INSERT INTO InvoiceHeaders
                                     (InvoiceNo,InvoiceDate,CustomerName,JobVendorCode,JobVendorName,
                                      DrivingBy,DrivingByName,VehicleCode,VehicleName,CashInHand,CashInHandName,
-                                     StartDate,EndDate,CreditCash,TotalAmount,IsCredit,CreatedBy,CreatedDate)
+                                     StartDate,EndDate,CreditCash,TotalAmount,IsCredit,CreatedBy,CreatedDate,
+                                     BillToName,BillToAddress)
                                 VALUES
                                     (@InvoiceNo,@InvoiceDate,@CustomerName,@JobVendorCode,@JobVendorName,
                                      @DrivingBy,@DrivingByName,@VehicleCode,@VehicleName,@CashInHand,@CashInHandName,
-                                     @StartDate,@EndDate,@CreditCash,@TotalAmount,@IsCredit,@CreatedBy,GETDATE());
+                                     @StartDate,@EndDate,@CreditCash,@TotalAmount,@IsCredit,@CreatedBy,GETDATE(),
+                                     @BillToName,@BillToAddress);
                                 SELECT SCOPE_IDENTITY();", conn, tran);
 
                             hCmd.Parameters.AddWithValue("@InvoiceNo", invoiceNo);
@@ -676,6 +681,8 @@ namespace Transport.Controllers
                             hCmd.Parameters.AddWithValue("@TotalAmount", totalAmount);
                             hCmd.Parameters.AddWithValue("@IsCredit", isCredit);
                             hCmd.Parameters.AddWithValue("@CreatedBy", (object)createdBy);
+                            hCmd.Parameters.AddWithValue("@BillToName", (object)BillToName ?? DBNull.Value);
+                            hCmd.Parameters.AddWithValue("@BillToAddress", (object)BillToAddress ?? DBNull.Value);
 
                             invoiceId = Convert.ToInt64(hCmd.ExecuteScalar());
 
@@ -800,7 +807,9 @@ namespace Transport.Controllers
                                 TotalAmount = Convert.ToDecimal(r["TotalAmount"]),
                                 IsCredit = Convert.ToBoolean(r["IsCredit"]),
                                 CreatedDate = Convert.ToDateTime(r["CreatedDate"]),
-                                TotalJobs = r["TotalJobs"] == DBNull.Value ? 0 : Convert.ToInt32(r["TotalJobs"])
+                                TotalJobs = r["TotalJobs"] == DBNull.Value ? 0 : Convert.ToInt32(r["TotalJobs"]),
+                                BillToName = r["BillToName"] == DBNull.Value ? "" : r["BillToName"].ToString(),
+                                BillToAddress = r["BillToAddress"] == DBNull.Value ? "" : r["BillToAddress"].ToString()
                             };
                         }
                     }
