@@ -3,176 +3,657 @@
     Layout = "";
 }
 <head>
-    <script>
-        var GrdInvoice;
+<style>
+    .s-paid    { background:#27ae60; color:#fff; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:bold; }
+    .s-partial { background:#f39c12; color:#fff; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:bold; }
+    .s-unpaid  { background:#e74c3c; color:#fff; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:bold; }
+    .s-manual  { background:#8e44ad; color:#fff; padding:2px 6px; border-radius:10px; font-size:10px; }
+    .s-auto    { background:#2980b9; color:#fff; padding:2px 6px; border-radius:10px; font-size:10px; }
+    .inv-no    { color:#c0392b; font-weight:bold; font-size:12px; }
+    .inv-amt   { color:#155724; font-weight:bold; }
+    .bal-amt   { color:#c0392b; font-weight:bold; }
+    .ab { border:none; border-radius:3px; padding:3px 7px; font-size:10px; color:#fff; cursor:pointer; margin:1px; }
+    .ab-js  { background:#34495e; } .ab-js:hover  { background:#2c3e50; }
+    .ab-inv { background:#c0392b; } .ab-inv:hover { background:#a93226; }
+    .ab-pay { background:#27ae60; } .ab-pay:hover { background:#1e8449; }
+    .ab-del { background:#e74c3c; } .ab-del:hover { background:#c0392b; }
+    .modal-hd { background:#2c3e50; color:#fff; }
+    .modal-hd .close { color:#fff; opacity:1; }
+    /* Payment history rows */
+    .pay-row { background:#f8f9fa; border-left:3px solid #27ae60; border-radius:4px;
+               padding:8px 12px; margin-bottom:6px; font-size:12px; position:relative; }
+    .pay-row .del-pay { position:absolute; right:8px; top:8px; background:#e74c3c;
+                        color:#fff; border:none; border-radius:3px; padding:2px 8px;
+                        font-size:10px; cursor:pointer; }
+    .pay-row .del-pay:hover { background:#c0392b; }
+    /* Progress bar */
+    .prog-wrap { background:#e9ecef; border-radius:6px; height:6px; margin-top:4px; }
+    .prog-fill { border-radius:6px; height:6px; transition:width .4s; }
+    .prog-fill.full    { background:#27ae60; }
+    .prog-fill.partial { background:#f39c12; }
+    /* Summary boxes */
+    .sum-box { text-align:center; padding:10px; border-radius:6px; background:#f8f9fa;
+               border:1px solid #dee2e6; }
+    .sum-box .sum-val { font-size:20px; font-weight:bold; margin-top:2px; }
+    .sum-box .sum-lbl { font-size:10px; color:#777; text-transform:uppercase; letter-spacing:.5px; }
+    /* Mode toggle */
+    .cash-fields, .bank-fields { display:none; }
+    /* Section divider */
+    .sec-div { font-size:11px; font-weight:bold; color:#555; text-transform:uppercase;
+               letter-spacing:.5px; border-bottom:1px solid #ddd; padding-bottom:5px;
+               margin-bottom:10px; margin-top:4px; }
+</style>
 
-        $("#TxtFromDate").datepicker({ format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small' });
-        $("#TxtToDate").datepicker({   format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small' });
+<script>
+var GrdInv;
 
-        GrdInvoice = $("#GrdInvoice").grid({
-            primaryKey: "InvoiceID",
-            uiLibrary: "bootstrap4",
-            responsive: true,
-            dataSource: BaseURL + "Reports/Invoice_FindAll",
-            columns: [
-                { field: "InvoiceNo",         width: 130, title: "INVOICE NO",   sortable: false, align: "left" },
-                { field: "DisplayInvoiceDate", width: 90,  title: "DATE",         sortable: false, align: "left" },
-                { field: "CustomerName",       width: 130, title: "CUSTOMER",     sortable: false, align: "left" },
-                { field: "JobVendorName",      width: 120, title: "JOB GIVEN BY", sortable: false, align: "left" },
-                { field: "DrivingByName",      width: 100, title: "DRIVING BY",   sortable: false, align: "left" },
-                { field: "VehicleName",        width: 80,  title: "VEHICLE",      sortable: false, align: "left" },
-                { field: "DisplayStartDate",   width: 85,  title: "FROM",         sortable: false, align: "left" },
-                { field: "DisplayEndDate",     width: 85,  title: "TO",           sortable: false, align: "left" },
-                { field: "TotalJobs",          width: 50,  title: "JOBS",         sortable: false, align: "center" },
-                {
-                    field: "TotalAmount", width: 90, title: "TOTAL (SGD)", sortable: false, align: "right",
-                    renderer: function (value) {
-                        return '<strong style="color:darkgreen;">$ ' + parseFloat(value).toFixed(2) + '</strong>';
-                    }
-                },
-                {
-                    field: "IsCredit", width: 60, title: "TYPE", sortable: false, align: "center",
-                    renderer: function (value) {
-                        return value
-                            ? '<span class="badge badge-danger">Credit</span>'
-                            : '<span class="badge badge-success">Cash</span>';
-                    }
-                },
-                {
-                    field: "InvoiceID", width: 140, title: "ACTION", sortable: false, align: "center",
-                    renderer: function (value, record) {
-                        return '<button onclick="OpenDocs(' + value + ')" class="btn btn-sm btn-primary" style="font-size:11px;"><i class="fa fa-print"></i> View / Print</button>';
-                    }
-                },
-                {
-                    field: "InvoiceID", width: 60, title: "DEL", sortable: false, align: "center",
-                    renderer: function (value, record) {
-                        return '<button onclick="DeleteInv(' + value + ',\'' + record.InvoiceNo + '\')" class="badge badge-danger" style="cursor:pointer;padding:5px;"><i class="fa fa-trash"></i></button>';
-                    }
-                }
-            ],
-            pager: { enable: true, limit: 50, sizes: ArrPaging }
+/* ── Datepickers ─────────────────────────────────────────── */
+$("#TxtFromDate").datepicker({ format:Common_Date_Format, autoclose:true, uiLibrary:'bootstrap4', iconsLibrary:'fontawesome', size:'small' });
+$("#TxtToDate").datepicker({   format:Common_Date_Format, autoclose:true, uiLibrary:'bootstrap4', iconsLibrary:'fontawesome', size:'small' });
+$("#txtManualInvDate").datepicker({   format:Common_Date_Format, autoclose:true, uiLibrary:'bootstrap4', iconsLibrary:'fontawesome', size:'small' });
+$("#txtManualStartDate").datepicker({ format:Common_Date_Format, autoclose:true, uiLibrary:'bootstrap4', iconsLibrary:'fontawesome', size:'small' });
+$("#txtManualEndDate").datepicker({   format:Common_Date_Format, autoclose:true, uiLibrary:'bootstrap4', iconsLibrary:'fontawesome', size:'small' });
+$("#txtPayDate").datepicker({ format:Common_Date_Format, autoclose:true, uiLibrary:'bootstrap4', iconsLibrary:'fontawesome', size:'small' });
+
+/* ── Load users for cash receiver ────────────────────────── */
+$.ajax({ type:"GET", url:BaseURL+"Common/Load_SystemUserDetail", datatype:"Json",
+    success:function(data){
+        $("#ddlReceivedBy option").remove();
+        $('#ddlReceivedBy').append('<option value="">-- Select User --</option>');
+        $.each(data,function(i,v){
+            $('#ddlReceivedBy').append('<option value="'+v.ID+'|'+v.Name+'">'+v.Name+'</option>');
         });
+    }
+});
 
-        function InvoiceSearch() {
-            GrdInvoice.clear();
-            GrdInvoice.reload({
-                CustomerName: $('#txtCustomerName').val(),
-                InvoiceNo:    $('#txtInvoiceNo').val(),
-                FromDate:     $('#TxtFromDate').val(),
-                ToDate:       $('#TxtToDate').val()
+/* ── Grid ────────────────────────────────────────────────── */
+GrdInv = $("#GrdInv").grid({
+    primaryKey:"InvoiceID", uiLibrary:"bootstrap4", responsive:true,
+    dataSource: BaseURL + "Reports/Invoice_FindAll",
+    columns:[
+        { field:"InvoiceNo", width:115, title:"INVOICE ID", sortable:false, align:"left",
+          renderer:function(v){ return '<span class="inv-no">'+v+'</span>'; }},
+        { field:"DisplayInvoiceDate", width:85, title:"DATE", sortable:false, align:"left" },
+        { field:"BillToName", width:135, title:"BILL TO", sortable:false, align:"left" },
+        { field:"DisplayStartDate", width:78, title:"FROM", sortable:false, align:"left" },
+        { field:"DisplayEndDate",   width:78, title:"TO",   sortable:false, align:"left" },
+        { field:"TotalJobs", width:42, title:"JOBS", sortable:false, align:"center" },
+        { field:"TotalAmount", width:90, title:"INVOICE AMT", sortable:false, align:"right",
+          renderer:function(v){ return '<span class="inv-amt">$'+parseFloat(v).toFixed(2)+'</span>'; }},
+        { field:"TotalPaid", width:90, title:"PAID", sortable:false, align:"right",
+          renderer:function(v,rec){
+            var pct = rec.TotalAmount>0 ? Math.min(100,(v/rec.TotalAmount)*100) : 0;
+            var cls = pct>=100?'full':'partial';
+            return '<div>$'+parseFloat(v).toFixed(2)+'</div>'+
+                   '<div class="prog-wrap"><div class="prog-fill '+cls+'" style="width:'+pct+'%"></div></div>';
+          }},
+        { field:"BalanceAmount", width:90, title:"BALANCE", sortable:false, align:"right",
+          renderer:function(v){
+            if(parseFloat(v)<=0.001) return '<span style="color:#27ae60;font-weight:bold;">&#10003; Cleared</span>';
+            return '<span class="bal-amt">$'+parseFloat(v).toFixed(2)+'</span>';
+          }},
+        { field:"PaymentStatus", width:72, title:"STATUS", sortable:false, align:"center",
+          renderer:function(v){
+            var cls = v==='Paid'?'s-paid': v==='Partial'?'s-partial':'s-unpaid';
+            return '<span class="'+cls+'">'+v+'</span>';
+          }},
+        { field:"IsManual", width:58, title:"TYPE", sortable:false, align:"center",
+          renderer:function(v){ return v?'<span class="s-manual">Manual</span>':'<span class="s-auto">Auto</span>'; }},
+        { field:"InvoiceID", width:230, title:"ACTIONS", sortable:false, align:"center",
+          renderer:function(v,rec){
+            var b='';
+            if(!rec.IsManual && rec.TotalJobs>0)
+                b+='<button class="ab ab-js" onclick="OpenJobSheet('+v+')"><i class="fa fa-list-alt"></i> Sheet</button>';
+            b+='<button class="ab ab-inv" onclick="OpenInvoice('+v+')"><i class="fa fa-file-invoice"></i> Invoice</button>';
+            b+='<button class="ab ab-pay" onclick="OpenPayment('+v+',' +
+               '\''+rec.InvoiceNo+'\','+rec.TotalAmount+','+rec.TotalPaid+','+rec.BalanceAmount+')">'+
+               '<i class="fa fa-money-bill-wave"></i> Pay</button>';
+            b+='<button class="ab ab-del" onclick="DelInv('+v+',\''+rec.InvoiceNo+'\')"><i class="fa fa-trash"></i></button>';
+            return b;
+          }}
+    ],
+    pager:{ enable:true, limit:20, sizes:[10,20,50,100] }
+});
+
+/* ── Search ──────────────────────────────────────────────── */
+function DoSearch(){
+    GrdInv.clear();
+    GrdInv.reload({
+        BillToName:   $('#txtBillTo').val().trim(),
+        InvoiceNo:    $('#txtInvNo').val().trim(),
+        FromDate:     $('#TxtFromDate').val(),
+        ToDate:       $('#TxtToDate').val(),
+        PaymentStatus:$('#ddlPayFilter').val()
+    });
+}
+function DoClear(){
+    $('#txtBillTo,#txtInvNo,#TxtFromDate,#TxtToDate').val('');
+    $('#ddlPayFilter').val('');
+    GrdInv.reload({});
+}
+document.onkeydown=function(e){ if((e?e.which:event.keyCode)==13){ DoSearch(); return false; } };
+$('#btnSearch').click(DoSearch);
+$('#btnClear').click(DoClear);
+
+/* ── Open windows ────────────────────────────────────────── */
+function OpenJobSheet(id){
+    var w=$(window).width()-40, h=$(window).height()-30;
+    window.open(BaseURL+'Reports/ViewReceipt?invoiceId='+id,'js_'+id,'width='+w+',height='+h+',scrollbars=yes');
+}
+function OpenInvoice(id){
+    var w=$(window).width()-40, h=$(window).height()-30;
+    window.open(BaseURL+'Reports/ViewInvoice?invoiceId='+id,'inv_'+id,'width='+w+',height='+h+',scrollbars=yes');
+}
+
+/* ── Payment Modal ───────────────────────────────────────── */
+var _invID=0, _invTotal=0, _balance=0;
+
+function OpenPayment(id, invNo, total, paid, balance){
+    _invID=id; _invTotal=total; _balance=balance;
+    $('#payModalTitle').text('Payments — '+invNo);
+    UpdateSummary(total, paid, balance);
+    $('#txtPayAmount').val(parseFloat(balance>0?balance:0).toFixed(2));
+    ResetPayForm();
+    LoadPayHistory(id);
+    $('#modalPayment').modal('show');
+}
+
+function UpdateSummary(total, paid, balance){
+    $('#payInvTotal').text('$'+parseFloat(total).toFixed(2));
+    $('#payInvPaid').text('$'+parseFloat(paid).toFixed(2));
+    $('#payInvBalance').text('$'+parseFloat(balance).toFixed(2));
+    var pct = total>0 ? Math.min(100,(paid/total)*100) : 0;
+    var cls = pct>=100?'full':'partial';
+    $('#payProg').attr('class','prog-fill '+cls).css('width',pct+'%');
+}
+
+function LoadPayHistory(id){
+    $('#payHistList').html('<p class="text-muted" style="font-size:12px;padding:8px;">Loading...</p>');
+    $.ajax({ url:BaseURL+'Reports/GetInvoicePayments', type:'GET', data:{InvoiceID:id}, dataType:'json',
+        success:function(r){
+            if(!r.records||r.records.length===0){
+                $('#payHistList').html('<p class="text-muted" style="font-size:12px;padding:4px;">No payments recorded yet.</p>');
+                return;
+            }
+            var html='';
+            $.each(r.records,function(i,p){
+                html+='<div class="pay-row">';
+                html+='<button class="del-pay" onclick="DelPayment('+p.PaymentID+')" title="Delete this payment">&#128465;</button>';
+                html+='<strong>'+p.PaymentDate+'</strong>';
+                html+=' &nbsp;&bull;&nbsp; <strong style="color:#27ae60;font-size:13px;">$'+parseFloat(p.PaidAmount).toFixed(2)+'</strong>';
+                html+=' &nbsp;&bull;&nbsp; <span style="color:#555;">'+p.PaymentMode+'</span>';
+                if(p.AccountName)    html+=' &rarr; <em>'+p.AccountName+'</em>';
+                if(p.ReceivedByName) html+=' &rarr; <em>'+p.ReceivedByName+'</em>';
+                if(p.Remarks)        html+=' &mdash; '+p.Remarks;
+                html+='</div>';
             });
+            $('#payHistList').html(html);
         }
+    });
+}
 
-        // Opens Receipt (Page 1) — which auto-opens Invoice (Page 2) via JS
-        function OpenDocs(invoiceId) {
-            var w = $(window).width() - 80;
-            var h = $(window).height() - 60;
-            window.open(BaseURL + 'Reports/ViewReceipt?invoiceId=' + invoiceId,
-                'receipt_' + invoiceId,
-                'width=' + w + ',height=' + h + ',scrollbars=yes');
+function DelPayment(paymentId){
+    if(!confirm('Delete this payment record?')) return;
+    $.ajax({ url:BaseURL+'Reports/DeletePayment', type:'POST', data:{PaymentID:paymentId}, dataType:'json',
+        success:function(r){
+            if(r.success){
+                _balance=r.balance;
+                UpdateSummary(_invTotal, r.totalPaid, r.balance);
+                $('#txtPayAmount').val(parseFloat(r.balance>0?r.balance:0).toFixed(2));
+                LoadPayHistory(_invID);
+                GrdInv.reload();
+            }
         }
+    });
+}
 
-        function DeleteInv(invoiceId, invoiceNo) {
-            if (!confirm('Delete invoice ' + invoiceNo + '? This cannot be undone.')) return;
-            $.ajax({
-                url:      BaseURL + 'Reports/DeleteInvoice',
-                type:     'POST',
-                data:     { invoiceId: invoiceId },
-                dataType: 'json',
-                success:  function (result) {
-                    if (result.success) GrdInvoice.reload();
-                    else alert('Failed to delete invoice.');
-                }
-            });
+function ResetPayForm(){
+    $('#ddlPayMode').val('');
+    $('.cash-fields,.bank-fields').hide();
+    $('#ddlReceivedBy').val('');
+    $('#txtPayAccount').val('');
+    $('#txtPayRemarks').val('');
+    var d=new Date(), mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    function p(n){return n<10?'0'+n:n;}
+    $('#txtPayDate').val(p(d.getDate())+'-'+mo[d.getMonth()]+'-'+d.getFullYear());
+}
+
+$('#ddlPayMode').change(function(){
+    var v=$(this).val();
+    $('.cash-fields,.bank-fields').hide();
+    if(v==='Cash')         $('.cash-fields').show();
+    if(v==='BankTransfer') $('.bank-fields').show();
+});
+
+$('#btnSavePayment').click(function(){
+    var mode=$('#ddlPayMode').val();
+    var amt=parseFloat($('#txtPayAmount').val());
+    if(!mode){ alert('Please select payment mode.'); return; }
+    if(isNaN(amt)||amt<=0){ alert('Please enter a valid amount greater than 0.'); return; }
+    if(amt>_balance+0.01){ alert('Amount $'+amt.toFixed(2)+' exceeds remaining balance of $'+parseFloat(_balance).toFixed(2)+'.'); return; }
+
+    var receivedByID='', receivedByName='', accountName=$('#txtPayAccount').val();
+    if(mode==='Cash'){
+        var sel=$('#ddlReceivedBy').val();
+        if(!sel){ alert('Please select who received the cash.'); return; }
+        var parts=sel.split('|'); receivedByID=parts[0]; receivedByName=parts[1];
+    }
+    if(mode==='BankTransfer' && !accountName){ alert('Please enter the bank account details.'); return; }
+
+    $(this).prop('disabled',true).html('<i class="fa fa-spinner fa-spin"></i> Saving...');
+    $.ajax({
+        url:BaseURL+'Reports/AddPayment', type:'POST',
+        data:{ InvoiceID:_invID, PaymentDate:$('#txtPayDate').val(),
+               PaidAmount:amt, PaymentMode:mode,
+               AccountName:accountName, ReceivedByUserID:receivedByID,
+               ReceivedByName:receivedByName, Remarks:$('#txtPayRemarks').val() },
+        dataType:'json',
+        success:function(r){
+            $('#btnSavePayment').prop('disabled',false).html('<i class="fa fa-save"></i> Record Payment');
+            if(r.success){
+                _balance=r.balance;
+                UpdateSummary(_invTotal, r.totalPaid, r.balance);
+                $('#txtPayAmount').val(parseFloat(r.balance>0?r.balance:0).toFixed(2));
+                ResetPayForm();
+                LoadPayHistory(_invID);
+                GrdInv.reload();
+            } else { alert('Error: '+r.message); }
+        },
+        error:function(){
+            $('#btnSavePayment').prop('disabled',false).html('<i class="fa fa-save"></i> Record Payment');
+            alert('Server error. Please try again.');
         }
+    });
+});
 
-        $('#btnSearch').click(function () { InvoiceSearch(); });
+/* ── Create Invoice Modal ────────────────────────────────── */
+$('#btnCreateInvoice').click(function(){
+    $('#frmManual')[0].reset();
+    var d=new Date(), mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    function p(n){return n<10?'0'+n:n;}
+    $('#txtManualInvDate').val(p(d.getDate())+'-'+mo[d.getMonth()]+'-'+d.getFullYear());
+    $('#txtManualDesc').val('TRANSPORT PROVIDED');
+    $('#modalCreate').modal('show');
+});
 
-        $('#btnClear').click(function () {
-            $('#txtCustomerName').val('');
-            $('#txtInvoiceNo').val('');
-            $('#TxtFromDate').val('');
-            $('#TxtToDate').val('');
-            GrdInvoice.reload({});
-        });
+$('#btnSaveManual').click(function(){
+    var billTo=$('#txtManualBillTo').val().trim();
+    var amt=$('#txtManualAmount').val();
+    if(!billTo){ alert('Bill To Name is required.'); return; }
+    if(!amt||parseFloat(amt)<=0){ alert('Please enter a valid amount.'); return; }
+    $(this).prop('disabled',true).html('<i class="fa fa-spinner fa-spin"></i> Saving...');
+    $.ajax({
+        url:BaseURL+'Reports/CreateManualInvoice', type:'POST',
+        data:{ BillToName:billTo,
+               BillToAddress:$('#txtManualAddress').val().trim(),
+               InvoiceDate:$('#txtManualInvDate').val(),
+               StartDate:$('#txtManualStartDate').val(),
+               EndDate:$('#txtManualEndDate').val(),
+               TotalAmount:amt,
+               Terms:$('#ddlManualTerms').val(),
+               Description:$('#txtManualDesc').val().trim() },
+        dataType:'json',
+        success:function(r){
+            $('#btnSaveManual').prop('disabled',false).html('<i class="fa fa-file-invoice"></i> Save &amp; Generate');
+            if(r.success){
+                $('#modalCreate').modal('hide');
+                GrdInv.reload();
+                setTimeout(function(){ OpenInvoice(r.invoiceId); },400);
+            } else { alert('Error: '+r.message); }
+        },
+        error:function(){
+            $('#btnSaveManual').prop('disabled',false).html('<i class="fa fa-file-invoice"></i> Save &amp; Generate');
+            alert('Server error. Please try again.');
+        }
+    });
+});
 
-        document.onkeydown = function (evt) {
-            if ((evt ? evt.which : event.keyCode) == 13) { InvoiceSearch(); return false; }
-        };
-    </script>
+/* ── Delete Invoice ──────────────────────────────────────── */
+function DelInv(id,no){
+    if(!confirm('Delete invoice '+no+'?\n\nThis will also delete all payment records for this invoice.\nThis action cannot be undone.')) return;
+    $.ajax({ url:BaseURL+'Reports/DeleteInvoice', type:'POST', data:{invoiceId:id}, dataType:'json',
+        success:function(r){ if(r.success) GrdInv.reload(); else alert('Delete failed.'); }
+    });
+}
+</script>
 </head>
 <body>
-    <div class="content">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="card card-pd">
-                        <div class="card-header">
-                            <span style="font-size:18px;" class="m-0"><i class="fa fa-file-invoice"></i></span>
-                            <span style="font-size:18px; border-left:1px solid #ccc; padding-left:10px;"> Invoice List</span>
-                            <div style="float:right;">
-                                <span style="border-left:1px solid #ccc; padding-left:15px; padding-right:15px;">
-                                    <a href="#" onclick="showForm()" title="Show Form"><i class="fas fa-caret-square-down"></i></a>
-                                </span>
-                                <span style="border-left:1px solid #ccc; padding-left:15px; padding-right:15px;">
-                                    <a href="#" onclick="hideForm()" title="Hide Form"><i class="fas fa-caret-square-up"></i></a>
-                                </span>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- Payment Modal                                           -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="modal fade" id="modalPayment" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header modal-hd">
+                <h5 class="modal-title" id="payModalTitle"><i class="fa fa-money-bill-wave"></i> Payments</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+
+                <!-- Summary Row -->
+                <div class="row" style="margin-bottom:14px;">
+                    <div class="col-sm-4">
+                        <div class="sum-box">
+                            <div class="sum-lbl">Invoice Amount</div>
+                            <div class="sum-val" id="payInvTotal">$0.00</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="sum-box">
+                            <div class="sum-lbl">Total Paid</div>
+                            <div class="sum-val" style="color:#27ae60;" id="payInvPaid">$0.00</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="sum-box">
+                            <div class="sum-lbl">Balance Due</div>
+                            <div class="sum-val" style="color:#c0392b;" id="payInvBalance">$0.00</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Progress Bar -->
+                <div class="prog-wrap" style="margin-bottom:16px;">
+                    <div class="prog-fill partial" id="payProg" style="width:0%;"></div>
+                </div>
+
+                <!-- Payment History -->
+                <div class="sec-div">Payment History</div>
+                <div id="payHistList"></div>
+
+                <hr style="margin:12px 0;" />
+
+                <!-- Add Payment Form -->
+                <div class="sec-div">Record New Payment</div>
+                <div class="row">
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label style="font-size:11px;font-weight:bold;">Date *</label>
+                            <input type="text" id="txtPayDate" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label style="font-size:11px;font-weight:bold;">Amount (SGD) *</label>
+                            <div class="input-group input-group-sm">
+                                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                                <input type="number" id="txtPayAmount" class="form-control" step="0.01" min="0.01" placeholder="0.00" />
+                            </div>
+                            <small class="text-muted" style="font-size:10px;">Partial payments allowed</small>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label style="font-size:11px;font-weight:bold;">Payment Mode *</label>
+                            <select id="ddlPayMode" class="form-control form-control-sm">
+                                <option value="">-- Select --</option>
+                                <option value="Cash">Cash</option>
+                                <option value="BankTransfer">Bank Transfer</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label style="font-size:11px;">Remarks</label>
+                            <input type="text" id="txtPayRemarks" class="form-control form-control-sm" placeholder="Optional note" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cash fields -->
+                <div class="cash-fields">
+                    <div class="alert alert-warning" style="padding:8px 12px;font-size:12px;margin-bottom:8px;">
+                        <i class="fa fa-hand-holding-usd"></i>
+                        <strong>Cash Payment</strong> — Select who received the cash
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-5">
+                            <div class="form-group">
+                                <label style="font-size:11px;font-weight:bold;">Cash Received By *</label>
+                                <select id="ddlReceivedBy" class="form-control form-control-sm">
+                                    <option value="">-- Select User --</option>
+                                </select>
                             </div>
                         </div>
-                        <div class="card-body">
-                            <div id="hidden-form">
-                                <div class="row">
-                                    <div class="col-sm-2">
-                                        <div class="form-group">
-                                            <label>Invoice No</label>
-                                            <input type="text" id="txtInvoiceNo" class="form-control" placeholder="e.g. NTT-INV-00001">
-                                        </div>
+                    </div>
+                </div>
+
+                <!-- Bank Transfer fields -->
+                <div class="bank-fields">
+                    <div class="alert alert-info" style="padding:8px 12px;font-size:12px;margin-bottom:8px;">
+                        <i class="fa fa-university"></i>
+                        <strong>Bank Transfer</strong> — Enter the account details
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label style="font-size:11px;font-weight:bold;">Bank / Account Name *</label>
+                                <input type="text" id="txtPayAccount" class="form-control form-control-sm"
+                                       placeholder="e.g. DBS 107-903506-0 or PayNow 201710306R" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
+                <button type="button" id="btnSavePayment" class="btn btn-success btn-sm">
+                    <i class="fa fa-save"></i> Record Payment
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- Create Invoice Modal                                    -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="modal fade" id="modalCreate" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header modal-hd">
+                <h5 class="modal-title">
+                    <i class="fa fa-file-invoice"></i> &nbsp;Create Invoice Manually
+                </h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="frmManual" autocomplete="off">
+
+                    <div class="sec-div">Bill To Details</div>
+                    <div class="row">
+                        <div class="col-sm-7">
+                            <div class="form-group">
+                                <label><strong>Bill To Name *</strong> <small class="text-muted">(Company or person name)</small></label>
+                                <input type="text" id="txtManualBillTo" class="form-control"
+                                       placeholder="e.g. ASIAN CLASSICAL TRAVELS" />
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label><strong>Invoice Date *</strong></label>
+                                <input type="text" id="txtManualInvDate" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <label><strong>Terms</strong></label>
+                                <select id="ddlManualTerms" class="form-control">
+                                    <option value="Credit">Credit</option>
+                                    <option value="Cash">Cash</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Bill To Address <small class="text-muted">(as shown on invoice)</small></label>
+                        <textarea id="txtManualAddress" class="form-control" rows="2"
+                                  placeholder="101 KITCHENER ROAD, JLN BESAR, #03-32 A&#10;SINGAPORE - 208511"></textarea>
+                    </div>
+
+                    <div class="sec-div" style="margin-top:14px;">Invoice Details</div>
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label>Period From</label>
+                                <input type="text" id="txtManualStartDate" class="form-control"
+                                       placeholder="Start date" />
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label>Period To</label>
+                                <input type="text" id="txtManualEndDate" class="form-control"
+                                       placeholder="End date" />
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label><strong>Total Amount (SGD) *</strong></label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                                    <input type="number" id="txtManualAmount" class="form-control"
+                                           placeholder="0.00" step="0.01" min="0.01" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label>Description <small class="text-muted">(on invoice)</small></label>
+                                <input type="text" id="txtManualDesc" class="form-control"
+                                       placeholder="TRANSPORT PROVIDED" />
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+                <div class="alert alert-info" style="font-size:12px;margin:6px 0 0;">
+                    <i class="fa fa-info-circle"></i>
+                    Invoice ID is auto-generated based on the last invoice number.
+                    The invoice will open automatically after saving.
+                    No job sheet is created for manual invoices.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" id="btnSaveManual" class="btn btn-warning">
+                    <i class="fa fa-file-invoice"></i> Save &amp; Generate
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- Main Page                                               -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card card-pd">
+
+                    <div class="card-header">
+                        <span style="font-size:18px;" class="m-0">
+                            <i class="fas fa-file-invoice"></i>
+                        </span>
+                        <span style="font-size:18px; border-left:1px solid #ccc; padding-left:10px;">
+                            Invoice
+                        </span>
+                        <div style="float:right;">
+                            <button type="button" id="btnCreateInvoice"
+                                    class="btn btn-warning btn-sm" style="margin-right:12px;">
+                                <i class="fa fa-plus-circle"></i> Create New
+                            </button>
+                            <span style="border-left:1px solid #ccc; padding-left:15px; padding-right:15px;">
+                                <a href="#" onclick="showForm()" title="Show Search">
+                                    <i class="fas fa-caret-square-down"></i>
+                                </a>
+                            </span>
+                            <span style="border-left:1px solid #ccc; padding-left:15px; padding-right:15px;">
+                                <a href="#" onclick="hideForm()" title="Hide Search">
+                                    <i class="fas fa-caret-square-up"></i>
+                                </a>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <!-- Filters -->
+                        <div id="hidden-form">
+                            <div class="row">
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label><i class="fa fa-hashtag"></i> Invoice ID</label>
+                                        <input type="text" id="txtInvNo" class="form-control"
+                                               placeholder="NTT-INV-00001">
                                     </div>
-                                    <div class="col-sm-2">
-                                        <div class="form-group">
-                                            <label>Customer / Vendor</label>
-                                            <input type="text" id="txtCustomerName" class="form-control">
-                                        </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label><i class="fa fa-user"></i> Bill To Name</label>
+                                        <input type="text" id="txtBillTo" class="form-control"
+                                               placeholder="Company / Customer">
                                     </div>
-                                    <div class="col-sm-2">
-                                        <div class="form-group">
-                                            <label>From Date</label>
-                                            <input type="text" id="TxtFromDate" class="form-control">
-                                        </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label>From Date</label>
+                                        <input type="text" id="TxtFromDate" class="form-control">
                                     </div>
-                                    <div class="col-sm-2">
-                                        <div class="form-group">
-                                            <label>To Date</label>
-                                            <input type="text" id="TxtToDate" class="form-control">
-                                        </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label>To Date</label>
+                                        <input type="text" id="TxtToDate" class="form-control">
                                     </div>
-                                    <div class="col-sm-3">
-                                        <div class="pdt-25">
-                                            <div class="row">
-                                                <div class="col-sm-6">
-                                                    <button type="button" id="btnSearch" class="btn btn-primary btn-block"><i class="fa fa-search"></i> Search</button>
-                                                </div>
-                                                <div class="col-sm-6">
-                                                    <button type="button" id="btnClear" class="btn btn-primary btn-block"><i class="fa fa-paint-brush"></i> Clear</button>
-                                                </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label><i class="fa fa-filter"></i> Payment Status</label>
+                                        <select id="ddlPayFilter" class="form-control">
+                                            <option value="">All</option>
+                                            <option value="Paid">Paid</option>
+                                            <option value="Partial">Partial</option>
+                                            <option value="Unpaid">Unpaid</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="pdt-25">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <button type="button" id="btnSearch"
+                                                        class="btn btn-primary btn-block">
+                                                    <i class="fa fa-search"></i> Search
+                                                </button>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <button type="button" id="btnClear"
+                                                        class="btn btn-secondary btn-block">
+                                                    <i class="fa fa-times"></i> Clear
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <br />
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <div class="box-body table-responsive no-padding">
-                                        <table id="GrdInvoice" class="table table-hover"></table>
-                                    </div>
+                        </div>
+
+                        <!-- Grid -->
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="box-body table-responsive no-padding">
+                                    <table id="GrdInv" class="table table-hover"></table>
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 </body>
