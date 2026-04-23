@@ -487,7 +487,6 @@ namespace Transport.Controllers
         // =====================================================================
         // INVOICE ACTIONS
         // =====================================================================
- 
 
         #region "Invoice"
 
@@ -518,6 +517,44 @@ namespace Transport.Controllers
 
         // ── Pages ─────────────────────────────────────────────────────────────
         public ActionResult InvoiceList(string HeaderViewID, string DetailViewID) { return View(); }
+
+        // ── Dashboard cards ───────────────────────────────────────────────────
+        [HttpGet]
+        public JsonResult InvoiceDashboard()
+        {
+            try
+            {
+                using (var conn = GetRawConnection())
+                {
+                    conn.Open();
+                    var cmd = new SqlCommand(@"
+                        SELECT
+                            ISNULL(SUM(h.TotalAmount), 0) AS TotalInvoiced,
+                            ISNULL(SUM(ISNULL((SELECT SUM(p.PaidAmount) FROM InvoicePayments p WHERE p.InvoiceID = h.InvoiceID), 0)), 0) AS TotalCollected,
+                            COUNT(*) AS TotalInvoices
+                        FROM InvoiceHeaders h", conn);
+                    using (var r = cmd.ExecuteReader())
+                    {
+                        if (r.Read())
+                        {
+                            decimal invoiced = Convert.ToDecimal(r["TotalInvoiced"]);
+                            decimal collected = Convert.ToDecimal(r["TotalCollected"]);
+                            int count = Convert.ToInt32(r["TotalInvoices"]);
+                            return Json(new
+                            {
+                                success = true,
+                                TotalInvoiced = invoiced,
+                                TotalCollected = collected,
+                                TotalPending = invoiced - collected,
+                                TotalInvoices = count
+                            }, JsonRequestBehavior.AllowGet);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex) { return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet); }
+            return Json(new { success = true, TotalInvoiced = 0, TotalCollected = 0, TotalPending = 0, TotalInvoices = 0 }, JsonRequestBehavior.AllowGet);
+        }
         public JsonResult InvoiceTest() { return Json(new { ok = true }, JsonRequestBehavior.AllowGet); }
 
         [HttpGet]
