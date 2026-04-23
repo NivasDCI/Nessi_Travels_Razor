@@ -3,8 +3,16 @@
   "WorkspaceRootPath": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{2ED5E85A-48D0-4792-9218-68E6C0781A51}|Transport\\Transport.csproj|C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\transport\\controllers\\reportscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2ED5E85A-48D0-4792-9218-68E6C0781A51}|Transport\\Transport.csproj|solutionrelative:transport\\controllers\\reportscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{2ED5E85A-48D0-4792-9218-68E6C0781A51}|Transport\\Transport.csproj|C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\transport\\views\\reports\\invoicelist.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{2ED5E85A-48D0-4792-9218-68E6C0781A51}|Transport\\Transport.csproj|solutionrelative:transport\\views\\reports\\invoicelist.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{CADE0411-3610-412E-822C-BB7948A069F4}|Transport.Model\\Transport.Model.csproj|C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\transport.model\\invoicemodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{CADE0411-3610-412E-822C-BB7948A069F4}|Transport.Model\\Transport.Model.csproj|solutionrelative:transport.model\\invoicemodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{2ED5E85A-48D0-4792-9218-68E6C0781A51}|Transport\\Transport.csproj|C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\transport\\controllers\\invoicecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -13,14 +21,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{57CB428B-00C2-46A5-9D11-7D6F1268058F}|Transport.Repository\\Transport.Repository.csproj|C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\transport.repository\\invoicerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{57CB428B-00C2-46A5-9D11-7D6F1268058F}|Transport.Repository\\Transport.Repository.csproj|solutionrelative:transport.repository\\invoicerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{CADE0411-3610-412E-822C-BB7948A069F4}|Transport.Model\\Transport.Model.csproj|c:\\users\\dell\\desktop\\project-folder\\jjk_info\\nessi\\nessi_travels_razor\\transport.model\\invoicemodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{CADE0411-3610-412E-822C-BB7948A069F4}|Transport.Model\\Transport.Model.csproj|solutionrelative:transport.model\\invoicemodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2ED5E85A-48D0-4792-9218-68E6C0781A51}|Transport\\Transport.csproj|C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\transport\\controllers\\reportscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2ED5E85A-48D0-4792-9218-68E6C0781A51}|Transport\\Transport.csproj|solutionrelative:transport\\controllers\\reportscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Views\\Invoice\\ViewReceipt.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
@@ -46,17 +46,17 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 8,
+          "SelectedChildIndex": 6,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 3,
               "Title": "InvoiceController.cs",
               "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Controllers\\InvoiceController.cs",
               "RelativeDocumentMoniker": "Transport\\Controllers\\InvoiceController.cs",
               "ToolTip": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Controllers\\InvoiceController.cs",
               "RelativeToolTip": "Transport\\Controllers\\InvoiceController.cs",
-              "ViewState": "AgIAAL0AAAAAAAAAAAAowEACAAADAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAASAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-04-17T14:54:05.592Z",
               "IsPinned": true,
@@ -76,41 +76,53 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 5,
+              "Title": "ViewReceipt.cshtml",
+              "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Views\\Invoice\\ViewReceipt.cshtml",
+              "RelativeDocumentMoniker": "Transport\\Views\\Invoice\\ViewReceipt.cshtml",
+              "ToolTip": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Views\\Invoice\\ViewReceipt.cshtml",
+              "RelativeToolTip": "Transport\\Views\\Invoice\\ViewReceipt.cshtml",
+              "ViewState": "AgIAAOsAAAAAAAAAAAAowO8AAAALAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-04-19T01:39:46.679Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "InvoiceModel.cs",
               "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport.Model\\InvoiceModel.cs",
               "RelativeDocumentMoniker": "Transport.Model\\InvoiceModel.cs",
               "ToolTip": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport.Model\\InvoiceModel.cs",
               "RelativeToolTip": "Transport.Model\\InvoiceModel.cs",
-              "ViewState": "AgIAAE8AAAAAAAAAAAAowFIAAAABAAAAAAAAAA==",
+              "ViewState": "AgIAADoAAAAAAAAAAAA6wEkAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-04-19T16:33:37.466Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 0,
               "Title": "ReportsController.cs",
               "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Controllers\\ReportsController.cs",
               "RelativeDocumentMoniker": "Transport\\Controllers\\ReportsController.cs",
               "ToolTip": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Controllers\\ReportsController.cs",
               "RelativeToolTip": "Transport\\Controllers\\ReportsController.cs",
-              "ViewState": "AgIAAPoCAAAAAAAAAAAcwAkDAAADAAAAAAAAAA==",
+              "ViewState": "AgIAAOUBAAAAAAAAAAAiwOkBAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-19T07:18:38.85Z"
+              "WhenOpened": "2026-04-19T07:18:38.85Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 4,
               "Title": "InvoiceRepository.cs",
               "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport.Repository\\InvoiceRepository.cs",
               "RelativeDocumentMoniker": "Transport.Repository\\InvoiceRepository.cs",
               "ToolTip": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport.Repository\\InvoiceRepository.cs",
               "RelativeToolTip": "Transport.Repository\\InvoiceRepository.cs",
-              "ViewState": "AgIAAPgAAAAAAAAAAAAowPwAAAABAAAAAAAAAA==",
+              "ViewState": "AgIAANcBAAAAAAAAAAAqwO8BAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-21T14:15:17.936Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-21T14:15:17.936Z"
             },
             {
               "$type": "Document",
@@ -126,28 +138,16 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "InvoiceList.cshtml",
               "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Views\\Reports\\InvoiceList.cshtml",
               "RelativeDocumentMoniker": "Transport\\Views\\Reports\\InvoiceList.cshtml",
               "ToolTip": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Views\\Reports\\InvoiceList.cshtml",
               "RelativeToolTip": "Transport\\Views\\Reports\\InvoiceList.cshtml",
-              "ViewState": "AgIAAHoCAAAAAAAAAAAYwJMCAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAI8CAAAAAAAAAAAUwKoCAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2026-04-18T15:36:21.085Z",
               "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "ViewReceipt.cshtml",
-              "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Views\\Invoice\\ViewReceipt.cshtml",
-              "RelativeDocumentMoniker": "Transport\\Views\\Invoice\\ViewReceipt.cshtml",
-              "ToolTip": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Views\\Invoice\\ViewReceipt.cshtml",
-              "RelativeToolTip": "Transport\\Views\\Invoice\\ViewReceipt.cshtml",
-              "ViewState": "AgIAAOsAAAAAAAAAAAAowO8AAAALAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-04-19T01:39:46.679Z"
             },
             {
               "$type": "Document",

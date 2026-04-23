@@ -487,159 +487,355 @@ namespace Transport.Controllers
         // =====================================================================
         // INVOICE ACTIONS
         // =====================================================================
+ 
+
         #region "Invoice"
 
+        // ── DB Connection (reads from Web.config EF string) ─────────────────
         private SqlConnection GetRawConnection()
         {
-            // Extract raw SQL connection string from Web.config EF connection string
-            // Same connection Entity Framework uses - guaranteed to work
             string efConnStr = System.Configuration.ConfigurationManager
                                    .ConnectionStrings["TransportEntities"].ConnectionString;
-
-            // EF stores the SQL connection inside: provider connection string="..."
-            // In Web.config it is HTML-encoded as &quot; so we handle both forms
             string marker = "provider connection string=";
-            int markerIdx = efConnStr.IndexOf(marker, System.StringComparison.OrdinalIgnoreCase);
-            string rawSqlConnStr = string.Empty;
-
-            if (markerIdx >= 0)
+            int mi = efConnStr.IndexOf(marker, System.StringComparison.OrdinalIgnoreCase);
+            string raw = string.Empty;
+            if (mi >= 0) { int o = efConnStr.IndexOf('"', mi) + 1; int c = efConnStr.IndexOf('"', o); raw = efConnStr.Substring(o, c - o); }
+            if (string.IsNullOrEmpty(raw))
             {
-                // Move past the marker and the opening quote character
-                int openQuote = efConnStr.IndexOf('"', markerIdx) + 1;
-                int closeQuote = efConnStr.IndexOf('"', openQuote);
-                rawSqlConnStr = efConnStr.Substring(openQuote, closeQuote - openQuote);
+                string m2 = "provider connection string=&quot;";
+                int m2i = efConnStr.IndexOf(m2, System.StringComparison.OrdinalIgnoreCase);
+                if (m2i >= 0) { int o2 = m2i + m2.Length; int c2 = efConnStr.IndexOf("&quot;", o2, System.StringComparison.OrdinalIgnoreCase); raw = efConnStr.Substring(o2, c2 - o2); }
             }
-
-            // If the Web.config value was HTML-encoded (e.g. &quot; instead of ")
-            // the IndexOf above won't find quotes - fall back to &quot; delimiters
-            if (string.IsNullOrEmpty(rawSqlConnStr))
-            {
-                string marker2 = "provider connection string=&quot;";
-                int m2 = efConnStr.IndexOf(marker2, System.StringComparison.OrdinalIgnoreCase);
-                if (m2 >= 0)
-                {
-                    int open2 = m2 + marker2.Length;
-                    int close2 = efConnStr.IndexOf("&quot;", open2, System.StringComparison.OrdinalIgnoreCase);
-                    rawSqlConnStr = efConnStr.Substring(open2, close2 - open2);
-                }
-            }
-
-            return new SqlConnection(rawSqlConnStr);
+            return new SqlConnection(raw);
         }
 
         private string GenerateInvoiceNo(SqlConnection conn, SqlTransaction tran)
         {
-            var cmd = new SqlCommand(
-                "SELECT 'NTT-INV-' + RIGHT('00000' + CAST(ISNULL(MAX(InvoiceID),0)+1 AS VARCHAR),5) FROM InvoiceHeaders",
-                conn, tran);
-            object result = cmd.ExecuteScalar();
-            return result != null ? result.ToString() : "NTT-INV-00001";
+            var cmd = new SqlCommand("SELECT 'NTT-INV-' + RIGHT('00000' + CAST(ISNULL(MAX(InvoiceID),0)+1 AS VARCHAR),5) FROM InvoiceHeaders", conn, tran);
+            object r = cmd.ExecuteScalar();
+            return r != null ? r.ToString() : "NTT-INV-00001";
         }
 
+        // ── Pages ─────────────────────────────────────────────────────────────
         public ActionResult InvoiceList(string HeaderViewID, string DetailViewID) { return View(); }
+        public JsonResult InvoiceTest() { return Json(new { ok = true }, JsonRequestBehavior.AllowGet); }
 
-        public JsonResult InvoiceTest()
+        [HttpGet]
+        public JsonResult GetVendorInfo(int vendorCode)
         {
-            return Json(new { ok = true, message = "Invoice actions working!" }, JsonRequestBehavior.AllowGet);
+            try
+            {
+                using (var db2 = new Transport.Entity.TransportEntities())
+                {
+                    var v = db2.JobVendors.FirstOrDefault(x => x.JobVendorCode == vendorCode);
+                    if (v == null) return Json(new { success = false }, JsonRequestBehavior.AllowGet);
+                    var addr = string.Join("\n", new[] { v.Address1, v.Address2, v.Address3 }
+                        .Where(a => !string.IsNullOrWhiteSpace(a)));
+                    return Json(new { success = true, name = v.JobVendorName, address = addr }, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ex) { return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet); }
         }
 
         [HttpGet]
-        public JsonResult Invoice_FindAll(string CustomerName, string InvoiceNo, string FromDate, string ToDate)
+        public JsonResult InvoiceSummary(string VendorName, string FromDate, string ToDate)
+        {
+            try
+            {
+                DateTime? pFrom = null, pTo = null;
+                string[] fmts = { "dd-MMM-yyyy", "dd-MM-yyyy", "MM/dd/yyyy", "yyyy-MM-dd" };
+                DateTime dt;
+                if (!string.IsNullOrEmpty(FromDate) && DateTime.TryParseExact(FromDate, fmts, CultureInfo.InvariantCulture, DateTimeStyles.None, out dt)) pFrom = dt;
+                if (!string.IsNullOrEmpty(ToDate) && DateTime.TryParseExact(ToDate, fmts, CultureInfo.InvariantCulture, DateTimeStyles.None, out dt)) pTo = dt;
+
+                using (var conn = GetRawConnection())
+                {
+                    conn.Open();
+                    // Previous balance: invoices before FromDate that are not fully paid
+                    decimal prevBalance = 0;
+                    if (pFrom.HasValue)
+                    {
+                        var prevCmd = new SqlCommand(@"
+                            SELECT ISNULL(SUM(h.TotalAmount - ISNULL((SELECT SUM(p.PaidAmount) FROM InvoicePayments p WHERE p.InvoiceID=h.InvoiceID),0)),0)
+                            FROM InvoiceHeaders h
+                            WHERE CAST(h.InvoiceDate AS DATE) < CAST(@FromDate AS DATE)
+                              AND (@VendorName IS NULL OR h.JobVendorName LIKE '%'+@VendorName+'%')
+                              AND ISNULL((SELECT SUM(p.PaidAmount) FROM InvoicePayments p WHERE p.InvoiceID=h.InvoiceID),0) < h.TotalAmount", conn);
+                        prevCmd.Parameters.AddWithValue("@FromDate", pFrom.Value);
+                        prevCmd.Parameters.AddWithValue("@VendorName", string.IsNullOrEmpty(VendorName) ? (object)DBNull.Value : VendorName);
+                        prevBalance = Convert.ToDecimal(prevCmd.ExecuteScalar());
+                    }
+
+                    var cmd = new SqlCommand(@"
+                        SELECT
+                            ISNULL(SUM(h.TotalAmount),0) AS TotalInvoiced,
+                            ISNULL(SUM(ISNULL((SELECT SUM(p.PaidAmount) FROM InvoicePayments p WHERE p.InvoiceID=h.InvoiceID),0)),0) AS TotalPaid,
+                            COUNT(*) AS InvoiceCount
+                        FROM InvoiceHeaders h
+                        WHERE (@VendorName IS NULL OR h.JobVendorName LIKE '%'+@VendorName+'%')
+                          AND (@FromDate IS NULL OR CAST(h.InvoiceDate AS DATE) >= CAST(@FromDate AS DATE))
+                          AND (@ToDate   IS NULL OR CAST(h.InvoiceDate AS DATE) <= CAST(@ToDate   AS DATE))", conn);
+                    cmd.Parameters.AddWithValue("@VendorName", string.IsNullOrEmpty(VendorName) ? (object)DBNull.Value : VendorName);
+                    cmd.Parameters.AddWithValue("@FromDate", pFrom.HasValue ? (object)pFrom.Value : DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ToDate", pTo.HasValue ? (object)pTo.Value : DBNull.Value);
+
+                    decimal totalInvoiced = 0, totalPaid = 0; int count = 0;
+                    using (var r = cmd.ExecuteReader())
+                    {
+                        if (r.Read())
+                        {
+                            totalInvoiced = Convert.ToDecimal(r["TotalInvoiced"]);
+                            totalPaid = Convert.ToDecimal(r["TotalPaid"]);
+                            count = Convert.ToInt32(r["InvoiceCount"]);
+                        }
+                    }
+                    decimal totalPending = (totalInvoiced - totalPaid) + prevBalance;
+                    return Json(new
+                    {
+                        success = true,
+                        VendorName = VendorName ?? "All Vendors",
+                        FromDate = pFrom.HasValue ? pFrom.Value.ToString("dd-MMM-yyyy") : "",
+                        ToDate = pTo.HasValue ? pTo.Value.ToString("dd-MMM-yyyy") : "",
+                        InvoiceCount = count,
+                        TotalInvoiced = totalInvoiced,
+                        TotalPaid = totalPaid,
+                        TotalPending = totalInvoiced - totalPaid,
+                        PrevBalance = prevBalance,
+                        GrandTotal = totalPending
+                    }, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ex) { return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet); }
+        }
+
+        // ── List Invoices with payment summary ────────────────────────────────
+        [HttpGet]
+        public JsonResult Invoice_FindAll(string BillToName, string InvoiceNo, string FromDate, string ToDate, string PaymentStatus, string VendorName)
         {
             var list = new List<InvoiceHeaderModel>();
             try
             {
-                DateTime? parsedFrom = null, parsedTo = null;
+                DateTime? pFrom = null, pTo = null;
                 string[] fmts = { "dd-MMM-yyyy", "dd-MM-yyyy", "MM/dd/yyyy", "yyyy-MM-dd" };
-                DateTime dtmp;
-                if (!string.IsNullOrEmpty(FromDate) && DateTime.TryParseExact(FromDate, fmts, CultureInfo.InvariantCulture, DateTimeStyles.None, out dtmp)) parsedFrom = dtmp;
-                if (!string.IsNullOrEmpty(ToDate) && DateTime.TryParseExact(ToDate, fmts, CultureInfo.InvariantCulture, DateTimeStyles.None, out dtmp)) parsedTo = dtmp;
+                DateTime dt;
+                if (!string.IsNullOrEmpty(FromDate) && DateTime.TryParseExact(FromDate, fmts, CultureInfo.InvariantCulture, DateTimeStyles.None, out dt)) pFrom = dt;
+                if (!string.IsNullOrEmpty(ToDate) && DateTime.TryParseExact(ToDate, fmts, CultureInfo.InvariantCulture, DateTimeStyles.None, out dt)) pTo = dt;
 
                 using (var conn = GetRawConnection())
                 {
                     conn.Open();
                     var cmd = new SqlCommand(@"
-                        SELECT h.*, (SELECT COUNT(*) FROM InvoiceDetails d WHERE d.InvoiceID=h.InvoiceID) AS TotalJobs
+                        SELECT h.*,
+                               (SELECT COUNT(*) FROM InvoiceDetails d WHERE d.InvoiceID=h.InvoiceID) AS TotalJobs,
+                               ISNULL((SELECT SUM(p.PaidAmount) FROM InvoicePayments p WHERE p.InvoiceID=h.InvoiceID),0) AS TotalPaid
                         FROM InvoiceHeaders h
-                        WHERE (@CustomerName IS NULL OR h.CustomerName LIKE '%'+@CustomerName+'%')
+                        WHERE (@BillToName   IS NULL OR h.BillToName   LIKE '%'+@BillToName+'%')
                           AND (@InvoiceNo    IS NULL OR h.InvoiceNo    LIKE '%'+@InvoiceNo+'%')
+                          AND (@VendorName   IS NULL OR h.JobVendorName LIKE '%'+@VendorName+'%')
                           AND (@FromDate     IS NULL OR CAST(h.InvoiceDate AS DATE) >= CAST(@FromDate AS DATE))
                           AND (@ToDate       IS NULL OR CAST(h.InvoiceDate AS DATE) <= CAST(@ToDate   AS DATE))
-                        ORDER BY h.InvoiceID DESC", conn);
-                    cmd.Parameters.AddWithValue("@CustomerName", string.IsNullOrEmpty(CustomerName) ? (object)DBNull.Value : CustomerName);
+                          AND (@PayStatus    IS NULL
+                               OR (@PayStatus='Paid'    AND ISNULL((SELECT SUM(p.PaidAmount) FROM InvoicePayments p WHERE p.InvoiceID=h.InvoiceID),0) >= h.TotalAmount)
+                               OR (@PayStatus='Partial' AND ISNULL((SELECT SUM(p.PaidAmount) FROM InvoicePayments p WHERE p.InvoiceID=h.InvoiceID),0) > 0
+                                   AND ISNULL((SELECT SUM(p.PaidAmount) FROM InvoicePayments p WHERE p.InvoiceID=h.InvoiceID),0) < h.TotalAmount)
+                               OR (@PayStatus='Unpaid'  AND ISNULL((SELECT SUM(p.PaidAmount) FROM InvoicePayments p WHERE p.InvoiceID=h.InvoiceID),0) = 0))
+                        ORDER BY h.InvoiceDate DESC, h.InvoiceID DESC", conn);
+
+                    cmd.Parameters.AddWithValue("@BillToName", string.IsNullOrEmpty(BillToName) ? (object)DBNull.Value : BillToName);
                     cmd.Parameters.AddWithValue("@InvoiceNo", string.IsNullOrEmpty(InvoiceNo) ? (object)DBNull.Value : InvoiceNo);
-                    cmd.Parameters.AddWithValue("@FromDate", parsedFrom.HasValue ? (object)parsedFrom.Value : DBNull.Value);
-                    cmd.Parameters.AddWithValue("@ToDate", parsedTo.HasValue ? (object)parsedTo.Value : DBNull.Value);
+                    cmd.Parameters.AddWithValue("@FromDate", pFrom.HasValue ? (object)pFrom.Value : DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ToDate", pTo.HasValue ? (object)pTo.Value : DBNull.Value);
+                    cmd.Parameters.AddWithValue("@PayStatus", string.IsNullOrEmpty(PaymentStatus) ? (object)DBNull.Value : PaymentStatus);
+                    cmd.Parameters.AddWithValue("@VendorName", string.IsNullOrEmpty(VendorName) ? (object)DBNull.Value : VendorName);
+
                     using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            list.Add(new InvoiceHeaderModel
+                            var h = MapHeader(reader);
+                            h.TotalPaid = reader["TotalPaid"] == DBNull.Value ? 0m : Convert.ToDecimal(reader["TotalPaid"]);
+                            list.Add(h);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex) { return Json(new { error = ex.Message }, JsonRequestBehavior.AllowGet); }
+            // Return flat objects so computed properties serialize correctly
+            var flat = list.Select(h => new {
+                InvoiceID = h.InvoiceID,
+                InvoiceNo = h.InvoiceNo,
+                DisplayInvoiceDate = h.DisplayInvoiceDate,
+                BillToName = h.BillToName,
+                BillToAddress = h.BillToAddress,
+                JobVendorName = h.JobVendorName,
+                CustomerName = h.CustomerName,
+                DisplayStartDate = h.DisplayStartDate,
+                DisplayEndDate = h.DisplayEndDate,
+                TotalJobs = h.TotalJobs,
+                TotalAmount = h.TotalAmount,
+                TotalPaid = h.TotalPaid,
+                BalanceAmount = h.TotalAmount - h.TotalPaid,
+                PaymentStatus = h.TotalPaid <= 0 ? "Unpaid" : h.TotalPaid >= h.TotalAmount ? "Paid" : "Partial",
+                IsManual = h.IsManual,
+                IsCredit = h.IsCredit,
+                CreditCash = h.CreditCash
+            }).ToList();
+            return Json(new { records = flat, total = flat.Count }, JsonRequestBehavior.AllowGet);
+        }
+
+        // ── Get Payment history for one invoice ───────────────────────────────
+        [HttpGet]
+        public JsonResult GetInvoicePayments(long InvoiceID)
+        {
+            var list = new List<object>();
+            try
+            {
+                using (var conn = GetRawConnection())
+                {
+                    conn.Open();
+                    var cmd = new SqlCommand(@"
+                        SELECT PaymentID, InvoiceID, PaymentDate, PaidAmount, PaymentMode,
+                               AccountName, ReceivedByUserID, ReceivedByName, Remarks, CreatedDate
+                        FROM InvoicePayments WHERE InvoiceID=@ID ORDER BY PaymentDate, PaymentID", conn);
+                    cmd.Parameters.AddWithValue("@ID", InvoiceID);
+                    using (var r = cmd.ExecuteReader())
+                    {
+                        while (r.Read())
+                        {
+                            list.Add(new
                             {
-                                InvoiceID = Convert.ToInt64(reader["InvoiceID"]),
-                                InvoiceNo = reader["InvoiceNo"].ToString(),
-                                InvoiceDate = Convert.ToDateTime(reader["InvoiceDate"]),
-                                CustomerName = reader["CustomerName"] == DBNull.Value ? "" : reader["CustomerName"].ToString(),
-                                JobVendorName = reader["JobVendorName"] == DBNull.Value ? "" : reader["JobVendorName"].ToString(),
-                                DrivingByName = reader["DrivingByName"] == DBNull.Value ? "" : reader["DrivingByName"].ToString(),
-                                VehicleName = reader["VehicleName"] == DBNull.Value ? "" : reader["VehicleName"].ToString(),
-                                StartDate = reader["StartDate"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(reader["StartDate"]),
-                                EndDate = reader["EndDate"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(reader["EndDate"]),
-                                CreditCash = reader["CreditCash"] == DBNull.Value ? "" : reader["CreditCash"].ToString(),
-                                TotalAmount = Convert.ToDecimal(reader["TotalAmount"]),
-                                IsCredit = Convert.ToBoolean(reader["IsCredit"]),
-                                CreatedDate = Convert.ToDateTime(reader["CreatedDate"]),
-                                TotalJobs = reader["TotalJobs"] == DBNull.Value ? 0 : Convert.ToInt32(reader["TotalJobs"]),
-                                BillToName = reader["BillToName"] == DBNull.Value ? "" : reader["BillToName"].ToString(),
-                                BillToAddress = reader["BillToAddress"] == DBNull.Value ? "" : reader["BillToAddress"].ToString()
+                                PaymentID = Convert.ToInt64(r["PaymentID"]),
+                                PaymentDate = r["PaymentDate"] == DBNull.Value ? "" : Convert.ToDateTime(r["PaymentDate"]).ToString("dd-MMM-yyyy"),
+                                PaidAmount = r["PaidAmount"] == DBNull.Value ? 0 : Convert.ToDecimal(r["PaidAmount"]),
+                                PaymentMode = r["PaymentMode"] == DBNull.Value ? "" : r["PaymentMode"].ToString(),
+                                AccountName = r["AccountName"] == DBNull.Value ? "" : r["AccountName"].ToString(),
+                                ReceivedByName = r["ReceivedByName"] == DBNull.Value ? "" : r["ReceivedByName"].ToString(),
+                                Remarks = r["Remarks"] == DBNull.Value ? "" : r["Remarks"].ToString()
                             });
                         }
                     }
                 }
             }
             catch (Exception ex) { return Json(new { error = ex.Message }, JsonRequestBehavior.AllowGet); }
-            return Json(new { records = list, total = list.Count }, JsonRequestBehavior.AllowGet);
+            return Json(new { records = list }, JsonRequestBehavior.AllowGet);
         }
 
+        // ── Add Payment ───────────────────────────────────────────────────────
+        [HttpPost]
+        public JsonResult AddPayment(long InvoiceID, string PaymentDate, decimal PaidAmount,
+            string PaymentMode, string AccountName, int? ReceivedByUserID, string ReceivedByName, string Remarks)
+        {
+            try
+            {
+                if (PaidAmount <= 0) return Json(new { success = false, message = "Amount must be greater than 0." });
+
+                DateTime? pDate = null;
+                DateTime dt;
+                string[] fmts = { "dd-MMM-yyyy", "dd-MM-yyyy", "MM/dd/yyyy", "yyyy-MM-dd" };
+                if (!string.IsNullOrEmpty(PaymentDate) && DateTime.TryParseExact(PaymentDate, fmts, CultureInfo.InvariantCulture, DateTimeStyles.None, out dt)) pDate = dt;
+                if (!pDate.HasValue) pDate = CommonRepository.GetTimeZoneDate();
+
+                using (var conn = GetRawConnection())
+                {
+                    conn.Open();
+                    // Validate: don't overpay
+                    var checkCmd = new SqlCommand(@"
+                        SELECT h.TotalAmount,
+                               ISNULL((SELECT SUM(p.PaidAmount) FROM InvoicePayments p WHERE p.InvoiceID=h.InvoiceID),0) AS AlreadyPaid
+                        FROM InvoiceHeaders h WHERE h.InvoiceID=@ID", conn);
+                    checkCmd.Parameters.AddWithValue("@ID", InvoiceID);
+                    decimal totalAmount = 0, alreadyPaid = 0;
+                    using (var r = checkCmd.ExecuteReader())
+                    {
+                        if (r.Read())
+                        {
+                            totalAmount = Convert.ToDecimal(r["TotalAmount"]);
+                            alreadyPaid = Convert.ToDecimal(r["AlreadyPaid"]);
+                        }
+                    }
+                    decimal remaining = totalAmount - alreadyPaid;
+                    if (PaidAmount > remaining)
+                        return Json(new { success = false, message = "Payment amount (" + PaidAmount.ToString("N2") + ") exceeds remaining balance (" + remaining.ToString("N2") + ")." });
+
+                    var cmd = new SqlCommand(@"
+                        INSERT INTO InvoicePayments
+                            (InvoiceID, PaymentDate, PaidAmount, PaymentMode, AccountName,
+                             ReceivedByUserID, ReceivedByName, Remarks, CreatedBy, CreatedDate)
+                        VALUES
+                            (@InvoiceID, @PaymentDate, @PaidAmount, @PaymentMode, @AccountName,
+                             @ReceivedByUserID, @ReceivedByName, @Remarks, @CreatedBy, GETDATE());
+                        SELECT SCOPE_IDENTITY();", conn);
+
+                    cmd.Parameters.AddWithValue("@InvoiceID", InvoiceID);
+                    cmd.Parameters.AddWithValue("@PaymentDate", pDate.Value);
+                    cmd.Parameters.AddWithValue("@PaidAmount", PaidAmount);
+                    cmd.Parameters.AddWithValue("@PaymentMode", (object)PaymentMode ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@AccountName", (object)AccountName ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ReceivedByUserID", (object)ReceivedByUserID ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ReceivedByName", (object)ReceivedByName ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Remarks", (object)Remarks ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@CreatedBy", SessionExpire.GetUserID());
+
+                    long newPaymentId = Convert.ToInt64(cmd.ExecuteScalar());
+                    decimal newTotal = alreadyPaid + PaidAmount;
+                    decimal newBal = totalAmount - newTotal;
+
+                    return Json(new { success = true, paymentId = newPaymentId, totalPaid = newTotal, balance = newBal });
+                }
+            }
+            catch (Exception ex) { return Json(new { success = false, message = ex.Message }); }
+        }
+
+        // ── Delete Payment ────────────────────────────────────────────────────
+        [HttpPost]
+        public JsonResult DeletePayment(long PaymentID)
+        {
+            try
+            {
+                using (var conn = GetRawConnection())
+                {
+                    conn.Open();
+                    var cmd = new SqlCommand("DELETE FROM InvoicePayments WHERE PaymentID=@ID", conn);
+                    cmd.Parameters.AddWithValue("@ID", PaymentID);
+                    cmd.ExecuteNonQuery();
+                }
+                return Json(new { success = true }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex) { return Json(new { success = false, message = ex.Message }); }
+        }
+
+        // ── Generate Invoice from Jobs Report ─────────────────────────────────
         public JsonResult GenerateInvoice(string CustomerName, string StartDate, string EndDate,
             int? JobVendorCode, int? DrivingBy, int? VehicleCode, string CreditCash, int? CashInHand,
             string BillToName, string BillToAddress)
         {
             try
             {
-                DateTime? parsedStart = null, parsedEnd = null;
+                DateTime? pStart = null, pEnd = null;
                 string[] fmts = { "dd-MMM-yyyy", "dd-MM-yyyy", "MM/dd/yyyy", "yyyy-MM-dd" };
-                DateTime dtmp;
-                if (!string.IsNullOrEmpty(StartDate) && DateTime.TryParseExact(StartDate, fmts, CultureInfo.InvariantCulture, DateTimeStyles.None, out dtmp)) parsedStart = dtmp;
-                if (!string.IsNullOrEmpty(EndDate) && DateTime.TryParseExact(EndDate, fmts, CultureInfo.InvariantCulture, DateTimeStyles.None, out dtmp)) parsedEnd = dtmp;
-                if (parsedStart == null) parsedStart = CommonRepository.GetTimeZoneDate();
-                if (parsedEnd == null) parsedEnd = CommonRepository.GetTimeZoneDate();
-
+                DateTime dt;
+                if (!string.IsNullOrEmpty(StartDate) && DateTime.TryParseExact(StartDate, fmts, CultureInfo.InvariantCulture, DateTimeStyles.None, out dt)) pStart = dt;
+                if (!string.IsNullOrEmpty(EndDate) && DateTime.TryParseExact(EndDate, fmts, CultureInfo.InvariantCulture, DateTimeStyles.None, out dt)) pEnd = dt;
+                if (pStart == null) pStart = CommonRepository.GetTimeZoneDate();
+                if (pEnd == null) pEnd = CommonRepository.GetTimeZoneDate();
                 if (JobVendorCode == 0) JobVendorCode = null;
                 if (DrivingBy == 0) DrivingBy = null;
                 if (VehicleCode == 0) VehicleCode = null;
                 if (CashInHand == 0) CashInHand = null;
                 if (string.IsNullOrWhiteSpace(CustomerName)) CustomerName = null;
 
-                int totalCount = 0;
-                var jobs = _objReportsRepository.Job_FindAll(1, parsedStart, parsedEnd, VehicleCode, JobVendorCode,
-                    CustomerName, null, DrivingBy, CashInHand, 500, null, null, out totalCount);
-
+                int tc = 0;
+                var jobs = _objReportsRepository.Job_FindAll(1, pStart, pEnd, VehicleCode, JobVendorCode,
+                    CustomerName, null, DrivingBy, CashInHand, 500, null, null, out tc);
                 if (!string.IsNullOrEmpty(CreditCash))
                 {
                     if (CreditCash == "Credit") jobs = jobs.Where(o => o.Credit.HasValue && o.Credit > 0).ToList();
                     else if (CreditCash == "Cash") jobs = jobs.Where(o => o.Cash.HasValue && o.Cash > 0).ToList();
                 }
-
-                if (jobs == null || !jobs.Any())
-                    return Json(new { success = false, message = "No jobs found for the selected filters." });
+                if (jobs == null || !jobs.Any()) return Json(new { success = false, message = "No jobs found." });
 
                 var first = jobs.First();
-                string invCustomer = string.IsNullOrEmpty(CustomerName) ? first.CustomerName : CustomerName;
-                bool isCredit = jobs.Any(o => o.Credit.HasValue && o.Credit > 0);
-                decimal totalAmount = jobs.Sum(o => o.Credit ?? o.Cash ?? 0);
-                int createdBy = SessionExpire.GetUserID();
-
+                decimal total = jobs.Sum(o => o.Credit ?? o.Cash ?? 0);
                 long invoiceId = 0;
 
                 using (var conn = GetRawConnection())
@@ -649,24 +845,23 @@ namespace Transport.Controllers
                     {
                         try
                         {
-                            string invoiceNo = GenerateInvoiceNo(conn, tran);
-
+                            string invNo = GenerateInvoiceNo(conn, tran);
                             var hCmd = new SqlCommand(@"
                                 INSERT INTO InvoiceHeaders
                                     (InvoiceNo,InvoiceDate,CustomerName,JobVendorCode,JobVendorName,
                                      DrivingBy,DrivingByName,VehicleCode,VehicleName,CashInHand,CashInHandName,
                                      StartDate,EndDate,CreditCash,TotalAmount,IsCredit,CreatedBy,CreatedDate,
-                                     BillToName,BillToAddress)
+                                     BillToName,BillToAddress,IsManual)
                                 VALUES
                                     (@InvoiceNo,@InvoiceDate,@CustomerName,@JobVendorCode,@JobVendorName,
                                      @DrivingBy,@DrivingByName,@VehicleCode,@VehicleName,@CashInHand,@CashInHandName,
                                      @StartDate,@EndDate,@CreditCash,@TotalAmount,@IsCredit,@CreatedBy,GETDATE(),
-                                     @BillToName,@BillToAddress);
+                                     @BillToName,@BillToAddress,0);
                                 SELECT SCOPE_IDENTITY();", conn, tran);
 
-                            hCmd.Parameters.AddWithValue("@InvoiceNo", invoiceNo);
+                            hCmd.Parameters.AddWithValue("@InvoiceNo", invNo);
                             hCmd.Parameters.AddWithValue("@InvoiceDate", DateTime.Now);
-                            hCmd.Parameters.AddWithValue("@CustomerName", (object)invCustomer ?? DBNull.Value);
+                            hCmd.Parameters.AddWithValue("@CustomerName", (object)(string.IsNullOrEmpty(CustomerName) ? first.CustomerName : CustomerName) ?? DBNull.Value);
                             hCmd.Parameters.AddWithValue("@JobVendorCode", (object)JobVendorCode ?? DBNull.Value);
                             hCmd.Parameters.AddWithValue("@JobVendorName", (object)first.JobVendorName ?? DBNull.Value);
                             hCmd.Parameters.AddWithValue("@DrivingBy", (object)DrivingBy ?? DBNull.Value);
@@ -675,64 +870,110 @@ namespace Transport.Controllers
                             hCmd.Parameters.AddWithValue("@VehicleName", (object)first.VehicleName ?? DBNull.Value);
                             hCmd.Parameters.AddWithValue("@CashInHand", (object)CashInHand ?? DBNull.Value);
                             hCmd.Parameters.AddWithValue("@CashInHandName", (object)first.CashInHandName ?? DBNull.Value);
-                            hCmd.Parameters.AddWithValue("@StartDate", (object)parsedStart ?? DBNull.Value);
-                            hCmd.Parameters.AddWithValue("@EndDate", (object)parsedEnd ?? DBNull.Value);
+                            hCmd.Parameters.AddWithValue("@StartDate", (object)pStart ?? DBNull.Value);
+                            hCmd.Parameters.AddWithValue("@EndDate", (object)pEnd ?? DBNull.Value);
                             hCmd.Parameters.AddWithValue("@CreditCash", (object)CreditCash ?? DBNull.Value);
-                            hCmd.Parameters.AddWithValue("@TotalAmount", totalAmount);
-                            hCmd.Parameters.AddWithValue("@IsCredit", isCredit);
-                            hCmd.Parameters.AddWithValue("@CreatedBy", (object)createdBy);
+                            hCmd.Parameters.AddWithValue("@TotalAmount", total);
+                            hCmd.Parameters.AddWithValue("@IsCredit", jobs.Any(o => o.Credit.HasValue && o.Credit > 0));
+                            hCmd.Parameters.AddWithValue("@CreatedBy", SessionExpire.GetUserID());
                             hCmd.Parameters.AddWithValue("@BillToName", (object)BillToName ?? DBNull.Value);
                             hCmd.Parameters.AddWithValue("@BillToAddress", (object)BillToAddress ?? DBNull.Value);
-
                             invoiceId = Convert.ToInt64(hCmd.ExecuteScalar());
 
                             foreach (var job in jobs)
                             {
-                                var dCmd = new SqlCommand(@"
-                                    INSERT INTO InvoiceDetails
-                                        (InvoiceID,JobCode,JobDate,JobTime,JobFrom,JobTo,
-                                         CustomerName,VehicleName,DrivingByName,JobVendorName,Credit,Cash,Amount)
-                                    VALUES
-                                        (@InvoiceID,@JobCode,@JobDate,@JobTime,@JobFrom,@JobTo,
-                                         @CustomerName,@VehicleName,@DrivingByName,@JobVendorName,@Credit,@Cash,@Amount)",
-                                    conn, tran);
-                                dCmd.Parameters.AddWithValue("@InvoiceID", invoiceId);
-                                dCmd.Parameters.AddWithValue("@JobCode", job.JobCode);
-                                dCmd.Parameters.AddWithValue("@JobDate", (object)job.JobDate ?? DBNull.Value);
-                                dCmd.Parameters.AddWithValue("@JobTime", (object)job.JobTime ?? DBNull.Value);
-                                dCmd.Parameters.AddWithValue("@JobFrom", (object)job.JobFrom ?? DBNull.Value);
-                                dCmd.Parameters.AddWithValue("@JobTo", (object)job.JobTo ?? DBNull.Value);
-                                dCmd.Parameters.AddWithValue("@CustomerName", (object)job.CustomerName ?? DBNull.Value);
-                                dCmd.Parameters.AddWithValue("@VehicleName", (object)job.VehicleName ?? DBNull.Value);
-                                dCmd.Parameters.AddWithValue("@DrivingByName", (object)job.DrivingByName ?? DBNull.Value);
-                                dCmd.Parameters.AddWithValue("@JobVendorName", (object)job.JobVendorName ?? DBNull.Value);
-                                dCmd.Parameters.AddWithValue("@Credit", (object)job.Credit ?? DBNull.Value);
-                                dCmd.Parameters.AddWithValue("@Cash", (object)job.Cash ?? DBNull.Value);
-                                dCmd.Parameters.AddWithValue("@Amount", (object)(job.Credit ?? job.Cash) ?? DBNull.Value);
+                                var dCmd = new SqlCommand(@"INSERT INTO InvoiceDetails(InvoiceID,JobCode,JobDate,JobTime,JobFrom,JobTo,CustomerName,VehicleName,DrivingByName,JobVendorName,Credit,Cash,Amount)VALUES(@IID,@JC,@JD,@JT,@JF,@JTO,@CN,@VN,@DB,@JV,@CR,@CA,@AM)", conn, tran);
+                                dCmd.Parameters.AddWithValue("@IID", invoiceId);
+                                dCmd.Parameters.AddWithValue("@JC", job.JobCode);
+                                dCmd.Parameters.AddWithValue("@JD", (object)job.JobDate ?? DBNull.Value);
+                                dCmd.Parameters.AddWithValue("@JT", (object)job.JobTime ?? DBNull.Value);
+                                dCmd.Parameters.AddWithValue("@JF", (object)job.JobFrom ?? DBNull.Value);
+                                dCmd.Parameters.AddWithValue("@JTO", (object)job.JobTo ?? DBNull.Value);
+                                dCmd.Parameters.AddWithValue("@CN", (object)job.CustomerName ?? DBNull.Value);
+                                dCmd.Parameters.AddWithValue("@VN", (object)job.VehicleName ?? DBNull.Value);
+                                dCmd.Parameters.AddWithValue("@DB", (object)job.DrivingByName ?? DBNull.Value);
+                                dCmd.Parameters.AddWithValue("@JV", (object)job.JobVendorName ?? DBNull.Value);
+                                dCmd.Parameters.AddWithValue("@CR", (object)job.Credit ?? DBNull.Value);
+                                dCmd.Parameters.AddWithValue("@CA", (object)job.Cash ?? DBNull.Value);
+                                dCmd.Parameters.AddWithValue("@AM", (object)(job.Credit ?? job.Cash) ?? DBNull.Value);
                                 dCmd.ExecuteNonQuery();
                             }
-
                             tran.Commit();
                         }
                         catch { tran.Rollback(); throw; }
                     }
                 }
-
                 return Json(new { success = true, invoiceId = invoiceId });
             }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = ex.Message });
-            }
+            catch (Exception ex) { return Json(new { success = false, message = ex.Message }); }
         }
 
+        // ── Create Manual Invoice ─────────────────────────────────────────────
+        [HttpPost]
+        public JsonResult CreateManualInvoice(string BillToName, string BillToAddress,
+            string InvoiceDate, string StartDate, string EndDate,
+            decimal TotalAmount, string Terms, string Description)
+        {
+            try
+            {
+                string[] fmts = { "dd-MMM-yyyy", "dd-MM-yyyy", "MM/dd/yyyy", "yyyy-MM-dd" };
+                DateTime dt;
+                DateTime invDate = CommonRepository.GetTimeZoneDate();
+                DateTime? pStart = null, pEnd = null;
+                if (!string.IsNullOrEmpty(InvoiceDate) && DateTime.TryParseExact(InvoiceDate, fmts, CultureInfo.InvariantCulture, DateTimeStyles.None, out dt)) invDate = dt;
+                if (!string.IsNullOrEmpty(StartDate) && DateTime.TryParseExact(StartDate, fmts, CultureInfo.InvariantCulture, DateTimeStyles.None, out dt)) pStart = dt;
+                if (!string.IsNullOrEmpty(EndDate) && DateTime.TryParseExact(EndDate, fmts, CultureInfo.InvariantCulture, DateTimeStyles.None, out dt)) pEnd = dt;
+
+                long invoiceId = 0;
+                string invNo = "";
+                using (var conn = GetRawConnection())
+                {
+                    conn.Open();
+                    using (var tran = conn.BeginTransaction())
+                    {
+                        try
+                        {
+                            invNo = GenerateInvoiceNo(conn, tran);
+                            var cmd = new SqlCommand(@"
+                                INSERT INTO InvoiceHeaders
+                                    (InvoiceNo,InvoiceDate,BillToName,BillToAddress,
+                                     StartDate,EndDate,CreditCash,TotalAmount,IsCredit,
+                                     CreatedBy,CreatedDate,IsManual,PaymentRemarks)
+                                VALUES
+                                    (@InvoiceNo,@InvoiceDate,@BillToName,@BillToAddress,
+                                     @StartDate,@EndDate,@Terms,@TotalAmount,1,
+                                     @CreatedBy,GETDATE(),1,@Description);
+                                SELECT SCOPE_IDENTITY();", conn, tran);
+
+                            cmd.Parameters.AddWithValue("@InvoiceNo", invNo);
+                            cmd.Parameters.AddWithValue("@InvoiceDate", invDate);
+                            cmd.Parameters.AddWithValue("@BillToName", (object)BillToName ?? DBNull.Value);
+                            cmd.Parameters.AddWithValue("@BillToAddress", (object)BillToAddress ?? DBNull.Value);
+                            cmd.Parameters.AddWithValue("@StartDate", (object)pStart ?? DBNull.Value);
+                            cmd.Parameters.AddWithValue("@EndDate", (object)pEnd ?? DBNull.Value);
+                            cmd.Parameters.AddWithValue("@Terms", string.IsNullOrEmpty(Terms) ? "Credit" : Terms);
+                            cmd.Parameters.AddWithValue("@TotalAmount", TotalAmount);
+                            cmd.Parameters.AddWithValue("@CreatedBy", SessionExpire.GetUserID());
+                            cmd.Parameters.AddWithValue("@Description", (object)Description ?? DBNull.Value);
+                            invoiceId = Convert.ToInt64(cmd.ExecuteScalar());
+                            tran.Commit();
+                        }
+                        catch { tran.Rollback(); throw; }
+                    }
+                }
+                return Json(new { success = true, invoiceId = invoiceId, invoiceNo = invNo });
+            }
+            catch (Exception ex) { return Json(new { success = false, message = ex.Message }); }
+        }
+
+        // ── View Invoice & Receipt ────────────────────────────────────────────
         public ActionResult ViewInvoice(long invoiceId)
         {
             var header = GetInvoiceHeader(invoiceId);
             var details = GetInvoiceDetails(invoiceId);
             if (header == null) return Content("Invoice not found.");
             header.Details = details;
-            decimal gross = details.Sum(d => d.Amount ?? 0);
+            decimal gross = header.IsManual ? header.TotalAmount : details.Sum(d => d.Amount ?? 0);
             ViewBag.Header = header;
             ViewBag.Details = details;
             ViewBag.GrossAmount = gross;
@@ -752,6 +993,7 @@ namespace Transport.Controllers
             return View();
         }
 
+        // ── Delete Invoice ────────────────────────────────────────────────────
         public JsonResult DeleteInvoice(long invoiceId)
         {
             try
@@ -763,10 +1005,9 @@ namespace Transport.Controllers
                     {
                         try
                         {
-                            var c1 = new SqlCommand("DELETE FROM InvoiceDetails WHERE InvoiceID=@ID", conn, tran);
-                            c1.Parameters.AddWithValue("@ID", invoiceId); c1.ExecuteNonQuery();
-                            var c2 = new SqlCommand("DELETE FROM InvoiceHeaders WHERE InvoiceID=@ID", conn, tran);
-                            c2.Parameters.AddWithValue("@ID", invoiceId); c2.ExecuteNonQuery();
+                            new SqlCommand("DELETE FROM InvoicePayments WHERE InvoiceID=@ID", conn, tran) { Parameters = { new SqlParameter("@ID", invoiceId) } }.ExecuteNonQuery();
+                            new SqlCommand("DELETE FROM InvoiceDetails  WHERE InvoiceID=@ID", conn, tran) { Parameters = { new SqlParameter("@ID", invoiceId) } }.ExecuteNonQuery();
+                            new SqlCommand("DELETE FROM InvoiceHeaders  WHERE InvoiceID=@ID", conn, tran) { Parameters = { new SqlParameter("@ID", invoiceId) } }.ExecuteNonQuery();
                             tran.Commit();
                         }
                         catch { tran.Rollback(); throw; }
@@ -777,6 +1018,7 @@ namespace Transport.Controllers
             catch (Exception ex) { return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet); }
         }
 
+        // ── Private Helpers ───────────────────────────────────────────────────
         private InvoiceHeaderModel GetInvoiceHeader(long invoiceId)
         {
             try
@@ -785,32 +1027,18 @@ namespace Transport.Controllers
                 {
                     conn.Open();
                     var cmd = new SqlCommand(@"
-                        SELECT h.*, (SELECT COUNT(*) FROM InvoiceDetails d WHERE d.InvoiceID=h.InvoiceID) AS TotalJobs
+                        SELECT h.*,
+                               (SELECT COUNT(*) FROM InvoiceDetails d WHERE d.InvoiceID=h.InvoiceID) AS TotalJobs,
+                               ISNULL((SELECT SUM(p.PaidAmount) FROM InvoicePayments p WHERE p.InvoiceID=h.InvoiceID),0) AS TotalPaid
                         FROM InvoiceHeaders h WHERE h.InvoiceID=@ID", conn);
                     cmd.Parameters.AddWithValue("@ID", invoiceId);
                     using (var r = cmd.ExecuteReader())
                     {
                         if (r.Read())
                         {
-                            return new InvoiceHeaderModel
-                            {
-                                InvoiceID = Convert.ToInt64(r["InvoiceID"]),
-                                InvoiceNo = r["InvoiceNo"].ToString(),
-                                InvoiceDate = Convert.ToDateTime(r["InvoiceDate"]),
-                                CustomerName = r["CustomerName"] == DBNull.Value ? "" : r["CustomerName"].ToString(),
-                                JobVendorName = r["JobVendorName"] == DBNull.Value ? "" : r["JobVendorName"].ToString(),
-                                DrivingByName = r["DrivingByName"] == DBNull.Value ? "" : r["DrivingByName"].ToString(),
-                                VehicleName = r["VehicleName"] == DBNull.Value ? "" : r["VehicleName"].ToString(),
-                                StartDate = r["StartDate"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(r["StartDate"]),
-                                EndDate = r["EndDate"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(r["EndDate"]),
-                                CreditCash = r["CreditCash"] == DBNull.Value ? "" : r["CreditCash"].ToString(),
-                                TotalAmount = Convert.ToDecimal(r["TotalAmount"]),
-                                IsCredit = Convert.ToBoolean(r["IsCredit"]),
-                                CreatedDate = Convert.ToDateTime(r["CreatedDate"]),
-                                TotalJobs = r["TotalJobs"] == DBNull.Value ? 0 : Convert.ToInt32(r["TotalJobs"]),
-                                BillToName = r["BillToName"] == DBNull.Value ? "" : r["BillToName"].ToString(),
-                                BillToAddress = r["BillToAddress"] == DBNull.Value ? "" : r["BillToAddress"].ToString()
-                            };
+                            var h = MapHeader(r);
+                            h.TotalPaid = r["TotalPaid"] == DBNull.Value ? 0 : Convert.ToDecimal(r["TotalPaid"]);
+                            return h;
                         }
                     }
                 }
@@ -830,9 +1058,7 @@ namespace Transport.Controllers
                     var cmd = new SqlCommand("SELECT * FROM InvoiceDetails WHERE InvoiceID=@ID ORDER BY JobDate,JobTime", conn);
                     cmd.Parameters.AddWithValue("@ID", invoiceId);
                     using (var r = cmd.ExecuteReader())
-                    {
                         while (r.Read())
-                        {
                             list.Add(new InvoiceDetailModel
                             {
                                 InvoiceDetailID = Convert.ToInt64(r["InvoiceDetailID"]),
@@ -848,50 +1074,86 @@ namespace Transport.Controllers
                                 JobVendorName = r["JobVendorName"] == DBNull.Value ? "" : r["JobVendorName"].ToString(),
                                 Credit = r["Credit"] == DBNull.Value ? (decimal?)null : Convert.ToDecimal(r["Credit"]),
                                 Cash = r["Cash"] == DBNull.Value ? (decimal?)null : Convert.ToDecimal(r["Cash"]),
-                                Amount = r["Amount"] == DBNull.Value ? (decimal?)null : Convert.ToDecimal(r["Amount"]),
+                                Amount = r["Amount"] == DBNull.Value ? (decimal?)null : Convert.ToDecimal(r["Amount"])
                             });
-                        }
-                    }
                 }
             }
             catch { }
             return list;
         }
 
-        private string InvDecimalToWords(decimal number)
+        private InvoiceHeaderModel MapHeader(System.Data.SqlClient.SqlDataReader r)
         {
-            if (number == 0) return "zero";
-            if (number < 0) return "minus " + InvDecimalToWords(Math.Abs(number));
-            int intPortion = (int)number; int decPortion = (int)((number - intPortion) * 100);
-            string words = InvNumberToWords(intPortion);
-            if (decPortion > 0) words += " and " + InvNumberToWords(decPortion) + " cents";
-            return words;
+            Func<string, string> str = col => {
+                try { return r[col] == DBNull.Value ? "" : r[col].ToString(); } catch { return ""; }
+            };
+            Func<string, decimal> dec = col => {
+                try { return r[col] == DBNull.Value ? 0m : Convert.ToDecimal(r[col]); } catch { return 0m; }
+            };
+            Func<string, DateTime?> ndt = col => {
+                try { return r[col] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(r[col]); } catch { return null; }
+            };
+            Func<string, bool> boo = col => {
+                try { return r[col] != DBNull.Value && Convert.ToBoolean(r[col]); } catch { return false; }
+            };
+            Func<string, int> cnt = col => {
+                try { return r[col] == DBNull.Value ? 0 : Convert.ToInt32(r[col]); } catch { return 0; }
+            };
+
+            return new InvoiceHeaderModel
+            {
+                InvoiceID = Convert.ToInt64(r["InvoiceID"]),
+                InvoiceNo = str("InvoiceNo"),
+                InvoiceDate = Convert.ToDateTime(r["InvoiceDate"]),
+                CustomerName = str("CustomerName"),
+                JobVendorName = str("JobVendorName"),
+                DrivingByName = str("DrivingByName"),
+                VehicleName = str("VehicleName"),
+                StartDate = ndt("StartDate"),
+                EndDate = ndt("EndDate"),
+                CreditCash = str("CreditCash"),
+                TotalAmount = dec("TotalAmount"),
+                IsCredit = boo("IsCredit"),
+                CreatedDate = Convert.ToDateTime(r["CreatedDate"]),
+                TotalJobs = cnt("TotalJobs"),
+                BillToName = str("BillToName"),
+                BillToAddress = str("BillToAddress"),
+                IsManual = boo("IsManual")
+            };
         }
 
-        private string InvNumberToWords(int number)
+        private string InvDecimalToWords(decimal n)
         {
-            if (number == 0) return "zero"; if (number < 0) return "minus " + InvNumberToWords(Math.Abs(number));
-            string words = "";
-            if ((number / 1000000) > 0) { words += InvNumberToWords(number / 1000000) + " million "; number %= 1000000; }
-            if ((number / 1000) > 0) { words += InvNumberToWords(number / 1000) + " thousand "; number %= 1000; }
-            if ((number / 100) > 0) { words += InvNumberToWords(number / 100) + " hundred "; number %= 100; }
-            if (number > 0)
+            if (n == 0) return "zero"; if (n < 0) return "minus " + InvDecimalToWords(Math.Abs(n));
+            int i = (int)n, d = (int)((n - i) * 100);
+            string w = InvNumberToWords(i);
+            if (d > 0) w += " and " + InvNumberToWords(d) + " cents";
+            return w;
+        }
+        private string InvNumberToWords(int n)
+        {
+            if (n == 0) return "zero"; if (n < 0) return "minus " + InvNumberToWords(Math.Abs(n));
+            string w = "";
+            if (n / 1000000 > 0) { w += InvNumberToWords(n / 1000000) + " million "; n %= 1000000; }
+            if (n / 1000 > 0) { w += InvNumberToWords(n / 1000) + " thousand "; n %= 1000; }
+            if (n / 100 > 0) { w += InvNumberToWords(n / 100) + " hundred "; n %= 100; }
+            if (n > 0)
             {
-                if (words != "") words += "and ";
+                if (w != "") w += "and ";
                 var u = new[] { "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen" };
                 var t = new[] { "zero", "ten", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety" };
-                if (number < 20) words += u[number]; else { words += t[number / 10]; if ((number % 10) > 0) words += "-" + u[number % 10]; }
+                if (n < 20) w += u[n]; else { w += t[n / 10]; if (n % 10 > 0) w += "-" + u[n % 10]; }
             }
-            return words;
+            return w;
         }
-
-        private string InvConvertToCamelCase(string input)
+        private string InvConvertToCamelCase(string s)
         {
-            var words = input.Split(' ');
+            var words = s.Split(' ');
             for (int i = 1; i < words.Length; i++) if (words[i].Length > 0) words[i] = char.ToUpper(words[i][0]) + words[i].Substring(1);
             return string.Join(" ", words);
         }
 
         #endregion
+
     }
 }

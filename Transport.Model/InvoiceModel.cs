@@ -25,33 +25,31 @@ namespace Transport.Model
         public int? CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
         public int TotalJobs { get; set; }
-
-        // Bill To — manually entered when generating invoice
         public string BillToName { get; set; }
         public string BillToAddress { get; set; }
+        public bool IsManual { get; set; }
+        public string PaymentRemarks { get; set; }
+
+        // Payment tracking (computed from InvoicePayments table)
+        public decimal TotalPaid { get; set; }
+        public decimal BalanceAmount { get { return TotalAmount - TotalPaid; } }
+        public string PaymentStatus
+        {
+            get
+            {
+                if (TotalPaid <= 0) return "Unpaid";
+                if (TotalPaid >= TotalAmount) return "Paid";
+                return "Partial";
+            }
+        }
 
         public List<InvoiceDetailModel> Details { get; set; }
 
-        public string DisplayInvoiceDate
-        {
-            get { return InvoiceDate.ToString("dd-MMM-yyyy"); }
-        }
-        public string DisplayStartDate
-        {
-            get { return StartDate.HasValue ? StartDate.Value.ToString("dd-MMM-yyyy") : ""; }
-        }
-        public string DisplayEndDate
-        {
-            get { return EndDate.HasValue ? EndDate.Value.ToString("dd-MMM-yyyy") : ""; }
-        }
-        public string DisplayShortStartDate
-        {
-            get { return StartDate.HasValue ? StartDate.Value.ToString("d/M/yy") : ""; }
-        }
-        public string DisplayShortEndDate
-        {
-            get { return EndDate.HasValue ? EndDate.Value.ToString("d/M/yy") : ""; }
-        }
+        public string DisplayInvoiceDate { get { return InvoiceDate.ToString("dd-MMM-yyyy"); } }
+        public string DisplayStartDate { get { return StartDate.HasValue ? StartDate.Value.ToString("dd-MMM-yyyy") : ""; } }
+        public string DisplayEndDate { get { return EndDate.HasValue ? EndDate.Value.ToString("dd-MMM-yyyy") : ""; } }
+        public string DisplayShortStartDate { get { return StartDate.HasValue ? StartDate.Value.ToString("d/M/yy") : ""; } }
+        public string DisplayShortEndDate { get { return EndDate.HasValue ? EndDate.Value.ToString("d/M/yy") : ""; } }
     }
 
     public class InvoiceDetailModel
@@ -71,13 +69,6 @@ namespace Transport.Model
         public decimal? Cash { get; set; }
         public decimal? Amount { get; set; }
 
-        public string DisplayJobDate
-        {
-            get { return JobDate.HasValue ? JobDate.Value.ToString("d/M/yyyy") : ""; }
-        }
-        public string DisplayJobTime
-        {
-            get { return JobDate.HasValue ? JobDate.Value.ToString("HH:mm") : ""; }
-        }
+        public string DisplayJobDate { get { return JobDate.HasValue ? JobDate.Value.ToString("d/M/yyyy") : ""; } }
     }
 }
