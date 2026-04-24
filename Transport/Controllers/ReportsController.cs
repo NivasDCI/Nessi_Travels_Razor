@@ -488,6 +488,7 @@ namespace Transport.Controllers
         // INVOICE ACTIONS
         // =====================================================================
 
+
         #region "Invoice"
 
         // ── DB Connection (reads from Web.config EF string) ─────────────────
@@ -520,7 +521,7 @@ namespace Transport.Controllers
 
         // ── Dashboard cards ───────────────────────────────────────────────────
         [HttpGet]
-        public JsonResult InvoiceDashboard()
+        public JsonResult InvoiceDashboard(string VendorName)
         {
             try
             {
@@ -529,10 +530,17 @@ namespace Transport.Controllers
                     conn.Open();
                     var cmd = new SqlCommand(@"
                         SELECT
-                            ISNULL(SUM(h.TotalAmount), 0) AS TotalInvoiced,
-                            ISNULL(SUM(ISNULL((SELECT SUM(p.PaidAmount) FROM InvoicePayments p WHERE p.InvoiceID = h.InvoiceID), 0)), 0) AS TotalCollected,
-                            COUNT(*) AS TotalInvoices
-                        FROM InvoiceHeaders h", conn);
+                            ISNULL(SUM(h.TotalAmount), 0)       AS TotalInvoiced,
+                            ISNULL(SUM(ISNULL(pay.Paid, 0)), 0) AS TotalCollected,
+                            COUNT(*)                             AS TotalInvoices
+                        FROM InvoiceHeaders h
+                        LEFT JOIN (
+                            SELECT InvoiceID, SUM(PaidAmount) AS Paid
+                            FROM InvoicePayments
+                            GROUP BY InvoiceID
+                        ) pay ON pay.InvoiceID = h.InvoiceID
+                        WHERE (@VendorName IS NULL OR h.JobVendorName LIKE '%'+@VendorName+'%')", conn);
+                    cmd.Parameters.AddWithValue("@VendorName", string.IsNullOrEmpty(VendorName) ? (object)DBNull.Value : VendorName);
                     using (var r = cmd.ExecuteReader())
                     {
                         if (r.Read())
@@ -593,11 +601,19 @@ namespace Transport.Controllers
                     if (pFrom.HasValue)
                     {
                         var prevCmd = new SqlCommand(@"
-                            SELECT ISNULL(SUM(h.TotalAmount - ISNULL((SELECT SUM(p.PaidAmount) FROM InvoicePayments p WHERE p.InvoiceID=h.InvoiceID),0)),0)
-                            FROM InvoiceHeaders h
-                            WHERE CAST(h.InvoiceDate AS DATE) < CAST(@FromDate AS DATE)
-                              AND (@VendorName IS NULL OR h.JobVendorName LIKE '%'+@VendorName+'%')
-                              AND ISNULL((SELECT SUM(p.PaidAmount) FROM InvoicePayments p WHERE p.InvoiceID=h.InvoiceID),0) < h.TotalAmount", conn);
+                            SELECT ISNULL(SUM(x.Balance), 0)
+                            FROM (
+                                SELECT h.TotalAmount - ISNULL(pay.Paid, 0) AS Balance
+                                FROM InvoiceHeaders h
+                                LEFT JOIN (
+                                    SELECT InvoiceID, SUM(PaidAmount) AS Paid
+                                    FROM InvoicePayments
+                                    GROUP BY InvoiceID
+                                ) pay ON pay.InvoiceID = h.InvoiceID
+                                WHERE CAST(h.InvoiceDate AS DATE) < CAST(@FromDate AS DATE)
+                                  AND (@VendorName IS NULL OR h.JobVendorName LIKE '%'+@VendorName+'%')
+                                  AND ISNULL(pay.Paid, 0) < h.TotalAmount
+                            ) x", conn);
                         prevCmd.Parameters.AddWithValue("@FromDate", pFrom.Value);
                         prevCmd.Parameters.AddWithValue("@VendorName", string.IsNullOrEmpty(VendorName) ? (object)DBNull.Value : VendorName);
                         prevBalance = Convert.ToDecimal(prevCmd.ExecuteScalar());
@@ -605,10 +621,15 @@ namespace Transport.Controllers
 
                     var cmd = new SqlCommand(@"
                         SELECT
-                            ISNULL(SUM(h.TotalAmount),0) AS TotalInvoiced,
-                            ISNULL(SUM(ISNULL((SELECT SUM(p.PaidAmount) FROM InvoicePayments p WHERE p.InvoiceID=h.InvoiceID),0)),0) AS TotalPaid,
-                            COUNT(*) AS InvoiceCount
+                            ISNULL(SUM(h.TotalAmount), 0)       AS TotalInvoiced,
+                            ISNULL(SUM(ISNULL(pay.Paid, 0)), 0) AS TotalPaid,
+                            COUNT(*)                             AS InvoiceCount
                         FROM InvoiceHeaders h
+                        LEFT JOIN (
+                            SELECT InvoiceID, SUM(PaidAmount) AS Paid
+                            FROM InvoicePayments
+                            GROUP BY InvoiceID
+                        ) pay ON pay.InvoiceID = h.InvoiceID
                         WHERE (@VendorName IS NULL OR h.JobVendorName LIKE '%'+@VendorName+'%')
                           AND (@FromDate IS NULL OR CAST(h.InvoiceDate AS DATE) >= CAST(@FromDate AS DATE))
                           AND (@ToDate   IS NULL OR CAST(h.InvoiceDate AS DATE) <= CAST(@ToDate   AS DATE))", conn);

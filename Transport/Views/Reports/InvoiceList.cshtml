@@ -57,18 +57,23 @@ $.ajax({type:"GET",url:BaseURL+"Common/Load_SystemUserDetail",datatype:"Json",su
 }});
 
 // ── Dashboard cards ──────────────────────────────────────────────────
-function LoadDashboard(){
-    $.ajax({url:BaseURL+"Reports/InvoiceDashboard",type:"GET",dataType:"json",
+function LoadDashboard(vendorName){
+    var vn = vendorName || "";
+    $.ajax({url:BaseURL+"Reports/InvoiceDashboard",type:"GET",
+        data:{VendorName:vn},
+        dataType:"json",
         success:function(r){
-            if(!r.success) return;
+            if(!r.success){ console.error("Dashboard error:",r.message); return; }
             $("#dashInvoiced").text("$"+parseFloat(r.TotalInvoiced||0).toFixed(2));
             $("#dashCollected").text("$"+parseFloat(r.TotalCollected||0).toFixed(2));
             $("#dashPending").text("$"+parseFloat(r.TotalPending||0).toFixed(2));
-            $("#dashCount").text(r.TotalInvoices+" invoices");
-        }
+            var label = vn ? vn : "all vendors";
+            $("#dashCount").text(r.TotalInvoices+" invoice"+(r.TotalInvoices!==1?"s":"")+" — "+label);
+        },
+        error:function(xhr){ console.error("Dashboard AJAX failed",xhr.status,xhr.statusText); }
     });
 }
-LoadDashboard();
+LoadDashboard("");
 
 // ── Grid ─────────────────────────────────────────────────────────────
 GrdInv = $("#GrdInv").grid({
@@ -132,6 +137,12 @@ GrdInv.on("dataBound",function(e,records){
     $("#sumBal").text("$"+bal.toFixed(2));
 });
 
+// ── Current vendor helper ────────────────────────────────────────────
+function currentVendor(){
+    var sel=$("#ddlVendorFilter").val();
+    return sel?sel.split("|")[1]:"";
+}
+
 // ── Search / Clear ────────────────────────────────────────────────────
 function DoSearch(){
     var vendorSel=$("#ddlVendorFilter").val();
@@ -145,11 +156,14 @@ function DoSearch(){
         PaymentStatus: $("#ddlPayFilter").val(),
         VendorName:    vendorName
     });
+    // Refresh cards to reflect the selected vendor
+    LoadDashboard(vendorName);
 }
 function DoClear(){
     $("#txtBillTo,#txtInvNo,#TxtFromDate,#TxtToDate").val("");
     $("#ddlPayFilter,#ddlVendorFilter").val("");
     GrdInv.reload({});
+    LoadDashboard("");  // Reset cards to show all vendors
 }
 document.onkeydown=function(e){if((e?e.which:event.keyCode)===13){DoSearch();return false;}};
 $("#btnSearch").click(DoSearch);
@@ -220,7 +234,7 @@ function LoadPayHistory(id){
 function DelPay(pid){
     if(!confirm("Delete this payment record?")) return;
     $.ajax({url:BaseURL+"Reports/DeletePayment",type:"POST",data:{PaymentID:pid},dataType:"json",
-        success:function(r){ if(r.success){ LoadPayHistory(_payInvID); GrdInv.reload(); LoadDashboard(); } }
+        success:function(r){ if(r.success){ LoadPayHistory(_payInvID); GrdInv.reload(); LoadDashboard(currentVendor()); } }
     });
 }
 function ResetPayForm(){
@@ -259,7 +273,7 @@ $("#btnRecordPay").click(function(){
                 _payBalance=parseFloat(r.balance||0);
                 $("#payInvPaid").text("$"+parseFloat(r.totalPaid||0).toFixed(2));
                 $("#payInvBal").text("$"+parseFloat(r.balance||0).toFixed(2));
-                ResetPayForm(); LoadPayHistory(_payInvID); GrdInv.reload(); LoadDashboard();
+                ResetPayForm(); LoadPayHistory(_payInvID); GrdInv.reload(); LoadDashboard(currentVendor());
             } else { alert("Error: "+r.message); }
         },
         error:function(xhr){
@@ -319,7 +333,7 @@ $("#btnSaveManual").click(function(){
             if(r.success){
                 $("#modalCreate").modal("hide");
                 GrdInv.reload();
-                LoadDashboard();
+                LoadDashboard(currentVendor());
                 // Open invoice view immediately - manual so isManual=true, no sheet
                 setTimeout(function(){ OpenDocModal(r.invoiceId, r.invoiceNo, true, 0); }, 500);
             } else {
@@ -376,7 +390,7 @@ $("#btnGenSummary").click(function(){
 function DelInv(id,no){
     if(!confirm("Delete invoice "+no+"? This cannot be undone.")) return;
     $.ajax({url:BaseURL+"Reports/DeleteInvoice",type:"POST",data:{invoiceId:id},dataType:"json",
-        success:function(r){ if(r.success){ GrdInv.reload(); LoadDashboard(); } else alert("Delete failed."); }
+        success:function(r){ if(r.success){ GrdInv.reload(); LoadDashboard(currentVendor()); } else alert("Delete failed."); }
     });
 }
 </script>
