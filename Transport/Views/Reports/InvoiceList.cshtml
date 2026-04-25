@@ -349,42 +349,181 @@ $("#btnSaveManual").click(function(){
 
 // ── Summary ────────────────────────────────────────────────────────────
 $("#btnSummary").click(function(){
-    LoadVendors(); // ensure populated
+    LoadVendors();
     var d=new Date(), mn=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
     function p(n){return n<10?"0"+n:n;}
     var first="01-"+mn[d.getMonth()]+"-"+d.getFullYear();
     var last=p(new Date(d.getFullYear(),d.getMonth()+1,0).getDate())+"-"+mn[d.getMonth()]+"-"+d.getFullYear();
     $("#txtSumFrom").val(first); $("#txtSumTo").val(last);
-    $("#sumResult").hide();
     $("#modalSummary").modal("show");
 });
 $("#btnGenSummary").click(function(){
     var vendorSel=$("#ddlSumVendor").val();
     var vendorName=vendorSel?vendorSel.split("|")[1]:"";
+    if(!vendorName){alert("Please select a vendor to generate the account statement.");return;}
     var $btn=$(this).prop("disabled",true).text("Loading...");
     $.ajax({url:BaseURL+"Reports/InvoiceSummary",type:"GET",
         data:{VendorName:vendorName, FromDate:$("#txtSumFrom").val(), ToDate:$("#txtSumTo").val()},
         dataType:"json",
         success:function(r){
-            $btn.prop("disabled",false).text("Generate Summary");
+            $btn.prop("disabled",false).text("Generate Statement");
             if(!r.success){alert("Error: "+(r.message||"Failed"));return;}
-            $("#sumResVendor").text(r.VendorName);
-            $("#sumResPeriod").text(r.FromDate+" to "+r.ToDate);
-            $("#sumResCount").text(r.InvoiceCount);
-            $("#sumResTotalInv").text("$"+parseFloat(r.TotalInvoiced).toFixed(2));
-            $("#sumResTotalPaid").text("$"+parseFloat(r.TotalPaid).toFixed(2));
-            $("#sumResTotalPend").text("$"+parseFloat(r.TotalPending).toFixed(2));
-            if(parseFloat(r.PrevBalance)>0){
-                $("#prevBalRow").show();
-                $("#sumResPrevBal").text("$"+parseFloat(r.PrevBalance).toFixed(2));
-                $("#sumResGrand").text("$"+parseFloat(r.GrandTotal).toFixed(2));
-                $("#grandRow").show();
-            } else { $("#prevBalRow,#grandRow").hide(); }
-            $("#sumResult").show();
+            $("#modalSummary").modal("hide");
+            // Open printable statement in new window
+            OpenVendorStatement(r);
         },
-        error:function(){ $btn.prop("disabled",false).text("Generate Summary"); alert("Server error."); }
+        error:function(xhr){
+            $btn.prop("disabled",false).text("Generate Statement");
+            alert("Server error "+xhr.status+". Please rebuild the project.");
+        }
     });
 });
+
+function OpenVendorStatement(r){
+    var w = window.open("", "vendorStatement", "width=1100,height=850,scrollbars=yes");
+    var prevBal = parseFloat(r.PrevBalance||0);
+    var totalInv = parseFloat(r.TotalInvoiced||0);
+    var totalPaid = parseFloat(r.TotalPaid||0);
+    var periodBal = parseFloat(r.TotalPending||0);
+    var grandTotal = parseFloat(r.GrandTotal||0);
+    function fmt(n){ return parseFloat(n||0).toLocaleString("en-SG",{minimumFractionDigits:2,maximumFractionDigits:2}); }
+
+    var rows = r.Rows || [];
+    var rowsHtml = "";
+    rows.forEach(function(row, i){
+        var rem = row.Remarks||"";
+        var remColor = rem==="Paid in Full"?"#1a7a3c": rem==="Partial Payment"?"#7a5c00":"#7a0000";
+        rowsHtml += '<tr>'
+            +'<td>'+(i+2)+'</td>'
+            +'<td>'+row.InvoiceDate+'</td>'
+            +'<td style="text-align:center;">Invoice</td>'
+            +'<td style="text-align:center;">'+row.InvoiceNo+'</td>'
+            +'<td style="text-align:right;">'+fmt(row.TotalAmount)+'</td>'
+            +'<td style="text-align:right;">'+fmt(row.Paid)+'</td>'
+            +'<td style="text-align:right;">'+(parseFloat(row.Balance)>0?fmt(row.Balance):"0.00")+'</td>'
+            +'<td style="text-align:center;color:'+remColor+';font-weight:600;">'+rem+'</td>'
+            +'</tr>';
+    });
+
+    var html = '<!DOCTYPE html><html><head>'
+        +'<meta charset="utf-8"/>'
+        +'<title>Vendor Account Summary - '+r.VendorName+'</title>'
+        +'<style>'
+        +'*{margin:0;padding:0;box-sizing:border-box;}'
+        +'body{font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#222;background:#fff;}'
+        +'.page{max-width:1050px;margin:0 auto;padding:30px 40px;}'
+        +'.no-print{text-align:right;margin-bottom:18px;}'
+        +'.no-print button{padding:7px 20px;border:1px solid #555;background:#fff;border-radius:4px;'
+        +'  cursor:pointer;font-size:13px;margin-left:8px;}'
+        +'.no-print button:hover{background:#f0f0f0;}'
+        +'h1{text-align:center;font-size:22px;font-weight:900;letter-spacing:1px;'
+        +'   text-transform:uppercase;margin-bottom:22px;border-bottom:2px solid #333;padding-bottom:12px;}'
+        +'.info-grid{display:table;width:100%;margin-bottom:20px;}'
+        +'.info-left{display:table-cell;width:55%;vertical-align:top;}'
+        +'.info-right{display:table-cell;width:45%;vertical-align:top;text-align:right;}'
+        +'.info-row{display:flex;margin-bottom:5px;font-size:12px;}'
+        +'.info-label{min-width:100px;font-weight:bold;color:#444;}'
+        +'.info-sep{margin:0 8px;color:#999;}'
+        +'.info-val{color:#222;}'
+        +'.info-right .info-row{justify-content:flex-end;}'
+        +'table{width:100%;border-collapse:collapse;margin-bottom:0;font-size:12px;}'
+        +'th{background:#f0f0f0;border:1px solid #bbb;padding:8px 10px;font-weight:bold;'
+        +'   text-align:center;font-size:11.5px;color:#333;}'
+        +'td{border:1px solid #ccc;padding:7px 10px;color:#333;}'
+        +'tr:nth-child(even) td{background:#fafafa;}'
+        +'.row-opening td{background:#fffdf0!important;font-weight:600;}'
+        +'.row-total td{background:#f0f0f0;font-weight:bold;border-top:2px solid #555;}'
+        +'.note-box{border:1px solid #ccc;background:#f9f9f9;padding:12px 16px;'
+        +'          margin-top:14px;font-size:12px;}'
+        +'.footer-sig{display:table;width:100%;margin-top:35px;}'
+        +'.sig-left{display:table-cell;width:50%;vertical-align:bottom;}'
+        +'.sig-right{display:table-cell;width:50%;text-align:right;vertical-align:bottom;'
+        +'           font-style:italic;color:#555;font-size:12px;}'
+        +'.sig-line{border-top:1px solid #555;width:180px;margin-top:38px;margin-bottom:4px;}'
+        +'.sig-label{font-size:11px;font-weight:bold;color:#444;}'
+        +'@@media print{.no-print{display:none!important;}'
+        +'  body{font-size:11px;} .page{padding:15px 20px;}}'
+        +'</style></head><body>'
+        +'<div class="page">'
+        +'<div class="no-print">'
+        +'  <button onclick="window.print()">&#128438; Print</button>'
+        +'  <button onclick="window.print()">&#128229; Download PDF</button>'
+        +'</div>'
+        +'<h1>Vendor Account Summary</h1>'
+        +'<div class="info-grid">'
+        +'  <div class="info-left">'
+        +'    <div class="info-row"><span class="info-label">Vendor Name</span><span class="info-sep">:</span><span class="info-val"><strong>'+r.VendorName+'</strong></span></div>'
+        +(r.VendorContact?'<div class="info-row"><span class="info-label">Phone</span><span class="info-sep">:</span><span class="info-val">'+r.VendorContact+'</span></div>':'')
+        +(r.VendorAddress?'<div class="info-row"><span class="info-label">Address</span><span class="info-sep">:</span><span class="info-val">'+r.VendorAddress+'</span></div>':'')
+        +'  </div>'
+        +'  <div class="info-right">'
+        +(r.FromDate?'<div class="info-row"><span class="info-label">Start Date</span><span class="info-sep">:</span><span class="info-val">'+r.FromDate+'</span></div>':'')
+        +(r.ToDate?'<div class="info-row"><span class="info-label">End Date</span><span class="info-sep">:</span><span class="info-val">'+r.ToDate+'</span></div>':'')
+        +'<div class="info-row"><span class="info-label">Generated On</span><span class="info-sep">:</span><span class="info-val">'+r.GeneratedOn+'</span></div>'
+        +'  </div>'
+        +'</div>'
+        +'<table>'
+        +'<thead><tr>'
+        +'  <th style="width:4%">S.No</th>'
+        +'  <th style="width:9%">Date</th>'
+        +'  <th style="width:13%">Particulars</th>'
+        +'  <th style="width:11%">Invoice No</th>'
+        +'  <th style="width:13%;text-align:right;">Invoice Amount ($)</th>'
+        +'  <th style="width:13%;text-align:right;">Amount Collected ($)</th>'
+        +'  <th style="width:11%;text-align:right;">Balance ($)</th>'
+        +'  <th style="width:12%">Remarks</th>'
+        +'</tr></thead>'
+        +'<tbody>';
+
+    // Opening balance row
+    if(prevBal > 0){
+        html += '<tr class="row-opening">'
+            +'<td>1</td>'
+            +'<td>'+(r.PrevDate||"&mdash;")+'</td>'
+            +'<td>Opening Balance (Previous Pending)</td>'
+            +'<td style="text-align:center;">&mdash;</td>'
+            +'<td style="text-align:right;">'+fmt(prevBal)+'</td>'
+            +'<td style="text-align:right;">0.00</td>'
+            +'<td style="text-align:right;">'+fmt(prevBal)+'</td>'
+            +'<td style="text-align:center;color:#7a5c00;font-weight:600;">Previous Pending</td>'
+            +'</tr>';
+    }
+
+    html += rowsHtml
+        +'</tbody>'
+        +'<tfoot>'
+        +'<tr class="row-total">'
+        +'  <td colspan="4" style="text-align:center;">TOTAL (Current Period)</td>'
+        +'  <td style="text-align:right;">'+fmt(totalInv)+'</td>'
+        +'  <td style="text-align:right;">'+fmt(totalPaid)+'</td>'
+        +'  <td style="text-align:right;">'+fmt(periodBal)+'</td>'
+        +'  <td style="text-align:center;">&mdash;</td>'
+        +'</tr>'
+        +'</tfoot>'
+        +'</table>';
+
+    // Note
+    if(prevBal > 0){
+        html += '<div class="note-box">'
+            +'<strong>Note:</strong> Opening Balance ($'+fmt(prevBal)+')'
+            +' + Current Period Balance ($'+fmt(periodBal)+')'
+            +' = Closing Balance (<strong>$'+fmt(grandTotal)+'</strong>)'
+            +'</div>';
+    }
+
+    html += '<div class="footer-sig">'
+        +'<div class="sig-left">'
+        +'  <div class="sig-line"></div>'
+        +'  <div class="sig-label">Authorized Signatory</div>'
+        +'</div>'
+        +'<div class="sig-right">Thank you for your business!</div>'
+        +'</div>'
+        +'</div></body></html>';
+
+    w.document.open();
+    w.document.write(html);
+    w.document.close();
+}
 
 // ── Delete Invoice ──────────────────────────────────────────────────────
 function DelInv(id,no){
@@ -622,15 +761,16 @@ function DelInv(id,no){
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header modal-hd">
-                <h5 class="modal-title"><i class="fa fa-chart-bar"></i> &nbsp;Invoice Summary</h5>
+                <h5 class="modal-title"><i class="fa fa-chart-bar"></i> &nbsp;Vendor Account Statement</h5>
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label>Vendor</label>
+                    <label><strong>Vendor *</strong></label>
                     <select id="ddlSumVendor" class="form-control">
-                        <option value="">All Vendors</option>
+                        <option value="">-- Select Vendor --</option>
                     </select>
+                    <small class="text-muted">A vendor must be selected to generate the account statement.</small>
                 </div>
                 <div class="row">
                     <div class="col-sm-6">
@@ -646,51 +786,17 @@ function DelInv(id,no){
                         </div>
                     </div>
                 </div>
-                <button type="button" id="btnGenSummary" class="btn btn-primary btn-block">
-                    <i class="fa fa-search"></i> Generate Summary
-                </button>
-                <div id="sumResult" style="display:none;margin-top:14px;">
-                    <hr style="margin-top:0;"/>
-                    <div style="text-align:center;margin-bottom:10px;">
-                        <strong id="sumResVendor"></strong><br/>
-                        <small class="text-muted" id="sumResPeriod"></small>
-                    </div>
-                    <div id="prevBalRow" class="sum-prev" style="display:none;">
-                        <i class="fa fa-exclamation-circle text-warning"></i>
-                        <strong>Previous Month Balance (carried forward):</strong>
-                        <span id="sumResPrevBal" style="color:#c0392b;font-weight:bold;float:right;"></span>
-                        <div style="clear:both;"></div>
-                        <small class="text-muted">Unpaid invoices from before the selected period</small>
-                    </div>
-                    <table class="table table-sm" style="font-size:13px;">
-                        <tr>
-                            <td>Total Invoices</td>
-                            <td class="text-right"><strong id="sumResCount"></strong></td>
-                        </tr>
-                        <tr>
-                            <td>Total Invoiced</td>
-                            <td class="text-right"><strong class="inv-amt" id="sumResTotalInv"></strong></td>
-                        </tr>
-                        <tr>
-                            <td>Total Paid</td>
-                            <td class="text-right"><strong style="color:#27ae60;" id="sumResTotalPaid"></strong></td>
-                        </tr>
-                        <tr>
-                            <td>Total Pending</td>
-                            <td class="text-right"><strong class="bal-amt" id="sumResTotalPend"></strong></td>
-                        </tr>
-                        <tr id="grandRow" style="display:none;">
-                            <td><strong>Grand Total Due (incl. previous balance)</strong></td>
-                            <td class="text-right"><strong class="bal-amt" style="font-size:16px;" id="sumResGrand"></strong></td>
-                        </tr>
-                    </table>
-                    <button class="btn btn-outline-secondary btn-sm btn-block" onclick="window.print()">
-                        <i class="fa fa-print"></i> Print this Summary
-                    </button>
+                <div class="alert alert-info" style="font-size:12px;margin-bottom:0;">
+                    <i class="fa fa-info-circle"></i>
+                    Generates a printable A4 account statement with opening balance, all invoices,
+                    payment status, and closing balance. Opens in a new window.
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
+                <button type="button" id="btnGenSummary" class="btn btn-primary">
+                    <i class="fa fa-file-alt"></i> Generate Statement
+                </button>
             </div>
         </div>
     </div>

@@ -488,7 +488,6 @@ namespace Transport.Controllers
         // INVOICE ACTIONS
         // =====================================================================
 
-
         #region "Invoice"
 
         // ── DB Connection (reads from Web.config EF string) ─────────────────
@@ -596,69 +595,122 @@ namespace Transport.Controllers
                 using (var conn = GetRawConnection())
                 {
                     conn.Open();
-                    // Previous balance: invoices before FromDate that are not fully paid
+
+                    // ── Previous balance (unpaid invoices before start date) ──
                     decimal prevBalance = 0;
+                    string prevInvDate = "";
                     if (pFrom.HasValue)
                     {
                         var prevCmd = new SqlCommand(@"
-                            SELECT ISNULL(SUM(x.Balance), 0)
+                            SELECT ISNULL(SUM(sub.Balance), 0), MAX(sub.InvDate)
                             FROM (
-                                SELECT h.TotalAmount - ISNULL(pay.Paid, 0) AS Balance
+                                SELECT h.TotalAmount - ISNULL(pay.Paid, 0) AS Balance,
+                                       CONVERT(VARCHAR(10), h.InvoiceDate, 103) AS InvDate
                                 FROM InvoiceHeaders h
                                 LEFT JOIN (
                                     SELECT InvoiceID, SUM(PaidAmount) AS Paid
-                                    FROM InvoicePayments
-                                    GROUP BY InvoiceID
+                                    FROM InvoicePayments GROUP BY InvoiceID
                                 ) pay ON pay.InvoiceID = h.InvoiceID
                                 WHERE CAST(h.InvoiceDate AS DATE) < CAST(@FromDate AS DATE)
                                   AND (@VendorName IS NULL OR h.JobVendorName LIKE '%'+@VendorName+'%')
                                   AND ISNULL(pay.Paid, 0) < h.TotalAmount
-                            ) x", conn);
+                            ) sub", conn);
                         prevCmd.Parameters.AddWithValue("@FromDate", pFrom.Value);
                         prevCmd.Parameters.AddWithValue("@VendorName", string.IsNullOrEmpty(VendorName) ? (object)DBNull.Value : VendorName);
-                        prevBalance = Convert.ToDecimal(prevCmd.ExecuteScalar());
+                        using (var pr = prevCmd.ExecuteReader())
+                        {
+                            if (pr.Read())
+                            {
+                                prevBalance = pr[0] == DBNull.Value ? 0 : Convert.ToDecimal(pr[0]);
+                                prevInvDate = pr[1] == DBNull.Value ? "" : pr[1].ToString();
+                            }
+                        }
                     }
 
-                    var cmd = new SqlCommand(@"
-                        SELECT
-                            ISNULL(SUM(h.TotalAmount), 0)       AS TotalInvoiced,
-                            ISNULL(SUM(ISNULL(pay.Paid, 0)), 0) AS TotalPaid,
-                            COUNT(*)                             AS InvoiceCount
+                    // ── Invoice rows in the period ──
+                    var rows = new List<object>();
+                    var rowCmd = new SqlCommand(@"
+                        SELECT h.InvoiceID, h.InvoiceNo,
+                               CONVERT(VARCHAR(10), h.InvoiceDate, 103) AS InvoiceDate,
+                               h.TotalAmount,
+                               ISNULL(pay.Paid, 0) AS Paid
                         FROM InvoiceHeaders h
                         LEFT JOIN (
                             SELECT InvoiceID, SUM(PaidAmount) AS Paid
-                            FROM InvoicePayments
-                            GROUP BY InvoiceID
+                            FROM InvoicePayments GROUP BY InvoiceID
                         ) pay ON pay.InvoiceID = h.InvoiceID
                         WHERE (@VendorName IS NULL OR h.JobVendorName LIKE '%'+@VendorName+'%')
                           AND (@FromDate IS NULL OR CAST(h.InvoiceDate AS DATE) >= CAST(@FromDate AS DATE))
-                          AND (@ToDate   IS NULL OR CAST(h.InvoiceDate AS DATE) <= CAST(@ToDate   AS DATE))", conn);
-                    cmd.Parameters.AddWithValue("@VendorName", string.IsNullOrEmpty(VendorName) ? (object)DBNull.Value : VendorName);
-                    cmd.Parameters.AddWithValue("@FromDate", pFrom.HasValue ? (object)pFrom.Value : DBNull.Value);
-                    cmd.Parameters.AddWithValue("@ToDate", pTo.HasValue ? (object)pTo.Value : DBNull.Value);
+                          AND (@ToDate   IS NULL OR CAST(h.InvoiceDate AS DATE) <= CAST(@ToDate   AS DATE))
+                        ORDER BY h.InvoiceDate, h.InvoiceID", conn);
+                    rowCmd.Parameters.AddWithValue("@VendorName", string.IsNullOrEmpty(VendorName) ? (object)DBNull.Value : VendorName);
+                    rowCmd.Parameters.AddWithValue("@FromDate", pFrom.HasValue ? (object)pFrom.Value : DBNull.Value);
+                    rowCmd.Parameters.AddWithValue("@ToDate", pTo.HasValue ? (object)pTo.Value : DBNull.Value);
 
-                    decimal totalInvoiced = 0, totalPaid = 0; int count = 0;
-                    using (var r = cmd.ExecuteReader())
+                    decimal totalInvoiced = 0, totalPaid = 0;
+                    decimal runningBalance = prevBalance;
+                    using (var r = rowCmd.ExecuteReader())
                     {
-                        if (r.Read())
+                        while (r.Read())
                         {
-                            totalInvoiced = Convert.ToDecimal(r["TotalInvoiced"]);
-                            totalPaid = Convert.ToDecimal(r["TotalPaid"]);
-                            count = Convert.ToInt32(r["InvoiceCount"]);
+                            decimal invAmt = Convert.ToDecimal(r["TotalAmount"]);
+                            decimal paid = Convert.ToDecimal(r["Paid"]);
+                            decimal balance = invAmt - paid;
+                            runningBalance = runningBalance + balance;
+                            string remarks = paid <= 0 ? "Pending" : balance <= 0 ? "Paid in Full" : "Partial Payment";
+                            totalInvoiced += invAmt;
+                            totalPaid += paid;
+                            rows.Add(new
+                            {
+                                InvoiceDate = r["InvoiceDate"].ToString(),
+                                InvoiceNo = r["InvoiceNo"].ToString(),
+                                TotalAmount = invAmt,
+                                Paid = paid,
+                                Balance = runningBalance,
+                                Remarks = remarks
+                            });
                         }
                     }
-                    decimal totalPending = (totalInvoiced - totalPaid) + prevBalance;
+
+                    // ── Get vendor info ──
+                    string vendorAddr = "", vendorContact = "";
+                    if (!string.IsNullOrEmpty(VendorName))
+                    {
+                        var vCmd = new SqlCommand(@"
+                            SELECT TOP 1 ISNULL(Address1,'') AS A1, ISNULL(Address2,'') AS A2,
+                                         ISNULL(Address3,'') AS A3, ISNULL(ContactNo,'') AS Phone,
+                                         JobVendorCode
+                            FROM JobVendors WHERE JobVendorName LIKE '%'+@VN+'%'", conn);
+                        vCmd.Parameters.AddWithValue("@VN", VendorName);
+                        using (var vr = vCmd.ExecuteReader())
+                        {
+                            if (vr.Read())
+                            {
+                                vendorAddr = string.Join(", ", new[] { vr["A1"].ToString(), vr["A2"].ToString(), vr["A3"].ToString() }
+                                                    .Where(a => !string.IsNullOrWhiteSpace(a)));
+                                vendorContact = vr["Phone"].ToString();
+                            }
+                        }
+                    }
+
+                    decimal periodBalance = totalInvoiced - totalPaid;
+                    decimal totalPending = prevBalance + periodBalance;
+
                     return Json(new
                     {
                         success = true,
-                        VendorName = VendorName ?? "All Vendors",
-                        FromDate = pFrom.HasValue ? pFrom.Value.ToString("dd-MMM-yyyy") : "",
-                        ToDate = pTo.HasValue ? pTo.Value.ToString("dd-MMM-yyyy") : "",
-                        InvoiceCount = count,
+                        VendorName = string.IsNullOrEmpty(VendorName) ? "All Vendors" : VendorName,
+                        VendorAddress = vendorAddr,
+                        VendorContact = vendorContact,
+                        FromDate = pFrom.HasValue ? pFrom.Value.ToString("dd/MM/yyyy") : "",
+                        ToDate = pTo.HasValue ? pTo.Value.ToString("dd/MM/yyyy") : "",
+                        GeneratedOn = DateTime.Now.ToString("dd/MM/yyyy hh:mm tt"),
+                        PrevBalance = prevBalance,
+                        PrevDate = prevInvDate,
+                        Rows = rows,
                         TotalInvoiced = totalInvoiced,
                         TotalPaid = totalPaid,
-                        TotalPending = totalInvoiced - totalPaid,
-                        PrevBalance = prevBalance,
+                        TotalPending = totalPending,
                         GrandTotal = totalPending
                     }, JsonRequestBehavior.AllowGet);
                 }
@@ -1135,7 +1187,7 @@ namespace Transport.Controllers
                                 Amount = r["Amount"] == DBNull.Value ? (decimal?)null : Convert.ToDecimal(r["Amount"])
                             });
                 }
-            }
+                }
             catch { }
             return list;
         }
