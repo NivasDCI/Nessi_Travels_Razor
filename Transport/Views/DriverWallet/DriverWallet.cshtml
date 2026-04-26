@@ -1,0 +1,565 @@
+@using Transport.Repository.Resource;
+@{
+    Layout = "";
+}
+<head>
+    <style>
+        .wallet-card {
+            border-radius: 10px;
+            color: #fff;
+            padding: 18px 20px;
+            margin-bottom: 12px;
+        }
+
+        .wc-earned {
+            background: linear-gradient(135deg,#27ae60,#2ecc71);
+        }
+
+        .wc-handover {
+            background: linear-gradient(135deg,#2980b9,#3498db);
+        }
+
+        .wc-expense {
+            background: linear-gradient(135deg,#e67e22,#f39c12);
+        }
+
+        .wc-balance {
+            background: linear-gradient(135deg,#8e44ad,#9b59b6);
+        }
+
+        .wallet-card .wc-label {
+            font-size: 12px;
+            opacity: .85;
+        }
+
+        .wallet-card .wc-amount {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .balance-negative .wc-amount {
+            color: #ffe0e0 !important;
+        }
+
+        .day-detail-row td {
+            font-size: 12px;
+        }
+    </style>
+    <script>
+    var GrdWallet, GrdDayDetail, GrdHandovers;
+
+    // ── Date pickers ─────────────────────────────────────────────────────────
+    $("#TxtFromDate").datepicker({ format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small' });
+    $("#TxtToDate").datepicker({   format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small' });
+    $("#TxtHandoverDate").datepicker({ format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small' });
+    $("#TxtExpenseDate").datepicker({  format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small' });
+
+    // Load "Hand Over To" dropdown (users list)
+    $.ajax({
+        type: "GET", url: BaseURL + "Common/Load_SystemUserDetail", datatype: "Json",
+        success: function (data) {
+            $("#ddlHandedTo option").remove();
+            $.each(data, function (i, v) {
+                $('#ddlHandedTo').append('<option value="' + v.ID + '">' + v.Name + '</option>');
+            });
+        }
+    });
+
+    // ── Summary cards loader ─────────────────────────────────────────────────
+    function LoadSummaryCards(summary) {
+        var bal = parseFloat(summary.RunningBalance || 0);
+        $("#CardEarned").text('$ ' + parseFloat(summary.TotalEarned     || 0).toFixed(2));
+        $("#CardHandover").text('$ ' + parseFloat(summary.TotalHandedOver || 0).toFixed(2));
+        $("#CardExpense").text('$ ' + parseFloat(summary.TotalExpenses   || 0).toFixed(2));
+        $("#CardBalance").text('$ ' + bal.toFixed(2));
+        if (bal < 0) $("#WcBalance").addClass("balance-negative");
+        else         $("#WcBalance").removeClass("balance-negative");
+    }
+
+    // ── Main wallet grid ─────────────────────────────────────────────────────
+    GrdWallet = $("#GrdWallet").grid({
+        primaryKey: "WalletID",
+        uiLibrary: "bootstrap4",
+        responsive: true,
+        dataSource: {
+            url: '@Url.Action("WalletSummary_FindAll","DriverWallet")',
+            success: function(response) {
+                if (response && response.summary) LoadSummaryCards(response.summary);
+            }
+        },
+        columns: [
+            { field: "DisplayWalletDate", width: 110, title: "DATE",       sortable: false, align: "left" },
+            { field: "TotalRides",        width: 70,  title: "RIDES",      sortable: false, align: "center" },
+            {
+                field: "TotalEarned", width: 100, title: "CASH EARNED", sortable: false, align: "right",
+                renderer: function (v) {
+                    return '<span style="color:#27ae60;font-weight:bold;">$ ' + parseFloat(v).toFixed(2) + '</span>';
+                }
+            },
+            {
+                field: "TotalHandedOver", width: 110, title: "HANDED OVER", sortable: false, align: "right",
+                renderer: function (v) {
+                    return v > 0 ? '<span style="color:#2980b9;font-weight:bold;">$ ' + parseFloat(v).toFixed(2) + '</span>' : '-';
+                }
+            },
+            {
+                field: "TotalExpenses", width: 100, title: "EXPENSES", sortable: false, align: "right",
+                renderer: function (v) {
+                    return v > 0 ? '<span style="color:#e67e22;font-weight:bold;">$ ' + parseFloat(v).toFixed(2) + '</span>' : '-';
+                }
+            },
+            {
+                field: "ClosingBalance", width: 110, title: "DAY BALANCE", sortable: false, align: "right",
+                renderer: function (v) {
+                    var color = parseFloat(v) >= 0 ? '#27ae60' : '#e74c3c';
+                    return '<span style="color:' + color + ';font-weight:bold;">$ ' + parseFloat(v).toFixed(2) + '</span>';
+                }
+            },
+            {
+                field: "RunningBalance", width: 120, title: "RUNNING BALANCE", sortable: false, align: "right",
+                renderer: function (v) {
+                    var color = parseFloat(v) >= 0 ? '#8e44ad' : '#e74c3c';
+                    return '<strong style="color:' + color + ';">$ ' + parseFloat(v).toFixed(2) + '</strong>';
+                }
+            },
+            {
+                field: "DisplayWalletDate", width: 80, title: "DETAILS", sortable: false, align: "center",
+                renderer: function (v, record) {
+                    return '<button onclick="OpenDayDetails(\'' + record.DriverUserID + '\',\'' + v + '\',\'' + record.DisplayWalletDate + '\')" class="badge badge-info" style="cursor:pointer;"><i class="fa fa-list"></i> Rides</button>';
+                }
+            }
+        ],
+        pager: { enable: true, limit: 30, sizes: ArrPaging }
+    });
+
+    function WalletSearch() {
+        GrdWallet.reload({ FromDate: $('#TxtFromDate').val(), ToDate: $('#TxtToDate').val() });
+    }
+    function WalletClear() {
+        $('#TxtFromDate').val(''); $('#TxtToDate').val('');
+        GrdWallet.reload({});
+    }
+
+    // ── Day drill-down modal ─────────────────────────────────────────────────
+    GrdDayDetail = $("#GrdDayDetail").grid({
+        primaryKey: "JobCode",
+        uiLibrary: "bootstrap4",
+        responsive: true,
+        dataSource: '',
+        columns: [
+            { field: "JobTime",      width: 55,  title: "TIME",     sortable: false },
+            { field: "JobFrom",      width: 140, title: "FROM",     sortable: false },
+            { field: "JobTo",        width: 140, title: "TO",       sortable: false },
+            { field: "CustomerName", width: 110, title: "CUSTOMER", sortable: false },
+            { field: "VehicleName",  width: 75,  title: "VEHICLE",  sortable: false },
+            {
+                field: "Cash", width: 80, title: "CASH (SGD)", sortable: false, align: "right",
+                renderer: function (v) {
+                    return v > 0 ? '<strong style="color:#27ae60;">$ ' + parseFloat(v).toFixed(2) + '</strong>' : '<span style="color:#999;">—</span>';
+                }
+            },
+            {
+                field: "Credit", width: 80, title: "CREDIT", sortable: false, align: "right",
+                renderer: function (v) {
+                    return v > 0 ? '<span style="color:#e74c3c;">$ ' + parseFloat(v).toFixed(2) + '</span>' : '<span style="color:#999;">—</span>';
+                }
+            }
+        ]
+    });
+
+    GrdDayDetail.on('dataBound', function (e, records) {
+        var totalCash = 0;
+        $.each(records, function () { totalCash += parseFloat(this.Cash || 0); });
+        var tfoot = GrdDayDetail.children('tfoot');
+        tfoot.children('tr[data-role="summary"]').remove();
+        tfoot.prepend('<tr data-role="summary" style="font-weight:bold;background:#f0f0f0;">' +
+            '<td colspan="5" style="text-align:right;padding:8px;">Total</td>' +
+            '<td style="text-align:right;padding:8px;color:#27ae60;">$ ' + totalCash.toFixed(2) + '</td>' +
+            '<td></td></tr>');
+    });
+
+    function OpenDayDetails(driverID, dateVal, dateLabel) {
+        $('#ModalDayLabel').text('Rides on ' + dateLabel);
+        $('#ModalDayDriverID').val(driverID);
+        $('#ModalDayDate').val(dateVal);
+        GrdDayDetail.reload({
+            DriverUserID: driverID,
+            WalletDate: dateVal
+        });
+        // update grid dataSource url
+        GrdDayDetail.loadData('@Url.Content("~/DriverWallet/DayDetails_FindAll")?DriverUserID=' + driverID + '&WalletDate=' + encodeURIComponent(dateVal));
+        $('#modalDayDetail').modal('show');
+    }
+
+    // ── Handover grid (history) ───────────────────────────────────────────────
+    GrdHandovers = $("#GrdHandovers").grid({
+        primaryKey: "HandoverID",
+        uiLibrary: "bootstrap4",
+        responsive: true,
+        dataSource: '@Url.Action("Handover_FindAll","DriverWallet")',
+        columns: [
+            { field: "DisplayHandoverDate", width: 100, title: "DATE",        sortable: false },
+            { field: "Amount",              width: 90,  title: "AMOUNT (SGD)",sortable: false, align: "right",
+              renderer: function(v){ return '<strong style="color:#2980b9;">$ ' + parseFloat(v).toFixed(2) + '</strong>'; } },
+            { field: "HandedToName",        width: 120, title: "HANDED TO",   sortable: false },
+            { field: "Remarks",             width: 160, title: "REMARKS",     sortable: false },
+            { field: "DisplayCreatedDate",  width: 130, title: "RECORDED AT", sortable: false },
+            {
+                field: "HandoverID", width: 60, title: "Delete", sortable: false, align: "center",
+                renderer: function (v) {
+                    return '<button onclick="DeleteHandover(' + v + ')" class="badge badge-danger" style="cursor:pointer;"><i class="fa fa-trash"></i></button>';
+                }
+            }
+        ],
+        pager: { enable: true, limit: 20, sizes: ArrPaging }
+    });
+
+    // ── Save Handover ─────────────────────────────────────────────────────────
+    $('#btnSaveHandover').click(function () {
+        var amt = parseFloat($('#TxtHandoverAmount').val());
+        if (!amt || amt <= 0) { alert('Please enter a valid amount.'); return; }
+        if (!$('#TxtHandoverDate').val()) { alert('Please select a date.'); return; }
+
+        $(this).prop('disabled', true).text('Saving...');
+        $.ajax({
+            url: '@Url.Content("~/DriverWallet/Handover_Save")',
+            type: 'POST',
+            data: JSON.stringify({
+                DriverUserID:   0,   // 0 = use session (driver's own)
+                HandoverDate:   $('#TxtHandoverDate').val(),
+                Amount:         amt,
+                HandedToUserID: $('#ddlHandedTo').val(),
+                HandedToName:   $('#ddlHandedTo option:selected').text(),
+                Remarks:        $('#TxtHandoverRemarks').val()
+            }),
+            dataType: 'json', contentType: 'application/json',
+            success: function (r) {
+                $('#btnSaveHandover').prop('disabled', false).text('Save Handover');
+                if (r.success) {
+                    $('#modalHandover').modal('hide');
+                    GrdWallet.reload({}); GrdHandovers.reload({});
+                    $('#TxtHandoverAmount').val(''); $('#TxtHandoverDate').val(''); $('#TxtHandoverRemarks').val('');
+                } else { alert('Error: ' + r.message); }
+            },
+            error: function () { $('#btnSaveHandover').prop('disabled', false).text('Save Handover'); alert('Server error.'); }
+        });
+    });
+
+    function DeleteHandover(id) {
+        if (!confirm('Delete this handover record?')) return;
+        $.ajax({
+            url: '@Url.Content("~/DriverWallet/Handover_Delete")',
+            type: 'POST', data: JSON.stringify({ HandoverID: id }),
+            dataType: 'json', contentType: 'application/json',
+            success: function (r) { if (r.success) { GrdWallet.reload({}); GrdHandovers.reload({}); } }
+        });
+    }
+
+    // ── Expense grid ─────────────────────────────────────────────────────────
+    var GrdExpenses = $("#GrdExpenses").grid({
+        primaryKey: "DriverExpenseID",
+        uiLibrary: "bootstrap4",
+        responsive: true,
+        dataSource: '@Url.Action("Expense_FindAll","DriverWallet")',
+        columns: [
+            { field: "DisplayExpenseDate", width: 100, title: "DATE",        sortable: false },
+            { field: "Category",           width: 90,  title: "CATEGORY",    sortable: false },
+            { field: "Amount",             width: 90,  title: "AMOUNT (SGD)",sortable: false, align: "right",
+              renderer: function(v){ return '<strong style="color:#e67e22;">$ ' + parseFloat(v).toFixed(2) + '</strong>'; } },
+            { field: "Remarks",            width: 160, title: "REMARKS",     sortable: false },
+            { field: "JobCode",            width: 80,  title: "JOB CODE",    sortable: false,
+              renderer: function(v){ return v ? '#' + v : '-'; } },
+            { field: "DisplayCreatedDate", width: 130, title: "RECORDED AT", sortable: false },
+            {
+                field: "DriverExpenseID", width: 60, title: "Del", sortable: false, align: "center",
+                renderer: function (v) {
+                    return '<button onclick="DeleteExpense(' + v + ')" class="badge badge-danger" style="cursor:pointer;"><i class="fa fa-trash"></i></button>';
+                }
+            }
+        ],
+        pager: { enable: true, limit: 20, sizes: ArrPaging }
+    });
+
+    // ── Save Expense ──────────────────────────────────────────────────────────
+    $('#btnSaveExpense').click(function () {
+        var amt = parseFloat($('#TxtExpenseAmount').val());
+        if (!amt || amt <= 0) { alert('Please enter a valid amount.'); return; }
+        if (!$('#TxtExpenseDate').val())     { alert('Please select a date.'); return; }
+        if (!$('#ddlExpenseCategory').val()) { alert('Please select a category.'); return; }
+
+        $(this).prop('disabled', true).text('Saving...');
+        $.ajax({
+            url: '@Url.Content("~/DriverWallet/Expense_Save")',
+            type: 'POST',
+            data: JSON.stringify({
+                DriverUserID: 0,
+                ExpenseDate:  $('#TxtExpenseDate').val(),
+                Category:     $('#ddlExpenseCategory').val(),
+                Amount:       amt,
+                Remarks:      $('#TxtExpenseRemarks').val(),
+                JobCode:      parseInt($('#TxtExpenseJobCode').val()) || 0
+            }),
+            dataType: 'json', contentType: 'application/json',
+            success: function (r) {
+                $('#btnSaveExpense').prop('disabled', false).text('Save Expense');
+                if (r.success) {
+                    $('#modalExpense').modal('hide');
+                    GrdWallet.reload({}); GrdExpenses.reload({});
+                    $('#TxtExpenseAmount').val(''); $('#TxtExpenseDate').val(''); $('#TxtExpenseRemarks').val(''); $('#TxtExpenseJobCode').val('');
+                } else { alert('Error: ' + r.message); }
+            },
+            error: function () { $('#btnSaveExpense').prop('disabled', false).text('Save Expense'); alert('Server error.'); }
+        });
+    });
+
+    function DeleteExpense(id) {
+        if (!confirm('Delete this expense record?')) return;
+        $.ajax({
+            url: '@Url.Content("~/DriverWallet/Expense_Delete")',
+            type: 'POST', data: JSON.stringify({ DriverExpenseID: id }),
+            dataType: 'json', contentType: 'application/json',
+            success: function (r) { if (r.success) { GrdWallet.reload({}); GrdExpenses.reload({}); } }
+        });
+    }
+    </script>
+</head>
+<body>
+    <!-- ══ SUMMARY CARDS ══════════════════════════════════════════════════════ -->
+    <div class="content">
+        <div class="container-fluid">
+
+            <div class="row mb-3">
+                <div class="col-sm-3">
+                    <div class="wallet-card wc-earned">
+                        <div class="wc-label"><i class="fa fa-dollar-sign"></i> Total Cash Earned</div>
+                        <div class="wc-amount" id="CardEarned">$ 0.00</div>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="wallet-card wc-handover">
+                        <div class="wc-label"><i class="fa fa-hand-holding-usd"></i> Total Handed Over</div>
+                        <div class="wc-amount" id="CardHandover">$ 0.00</div>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="wallet-card wc-expense">
+                        <div class="wc-label"><i class="fa fa-receipt"></i> Total Expenses</div>
+                        <div class="wc-amount" id="CardExpense">$ 0.00</div>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="wallet-card wc-balance" id="WcBalance">
+                        <div class="wc-label"><i class="fa fa-wallet"></i> Wallet Balance</div>
+                        <div class="wc-amount" id="CardBalance">$ 0.00</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══ DAILY WALLET GRID ════════════════════════════════════════════════ -->
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card card-pd">
+                        <div class="card-header">
+                            <span style="font-size:18px;"><i class="fa fa-wallet"></i></span>
+                            <span style="font-size:18px; border-left:1px solid #ccc; padding-left:10px;"> My Wallet — Daily Summary</span>
+                            <div style="float:right;">
+                                <button type="button" class="btn btn-primary btn-sm mr-1" data-toggle="modal" data-target="#modalHandover">
+                                    <i class="fa fa-hand-holding-usd"></i> Record Handover
+                                </button>
+                                <button type="button" class="btn btn-warning btn-sm mr-2" data-toggle="modal" data-target="#modalExpense">
+                                    <i class="fa fa-receipt"></i> Add Expense
+                                </button>
+                                <span style="border-left:1px solid #ccc; padding-left:15px; padding-right:15px;">
+                                    <a href="#" onclick="showForm()" title="Show Filter"><i class="fas fa-caret-square-down"></i></a>
+                                </span>
+                                <span style="border-left:1px solid #ccc; padding-left:15px; padding-right:15px;">
+                                    <a href="#" onclick="hideForm()" title="Hide Filter"><i class="fas fa-caret-square-up"></i></a>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="hidden-form">
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>From Date</label>
+                                            <input type="text" id="TxtFromDate" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>To Date</label>
+                                            <input type="text" id="TxtToDate" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2 pdt-25">
+                                        <button type="button" class="btn btn-primary btn-block" onclick="WalletSearch()"><i class="fa fa-search"></i> Search</button>
+                                    </div>
+                                    <div class="col-sm-2 pdt-25">
+                                        <button type="button" class="btn btn-secondary btn-block" onclick="WalletClear()"><i class="fa fa-paint-brush"></i> Clear</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="box-body table-responsive no-padding">
+                                <table id="GrdWallet" class="table table-hover"></table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══ HANDOVER HISTORY ══════════════════════════════════════════════════ -->
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card card-pd">
+                        <div class="card-header">
+                            <span style="font-size:16px;"><i class="fa fa-exchange-alt"></i> Cash Handover History</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="box-body table-responsive no-padding">
+                                <table id="GrdHandovers" class="table table-hover"></table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══ EXPENSE HISTORY ════════════════════════════════════════════════════ -->
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card card-pd">
+                        <div class="card-header">
+                            <span style="font-size:16px;"><i class="fa fa-receipt"></i> My Expenses</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="box-body table-responsive no-padding">
+                                <table id="GrdExpenses" class="table table-hover"></table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ══ MODAL: Day Ride Detail ════════════════════════════════════════════════ -->
+    <div class="modal fade" id="modalDayDetail" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="background:#2c3e50;color:#fff;">
+                    <h5 class="modal-title" id="ModalDayLabel"><i class="fa fa-list"></i> Rides</h5>
+                    <input type="hidden" id="ModalDayDriverID" />
+                    <input type="hidden" id="ModalDayDate" />
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="box-body table-responsive no-padding">
+                        <table id="GrdDayDetail" class="table table-hover"></table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ MODAL: Record Handover ════════════════════════════════════════════════ -->
+    <div class="modal fade" id="modalHandover" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="background:#2980b9;color:#fff;">
+                    <h5 class="modal-title"><i class="fa fa-hand-holding-usd"></i> Record Cash Handover</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Handover Date <span style="color:red">*</span></label>
+                                <input type="text" id="TxtHandoverDate" class="form-control" placeholder="Select date">
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Amount (SGD) <span style="color:red">*</span></label>
+                                <input type="number" id="TxtHandoverAmount" class="form-control" placeholder="0.00" step="0.01" min="0">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Handed To <span style="color:red">*</span></label>
+                        @Html.DropDownList("ddlHandedTo", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @id = "ddlHandedTo" })
+                    </div>
+                    <div class="form-group">
+                        <label>Remarks</label>
+                        <textarea id="TxtHandoverRemarks" class="form-control" rows="2" placeholder="Optional notes..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnSaveHandover" class="btn btn-primary"><i class="fa fa-save"></i> Save Handover</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ MODAL: Add Expense ════════════════════════════════════════════════════ -->
+    <div class="modal fade" id="modalExpense" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="background:#e67e22;color:#fff;">
+                    <h5 class="modal-title"><i class="fa fa-receipt"></i> Add Expense</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Expense Date <span style="color:red">*</span></label>
+                                <input type="text" id="TxtExpenseDate" class="form-control" placeholder="Select date">
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Category <span style="color:red">*</span></label>
+                                <select id="ddlExpenseCategory" class="form-control">
+                                    <option value="">-- Select --</option>
+                                    <option value="Fuel">Fuel</option>
+                                    <option value="Toll">Toll</option>
+                                    <option value="Parking">Parking</option>
+                                    <option value="Vehicle Maintenance">Vehicle Maintenance</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Amount (SGD) <span style="color:red">*</span></label>
+                                <input type="number" id="TxtExpenseAmount" class="form-control" placeholder="0.00" step="0.01" min="0">
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Linked Job Code <small class="text-muted">(optional)</small></label>
+                                <input type="number" id="TxtExpenseJobCode" class="form-control" placeholder="Job number">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Remarks</label>
+                        <textarea id="TxtExpenseRemarks" class="form-control" rows="2" placeholder="e.g. Petrol at Shell Serangoon"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnSaveExpense" class="btn btn-warning"><i class="fa fa-save"></i> Save Expense</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>

@@ -67,6 +67,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="db_data_access.cs" />
+    <Compile Include="Driverwalletmodel.cs" />
     <Compile Include="ExpenseModel.cs" />
     <Compile Include="ReportsModel.cs" />
     <Compile Include="SystemMasterModel.cs" />

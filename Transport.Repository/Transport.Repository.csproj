@@ -158,6 +158,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Driverwalletrepository.cs" />
     <Compile Include="ExpenseRepository.cs" />
     <Compile Include="IExpenseRepository.cs" />
     <Compile Include="IJobRepository.cs" />

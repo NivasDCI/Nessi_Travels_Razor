@@ -1,0 +1,539 @@
+@using Transport.Repository.Resource;
+@{
+    Layout = "";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Vendor Account Summary</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <style>
+        /* ── Page ─────────────────────────────────────────────────────────── */
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            font-size: 13px;
+            background: #fff;
+            color: #222;
+        }
+
+        .page-wrap {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 0 20px 40px;
+        }
+
+        /* ── Header ───────────────────────────────────────────────────────── */
+        .report-title {
+            font-size: 22px;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: 1px;
+            margin-bottom: 18px;
+        }
+
+        .vendor-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+            .vendor-meta .left-block, .vendor-meta .right-block {
+                min-width: 300px;
+            }
+
+        .meta-row {
+            display: flex;
+            margin-bottom: 4px;
+        }
+
+        .meta-label {
+            font-weight: 700;
+            min-width: 110px;
+        }
+
+        .meta-sep {
+            margin: 0 8px;
+        }
+
+        .divider {
+            border-top: 2px solid #999;
+            margin: 14px 0;
+        }
+
+        .btn-action {
+            font-size: 13px;
+            padding: 5px 14px;
+            border-radius: 4px;
+            border: 1px solid #555;
+            background: #fff;
+            cursor: pointer;
+            margin-left: 6px;
+        }
+
+            .btn-action:hover {
+                background: #f0f0f0;
+            }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        /* ── Table ────────────────────────────────────────────────────────── */
+        #summaryTable {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 6px;
+        }
+
+            #summaryTable thead th {
+                background: #e8e8e8;
+                font-weight: 700;
+                font-size: 12.5px;
+                text-align: center;
+                padding: 8px 6px;
+                border: 1px solid #ccc;
+            }
+
+            #summaryTable tbody td {
+                padding: 7px 6px;
+                border: 1px solid #ddd;
+                vertical-align: middle;
+            }
+
+            #summaryTable tbody tr:hover {
+                background: #f9f9f9;
+            }
+
+        /* Opening balance row */
+        .row-opening {
+            background: #fffbe6 !important;
+        }
+
+            .row-opening td {
+                color: #7a6000;
+            }
+
+        /* Invoice row */
+        .row-invoice td {
+            font-weight: 600;
+        }
+
+        /* Receipt sub-row */
+        .row-receipt {
+            background: #f4fff4 !important;
+        }
+
+            .row-receipt td {
+                font-size: 12.5px;
+                color: #333;
+            }
+
+        .receipt-tree {
+            font-family: monospace;
+            color: #bbb;
+            font-size: 13px;
+            margin-right: 3px;
+        }
+
+        .receipt-label {
+            color: #2e7d32;
+            font-weight: 600;
+        }
+
+        .amount-collected {
+            color: #2e7d32;
+            font-weight: 600;
+        }
+
+        /* Status badges */
+        .badge-pending {
+            color: #c0392b;
+            font-weight: 700;
+        }
+
+        .badge-partial {
+            color: #e67e22;
+            font-weight: 700;
+        }
+
+        .badge-paid {
+            color: #1a7a1a;
+            font-weight: 700;
+        }
+
+        .badge-prev {
+            color: #7a6000;
+            font-weight: 700;
+        }
+
+        .badge-received {
+            color: #2e7d32;
+            font-weight: 700;
+        }
+
+        .badge-opening {
+            color: #b8860b;
+            font-weight: 700;
+        }
+
+        /* Total row */
+        .row-total td {
+            background: #f0f0f0;
+            font-weight: 700;
+            text-align: center;
+            font-size: 13px;
+            border-top: 2px solid #999;
+        }
+
+        /* Note box */
+        .note-box {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 8px 14px;
+            margin-top: 14px;
+            font-size: 13px;
+            background: #fafafa;
+        }
+
+        /* Footer */
+        .footer-section {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .signatory-block {
+            min-width: 160px;
+        }
+
+        .signatory-line {
+            border-top: 1px solid #555;
+            margin-top: 30px;
+            width: 180px;
+        }
+
+        .thank-you {
+            font-style: italic;
+            color: #555;
+            align-self: flex-end;
+        }
+
+        /* Search form */
+        .search-card {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+        }
+
+            .search-card label {
+                font-weight: 600;
+                font-size: 12.5px;
+            }
+
+            .search-card .form-control {
+                font-size: 13px;
+                height: 34px;
+            }
+
+        #btnGenerate {
+            background: #343a40;
+            color: #fff;
+            border: none;
+            padding: 6px 20px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+            #btnGenerate:hover {
+                background: #23272b;
+            }
+
+        /* Loading / error */
+        #loadingMsg {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #555;
+        }
+
+        #errorMsg {
+            display: none;
+            text-align: center;
+            padding: 16px;
+            color: #c00;
+        }
+
+        /* ── Print overrides ──────────────────────────────────────────────── */
+        @@media print {
+            .search-card, .no-print {
+                display: none !important;
+            }
+
+            body {
+                margin: 0;
+            }
+
+            .page-wrap {
+                margin: 0;
+                max-width: 100%;
+            }
+
+            #summaryTable tbody tr:hover {
+                background: inherit !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrap">
+
+        <!-- ── Search Form (hidden on print) ─────────────────────────────────── -->
+        <div class="search-card no-print">
+            <div class="row align-items-end">
+                <div class="col-sm-3">
+                    <label>Vendor Name</label>
+                    <input type="text" id="txtVendorName" class="form-control" placeholder="e.g. ABC Solutions" />
+                </div>
+                <div class="col-sm-3">
+                    <label>From Date</label>
+                    <input type="text" id="txtFromDate" class="form-control" placeholder="dd-MM-yyyy" />
+                </div>
+                <div class="col-sm-3">
+                    <label>To Date</label>
+                    <input type="text" id="txtToDate" class="form-control" placeholder="dd-MM-yyyy" />
+                </div>
+                <div class="col-sm-3">
+                    <button id="btnGenerate"><i class="fa fa-file-alt"></i>&nbsp; Generate Summary</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Report Output ─────────────────────────────────────────────────── -->
+        <div id="reportOutput" style="display:none;">
+
+            <!-- Title + Buttons -->
+            <div class="header-row">
+                <div style="flex:1;"></div>
+                <div class="report-title" style="flex:2;">VENDOR ACCOUNT SUMMARY</div>
+                <div style="flex:1; text-align:right; padding-top:4px;" class="no-print">
+                    <button class="btn-action" onclick="window.print()"><i class="fa fa-print"></i> Print</button>
+                    <button class="btn-action" onclick="downloadPDF()"><i class="fa fa-download"></i> Download</button>
+                </div>
+            </div>
+
+            <!-- Vendor Info -->
+            <div class="vendor-meta">
+                <div class="left-block">
+                    <div class="meta-row"><span class="meta-label">Vendor Name</span><span class="meta-sep">:</span><span id="rVendorName">-</span></div>
+                    <div class="meta-row"><span class="meta-label">Phone</span><span class="meta-sep">:</span><span id="rVendorContact">-</span></div>
+                    <div class="meta-row"><span class="meta-label">Address</span><span class="meta-sep">:</span><span id="rVendorAddress">-</span></div>
+                </div>
+                <div class="right-block" style="text-align:left;">
+                    <div class="meta-row"><span class="meta-label">Start Date</span><span class="meta-sep">:</span><span id="rFromDate">-</span></div>
+                    <div class="meta-row"><span class="meta-label">End Date</span><span class="meta-sep">:</span><span id="rToDate">-</span></div>
+                    <div class="meta-row"><span class="meta-label">Generated On</span><span class="meta-sep">:</span><span id="rGeneratedOn">-</span></div>
+                </div>
+            </div>
+            <div class="divider"></div>
+
+            <!-- Summary Table -->
+            <table id="summaryTable">
+                <thead>
+                    <tr>
+                        <th style="width:45px;">S.No.</th>
+                        <th style="width:90px;">Date</th>
+                        <th style="width:220px;">Particulars</th>
+                        <th style="width:130px;">Invoice No.</th>
+                        <th style="width:120px; text-align:right;">Invoice Amount (₹)</th>
+                        <th style="width:130px; text-align:right;">Amount Collected (₹)</th>
+                        <th style="width:110px; text-align:right;">Balance (₹)</th>
+                        <th style="width:130px;">Remarks</th>
+                    </tr>
+                </thead>
+                <tbody id="summaryTbody">
+                </tbody>
+            </table>
+
+            <!-- Note -->
+            <div class="note-box">
+                <strong>Note:</strong>
+                Opening Balance (<span id="noteOpening">₹ 0.00</span>) +
+                Current Period Balance (<span id="notePeriod">₹ 0.00</span>) =
+                Closing Balance (<span id="noteClosing">₹ 0.00</span>)
+            </div>
+
+            <!-- Footer -->
+            <div class="footer-section">
+                <div class="signatory-block">
+                    <div style="font-weight:700; margin-bottom:4px;">Authorized Signatory</div>
+                    <div class="signatory-line"></div>
+                </div>
+                <div class="thank-you">Thank you for your business!</div>
+            </div>
+
+        </div><!-- /reportOutput -->
+
+        <div id="loadingMsg"><i class="fa fa-spinner fa-spin"></i>&nbsp; Generating summary, please wait…</div>
+        <div id="errorMsg"></div>
+
+    </div><!-- /page-wrap -->
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+    // ── Date picker (gijgo, same as rest of project) ──────────────────────
+    $(function () {
+        $("#txtFromDate").datepicker({ format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small' });
+        $("#txtToDate"  ).datepicker({ format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small' });
+
+        $("#btnGenerate").on("click", generateSummary);
+    });
+
+    // ── Format number Indian-style ─────────────────────────────────────────
+    function fmt(n) {
+        return parseFloat(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    // ── Main: call API and render ──────────────────────────────────────────
+    function generateSummary() {
+        var vendorName = $.trim($("#txtVendorName").val());
+        var fromDate   = $.trim($("#txtFromDate").val());
+        var toDate     = $.trim($("#txtToDate").val());
+
+        $("#reportOutput").hide();
+        $("#errorMsg").hide();
+        $("#loadingMsg").show();
+
+        $.ajax({
+            url: '@Url.Action("InvoiceSummary", "Reports")',
+            type: "GET",
+            data: { VendorName: vendorName, FromDate: fromDate, ToDate: toDate },
+            dataType: "json",
+            success: function (data) {
+                $("#loadingMsg").hide();
+                if (!data.success) {
+                    $("#errorMsg").text("Error: " + data.message).show();
+                    return;
+                }
+                renderSummary(data);
+                $("#reportOutput").show();
+            },
+            error: function () {
+                $("#loadingMsg").hide();
+                $("#errorMsg").text("Failed to load data. Please try again.").show();
+            }
+        });
+    }
+
+    // ── Render the full report ─────────────────────────────────────────────
+    function renderSummary(data) {
+
+        // Header fields
+        $("#rVendorName"   ).text(data.VendorName    || "-");
+        $("#rVendorContact").text(data.VendorContact  || "-");
+        $("#rVendorAddress").text(data.VendorAddress  || "-");
+        $("#rFromDate"     ).text(data.FromDate       || "-");
+        $("#rToDate"       ).text(data.ToDate         || "-");
+        $("#rGeneratedOn"  ).text(data.GeneratedOn    || "-");
+
+        var tbody = "";
+        var sno   = 1;
+
+        // ── Opening balance row ────────────────────────────────────────────
+        if (data.PrevBalance > 0) {
+            tbody +=
+                '<tr class="row-opening">' +
+                    '<td style="text-align:center;">' + sno++ + '</td>' +
+                    '<td>' + (data.PrevDate || "-") + '</td>' +
+                    '<td>Opening Balance (Previous Pending)</td>' +
+                    '<td style="text-align:center;">-</td>' +
+                    '<td style="text-align:right;">' + fmt(data.PrevBalance) + '</td>' +
+                    '<td style="text-align:right;">0.00</td>' +
+                    '<td style="text-align:right;">' + fmt(data.PrevBalance) + '</td>' +
+                    '<td class="badge-opening">Previous Pending</td>' +
+                '</tr>';
+        }
+
+        // ── Invoice rows with receipt sub-rows ─────────────────────────────
+        $.each(data.Rows, function (i, row) {
+
+            var hasReceipts  = row.Payments && row.Payments.length > 0;
+            var invBalance   = row.PrePaymentBalance;   // balance the invoice row displays
+            var remarkClass  = "badge-pending";
+            var remarkText   = "Pending";
+            if (row.Paid > 0 && row.NetBalance <= 0) { remarkClass = "badge-paid";    remarkText = "Paid in Full"; }
+            else if (row.Paid > 0)                   { remarkClass = "badge-partial";  remarkText = "Partial Payment"; }
+
+            // Invoice row — Amount Collected is 0 because collections are shown per receipt
+            tbody +=
+                '<tr class="row-invoice">' +
+                    '<td style="text-align:center;">' + sno++ + '</td>' +
+                    '<td>' + row.InvoiceDate + '</td>' +
+                    '<td><strong>Invoice</strong></td>' +
+                    '<td style="text-align:center;">' + row.InvoiceNo + '</td>' +
+                    '<td style="text-align:right;">' + fmt(row.TotalAmount) + '</td>' +
+                    '<td style="text-align:right; color:#aaa;">0.00</td>' +
+                    '<td style="text-align:right;">' + fmt(invBalance) + '</td>' +
+                    '<td class="' + remarkClass + '">' + remarkText + '</td>' +
+                '</tr>';
+
+            // Receipt sub-rows — each one reduces the running balance
+            if (hasReceipts) {
+                var count        = row.Payments.length;
+                var receiptBal   = invBalance;           // starts at invoice's pre-payment balance
+
+                $.each(row.Payments, function (pi, pmt) {
+                    receiptBal -= pmt.PaidAmount;        // balance drops per receipt
+
+                    // Tree connector: ├─ for middle rows, └─ for the last
+                    var connector = (pi === count - 1) ? "└─ " : "├─ ";
+
+                    tbody +=
+                        '<tr class="row-receipt">' +
+                            '<td></td>' +
+                            '<td style="padding-left:22px; color:#555;">' + pmt.PaymentDate + '</td>' +
+                            '<td>' +
+                                '<span class="receipt-tree">' + connector + '</span>' +
+                                '<span class="receipt-label">Receipt</span>' +
+                            '</td>' +
+                            '<td style="text-align:center; color:#aaa;">-</td>' +
+                            '<td style="text-align:right; color:#aaa;">0.00</td>' +
+                            '<td style="text-align:right;" class="amount-collected">' + fmt(pmt.PaidAmount) + '</td>' +
+                            '<td style="text-align:right;">' + fmt(receiptBal) + '</td>' +
+                            '<td class="badge-received">Payment Received</td>' +
+                        '</tr>';
+                });
+            }
+        });
+
+        // ── Total row ──────────────────────────────────────────────────────
+        tbody +=
+            '<tr class="row-total">' +
+                '<td colspan="4">TOTAL (Current Period)</td>' +
+                '<td style="text-align:right;">' + fmt(data.TotalInvoiced) + '</td>' +
+                '<td style="text-align:right;">' + fmt(data.TotalPaid)     + '</td>' +
+                '<td style="text-align:right;">' + fmt(data.TotalPending)  + '</td>' +
+                '<td>-</td>' +
+            '</tr>';
+
+        $("#summaryTbody").html(tbody);
+
+        // ── Note line ──────────────────────────────────────────────────────
+        $("#noteOpening").text("₹ " + fmt(data.PrevBalance));
+        $("#notePeriod" ).text("₹ " + fmt(data.TotalPending));
+        $("#noteClosing").text("₹ " + fmt(data.GrandTotal));
+    }
+
+    // ── Download via browser print-to-PDF ─────────────────────────────────
+    function downloadPDF() {
+        window.print();
+    }
+    </script>
+</body>
+</html>
