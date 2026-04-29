@@ -1,0 +1,59 @@
+@model Transport.Model.CashHandoverViewModel
+@{
+    ViewBag.Title = "Handover Cash";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="card">
+                <div class="card-header bg-warning">
+                    <h4>Cash Handover</h4>
+                </div>
+                <div class="card-body">
+                    @using (Html.BeginForm("HandoverCash", "Wallet", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <div class="form-group">
+                            <label>Select Driver</label>
+                            @Html.DropDownListFor(m => m.DriverUserID,
+                                new SelectList(Model.Drivers, "UserID", "DriverName"),
+                                "Select Driver",
+                                new { @class = "form-control", required = "required" })
+                            @Html.ValidationMessageFor(m => m.DriverUserID)
+                        </div>
+
+                        <div class="form-group">
+                            <label>Handover Amount</label>
+                            @Html.TextBoxFor(m => m.HandoverAmount, new { @class = "form-control", type = "number", step = "0.01", required = "required" })
+                            @Html.ValidationMessageFor(m => m.HandoverAmount)
+                        </div>
+
+                        <div class="form-group">
+                            <label>Handover Date</label>
+                            @Html.TextBoxFor(m => m.HandoverDate, new { @class = "form-control", type = "date", required = "required" })
+                        </div>
+
+                        <div class="form-group">
+                            <label>Handed To (Admin)</label>
+                            @Html.DropDownListFor(m => m.HandedToUserID,
+                                new SelectList(Model.Admins, "UserID", "UserName"),
+                                "Select Admin",
+                                new { @class = "form-control", required = "required" })
+                        </div>
+
+                        <div class="form-group">
+                            <label>Remarks</label>
+                            @Html.TextAreaFor(m => m.Remarks, new { @class = "form-control", rows = 3 })
+                        </div>
+
+                        <button type="submit" class="btn btn-warning btn-block">Submit Handover</button>
+                        <a href="@Url.Action("Dashboard")" class="btn btn-secondary btn-block mt-2">Cancel</a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

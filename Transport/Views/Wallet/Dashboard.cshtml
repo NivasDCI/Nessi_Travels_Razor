@@ -1,0 +1,137 @@
+@model Transport.Model.WalletDashboardViewModel
+@{
+    ViewBag.Title = "Wallet Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h2>Wallet Management Dashboard</h2>
+            <hr />
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+        </div>
+    }
+
+    @if (Model == null)
+    {
+        <div class="alert alert-warning">
+            <h4>No data available</h4>
+            <p>Please check your database connection and try again.</p>
+        </div>
+    }
+    else
+    {
+        <!-- Summary Cards -->
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card text-white bg-primary mb-3">
+                    <div class="card-header">Company Wallet</div>
+                    <div class="card-body">
+                        <h3 class="card-title">@(Model.AdminWallet?.CurrentBalance.ToString("C") ?? "₹0.00")</h3>
+                        <p>
+                            Total Received: @(Model.AdminWallet?.TotalCashReceived.ToString("C") ?? "₹0.00")<br />
+                            Total Expenses: @(Model.AdminWallet?.TotalExpenses.ToString("C") ?? "₹0.00")
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-white bg-success mb-3">
+                    <div class="card-header">Drivers Wallet Total</div>
+                    <div class="card-body">
+                        <h3 class="card-title">@Model.TotalDriverBalance.ToString("C")</h3>
+                        <p>Total Drivers: @(Model.DriverWallets?.Count ?? 0)</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-white bg-info mb-3">
+                    <div class="card-header">Total System Cash</div>
+                    <div class="card-body">
+                        <h3 class="card-title">@Model.TotalSystemCash.ToString("C")</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <a href="@Url.Action("HandoverCash")" class="btn btn-warning">Handover Cash</a>
+                <a href="@Url.Action("DriverExpense")" class="btn btn-info">Driver Expense</a>
+                <a href="@Url.Action("CompanyExpense")" class="btn btn-danger">Company Expense</a>
+                <a href="@Url.Action("TransactionHistory")" class="btn btn-secondary">Transaction History</a>
+            </div>
+        </div>
+
+        <!-- Driver Wallets Table -->
+        <div class="card">
+            <div class="card-header">Driver Wallets</div>
+            <div class="card-body">
+                @if (Model.DriverWallets != null && Model.DriverWallets.Any())
+                {
+                    <table class="table table-bordered" id="driverTable">
+                        <thead>
+                            <tr>
+                                <th>Driver</th>
+                                <th>Balance</th>
+                                <th>Earned</th>
+                                <th>Expenses</th>
+                                <th>Handed Over</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var d in Model.DriverWallets)
+                            {
+                                <tr>
+                                    <td>@d.DriverName</td>
+                                    <td class="@(d.CurrentBalance < 0 ? "text-danger" : "text-success")">@d.CurrentBalance.ToString("C")</td>
+                                    <td>@d.TotalEarned.ToString("C")</td>
+                                    <td>@d.TotalExpenses.ToString("C")</td>
+                                    <td>@d.TotalHandedOver.ToString("C")</td>
+                                    <td>
+                                        <a href="@Url.Action("DriverWalletDetail", new { id = d.UserID })" class="btn btn-sm btn-primary">Details</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p>No drivers found.</p>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#driverTable').DataTable({
+                "pageLength": 25,
+                "language": {
+                    "emptyTable": "No driver wallets found"
+                }
+            });
+        });
+    </script>
+}

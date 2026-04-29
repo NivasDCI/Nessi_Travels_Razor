@@ -356,6 +356,7 @@ C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Nessi_Travels_Razor\Transpor
 C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Nessi_Travels_Razor\Transport\bin\Microsoft.Web.Infrastructure.dll
 C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Nessi_Travels_Razor\Transport\bin\MiniExcel.dll
 C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Nessi_Travels_Razor\Transport\bin\Newtonsoft.Json.dll
+C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Nessi_Travels_Razor\Transport\bin\System.Configuration.ConfigurationManager.dll
 C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Nessi_Travels_Razor\Transport\bin\System.Web.Helpers.dll
 C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Nessi_Travels_Razor\Transport\bin\System.Web.Razor.dll
 C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Nessi_Travels_Razor\Transport\bin\System.Web.Webpages.Deployment.dll
@@ -374,6 +375,7 @@ C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Nessi_Travels_Razor\Transpor
 C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Nessi_Travels_Razor\Transport\bin\EntityFramework.SqlServer.xml
 C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Nessi_Travels_Razor\Transport\bin\Microsoft.ApplicationInsights.xml
 C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Nessi_Travels_Razor\Transport\bin\Newtonsoft.Json.xml
+C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Nessi_Travels_Razor\Transport\bin\System.Configuration.ConfigurationManager.xml
 C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Nessi_Travels_Razor\Transport\bin\Twilio.xml
 C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Nessi_Travels_Razor\Transport\bin\System.Web.Razor.xml
 C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Nessi_Travels_Razor\Transport\bin\System.Web.Webpages.xml

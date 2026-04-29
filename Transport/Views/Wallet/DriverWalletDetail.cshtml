@@ -1,0 +1,189 @@
+@model Transport.Model.DriverWalletDetailViewModel
+@{
+    ViewBag.Title = "Driver Wallet Details - " + Model.DriverInfo.DriverName;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h2>Driver Wallet: @Model.DriverInfo.DriverName</h2>
+            <hr />
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    <!-- Driver Summary Cards -->
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white mb-3">
+                <div class="card-body">
+                    <h6 class="card-title">Current Balance</h6>
+                    <h3 class="card-title">@Model.DriverInfo.CurrentBalance.ToString("C")</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white mb-3">
+                <div class="card-body">
+                    <h6 class="card-title">Total Earned</h6>
+                    <h3 class="card-title">@Model.TotalJobEarnings.ToString("C")</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white mb-3">
+                <div class="card-body">
+                    <h6 class="card-title">Total Handed Over</h6>
+                    <h3 class="card-title">@Model.TotalHandovers.ToString("C")</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-danger text-white mb-3">
+                <div class="card-body">
+                    <h6 class="card-title">Total Expenses</h6>
+                    <h3 class="card-title">@Model.TotalDriverExpenses.ToString("C")</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="btn-group">
+                <a href="@Url.Action("HandoverCash", new { driverId = Model.DriverInfo.UserID })" class="btn btn-warning">Handover Cash</a>
+                <a href="@Url.Action("DriverExpense", new { driverId = Model.DriverInfo.UserID })" class="btn btn-info">Add Expense</a>
+                <a href="@Url.Action("DriverWallets")" class="btn btn-secondary">Back to List</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab Navigation -->
+    <ul class="nav nav-tabs" id="walletTabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="transactions-tab" data-toggle="tab" href="#transactions" role="tab">Transactions</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="handovers-tab" data-toggle="tab" href="#handovers" role="tab">Cash Handovers</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="expenses-tab" data-toggle="tab" href="#expenses" role="tab">Expenses</a>
+        </li>
+    </ul>
+
+    <div class="tab-content mt-3">
+        <!-- Transactions Tab -->
+        <div class="tab-pane fade show active" id="transactions" role="tabpanel">
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered" id="transactionsTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Category</th>
+                            <th>Amount</th>
+                            <th>Balance Before</th>
+                            <th>Balance After</th>
+                            <th>Description</th>
+                            <th>Created By</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var trans in Model.Transactions)
+                        {
+                            <tr>
+                                <td>@trans.TransactionDate.ToString("dd-MM-yyyy HH:mm")</td>
+                                <td>
+                                    <span class="badge @(trans.TransactionType == "Credit" ? "badge-success" : "badge-danger")">
+                                        @trans.TransactionType
+                                    </span>
+                                </td>
+                                <td>@trans.Category</td>
+                                <td class="@(trans.TransactionType == "Credit" ? "text-success" : "text-danger")">
+                                    @trans.Amount.ToString("C")
+                                </td>
+                                <td>@trans.BalanceBefore.ToString("C")</td>
+                                <td>@trans.BalanceAfter.ToString("C")</td>
+                                <td>@trans.Description</td>
+                                <td>@trans.CreatedByName</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Handovers Tab -->
+        <div class="tab-pane fade" id="handovers" role="tabpanel">
+            <div class="table-responsive">
+                <table class="table table-striped" id="handoversTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Handed To</th>
+                            <th>Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var handover in Model.Handovers)
+                        {
+                            <tr>
+                                <td>@handover.HandoverDate.ToString("dd-MM-yyyy")</td>
+                                <td class="text-danger">@handover.HandoverAmount.ToString("C")</td>
+                                <td>@handover.HandedToName</td>
+                                <td>@handover.Remarks</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Expenses Tab -->
+        <div class="tab-pane fade" id="expenses" role="tabpanel">
+            <div class="table-responsive">
+                <table class="table table-striped" id="expensesTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Category</th>
+                            <th>Amount</th>
+                            <th>Job Code</th>
+                            <th>Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var expense in Model.Expenses)
+                        {
+                            <tr>
+                                <td>@expense.ExpenseDate.ToString("dd-MM-yyyy")</td>
+                                <td>@expense.Category</td>
+                                <td class="text-danger">@expense.Amount.ToString("C")</td>
+                                <td>@(expense.JobCode.HasValue ? expense.JobCode.ToString() : "-")</td>
+                                <td>@expense.Remarks</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#transactionsTable, #handoversTable, #expensesTable').DataTable({
+                "pageLength": 25,
+                "order": [[0, "desc"]]
+            });
+        });
+    </script>
+}

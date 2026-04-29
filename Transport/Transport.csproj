@@ -105,6 +105,9 @@
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration.ConfigurationManager, Version=10.0.0.7, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Configuration.ConfigurationManager.10.0.7\lib\net462\System.Configuration.ConfigurationManager.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -3791,6 +3794,7 @@
     <Compile Include="Controllers\SystemMasterController.cs" />
     <Compile Include="Controllers\ProjectMasterController.cs" />
     <Compile Include="Controllers\JobController.cs" />
+    <Compile Include="Controllers\WalletController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -4018,6 +4022,14 @@
     <Content Include="Views\Reports\VendorAccountSummary.cshtml" />
     <Content Include="Views\DriverWallet\DriverWallet.cshtml" />
     <Content Include="Views\DriverWallet\AdminWallet.cshtml" />
+    <Content Include="Views\Wallet\Dashboard.cshtml" />
+    <Content Include="Views\Wallet\DriverWallets.cshtml" />
+    <Content Include="Views\Wallet\HandoverCash.cshtml" />
+    <Content Include="Views\Wallet\DriverExpense.cshtml" />
+    <Content Include="Views\Wallet\CompanyExpense.cshtml" />
+    <Content Include="Views\Wallet\DriverWalletDetail.cshtml" />
+    <Content Include="Views\Wallet\TransactionHistory.cshtml" />
+    <Content Include="Views\Wallet\AdminWallet.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

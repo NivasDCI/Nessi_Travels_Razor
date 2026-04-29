@@ -1,0 +1,71 @@
+@model List<Transport.Model.DriverWalletViewModel>
+@{
+    ViewBag.Title = "Driver Wallets";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h2>Driver Wallets</h2>
+            <hr />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered" id="driverTable">
+                    <thead>
+                        <tr>
+                            <th>Driver Name</th>
+                            <th>Current Balance</th>
+                            <th>Total Earned</th>
+                            <th>Total Expenses</th>
+                            <th>Total Handed Over</th>
+                            <th>Last Updated</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var driver in Model)
+                        {
+                            <tr>
+                                <td>@driver.DriverName</td>
+                                <td class="@(driver.CurrentBalance < 0 ? "text-danger" : "text-success")">
+                                    @driver.CurrentBalance.ToString("C")
+                                </td>
+                                <td>@driver.TotalEarned.ToString("C")</td>
+                                <td>@driver.TotalExpenses.ToString("C")</td>
+                                <td>@driver.TotalHandedOver.ToString("C")</td>
+                                <td>@driver.LastUpdated.ToString("dd-MM-yyyy HH:mm")</td>
+                                <td>
+                                    <a href="@Url.Action("DriverWalletDetail", new { id = driver.UserID })" class="btn btn-sm btn-primary">
+                                        View Details
+                                    </a>
+                                    <a href="@Url.Action("HandoverCash", new { driverId = driver.UserID })" class="btn btn-sm btn-warning">
+                                        Handover Cash
+                                    </a>
+                                    <a href="@Url.Action("DriverExpense", new { driverId = driver.UserID })" class="btn btn-sm btn-info">
+                                        Add Expense
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#driverTable').DataTable({
+                "pageLength": 25,
+                "order": [[1, "desc"]]
+            });
+        });
+    </script>
+}
