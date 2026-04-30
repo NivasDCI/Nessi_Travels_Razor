@@ -1,0 +1,428 @@
+@using Transport.Repository.Resource;
+@{
+    Layout = "";
+}
+<head>
+    <style>
+        .tab-section {
+            display: none;
+        }
+
+            .tab-section.active {
+                display: block;
+            }
+
+        .exp-tab-btn {
+            margin-right: 6px;
+            margin-bottom: 10px;
+            border-radius: 20px;
+            padding: 6px 20px;
+            font-weight: 600;
+        }
+    </style>
+    <script>var dpOpts = { format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small' };
+    $('#TxtDrvDate').datepicker(dpOpts);
+    $('#TxtCmpDate').datepicker(dpOpts);
+    $('#TxtDrvFrom').datepicker(dpOpts);
+    $('#TxtDrvTo').datepicker(dpOpts);
+    $('#TxtCmpFrom').datepicker(dpOpts);
+    $('#TxtCmpTo').datepicker(dpOpts);
+
+    // Load user dropdowns
+    $.ajax({ type: 'GET', url: BaseURL + 'Common/Load_SystemUserDetail', datatype: 'Json',
+        success: function (data) {
+            ['ddlDrvDriver', 'ddlDrvFilter', 'ddlCmpDriver'].forEach(function (id) {
+                var $el = $('#' + id);
+                $el.empty();
+                if (id === 'ddlDrvFilter') $el.append('<option value="0">-- All Drivers --</option>');
+                else $el.append('<option value="0">-- Select --</option>');
+                $.each(data, function (i, v) {
+                    if (v.ID > 0) $el.append('<option value="' + v.ID + '">' + v.Name + '</option>');
+                });
+            });
+        }
+    });
+
+    // Tab switching
+    function showTab(tab) {
+        $('.tab-section').removeClass('active');
+        $('.exp-tab-btn').removeClass('btn-primary').addClass('btn-outline-secondary');
+        $('#sec_' + tab).addClass('active');
+        $('#tab_' + tab).removeClass('btn-outline-secondary').addClass('btn-primary');
+    }
+
+    // ══ DRIVER EXPENSE GRID ══════════════════════════════════════════════════
+    var GrdDrv = $('#GrdDrv').grid({
+        primaryKey: 'DriverExpenseID', uiLibrary: 'bootstrap4', responsive: true,
+        dataSource: BaseURL + 'Wallet/DriverExpense_FindAll',
+        columns: [
+            { field: 'DisplayExpenseDate', width: 100, title: 'DATE',     sortable: false },
+            { field: 'DriverName',         width: 110, title: 'DRIVER',   sortable: false },
+            { field: 'Category',           width: 110, title: 'CATEGORY', sortable: false },
+            { field: 'Amount', width: 100, title: 'AMOUNT (SGD)', sortable: false, align: 'right',
+              renderer: function (v) { return '<strong style="color:#e74c3c;">$ ' + parseFloat(v).toFixed(2) + '</strong>'; } },
+            { field: 'Remarks',            width: 160, title: 'REMARKS',  sortable: false },
+            { field: 'JobCode',            width: 65,  title: 'JOB #',    sortable: false,
+              renderer: function (v) { return v ? '#' + v : '&mdash;'; } },
+            { field: 'DisplayCreatedDate', width: 110, title: 'RECORDED', sortable: false },
+            { field: 'DriverExpenseID', width: 55, title: '', sortable: false, align: 'center',
+              renderer: function (v) { return '<button onclick="DelDrv(' + v + ')" class="badge badge-danger" style="cursor:pointer;border:none;padding:4px 8px;"><i class="fa fa-trash"></i></button>'; } }
+        ],
+        pager: { enable: true, limit: 25, sizes: ArrPaging }
+    });
+
+    function DrvSearch() {
+        GrdDrv.reload({ DriverUserID: parseInt($('#ddlDrvFilter').val()) || null, FromDate: $('#TxtDrvFrom').val(), ToDate: $('#TxtDrvTo').val() });
+    }
+    function DrvClear() {
+        $('#TxtDrvFrom,#TxtDrvTo').val(''); $('#ddlDrvFilter').val('0');
+        GrdDrv.reload({});
+    }
+
+    $('#btnSaveDrv').click(function () {
+        var duid = parseInt($('#ddlDrvDriver').val()) || 0;
+        var amt  = parseFloat($('#TxtDrvAmount').val());
+        var dt   = $('#TxtDrvDate').val();
+        var cat  = $('#ddlDrvCat').val();
+        if (duid <= 0)         { alert('Please select a driver.'); return; }
+        if (!dt)               { alert('Please select a date.');   return; }
+        if (!cat)              { alert('Please select a category.'); return; }
+        if (!amt || amt <= 0)  { alert('Please enter a valid amount.'); return; }
+
+        $(this).prop('disabled', true).text('Saving...');
+        $.ajax({
+            url: BaseURL + 'Wallet/DriverExpense_Save', type: 'POST',
+            dataType: 'json', contentType: 'application/json',
+            data: JSON.stringify({ DriverUserID: duid, ExpenseDate: dt, Category: cat, Amount: amt,
+                Remarks: $('#TxtDrvRemarks').val(), JobCode: parseInt($('#TxtDrvJobCode').val()) || 0 }),
+            success: function (r) {
+                $('#btnSaveDrv').prop('disabled', false).text('Save Driver Expense');
+                if (r.success) {
+                    GrdDrv.reload({});
+                    $('#TxtDrvDate,#TxtDrvAmount,#TxtDrvRemarks,#TxtDrvJobCode').val('');
+                    $('#ddlDrvDriver,#ddlDrvCat').val('0');
+                    alert('Driver expense saved successfully.');
+                } else { alert('Error: ' + (r.message || 'Failed.')); }
+            },
+            error: function () { $('#btnSaveDrv').prop('disabled', false).text('Save Driver Expense'); alert('Server error.'); }
+        });
+    });
+
+    function DelDrv(id) {
+        if (!confirm('Delete this driver expense?')) return;
+        $.ajax({
+            url: BaseURL + 'Wallet/DriverExpense_Delete', type: 'POST',
+            dataType: 'json', contentType: 'application/json',
+            data: JSON.stringify({ DriverExpenseID: id }),
+            success: function (r) { if (r.success) GrdDrv.reload({}); else alert('Failed.'); }
+        });
+    }
+
+    // ══ COMPANY EXPENSE GRID ═════════════════════════════════════════════════
+    var GrdCmp = $('#GrdCmp').grid({
+        primaryKey: 'CompanyExpenseID', uiLibrary: 'bootstrap4', responsive: true,
+        dataSource: BaseURL + 'Wallet/CompanyExpense_FindAll',
+        columns: [
+            { field: 'DisplayExpenseDate', width: 100, title: 'DATE',      sortable: false },
+            { field: 'Category',           width: 130, title: 'CATEGORY',  sortable: false },
+            { field: 'Amount', width: 105, title: 'AMOUNT (SGD)', sortable: false, align: 'right',
+              renderer: function (v) { return '<strong style="color:#e74c3c;">$ ' + parseFloat(v).toFixed(2) + '</strong>'; } },
+            { field: 'DriverName',         width: 110, title: 'DRIVER',    sortable: false,
+              renderer: function (v) { return v && v.trim() ? v : '&mdash;'; } },
+            { field: 'Remarks',            width: 160, title: 'REMARKS',   sortable: false },
+            { field: 'CreatedByName',      width: 110, title: 'ADDED BY',  sortable: false },
+            { field: 'DisplayCreatedDate', width: 110, title: 'RECORDED',  sortable: false },
+            { field: 'CompanyExpenseID', width: 55, title: '', sortable: false, align: 'center',
+              renderer: function (v) { return '<button onclick="DelCmp(' + v + ')" class="badge badge-danger" style="cursor:pointer;border:none;padding:4px 8px;"><i class="fa fa-trash"></i></button>'; } }
+        ],
+        pager: { enable: true, limit: 25, sizes: ArrPaging }
+    });
+
+    function CmpSearch() {
+        GrdCmp.reload({ FromDate: $('#TxtCmpFrom').val(), ToDate: $('#TxtCmpTo').val(), Category: $('#ddlCmpCatFilter').val() });
+    }
+    function CmpClear() {
+        $('#TxtCmpFrom,#TxtCmpTo').val(''); $('#ddlCmpCatFilter').val('');
+        GrdCmp.reload({});
+    }
+
+    $('#btnSaveCmp').click(function () {
+        var amt = parseFloat($('#TxtCmpAmount').val());
+        var dt  = $('#TxtCmpDate').val();
+        var cat = $('#ddlCmpCat').val();
+        if (!dt)              { alert('Please select a date.');     return; }
+        if (!cat)             { alert('Please select a category.'); return; }
+        if (!amt || amt <= 0) { alert('Please enter a valid amount.'); return; }
+
+        $(this).prop('disabled', true).text('Saving...');
+        $.ajax({
+            url: BaseURL + 'Wallet/CompanyExpense_Save', type: 'POST',
+            dataType: 'json', contentType: 'application/json',
+            data: JSON.stringify({ ExpenseDate: dt, Category: cat, Amount: amt,
+                Remarks: $('#TxtCmpRemarks').val(),
+                DriverUserID: parseInt($('#ddlCmpDriver').val()) || 0 }),
+            success: function (r) {
+                $('#btnSaveCmp').prop('disabled', false).text('Save Company Expense');
+                if (r.success) {
+                    GrdCmp.reload({});
+                    $('#TxtCmpDate,#TxtCmpAmount,#TxtCmpRemarks').val('');
+                    $('#ddlCmpCat,#ddlCmpDriver').val('0');
+                    alert('Company expense saved successfully.');
+                } else { alert('Error: ' + (r.message || 'Failed.')); }
+            },
+            error: function () { $('#btnSaveCmp').prop('disabled', false).text('Save Company Expense'); alert('Server error.'); }
+        });
+    });
+
+    function DelCmp(id) {
+        if (!confirm('Delete this company expense?')) return;
+        $.ajax({
+            url: BaseURL + 'Wallet/CompanyExpense_Delete', type: 'POST',
+            dataType: 'json', contentType: 'application/json',
+            data: JSON.stringify({ CompanyExpenseID: id }),
+            success: function (r) { if (r.success) GrdCmp.reload({}); else alert('Failed.'); }
+        });
+    }</script>
+</head>
+<body>
+    <div class="content">
+        <div class="container-fluid">
+
+            <!-- TAB BUTTONS -->
+            <div class="mb-3">
+                <button id="tab_drv" class="btn btn-primary exp-tab-btn" onclick="showTab('drv')">
+                    <i class="fa fa-id-card"></i> Driver Expenses
+                </button>
+                <button id="tab_cmp" class="btn btn-outline-secondary exp-tab-btn" onclick="showTab('cmp')">
+                    <i class="fa fa-building"></i> Company Expenses
+                </button>
+            </div>
+
+            <!-- ══ TAB: DRIVER EXPENSES ══════════════════════════════════════════════ -->
+            <div id="sec_drv" class="tab-section active">
+
+                <!-- ADD FORM CARD -->
+                <div class="card card-pd mb-3" style="border-left:4px solid #e74c3c;">
+                    <div class="card-header" style="background:#e74c3c;color:#fff;">
+                        <i class="fa fa-plus-circle"></i>&nbsp; Add Driver Expense
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label>Driver <span class="text-danger">*</span></label>
+                                    @Html.DropDownList("ddlDrvDriver", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @id = "ddlDrvDriver" })
+                                </div>
+                            </div>
+                            <div class="col-sm-2">
+                                <div class="form-group">
+                                    <label>Date <span class="text-danger">*</span></label>
+                                    <input type="text" id="TxtDrvDate" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="col-sm-2">
+                                <div class="form-group">
+                                    <label>Category <span class="text-danger">*</span></label>
+                                    <select id="ddlDrvCat" class="form-control">
+                                        <option value="">-- Select --</option>
+                                        <option value="Fuel">Fuel</option>
+                                        <option value="Toll">Toll</option>
+                                        <option value="Parking">Parking</option>
+                                        <option value="Food">Food</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-2">
+                                <div class="form-group">
+                                    <label>Amount (SGD) <span class="text-danger">*</span></label>
+                                    <input type="number" id="TxtDrvAmount" class="form-control" placeholder="0.00" step="0.01" min="0" />
+                                </div>
+                            </div>
+                            <div class="col-sm-1">
+                                <div class="form-group">
+                                    <label>Job #</label>
+                                    <input type="number" id="TxtDrvJobCode" class="form-control" placeholder="Optional" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label>Remarks</label>
+                                    <input type="text" id="TxtDrvRemarks" class="form-control" placeholder="e.g. Shell petrol, ERP Buona Vista" />
+                                </div>
+                            </div>
+                            <div class="col-sm-2 pdt-25">
+                                <button type="button" id="btnSaveDrv" class="btn btn-danger btn-block"><i class="fa fa-save"></i> Save Driver Expense</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DRIVER EXPENSE GRID -->
+                <div class="card card-pd">
+                    <div class="card-header">
+                        <i class="fa fa-list"></i>&nbsp; Driver Expense Records
+                        <div style="float:right;">
+                            <span style="border-left:1px solid #ccc; padding-left:15px; padding-right:15px;">
+                                <a href="#" onclick="showForm()"><i class="fas fa-caret-square-down"></i></a>
+                            </span>
+                            <span style="border-left:1px solid #ccc; padding-left:15px; padding-right:15px;">
+                                <a href="#" onclick="hideForm()"><i class="fas fa-caret-square-up"></i></a>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="hidden-form">
+                            <div class="row mb-2">
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label>Driver</label>
+                                        @Html.DropDownList("ddlDrvFilter", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @id = "ddlDrvFilter" })
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label>From</label>
+                                        <input type="text" id="TxtDrvFrom" class="form-control" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label>To</label>
+                                        <input type="text" id="TxtDrvTo" class="form-control" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-2 pdt-25">
+                                    <button type="button" class="btn btn-secondary btn-block" onclick="DrvSearch()"><i class="fa fa-search"></i> Filter</button>
+                                </div>
+                                <div class="col-sm-2 pdt-25">
+                                    <button type="button" class="btn btn-secondary btn-block" onclick="DrvClear()"><i class="fa fa-paint-brush"></i> Clear</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="box-body table-responsive no-padding">
+                            <table id="GrdDrv" class="table table-hover"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══ TAB: COMPANY EXPENSES ══════════════════════════════════════════════ -->
+            <div id="sec_cmp" class="tab-section">
+
+                <!-- ADD FORM CARD -->
+                <div class="card card-pd mb-3" style="border-left:4px solid #8e44ad;">
+                    <div class="card-header" style="background:#8e44ad;color:#fff;">
+                        <i class="fa fa-plus-circle"></i>&nbsp; Add Company Expense
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-2">
+                                <div class="form-group">
+                                    <label>Date <span class="text-danger">*</span></label>
+                                    <input type="text" id="TxtCmpDate" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label>Category <span class="text-danger">*</span></label>
+                                    <select id="ddlCmpCat" class="form-control">
+                                        <option value="">-- Select --</option>
+                                        <option value="Driver Salary">Driver Salary</option>
+                                        <option value="Fuel">Fuel</option>
+                                        <option value="Vehicle Maintenance">Vehicle Maintenance</option>
+                                        <option value="Office">Office</option>
+                                        <option value="Insurance">Insurance</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-2">
+                                <div class="form-group">
+                                    <label>Amount (SGD) <span class="text-danger">*</span></label>
+                                    <input type="number" id="TxtCmpAmount" class="form-control" placeholder="0.00" step="0.01" min="0" />
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label>Linked Driver <small class="text-muted">(for salary)</small></label>
+                                    @Html.DropDownList("ddlCmpDriver", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @id = "ddlCmpDriver" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label>Remarks</label>
+                                    <input type="text" id="TxtCmpRemarks" class="form-control" placeholder="e.g. May 2025 salary, Annual road tax" />
+                                </div>
+                            </div>
+                            <div class="col-sm-2 pdt-25">
+                                <button type="button" id="btnSaveCmp" class="btn btn-block" style="background:#8e44ad;color:#fff;"><i class="fa fa-save"></i> Save Company Expense</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COMPANY EXPENSE GRID -->
+                <div class="card card-pd">
+                    <div class="card-header">
+                        <i class="fa fa-list"></i>&nbsp; Company Expense Records
+                        <div style="float:right;">
+                            <span style="border-left:1px solid #ccc; padding-left:15px; padding-right:15px;">
+                                <a href="#" onclick="showForm()"><i class="fas fa-caret-square-down"></i></a>
+                            </span>
+                            <span style="border-left:1px solid #ccc; padding-left:15px; padding-right:15px;">
+                                <a href="#" onclick="hideForm()"><i class="fas fa-caret-square-up"></i></a>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="hidden-form">
+                            <div class="row mb-2">
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label>From</label>
+                                        <input type="text" id="TxtCmpFrom" class="form-control" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label>To</label>
+                                        <input type="text" id="TxtCmpTo" class="form-control" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label>Category</label>
+                                        <select id="ddlCmpCatFilter" class="form-control">
+                                            <option value="">-- All --</option>
+                                            <option value="Driver Salary">Driver Salary</option>
+                                            <option value="Fuel">Fuel</option>
+                                            <option value="Vehicle Maintenance">Vehicle Maintenance</option>
+                                            <option value="Office">Office</option>
+                                            <option value="Insurance">Insurance</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-2 pdt-25">
+                                    <button type="button" class="btn btn-secondary btn-block" onclick="CmpSearch()"><i class="fa fa-search"></i> Filter</button>
+                                </div>
+                                <div class="col-sm-2 pdt-25">
+                                    <button type="button" class="btn btn-secondary btn-block" onclick="CmpClear()"><i class="fa fa-paint-brush"></i> Clear</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="box-body table-responsive no-padding">
+                            <table id="GrdCmp" class="table table-hover"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>

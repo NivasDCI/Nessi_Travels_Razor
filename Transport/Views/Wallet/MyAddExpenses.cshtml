@@ -1,0 +1,196 @@
+@using Transport.Repository.Resource;
+@{
+    Layout = "";
+    string uidStr = (ViewBag.CurrentUID != null) ? ViewBag.CurrentUID.ToString() : "0";
+}
+<head>
+    <script>
+    var CURRENT_UID = @uidStr;
+    var dpOpts = { format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small' };
+    $('#TxtEFrom').datepicker(dpOpts);
+    $('#TxtETo').datepicker(dpOpts);
+    $('#TxtExpDate').datepicker(dpOpts);
+
+    // ── Expense Grid ──────────────────────────────────────────────────────────
+    var GrdExp = $('#GrdExp').grid({
+        primaryKey: 'DriverExpenseID', uiLibrary: 'bootstrap4', responsive: true,
+        dataSource: BaseURL + 'Wallet/DriverExpense_FindAll?DriverUserID=' + CURRENT_UID,
+        columns: [
+            { field: 'DisplayExpenseDate', width: 100, title: 'DATE',         sortable: false },
+            { field: 'Category',           width: 120, title: 'CATEGORY',     sortable: false },
+            { field: 'Amount', width: 100, title: 'AMOUNT (SGD)', sortable: false, align: 'right',
+              renderer: function (v) { return '<strong style="color:#e74c3c;">$ ' + parseFloat(v).toFixed(2) + '</strong>'; } },
+            { field: 'Remarks',            width: 180, title: 'REMARKS',      sortable: false },
+            { field: 'JobCode',            width: 70,  title: 'JOB #',        sortable: false,
+              renderer: function (v) { return v ? '#' + v : '&mdash;'; } },
+            { field: 'DisplayCreatedDate', width: 110, title: 'RECORDED',     sortable: false },
+            { field: 'DriverExpenseID', width: 55, title: '', sortable: false, align: 'center',
+              renderer: function (v) { return '<button onclick="DelExp(' + v + ')" class="badge badge-danger" style="cursor:pointer;border:none;padding:4px 8px;"><i class="fa fa-trash"></i></button>'; } }
+        ],
+        pager: { enable: true, limit: 25, sizes: ArrPaging }
+    });
+
+    function ExpSearch() {
+        GrdExp.reload({ DriverUserID: CURRENT_UID, FromDate: $('#TxtEFrom').val(), ToDate: $('#TxtETo').val() });
+    }
+    function ExpClear() {
+        $('#TxtEFrom,#TxtETo').val('');
+        GrdExp.reload({ DriverUserID: CURRENT_UID });
+    }
+
+    // ── Save Expense ──────────────────────────────────────────────────────────
+    $('#btnSaveExp').click(function () {
+        var amt = parseFloat($('#TxtExpAmount').val());
+        var dt  = $('#TxtExpDate').val();
+        var cat = $('#ddlExpCat').val();
+        if (!dt)           { alert('Please select a date.'); return; }
+        if (!cat)          { alert('Please select a category.'); return; }
+        if (!amt || amt <= 0) { alert('Please enter a valid amount.'); return; }
+
+        $(this).prop('disabled', true).text('Saving...');
+        $.ajax({
+            url: BaseURL + 'Wallet/DriverExpense_Save', type: 'POST',
+            dataType: 'json', contentType: 'application/json',
+            data: JSON.stringify({
+                DriverUserID: CURRENT_UID,
+                ExpenseDate:  dt,
+                Category:     cat,
+                Amount:       amt,
+                Remarks:      $('#TxtExpRemarks').val(),
+                JobCode:      parseInt($('#TxtExpJobCode').val()) || 0
+            }),
+            success: function (r) {
+                $('#btnSaveExp').prop('disabled', false).text('Save Expense');
+                if (r.success) {
+                    $('#modalExp').modal('hide');
+                    GrdExp.reload({ DriverUserID: CURRENT_UID });
+                    $('#TxtExpDate,#TxtExpAmount,#TxtExpRemarks,#TxtExpJobCode').val('');
+                    $('#ddlExpCat').val('');
+                } else { alert('Error: ' + (r.message || 'Failed.')); }
+            },
+            error: function () { $('#btnSaveExp').prop('disabled', false).text('Save Expense'); alert('Server error.'); }
+        });
+    });
+
+    function DelExp(id) {
+        if (!confirm('Delete this expense?')) return;
+        $.ajax({
+            url: BaseURL + 'Wallet/DriverExpense_Delete', type: 'POST',
+            dataType: 'json', contentType: 'application/json',
+            data: JSON.stringify({ DriverExpenseID: id }),
+            success: function (r) { if (r.success) GrdExp.reload({ DriverUserID: CURRENT_UID }); else alert('Failed.'); }
+        });
+    }
+    </script>
+</head>
+<body>
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card card-pd">
+                        <div class="card-header">
+                            <span style="font-size:18px;"><i class="fa fa-receipt"></i></span>
+                            <span style="font-size:18px; border-left:1px solid #ccc; padding-left:10px;"> My Expenses</span>
+                            <div style="float:right;">
+                                <button type="button" class="btn btn-danger btn-sm mr-2" data-toggle="modal" data-target="#modalExp">
+                                    <i class="fa fa-plus"></i> Add Expense
+                                </button>
+                                <span style="border-left:1px solid #ccc; padding-left:15px; padding-right:15px;">
+                                    <a href="#" onclick="showForm()"><i class="fas fa-caret-square-down"></i></a>
+                                </span>
+                                <span style="border-left:1px solid #ccc; padding-left:15px; padding-right:15px;">
+                                    <a href="#" onclick="hideForm()"><i class="fas fa-caret-square-up"></i></a>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="hidden-form">
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>From Date</label>
+                                            <input type="text" id="TxtEFrom" class="form-control" />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>To Date</label>
+                                            <input type="text" id="TxtETo" class="form-control" />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2 pdt-25">
+                                        <button type="button" class="btn btn-primary btn-block" onclick="ExpSearch()"><i class="fa fa-search"></i> Search</button>
+                                    </div>
+                                    <div class="col-sm-2 pdt-25">
+                                        <button type="button" class="btn btn-secondary btn-block" onclick="ExpClear()"><i class="fa fa-paint-brush"></i> Clear</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="box-body table-responsive no-padding">
+                                <table id="GrdExp" class="table table-hover"></table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Add Expense -->
+    <div class="modal fade" id="modalExp" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="background:#c0392b;color:#fff;">
+                    <h5 class="modal-title"><i class="fa fa-receipt"></i> Add My Expense</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Date <span class="text-danger">*</span></label>
+                                <input type="text" id="TxtExpDate" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Category <span class="text-danger">*</span></label>
+                                <select id="ddlExpCat" class="form-control">
+                                    <option value="">-- Select --</option>
+                                    <option value="Fuel">Fuel</option>
+                                    <option value="Toll">Toll</option>
+                                    <option value="Parking">Parking</option>
+                                    <option value="Food">Food</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Amount (SGD) <span class="text-danger">*</span></label>
+                                <input type="number" id="TxtExpAmount" class="form-control" placeholder="0.00" step="0.01" min="0" />
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Job Code <small class="text-muted">(optional)</small></label>
+                                <input type="number" id="TxtExpJobCode" class="form-control" placeholder="Job number" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Remarks</label>
+                        <textarea id="TxtExpRemarks" class="form-control" rows="2" placeholder="e.g. Shell petrol, ERP charge"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnSaveExp" class="btn btn-danger"><i class="fa fa-save"></i> Save Expense</button>
+                    <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>

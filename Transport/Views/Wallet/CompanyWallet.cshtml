@@ -1,0 +1,391 @@
+@using Transport.Repository.Resource;
+@{
+    Layout = "";
+}
+<head>
+    <style>
+        .wcard {
+            border-radius: 10px;
+            color: #fff;
+            padding: 16px 18px;
+            margin-bottom: 14px;
+        }
+
+        .wc-earn {
+            background: linear-gradient(135deg,#1a9e6e,#27ae60);
+        }
+
+        .wc-hand {
+            background: linear-gradient(135deg,#1a6fa3,#2980b9);
+        }
+
+        .wc-dexp {
+            background: linear-gradient(135deg,#d68910,#f39c12);
+        }
+
+        .wc-cexp {
+            background: linear-gradient(135deg,#a93226,#e74c3c);
+        }
+
+        .wc-with {
+            background: linear-gradient(135deg,#5d6d7e,#7f8c8d);
+        }
+
+        .wc-bal {
+            background: linear-gradient(135deg,#6c3483,#8e44ad);
+        }
+
+        .wcard .wc-lbl {
+            font-size: 11px;
+            opacity: .85;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .wcard .wc-amt {
+            font-size: 20px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .wcard .wc-sub {
+            font-size: 11px;
+            opacity: .7;
+        }
+
+        .tbl-driver-row td {
+            font-size: 13px;
+        }
+    </style>
+    <script>// ── Load company summary cards + driver breakdown ─────────────────────────
+    function LoadCompanyData() {
+        $.ajax({ url: BaseURL + 'Wallet/CompanyWallet_FindAll', type: 'GET', dataType: 'json',
+            success: function (r) {
+                if (r.summary) {
+                    var s = r.summary;
+                    $('#CardTotalEarned').text('$ '  + parseFloat(s.TotalDriverEarnings  || 0).toFixed(2));
+                    $('#CardHandedOver').text('$ '   + parseFloat(s.TotalHandedOver      || 0).toFixed(2));
+                    $('#CardDrvExp').text('$ '       + parseFloat(s.TotalDriverExpenses  || 0).toFixed(2));
+                    $('#CardCmpExp').text('$ '       + parseFloat(s.TotalCompanyExpenses || 0).toFixed(2));
+                    $('#CardWithDrv').text('$ '      + parseFloat(s.WithDrivers          || 0).toFixed(2));
+                    var bal = parseFloat(s.CompanyBalance || 0);
+                    $('#CardBal').text('$ ' + bal.toFixed(2));
+                    if (bal < 0) $('#WcBal').css('background','linear-gradient(135deg,#c0392b,#e74c3c)');
+                }
+                // populate driver breakdown table
+                var tbody = $('#tblDriverBreakdown tbody');
+                tbody.empty();
+                if (r.records && r.records.length > 0) {
+                    $.each(r.records, function (i, d) {
+                        var balColor = parseFloat(d.Balance) >= 0 ? '#8e44ad' : '#e74c3c';
+                        tbody.append(
+                            '<tr class="tbl-driver-row">' +
+                            '<td>' + d.DriverName + '</td>' +
+                            '<td style="text-align:right;color:#27ae60;font-weight:bold;">$ ' + parseFloat(d.TotalEarned).toFixed(2)     + '</td>' +
+                            '<td style="text-align:right;color:#2980b9;font-weight:bold;">$ ' + parseFloat(d.TotalHandedOver).toFixed(2) + '</td>' +
+                            '<td style="text-align:right;color:#e74c3c;font-weight:bold;">$ ' + parseFloat(d.TotalExpenses).toFixed(2)   + '</td>' +
+                            '<td style="text-align:right;color:' + balColor + ';font-weight:bold;">$ ' + parseFloat(d.Balance).toFixed(2) + '</td>' +
+                            '</tr>'
+                        );
+                    });
+                } else {
+                    tbody.append('<tr><td colspan="5" style="text-align:center;color:#999;padding:20px;">No data found.</td></tr>');
+                }
+            }
+        });
+    }
+
+    // ── Company Expense Grid ──────────────────────────────────────────────────
+    var dpOpts = { format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small' };
+    $('#TxtExpFrom').datepicker(dpOpts);
+    $('#TxtExpTo').datepicker(dpOpts);
+    $('#TxtCEDate').datepicker(dpOpts);
+
+    // optional: link an expense to a driver (e.g. salary)
+    $.ajax({ type: 'GET', url: BaseURL + 'Common/Load_SystemUserDetail', datatype: 'Json',
+        success: function (data) {
+            $('#ddlCEDriver').empty();
+            $('#ddlCEDriver').append('<option value="0">-- None / N/A --</option>');
+            $.each(data, function (i, v) {
+                if (v.ID > 0) $('#ddlCEDriver').append('<option value="' + v.ID + '">' + v.Name + '</option>');
+            });
+        }
+    });
+
+    var GrdCmpExp = $('#GrdCmpExp').grid({
+        primaryKey: 'CompanyExpenseID', uiLibrary: 'bootstrap4', responsive: true,
+        dataSource: BaseURL + 'Wallet/CompanyExpense_FindAll',
+        columns: [
+            { field: 'DisplayExpenseDate', width: 100, title: 'DATE',       sortable: false },
+            { field: 'Category',           width: 130, title: 'CATEGORY',   sortable: false },
+            { field: 'Amount', width: 105, title: 'AMOUNT (SGD)', sortable: false, align: 'right',
+              renderer: function (v) { return '<strong style="color:#e74c3c;">$ ' + parseFloat(v).toFixed(2) + '</strong>'; } },
+            { field: 'DriverName',         width: 110, title: 'DRIVER',     sortable: false,
+              renderer: function (v) { return v && v.trim() ? v : '&mdash;'; } },
+            { field: 'Remarks',            width: 160, title: 'REMARKS',    sortable: false },
+            { field: 'CreatedByName',      width: 110, title: 'ADDED BY',   sortable: false },
+            { field: 'DisplayCreatedDate', width: 110, title: 'RECORDED',   sortable: false },
+            { field: 'CompanyExpenseID', width: 55, title: '', sortable: false, align: 'center',
+              renderer: function (v) { return '<button onclick="DelCE(' + v + ')" class="badge badge-danger" style="cursor:pointer;border:none;padding:4px 8px;"><i class="fa fa-trash"></i></button>'; } }
+        ],
+        pager: { enable: true, limit: 25, sizes: ArrPaging }
+    });
+
+    function CESearch() {
+        GrdCmpExp.reload({ FromDate: $('#TxtExpFrom').val(), ToDate: $('#TxtExpTo').val(), Category: $('#ddlCEFilter').val() });
+    }
+    function CEClear() {
+        $('#TxtExpFrom,#TxtExpTo').val(''); $('#ddlCEFilter').val('');
+        GrdCmpExp.reload({});
+    }
+
+    $('#btnSaveCE').click(function () {
+        var amt = parseFloat($('#TxtCEAmount').val());
+        var dt  = $('#TxtCEDate').val();
+        var cat = $('#ddlCECategory').val();
+        if (!dt)           { alert('Please select a date.');     return; }
+        if (!cat)          { alert('Please select a category.'); return; }
+        if (!amt || amt <= 0) { alert('Please enter a valid amount.'); return; }
+
+        $(this).prop('disabled', true).text('Saving...');
+        $.ajax({
+            url: BaseURL + 'Wallet/CompanyExpense_Save', type: 'POST',
+            dataType: 'json', contentType: 'application/json',
+            data: JSON.stringify({
+                ExpenseDate:  dt,
+                Category:     cat,
+                Amount:       amt,
+                Remarks:      $('#TxtCERemarks').val(),
+                DriverUserID: parseInt($('#ddlCEDriver').val()) || 0
+            }),
+            success: function (r) {
+                $('#btnSaveCE').prop('disabled', false).text('Save');
+                if (r.success) {
+                    $('#modalCE').modal('hide');
+                    LoadCompanyData();
+                    GrdCmpExp.reload({});
+                    $('#TxtCEDate,#TxtCEAmount,#TxtCERemarks').val('');
+                    $('#ddlCECategory,#ddlCEDriver').val('0');
+                } else { alert('Error: ' + (r.message || 'Failed.')); }
+            },
+            error: function () { $('#btnSaveCE').prop('disabled', false).text('Save'); alert('Server error.'); }
+        });
+    });
+
+    function DelCE(id) {
+        if (!confirm('Delete this company expense?')) return;
+        $.ajax({
+            url: BaseURL + 'Wallet/CompanyExpense_Delete', type: 'POST',
+            dataType: 'json', contentType: 'application/json',
+            data: JSON.stringify({ CompanyExpenseID: id }),
+            success: function (r) { if (r.success) { LoadCompanyData(); GrdCmpExp.reload({}); } else alert('Failed.'); }
+        });
+    }
+
+    $(document).ready(function () { LoadCompanyData(); });</script>
+</head>
+<body>
+    <div class="content">
+        <div class="container-fluid">
+
+            <!-- SUMMARY CARDS -->
+            <div class="row mb-3">
+                <div class="col-sm-2">
+                    <div class="wcard wc-earn">
+                        <div class="wc-lbl"><i class="fa fa-car"></i> Driver Earnings</div>
+                        <div class="wc-amt" id="CardTotalEarned">$ 0.00</div>
+                        <div class="wc-sub">total cash collected</div>
+                    </div>
+                </div>
+                <div class="col-sm-2">
+                    <div class="wcard wc-hand">
+                        <div class="wc-lbl"><i class="fa fa-hand-holding-usd"></i> Handed Over</div>
+                        <div class="wc-amt" id="CardHandedOver">$ 0.00</div>
+                        <div class="wc-sub">received by admin</div>
+                    </div>
+                </div>
+                <div class="col-sm-2">
+                    <div class="wcard wc-dexp">
+                        <div class="wc-lbl"><i class="fa fa-gas-pump"></i> Driver Expenses</div>
+                        <div class="wc-amt" id="CardDrvExp">$ 0.00</div>
+                        <div class="wc-sub">fuel, toll, parking</div>
+                    </div>
+                </div>
+                <div class="col-sm-2">
+                    <div class="wcard wc-cexp">
+                        <div class="wc-lbl"><i class="fa fa-building"></i> Company Expenses</div>
+                        <div class="wc-amt" id="CardCmpExp">$ 0.00</div>
+                        <div class="wc-sub">salary, ops, maintenance</div>
+                    </div>
+                </div>
+                <div class="col-sm-2">
+                    <div class="wcard wc-with">
+                        <div class="wc-lbl"><i class="fa fa-user-clock"></i> With Drivers</div>
+                        <div class="wc-amt" id="CardWithDrv">$ 0.00</div>
+                        <div class="wc-sub">not yet handed over</div>
+                    </div>
+                </div>
+                <div class="col-sm-2">
+                    <div class="wcard wc-bal" id="WcBal">
+                        <div class="wc-lbl"><i class="fa fa-landmark"></i> Company Balance</div>
+                        <div class="wc-amt" id="CardBal">$ 0.00</div>
+                        <div class="wc-sub">received &minus; company exp</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DRIVER BREAKDOWN TABLE -->
+            <div class="row mb-3">
+                <div class="col-lg-12">
+                    <div class="card card-pd">
+                        <div class="card-header">
+                            <i class="fa fa-users"></i>&nbsp; Per-Driver Breakdown
+                            <div style="float:right;">
+                                <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#modalCE">
+                                    <i class="fa fa-plus"></i> Add Company Expense
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-bordered" style="font-size:13px;">
+                                    <thead style="background:#2c3e50;color:#fff;">
+                                        <tr>
+                                            <th>DRIVER</th>
+                                            <th style="text-align:right;">EARNED (SGD)</th>
+                                            <th style="text-align:right;">HANDED OVER (SGD)</th>
+                                            <th style="text-align:right;">EXPENSES (SGD)</th>
+                                            <th style="text-align:right;">BALANCE (SGD)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tblDriverBreakdown">
+                                        <tr><td colspan="5" style="text-align:center;padding:20px;color:#999;">Loading...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COMPANY EXPENSE GRID -->
+            <div class="row mb-3">
+                <div class="col-lg-12">
+                    <div class="card card-pd">
+                        <div class="card-header">
+                            <i class="fa fa-receipt"></i>&nbsp; Company Expense Records
+                            <div style="float:right;">
+                                <span style="border-left:1px solid #ccc; padding-left:15px; padding-right:15px;">
+                                    <a href="#" onclick="showForm()"><i class="fas fa-caret-square-down"></i></a>
+                                </span>
+                                <span style="border-left:1px solid #ccc; padding-left:15px; padding-right:15px;">
+                                    <a href="#" onclick="hideForm()"><i class="fas fa-caret-square-up"></i></a>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="hidden-form">
+                                <div class="row mb-2">
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>From Date</label>
+                                            <input type="text" id="TxtExpFrom" class="form-control" />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>To Date</label>
+                                            <input type="text" id="TxtExpTo" class="form-control" />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>Category</label>
+                                            <select id="ddlCEFilter" class="form-control">
+                                                <option value="">-- All --</option>
+                                                <option value="Driver Salary">Driver Salary</option>
+                                                <option value="Fuel">Fuel</option>
+                                                <option value="Vehicle Maintenance">Vehicle Maintenance</option>
+                                                <option value="Office">Office</option>
+                                                <option value="Insurance">Insurance</option>
+                                                <option value="Other">Other</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2 pdt-25">
+                                        <button type="button" class="btn btn-primary btn-block" onclick="CESearch()"><i class="fa fa-search"></i> Search</button>
+                                    </div>
+                                    <div class="col-sm-2 pdt-25">
+                                        <button type="button" class="btn btn-secondary btn-block" onclick="CEClear()"><i class="fa fa-paint-brush"></i> Clear</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="box-body table-responsive no-padding">
+                                <table id="GrdCmpExp" class="table table-hover"></table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODAL: Add Company Expense -->
+    <div class="modal fade" id="modalCE" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="background:#c0392b;color:#fff;">
+                    <h5 class="modal-title"><i class="fa fa-building"></i> Add Company Expense</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Date <span class="text-danger">*</span></label>
+                                <input type="text" id="TxtCEDate" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Category <span class="text-danger">*</span></label>
+                                <select id="ddlCECategory" class="form-control">
+                                    <option value="">-- Select --</option>
+                                    <option value="Driver Salary">Driver Salary</option>
+                                    <option value="Fuel">Fuel</option>
+                                    <option value="Vehicle Maintenance">Vehicle Maintenance</option>
+                                    <option value="Office">Office</option>
+                                    <option value="Insurance">Insurance</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Amount (SGD) <span class="text-danger">*</span></label>
+                                <input type="number" id="TxtCEAmount" class="form-control" placeholder="0.00" step="0.01" min="0" />
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Linked Driver <small class="text-muted">(for salary)</small></label>
+                                @Html.DropDownList("ddlCEDriver", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @id = "ddlCEDriver" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Remarks</label>
+                        <textarea id="TxtCERemarks" class="form-control" rows="2" placeholder="e.g. May salary for John, Quarterly insurance premium"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnSaveCE" class="btn btn-danger"><i class="fa fa-save"></i> Save</button>
+                    <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>

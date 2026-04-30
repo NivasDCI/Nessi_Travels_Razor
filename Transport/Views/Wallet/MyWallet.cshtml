@@ -1,0 +1,320 @@
+@using Transport.Repository.Resource;
+@{
+    Layout = "";
+    string uidStr = (ViewBag.CurrentUID != null) ? ViewBag.CurrentUID.ToString() : "0";
+}
+<head>
+    <style>
+        .wcard {
+            border-radius: 10px;
+            color: #fff;
+            padding: 16px 18px;
+            margin-bottom: 14px;
+        }
+
+        .wc-earn {
+            background: linear-gradient(135deg,#1a9e6e,#27ae60);
+        }
+
+        .wc-over {
+            background: linear-gradient(135deg,#1a6fa3,#2980b9);
+        }
+
+        .wc-exp {
+            background: linear-gradient(135deg,#a93226,#e74c3c);
+        }
+
+        .wc-bal {
+            background: linear-gradient(135deg,#6c3483,#8e44ad);
+        }
+
+        .wcard .wc-lbl {
+            font-size: 11px;
+            opacity: .85;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .wcard .wc-amt {
+            font-size: 22px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .wcard .wc-sub {
+            font-size: 11px;
+            opacity: .7;
+        }
+
+        .bal-neg .wc-amt {
+            color: #ffcccc !important;
+        }
+    </style>
+    <script>
+    var CURRENT_UID = @uidStr;
+    var dpOpts = { format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small' };
+    $('#TxtFrom').datepicker(dpOpts);
+    $('#TxtTo').datepicker(dpOpts);
+    $('#TxtHODate').datepicker(dpOpts);
+
+    // Load "Handed To" dropdown
+    $.ajax({ type: 'GET', url: BaseURL + 'Common/Load_SystemUserDetail', datatype: 'Json',
+        success: function (data) {
+            $('#ddlHandedTo').empty();
+            $.each(data, function (i, v) {
+                if (v.ID > 0) $('#ddlHandedTo').append('<option value="' + v.ID + '">' + v.Name + '</option>');
+            });
+        }
+    });
+
+    // ── Balance cards ─────────────────────────────────────────────────────────
+    function LoadBalance() {
+        $.ajax({ url: BaseURL + 'Wallet/MyCashHistory_FindAll', type: 'GET', dataType: 'json',
+            data: { FromDate: '', ToDate: '' },
+            success: function () { }
+        });
+        $.ajax({ url: BaseURL + 'Wallet/MyWallet_FindAll', type: 'GET', dataType: 'json',
+            data: { FromDate: '', ToDate: '' },
+            success: function (r) {
+                if (r.balance) {
+                    $('#CardEarned').text('$ ' + parseFloat(r.balance.TotalEarned || 0).toFixed(2));
+                    $('#CardHandover').text('$ ' + parseFloat(r.balance.TotalHandedOver || 0).toFixed(2));
+                    $('#CardExpense').text('$ ' + parseFloat(r.balance.TotalExpenses || 0).toFixed(2));
+                    var bal = parseFloat(r.balance.WalletBalance || 0);
+                    $('#CardBalance').text('$ ' + bal.toFixed(2));
+                    if (bal < 0) $('#WcBal').addClass('bal-neg'); else $('#WcBal').removeClass('bal-neg');
+                }
+            }
+        });
+    }
+
+    // ── Cash History Grid ─────────────────────────────────────────────────────
+    var GrdCash = $('#GrdCash').grid({
+        primaryKey: 'JobCode', uiLibrary: 'bootstrap4', responsive: true,
+        dataSource: BaseURL + 'Wallet/MyCashHistory_FindAll',
+        columns: [
+            { field: 'DisplayJobDate', width: 100, title: 'DATE',     sortable: false },
+            { field: 'JobTime',        width: 55,  title: 'TIME',     sortable: false },
+            { field: 'JobFrom',        width: 130, title: 'FROM',     sortable: false },
+            { field: 'JobTo',          width: 130, title: 'TO',       sortable: false },
+            { field: 'CustomerName',   width: 110, title: 'CUSTOMER', sortable: false },
+            { field: 'VehicleName',    width: 80,  title: 'VEHICLE',  sortable: false },
+            { field: 'Cash', width: 85, title: 'CASH (SGD)', sortable: false, align: 'right',
+              renderer: function (v) { return parseFloat(v) > 0 ? '<strong style="color:#27ae60;">$ ' + parseFloat(v).toFixed(2) + '</strong>' : '&mdash;'; } }
+        ],
+        pager: { enable: true, limit: 30, sizes: ArrPaging }
+    });
+
+    function CashSearch() {
+        GrdCash.reload({ FromDate: $('#TxtFrom').val(), ToDate: $('#TxtTo').val() });
+    }
+    function CashClear() {
+        $('#TxtFrom,#TxtTo').val('');
+        GrdCash.reload({});
+    }
+
+    // ── Handover History Grid ─────────────────────────────────────────────────
+    var GrdHO = $('#GrdHO').grid({
+        primaryKey: 'HandoverID', uiLibrary: 'bootstrap4', responsive: true,
+        dataSource: BaseURL + 'Wallet/Handover_FindAll?DriverUserID=' + CURRENT_UID,
+        columns: [
+            { field: 'DisplayHandoverDate', width: 100, title: 'DATE',       sortable: false },
+            { field: 'Amount', width: 100, title: 'AMOUNT (SGD)', sortable: false, align: 'right',
+              renderer: function (v) { return '<strong style="color:#2980b9;">$ ' + parseFloat(v).toFixed(2) + '</strong>'; } },
+            { field: 'HandedToName',        width: 120, title: 'HANDED TO',  sortable: false },
+            { field: 'Remarks',             width: 160, title: 'REMARKS',    sortable: false },
+            { field: 'DisplayCreatedDate',  width: 120, title: 'RECORDED',   sortable: false },
+            { field: 'HandoverID', width: 55, title: '', sortable: false, align: 'center',
+              renderer: function (v) { return '<button onclick="DelHO(' + v + ')" class="badge badge-danger" style="cursor:pointer;border:none;padding:4px 8px;"><i class="fa fa-trash"></i></button>'; } }
+        ],
+        pager: { enable: true, limit: 20, sizes: ArrPaging }
+    });
+
+    // ── Save Handover ─────────────────────────────────────────────────────────
+    $('#btnSaveHO').click(function () {
+        var amt   = parseFloat($('#TxtHOAmount').val());
+        var dt    = $('#TxtHODate').val();
+        if (!dt)           { alert('Please select a date.'); return; }
+        if (!amt || amt <= 0) { alert('Please enter a valid amount.'); return; }
+
+        $(this).prop('disabled', true).text('Saving...');
+        $.ajax({
+            url: BaseURL + 'Wallet/Handover_Save', type: 'POST',
+            dataType: 'json', contentType: 'application/json',
+            data: JSON.stringify({
+                DriverUserID:   CURRENT_UID,
+                HandoverDate:   dt,
+                Amount:         amt,
+                HandedToUserID: parseInt($('#ddlHandedTo').val()) || 0,
+                HandedToName:   $('#ddlHandedTo option:selected').text(),
+                Remarks:        $('#TxtHORemarks').val()
+            }),
+            success: function (r) {
+                $('#btnSaveHO').prop('disabled', false).text('Submit');
+                if (r.success) {
+                    $('#modalHO').modal('hide');
+                    LoadBalance();
+                    GrdHO.reload();
+                    $('#TxtHODate,#TxtHOAmount,#TxtHORemarks').val('');
+                } else { alert('Error: ' + (r.message || 'Failed.')); }
+            },
+            error: function () { $('#btnSaveHO').prop('disabled', false).text('Submit'); alert('Server error.'); }
+        });
+    });
+
+    function DelHO(id) {
+        if (!confirm('Delete this handover record?')) return;
+        $.ajax({
+            url: BaseURL + 'Wallet/Handover_Delete', type: 'POST',
+            dataType: 'json', contentType: 'application/json',
+            data: JSON.stringify({ HandoverID: id }),
+            success: function (r) { if (r.success) { LoadBalance(); GrdHO.reload(); } else alert('Failed.'); }
+        });
+    }
+
+    $(document).ready(function () { LoadBalance(); });
+    </script>
+</head>
+<body>
+    <div class="content">
+        <div class="container-fluid">
+
+            <!-- BALANCE CARDS -->
+            <div class="row mb-3">
+                <div class="col-sm-3">
+                    <div class="wcard wc-earn">
+                        <div class="wc-lbl"><i class="fa fa-dollar-sign"></i> Total Earned</div>
+                        <div class="wc-amt" id="CardEarned">$ 0.00</div>
+                        <div class="wc-sub">from cash rides</div>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="wcard wc-over">
+                        <div class="wc-lbl"><i class="fa fa-hand-holding-usd"></i> Handed Over</div>
+                        <div class="wc-amt" id="CardHandover">$ 0.00</div>
+                        <div class="wc-sub">submitted to admin</div>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="wcard wc-exp">
+                        <div class="wc-lbl"><i class="fa fa-receipt"></i> My Expenses</div>
+                        <div class="wc-amt" id="CardExpense">$ 0.00</div>
+                        <div class="wc-sub">fuel, toll, etc.</div>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="wcard wc-bal" id="WcBal">
+                        <div class="wc-lbl"><i class="fa fa-wallet"></i> Wallet Balance</div>
+                        <div class="wc-amt" id="CardBalance">$ 0.00</div>
+                        <div class="wc-sub">earned &minus; handed &minus; expenses</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CASH COLLECTION HISTORY -->
+            <div class="row mb-3">
+                <div class="col-lg-12">
+                    <div class="card card-pd">
+                        <div class="card-header">
+                            <span style="font-size:18px;"><i class="fa fa-money-bill-wave"></i></span>
+                            <span style="font-size:18px; border-left:1px solid #ccc; padding-left:10px;"> Cash Collection History</span>
+                            <div style="float:right;">
+                                <button type="button" class="btn btn-primary btn-sm mr-2" data-toggle="modal" data-target="#modalHO">
+                                    <i class="fa fa-hand-holding-usd"></i> Submit Handover
+                                </button>
+                                <span style="border-left:1px solid #ccc; padding-left:15px; padding-right:15px;">
+                                    <a href="#" onclick="showForm()"><i class="fas fa-caret-square-down"></i></a>
+                                </span>
+                                <span style="border-left:1px solid #ccc; padding-left:15px; padding-right:15px;">
+                                    <a href="#" onclick="hideForm()"><i class="fas fa-caret-square-up"></i></a>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="hidden-form">
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>From Date</label>
+                                            <input type="text" id="TxtFrom" class="form-control" />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>To Date</label>
+                                            <input type="text" id="TxtTo" class="form-control" />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2 pdt-25">
+                                        <button type="button" class="btn btn-primary btn-block" onclick="CashSearch()"><i class="fa fa-search"></i> Search</button>
+                                    </div>
+                                    <div class="col-sm-2 pdt-25">
+                                        <button type="button" class="btn btn-secondary btn-block" onclick="CashClear()"><i class="fa fa-paint-brush"></i> Clear</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="box-body table-responsive no-padding">
+                                <table id="GrdCash" class="table table-hover"></table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HANDOVER HISTORY -->
+            <div class="row mb-3">
+                <div class="col-lg-12">
+                    <div class="card card-pd">
+                        <div class="card-header"><i class="fa fa-exchange-alt"></i>&nbsp; My Handover Records</div>
+                        <div class="card-body">
+                            <div class="box-body table-responsive no-padding">
+                                <table id="GrdHO" class="table table-hover"></table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODAL: Submit Handover -->
+    <div class="modal fade" id="modalHO" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="background:#2980b9;color:#fff;">
+                    <h5 class="modal-title"><i class="fa fa-hand-holding-usd"></i> Submit Cash Handover</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Date <span class="text-danger">*</span></label>
+                                <input type="text" id="TxtHODate" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Amount (SGD) <span class="text-danger">*</span></label>
+                                <input type="number" id="TxtHOAmount" class="form-control" placeholder="0.00" step="0.01" min="0" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Handing Over To <span class="text-danger">*</span></label>
+                        @Html.DropDownList("ddlHandedTo", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @id = "ddlHandedTo" })
+                    </div>
+                    <div class="form-group">
+                        <label>Remarks</label>
+                        <textarea id="TxtHORemarks" class="form-control" rows="2" placeholder="Optional notes..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnSaveHO" class="btn btn-primary"><i class="fa fa-save"></i> Submit</button>
+                    <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>

@@ -1,0 +1,194 @@
+@using Transport.Repository.Resource;
+@{
+    Layout = "";
+    string uidStr = (ViewBag.CurrentUID != null) ? ViewBag.CurrentUID.ToString() : "0";
+}
+<head>
+    <style>
+        .wcard {
+            border-radius: 10px;
+            color: #fff;
+            padding: 16px 18px;
+            margin-bottom: 14px;
+        }
+
+        .wc-recv {
+            background: linear-gradient(135deg,#1a9e6e,#27ae60);
+        }
+
+        .wcard .wc-lbl {
+            font-size: 11px;
+            opacity: .85;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .wcard .wc-amt {
+            font-size: 26px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .wcard .wc-sub {
+            font-size: 11px;
+            opacity: .7;
+        }
+    </style>
+    <script>
+    var CURRENT_UID = @uidStr;
+    var SEL_ADMIN   = CURRENT_UID;
+
+    var dpOpts = { format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small' };
+    $('#TxtFrom').datepicker(dpOpts);
+    $('#TxtTo').datepicker(dpOpts);
+
+    // Load admin selector (admin views their own received cash, or another admin)
+    $.ajax({ type: 'GET', url: BaseURL + 'Common/Load_SystemUserDetail', datatype: 'Json',
+        success: function (data) {
+            $('#ddlAdmin').empty();
+            $.each(data, function (i, v) {
+                if (v.ID > 0) {
+                    var sel = v.ID === CURRENT_UID ? ' selected' : '';
+                    $('#ddlAdmin').append('<option value="' + v.ID + '"' + sel + '>' + v.Name + '</option>');
+                }
+            });
+            LoadAdminWallet(); // auto-load for current admin on open
+        }
+    });
+
+    function LoadBalance(uid) {
+        $.ajax({ url: BaseURL + 'Wallet/AdminWallet_FindAll', type: 'GET', dataType: 'json',
+            data: { AdminUserID: uid, FromDate: '', ToDate: '' },
+            success: function (r) {
+                if (r.balance) {
+                    $('#CardReceived').text('$ ' + parseFloat(r.balance.TotalReceived || 0).toFixed(2));
+                }
+            }
+        });
+    }
+
+    // ── Admin Wallet Grid ─────────────────────────────────────────────────────
+    var GrdAdmin = $('#GrdAdmin').grid({
+        primaryKey: 'HandoverID', uiLibrary: 'bootstrap4', responsive: true,
+        dataSource: BaseURL + 'Wallet/AdminWallet_FindAll?AdminUserID=' + CURRENT_UID,
+        columns: [
+            { field: 'DisplayHandoverDate', width: 100, title: 'DATE',         sortable: false },
+            { field: 'DriverName',          width: 130, title: 'RECEIVED FROM',sortable: false },
+            { field: 'Amount', width: 110, title: 'AMOUNT (SGD)', sortable: false, align: 'right',
+              renderer: function (v) { return '<strong style="color:#27ae60;font-size:15px;">$ ' + parseFloat(v).toFixed(2) + '</strong>'; } },
+            { field: 'Remarks',             width: 180, title: 'REMARKS',      sortable: false },
+            { field: 'DisplayCreatedDate',  width: 120, title: 'RECORDED AT',  sortable: false }
+        ],
+        pager: { enable: true, limit: 30, sizes: ArrPaging }
+    });
+
+    GrdAdmin.on('dataBound', function (e, recs) {
+        // Total row in footer
+        var tot = 0;
+        $.each(recs, function () { tot += parseFloat(this.Amount || 0); });
+        var tf = GrdAdmin.children('tfoot');
+        tf.children('tr[data-role="at"]').remove();
+        tf.prepend('<tr data-role="at" style="font-weight:bold;background:#eafaf1;"><td colspan="2" style="text-align:right;padding:8px;">Page Total</td><td style="text-align:right;padding:8px;color:#27ae60;">$ ' + tot.toFixed(2) + '</td><td colspan="2"></td></tr>');
+    });
+
+    function LoadAdminWallet() {
+        SEL_ADMIN = parseInt($('#ddlAdmin').val()) || CURRENT_UID;
+        LoadBalance(SEL_ADMIN);
+        GrdAdmin.reload({ AdminUserID: SEL_ADMIN, FromDate: $('#TxtFrom').val(), ToDate: $('#TxtTo').val() });
+    }
+
+    function WalletSearch() {
+        GrdAdmin.reload({ AdminUserID: SEL_ADMIN, FromDate: $('#TxtFrom').val(), ToDate: $('#TxtTo').val() });
+    }
+    function WalletClear() {
+        $('#TxtFrom,#TxtTo').val('');
+        GrdAdmin.reload({ AdminUserID: SEL_ADMIN });
+    }
+    </script>
+</head>
+<body>
+    <div class="content">
+        <div class="container-fluid">
+
+            <!-- PAGE HEADER / FILTER -->
+            <div class="row mb-2">
+                <div class="col-lg-12">
+                    <div class="card card-pd">
+                        <div class="card-header">
+                            <span style="font-size:18px;"><i class="fa fa-user-shield"></i></span>
+                            <span style="font-size:18px; border-left:1px solid #ccc; padding-left:10px;"> Admin Wallet — Cash Received</span>
+                            <div style="float:right;">
+                                <span style="border-left:1px solid #ccc; padding-left:15px; padding-right:15px;">
+                                    <a href="#" onclick="showForm()"><i class="fas fa-caret-square-down"></i></a>
+                                </span>
+                                <span style="border-left:1px solid #ccc; padding-left:15px; padding-right:15px;">
+                                    <a href="#" onclick="hideForm()"><i class="fas fa-caret-square-up"></i></a>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="hidden-form">
+                                <div class="row align-items-end">
+                                    <div class="col-sm-3">
+                                        <label>Received By (Admin)</label>
+                                        @Html.DropDownList("ddlAdmin", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @id = "ddlAdmin" })
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <label>From Date</label>
+                                        <input type="text" id="TxtFrom" class="form-control" />
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <label>To Date</label>
+                                        <input type="text" id="TxtTo" class="form-control" />
+                                    </div>
+                                    <div class="col-sm-2 pdt-25">
+                                        <button type="button" class="btn btn-primary btn-block" onclick="LoadAdminWallet()"><i class="fa fa-search"></i> Search</button>
+                                    </div>
+                                    <div class="col-sm-2 pdt-25">
+                                        <button type="button" class="btn btn-secondary btn-block" onclick="WalletClear()"><i class="fa fa-paint-brush"></i> Clear</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BALANCE CARD -->
+            <div class="row mb-3">
+                <div class="col-sm-4">
+                    <div class="wcard wc-recv">
+                        <div class="wc-lbl"><i class="fa fa-hand-holding-usd"></i> Total Cash Received</div>
+                        <div class="wc-amt" id="CardReceived">$ 0.00</div>
+                        <div class="wc-sub">from all driver handovers</div>
+                    </div>
+                </div>
+                <div class="col-sm-8">
+                    <div class="card" style="border-left:4px solid #27ae60;padding:14px 18px;">
+                        <p class="mb-1" style="font-size:13px;color:#555;"><i class="fa fa-info-circle text-success"></i> &nbsp;<strong>How Admin Wallet Works</strong></p>
+                        <p class="mb-0" style="font-size:12px;color:#777;">
+                            This wallet shows every cash handover received by you (or the selected admin) from drivers.
+                            Each time a driver submits cash, it is recorded here automatically.
+                            Use the <strong>Driver Wallet</strong> page to view individual driver balances.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RECEIVED CASH GRID -->
+            <div class="row mb-3">
+                <div class="col-lg-12">
+                    <div class="card card-pd">
+                        <div class="card-header"><i class="fa fa-list-alt"></i>&nbsp; Handover Records Received</div>
+                        <div class="card-body">
+                            <div class="box-body table-responsive no-padding">
+                                <table id="GrdAdmin" class="table table-hover"></table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>

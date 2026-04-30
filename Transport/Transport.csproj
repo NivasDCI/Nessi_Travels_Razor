@@ -3783,7 +3783,6 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\SessionExpiry.cs" />
     <Compile Include="Controllers\CommonController.cs" />
-    <Compile Include="Controllers\Driverwalletcontroller.cs" />
     <Compile Include="Controllers\ExpenseController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LoginController.cs" />
@@ -3791,6 +3790,7 @@
     <Compile Include="Controllers\SystemMasterController.cs" />
     <Compile Include="Controllers\ProjectMasterController.cs" />
     <Compile Include="Controllers\JobController.cs" />
+    <Compile Include="Controllers\WalletController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -4016,8 +4016,12 @@
     <Content Include="Views\Reports\MyAccountsReport.cshtml" />
     <Content Include="Views\Reports\TransactionsReport.cshtml" />
     <Content Include="Views\Reports\VendorAccountSummary.cshtml" />
-    <Content Include="Views\DriverWallet\DriverWallet.cshtml" />
-    <Content Include="Views\DriverWallet\AdminWallet.cshtml" />
+    <Content Include="Views\Wallet\AdminWallet.cshtml" />
+    <Content Include="Views\Wallet\DriverWallet.cshtml" />
+    <Content Include="Views\Wallet\CompanyWallet.cshtml" />
+    <Content Include="Views\Wallet\AddExpenses.cshtml" />
+    <Content Include="Views\Wallet\MyWallet.cshtml" />
+    <Content Include="Views\Wallet\MyAddExpenses.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
