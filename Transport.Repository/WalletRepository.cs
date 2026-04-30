@@ -43,13 +43,19 @@ namespace Transport.Repository
     // ─── IMPLEMENTATION ───────────────────────────────────────────────────────
     public class WalletRepository : IWalletRepository
     {
+        //private string Conn()
+        //{
+        //    string path = System.Web.Hosting.HostingEnvironment.MapPath("~/ConnectionString.txt");
+        //    string val = "";
+        //    using (var sr = new StreamReader(path))
+        //        while (sr.Peek() >= 0) val = sr.ReadLine();
+        //    return val;
+        //}
+
         private string Conn()
         {
             string path = System.Web.Hosting.HostingEnvironment.MapPath("~/ConnectionString.txt");
-            string val = "";
-            using (var sr = new StreamReader(path))
-                while (sr.Peek() >= 0) val = sr.ReadLine();
-            return val;
+            return File.ReadAllText(path);
         }
 
         // ════════════════════════════════════════════════════════════════════

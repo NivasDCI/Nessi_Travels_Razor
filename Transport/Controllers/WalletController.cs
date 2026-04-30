@@ -25,10 +25,9 @@ namespace Transport.Controllers
         }
 
         // ════════════════════════════════════════════════════════════════════
-        // PAGE ACTIONS (return views)
+        // PAGE ACTIONS
         // ════════════════════════════════════════════════════════════════════
 
-        // ADMIN pages
         public ActionResult AdminWallet(string HeaderViewID, string DetailViewID)
         {
             ViewBag.CurrentUID = SessionExpire.GetUserID().ToString();
@@ -50,7 +49,6 @@ namespace Transport.Controllers
             return View();
         }
 
-        // DRIVER pages
         public ActionResult MyWallet(string HeaderViewID, string DetailViewID)
         {
             ViewBag.CurrentUID = SessionExpire.GetUserID().ToString();
@@ -64,42 +62,178 @@ namespace Transport.Controllers
         }
 
         // ════════════════════════════════════════════════════════════════════
-        // DRIVER WALLET - JSON ACTIONS
+        // DIAGNOSTIC — open this URL in browser to see the exact error
+        // URL: /Wallet/Diagnostic
+        // ════════════════════════════════════════════════════════════════════
+        [AllowAnonymous]
+        public JsonResult Diagnostic()
+        {
+            var results = new System.Collections.Generic.List<object>();
+            string connStr = "";
+            try
+            {
+                // Test 1: read connection string
+                string path = System.Web.Hosting.HostingEnvironment.MapPath("~/ConnectionString.txt");
+                using (var sr = new System.IO.StreamReader(path))
+                    while (sr.Peek() >= 0) connStr = sr.ReadLine();
+                results.Add(new { test = "ConnectionString", status = "OK", detail = connStr.Substring(0, 30) + "..." });
+            }
+            catch (Exception ex) { results.Add(new { test = "ConnectionString", status = "FAIL", detail = ex.Message }); }
+
+            // Test 2: check each stored proc
+            string[] procs = {
+                "sp_frm_sync_DriverWallet",
+                "sp_frm_get_DriverWallet_Summary",
+                "sp_frm_get_DriverWallet_Balance",
+                "sp_frm_get_DriverCashHistory",
+                "sp_frm_get_DriverHandovers",
+                "sp_frm_get_DriverExpenses",
+                "sp_frm_get_AdminWallet_Summary",
+                "sp_frm_get_AdminWallet_Balance",
+                "sp_frm_get_CompanyExpenses",
+                "sp_frm_get_CompanyWallet_Summary",
+                "sp_frm_get_CompanyWallet_DriverBreakdown"
+            };
+
+            try
+            {
+                using (var conn = new System.Data.SqlClient.SqlConnection(connStr))
+                {
+                    conn.Open();
+                    foreach (var proc in procs)
+                    {
+                        var cmd = new System.Data.SqlClient.SqlCommand(
+                            "SELECT COUNT(1) FROM sys.objects WHERE type='P' AND name=@n", conn);
+                        cmd.Parameters.AddWithValue("@n", proc);
+                        int exists = (int)cmd.ExecuteScalar();
+                        results.Add(new { test = "Proc: " + proc, status = exists > 0 ? "EXISTS" : "MISSING", detail = "" });
+                    }
+
+                    // Test tables
+                    string[] tables = { "DriverWallet", "DriverHandover", "DriverExpense", "CompanyExpense" };
+                    foreach (var tbl in tables)
+                    {
+                        var cmd = new System.Data.SqlClient.SqlCommand(
+                            "SELECT COUNT(1) FROM sysobjects WHERE xtype='U' AND name=@n", conn);
+                        cmd.Parameters.AddWithValue("@n", tbl);
+                        int exists = (int)cmd.ExecuteScalar();
+                        results.Add(new { test = "Table: " + tbl, status = exists > 0 ? "EXISTS" : "MISSING", detail = "" });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                results.Add(new { test = "DB Connection", status = "FAIL", detail = ex.Message });
+            }
+
+            // Test 3: try calling the actual repo method
+            try
+            {
+                int uid = SessionExpire.GetUserID();
+                var list = _repo.GetDriverCashHistory(uid, null, null);
+                results.Add(new { test = "GetDriverCashHistory", status = "OK", detail = "Returned " + list.Count + " rows" });
+            }
+            catch (Exception ex)
+            {
+                results.Add(new { test = "GetDriverCashHistory", status = "FAIL", detail = ex.Message });
+            }
+
+            try
+            {
+                int uid = SessionExpire.GetUserID();
+                var bal = _repo.GetDriverWalletBalance(uid);
+                results.Add(new { test = "GetDriverWalletBalance", status = "OK", detail = "Balance=" + bal.WalletBalance });
+            }
+            catch (Exception ex)
+            {
+                results.Add(new { test = "GetDriverWalletBalance", status = "FAIL", detail = ex.Message });
+            }
+
+            try
+            {
+                var list = _repo.GetHandovers(null, null, null);
+                results.Add(new { test = "GetHandovers", status = "OK", detail = "Returned " + list.Count + " rows" });
+            }
+            catch (Exception ex)
+            {
+                results.Add(new { test = "GetHandovers", status = "FAIL", detail = ex.Message });
+            }
+
+            return Json(results, JsonRequestBehavior.AllowGet);
+        }
+
+        // ════════════════════════════════════════════════════════════════════
+        // MY WALLET (driver's own)
         // ════════════════════════════════════════════════════════════════════
 
         [HttpGet]
-        public JsonResult DriverWallet_FindAll(int DriverUserID, string FromDate, string ToDate)
-        {
-            var list = _repo.GetDriverWalletSummary(DriverUserID, Parse(FromDate), Parse(ToDate));
-            var balance = _repo.GetDriverWalletBalance(DriverUserID);
-            return Json(new { records = list, total = list.Count, balance = balance },
-                        JsonRequestBehavior.AllowGet);
-        }
-
-        [HttpGet]
-        public JsonResult DriverCashHistory_FindAll(int DriverUserID, string FromDate, string ToDate)
-        {
-            var list = _repo.GetDriverCashHistory(DriverUserID, Parse(FromDate), Parse(ToDate));
-            return Json(new { records = list, total = list.Count }, JsonRequestBehavior.AllowGet);
-        }
-
-        // Driver's own wallet (uses session UID)
-        [HttpGet]
         public JsonResult MyWallet_FindAll(string FromDate, string ToDate)
         {
-            int uid = SessionExpire.GetUserID();
-            var list = _repo.GetDriverWalletSummary(uid, Parse(FromDate), Parse(ToDate));
-            var balance = _repo.GetDriverWalletBalance(uid);
-            return Json(new { records = list, total = list.Count, balance = balance },
-                        JsonRequestBehavior.AllowGet);
+            try
+            {
+                int uid = SessionExpire.GetUserID();
+                var list = _repo.GetDriverWalletSummary(uid, Parse(FromDate), Parse(ToDate));
+                var balance = _repo.GetDriverWalletBalance(uid);
+                return Json(new { records = list, total = list.Count, balance = balance },
+                            JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { records = new object[0], total = 0, error = ex.Message },
+                            JsonRequestBehavior.AllowGet);
+            }
         }
 
         [HttpGet]
         public JsonResult MyCashHistory_FindAll(string FromDate, string ToDate)
         {
-            int uid = SessionExpire.GetUserID();
-            var list = _repo.GetDriverCashHistory(uid, Parse(FromDate), Parse(ToDate));
-            return Json(new { records = list, total = list.Count }, JsonRequestBehavior.AllowGet);
+            try
+            {
+                int uid = SessionExpire.GetUserID();
+                var list = _repo.GetDriverCashHistory(uid, Parse(FromDate), Parse(ToDate));
+                return Json(new { records = list, total = list.Count }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { records = new object[0], total = 0, error = ex.Message },
+                            JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        // ════════════════════════════════════════════════════════════════════
+        // DRIVER WALLET (admin view — select any driver)
+        // ════════════════════════════════════════════════════════════════════
+
+        [HttpGet]
+        public JsonResult DriverWallet_FindAll(int DriverUserID, string FromDate, string ToDate)
+        {
+            try
+            {
+                var list = _repo.GetDriverWalletSummary(DriverUserID, Parse(FromDate), Parse(ToDate));
+                var balance = _repo.GetDriverWalletBalance(DriverUserID);
+                return Json(new { records = list, total = list.Count, balance = balance },
+                            JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { records = new object[0], total = 0, error = ex.Message },
+                            JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpGet]
+        public JsonResult DriverCashHistory_FindAll(int DriverUserID, string FromDate, string ToDate)
+        {
+            try
+            {
+                var list = _repo.GetDriverCashHistory(DriverUserID, Parse(FromDate), Parse(ToDate));
+                return Json(new { records = list, total = list.Count }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { records = new object[0], total = 0, error = ex.Message },
+                            JsonRequestBehavior.AllowGet);
+            }
         }
 
         // ════════════════════════════════════════════════════════════════════
@@ -109,11 +243,19 @@ namespace Transport.Controllers
         [HttpGet]
         public JsonResult Handover_FindAll(int? DriverUserID, string FromDate, string ToDate)
         {
-            // If driver role, always scope to self
-            int? uid = (DriverUserID.HasValue && DriverUserID.Value > 0)
-                       ? DriverUserID : (int?)null;
-            var list = _repo.GetHandovers(uid, Parse(FromDate), Parse(ToDate));
-            return Json(new { records = list, total = list.Count }, JsonRequestBehavior.AllowGet);
+            try
+            {
+                int? uid = (DriverUserID.HasValue && DriverUserID.Value > 0)
+                           ? DriverUserID : (int?)null;
+                if (uid == null) { var self = SessionExpire.GetUserID(); if (self > 0) uid = self; }
+                var list = _repo.GetHandovers(uid, Parse(FromDate), Parse(ToDate));
+                return Json(new { records = list, total = list.Count }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { records = new object[0], total = 0, error = ex.Message },
+                            JsonRequestBehavior.AllowGet);
+            }
         }
 
         [HttpPost]
@@ -152,10 +294,19 @@ namespace Transport.Controllers
         [HttpGet]
         public JsonResult DriverExpense_FindAll(int? DriverUserID, string FromDate, string ToDate)
         {
-            int? uid = (DriverUserID.HasValue && DriverUserID.Value > 0)
-                       ? DriverUserID : (int?)null;
-            var list = _repo.GetDriverExpenses(uid, Parse(FromDate), Parse(ToDate));
-            return Json(new { records = list, total = list.Count }, JsonRequestBehavior.AllowGet);
+            try
+            {
+                int? uid = (DriverUserID.HasValue && DriverUserID.Value > 0)
+                           ? DriverUserID : (int?)null;
+                if (uid == null) { var self = SessionExpire.GetUserID(); if (self > 0) uid = self; }
+                var list = _repo.GetDriverExpenses(uid, Parse(FromDate), Parse(ToDate));
+                return Json(new { records = list, total = list.Count }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { records = new object[0], total = 0, error = ex.Message },
+                            JsonRequestBehavior.AllowGet);
+            }
         }
 
         [HttpPost]
@@ -194,12 +345,20 @@ namespace Transport.Controllers
         [HttpGet]
         public JsonResult AdminWallet_FindAll(int? AdminUserID, string FromDate, string ToDate)
         {
-            int uid = (AdminUserID.HasValue && AdminUserID.Value > 0)
-                      ? AdminUserID.Value : SessionExpire.GetUserID();
-            var list = _repo.GetAdminWallet(uid, Parse(FromDate), Parse(ToDate));
-            var balance = _repo.GetAdminWalletBalance(uid);
-            return Json(new { records = list, total = list.Count, balance = balance },
-                        JsonRequestBehavior.AllowGet);
+            try
+            {
+                int uid = (AdminUserID.HasValue && AdminUserID.Value > 0)
+                          ? AdminUserID.Value : SessionExpire.GetUserID();
+                var list = _repo.GetAdminWallet(uid, Parse(FromDate), Parse(ToDate));
+                var balance = _repo.GetAdminWalletBalance(uid);
+                return Json(new { records = list, total = list.Count, balance = balance },
+                            JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { records = new object[0], total = 0, error = ex.Message },
+                            JsonRequestBehavior.AllowGet);
+            }
         }
 
         // ════════════════════════════════════════════════════════════════════
@@ -209,17 +368,33 @@ namespace Transport.Controllers
         [HttpGet]
         public JsonResult CompanyWallet_FindAll()
         {
-            var summary = _repo.GetCompanyWalletSummary();
-            var breakdown = _repo.GetCompanyWalletDriverBreakdown();
-            return Json(new { summary = summary, records = breakdown, total = breakdown.Count },
-                        JsonRequestBehavior.AllowGet);
+            try
+            {
+                var summary = _repo.GetCompanyWalletSummary();
+                var breakdown = _repo.GetCompanyWalletDriverBreakdown();
+                return Json(new { summary = summary, records = breakdown, total = breakdown.Count },
+                            JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { records = new object[0], total = 0, error = ex.Message },
+                            JsonRequestBehavior.AllowGet);
+            }
         }
 
         [HttpGet]
         public JsonResult CompanyExpense_FindAll(string FromDate, string ToDate, string Category)
         {
-            var list = _repo.GetCompanyExpenses(Parse(FromDate), Parse(ToDate), Category);
-            return Json(new { records = list, total = list.Count }, JsonRequestBehavior.AllowGet);
+            try
+            {
+                var list = _repo.GetCompanyExpenses(Parse(FromDate), Parse(ToDate), Category);
+                return Json(new { records = list, total = list.Count }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { records = new object[0], total = 0, error = ex.Message },
+                            JsonRequestBehavior.AllowGet);
+            }
         }
 
         [HttpPost]
@@ -238,7 +413,7 @@ namespace Transport.Controllers
                     DriverUserID = (DriverUserID.HasValue && DriverUserID.Value > 0) ? DriverUserID : null,
                     CreatedBy = SessionExpire.GetUserID()
                 });
-                return Json(new { success = ok, message = ok ? "" : "Failed to save expense." });
+                return Json(new { success = ok, message = ok ? "" : "Failed to save." });
             }
             catch (Exception ex) { return Json(new { success = false, message = ex.Message }); }
         }

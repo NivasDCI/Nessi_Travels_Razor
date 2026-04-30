@@ -43,14 +43,14 @@
         var amt = parseFloat($('#TxtExpAmount').val());
         var dt  = $('#TxtExpDate').val();
         var cat = $('#ddlExpCat').val();
-        if (!dt)           { alert('Please select a date.'); return; }
-        if (!cat)          { alert('Please select a category.'); return; }
-        if (!amt || amt <= 0) { alert('Please enter a valid amount.'); return; }
+        if (!dt)               { alert('Please select a date.');     return; }
+        if (!cat)              { alert('Please select a category.'); return; }
+        if (!amt || amt <= 0)  { alert('Please enter a valid amount.'); return; }
 
         $(this).prop('disabled', true).text('Saving...');
         $.ajax({
-            url: BaseURL + 'Wallet/DriverExpense_Save', type: 'POST',
-            dataType: 'json', contentType: 'application/json',
+            url: BaseURL + 'Wallet/DriverExpense_Save',
+            type: 'POST', dataType: 'json', contentType: 'application/json',
             data: JSON.stringify({
                 DriverUserID: CURRENT_UID,
                 ExpenseDate:  dt,
@@ -68,17 +68,23 @@
                     $('#ddlExpCat').val('');
                 } else { alert('Error: ' + (r.message || 'Failed.')); }
             },
-            error: function () { $('#btnSaveExp').prop('disabled', false).text('Save Expense'); alert('Server error.'); }
+            error: function () {
+                $('#btnSaveExp').prop('disabled', false).text('Save Expense');
+                alert('Server error. Please try again.');
+            }
         });
     });
 
     function DelExp(id) {
         if (!confirm('Delete this expense?')) return;
         $.ajax({
-            url: BaseURL + 'Wallet/DriverExpense_Delete', type: 'POST',
-            dataType: 'json', contentType: 'application/json',
+            url: BaseURL + 'Wallet/DriverExpense_Delete',
+            type: 'POST', dataType: 'json', contentType: 'application/json',
             data: JSON.stringify({ DriverExpenseID: id }),
-            success: function (r) { if (r.success) GrdExp.reload({ DriverUserID: CURRENT_UID }); else alert('Failed.'); }
+            success: function (r) {
+                if (r.success) GrdExp.reload({ DriverUserID: CURRENT_UID });
+                else alert('Failed to delete.');
+            }
         });
     }
     </script>
@@ -93,7 +99,8 @@
                             <span style="font-size:18px;"><i class="fa fa-receipt"></i></span>
                             <span style="font-size:18px; border-left:1px solid #ccc; padding-left:10px;"> My Expenses</span>
                             <div style="float:right;">
-                                <button type="button" class="btn btn-danger btn-sm mr-2" data-toggle="modal" data-target="#modalExp">
+                                <button type="button" class="btn btn-danger btn-sm mr-2"
+                                        data-toggle="modal" data-target="#modalExp">
                                     <i class="fa fa-plus"></i> Add Expense
                                 </button>
                                 <span style="border-left:1px solid #ccc; padding-left:15px; padding-right:15px;">
@@ -120,10 +127,14 @@
                                         </div>
                                     </div>
                                     <div class="col-sm-2 pdt-25">
-                                        <button type="button" class="btn btn-primary btn-block" onclick="ExpSearch()"><i class="fa fa-search"></i> Search</button>
+                                        <button type="button" class="btn btn-primary btn-block" onclick="ExpSearch()">
+                                            <i class="fa fa-search"></i> Search
+                                        </button>
                                     </div>
                                     <div class="col-sm-2 pdt-25">
-                                        <button type="button" class="btn btn-secondary btn-block" onclick="ExpClear()"><i class="fa fa-paint-brush"></i> Clear</button>
+                                        <button type="button" class="btn btn-secondary btn-block" onclick="ExpClear()">
+                                            <i class="fa fa-paint-brush"></i> Clear
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -171,23 +182,28 @@
                         <div class="col-sm-6">
                             <div class="form-group">
                                 <label>Amount (SGD) <span class="text-danger">*</span></label>
-                                <input type="number" id="TxtExpAmount" class="form-control" placeholder="0.00" step="0.01" min="0" />
+                                <input type="number" id="TxtExpAmount" class="form-control"
+                                       placeholder="0.00" step="0.01" min="0" />
                             </div>
                         </div>
                         <div class="col-sm-6">
                             <div class="form-group">
                                 <label>Job Code <small class="text-muted">(optional)</small></label>
-                                <input type="number" id="TxtExpJobCode" class="form-control" placeholder="Job number" />
+                                <input type="number" id="TxtExpJobCode" class="form-control"
+                                       placeholder="Job number" />
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label>Remarks</label>
-                        <textarea id="TxtExpRemarks" class="form-control" rows="2" placeholder="e.g. Shell petrol, ERP charge"></textarea>
+                        <textarea id="TxtExpRemarks" class="form-control" rows="2"
+                                  placeholder="e.g. Shell petrol, ERP charge"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" id="btnSaveExp" class="btn btn-danger"><i class="fa fa-save"></i> Save Expense</button>
+                    <button type="button" id="btnSaveExp" class="btn btn-danger">
+                        <i class="fa fa-save"></i> Save Expense
+                    </button>
                     <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancel</button>
                 </div>
             </div>
