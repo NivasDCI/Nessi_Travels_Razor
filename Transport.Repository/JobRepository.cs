@@ -196,14 +196,14 @@ namespace Transport.Repository
             return ObjJobs;
         }
 
-        
+
         public JobModel Job_Edit(long? JobCode)
         {
             JobModel ObjJobs = (from ct in db.Jobs
-                                
-                                //join jv in db.JobVendors on  ct.JobVendorCode equals jv.JobVendorCode
-                                where ct.JobCode == JobCode 
-                               let jobvenname = (from jv in db.JobVendors where jv.JobVendorCode == ct.JobVendorCode select jv.JobVendorName).FirstOrDefault()
+
+                                    //join jv in db.JobVendors on  ct.JobVendorCode equals jv.JobVendorCode
+                                where ct.JobCode == JobCode
+                                let jobvenname = (from jv in db.JobVendors where jv.JobVendorCode == ct.JobVendorCode select jv.JobVendorName).FirstOrDefault()
                                 select new JobModel
                                 {
                                     JobCode = ct.JobCode,
@@ -474,17 +474,48 @@ namespace Transport.Repository
 
                 if (JobStatus == "Job Completed")
                 {
-                    //Update Job Request Status
-                    var _requestCode = (from ct in db.Jobs where ct.JobCode == JobCode select ct.JobRequestCode).FirstOrDefault();
-                    var objReqUpdate = (from ct in db.JobRequests where ct.JobRequestCode == _requestCode select ct).ToList();
+                    // ── Update Job Request status (existing logic ─ keep as-is) ──────────
+                    var _requestCode = (from ct in db.Jobs
+                                        where ct.JobCode == JobCode
+                                        select ct.JobRequestCode).FirstOrDefault();
+
+                    var objReqUpdate = (from ct in db.JobRequests
+                                        where ct.JobRequestCode == _requestCode
+                                        select ct).ToList();
 
                     if (objReqUpdate != null && objReqUpdate.Count == 1)
                     {
                         objReqUpdate[0].JobRequestStatus = "Completed";
-
                         db.SaveChanges();
                     }
+
+                    // ── NEW: Credit CashInHand user's wallet ─────────────────────────────
+                    // Safe to call ─ sp_frm_wallet_OnJobComplete has an idempotency guard
+                    try
+                    {
+                        string connPath = System.Web.Hosting.HostingEnvironment.MapPath("~/ConnectionString.txt");
+                        string connStr = System.IO.File.ReadAllText(connPath);
+
+                        using (var conn = new System.Data.SqlClient.SqlConnection(connStr))
+                        {
+                            conn.Open();
+                            var walletCmd = new System.Data.SqlClient.SqlCommand(
+                                "sp_frm_wallet_OnJobComplete", conn)
+                            {
+                                CommandType = System.Data.CommandType.StoredProcedure
+                            };
+                            walletCmd.Parameters.AddWithValue("@JobCode", JobCode.Value);
+                            walletCmd.ExecuteNonQuery();
+                        }
+                    }
+                    catch (Exception walletEx)
+                    {
+                        // Log but do NOT break the job status update
+                        // Use Console.WriteLine or your preferred logging method
+                        System.Diagnostics.Debug.WriteLine("Wallet credit error: " + walletEx.Message);
+                    }
                 }
+
                 ObjMessage.Result = true;
                 ObjMessage.Status = WEBCONSTANTMESSAGECODE.UPDATE;
                 ObjMessage.Message = WEBCONSTANTMESSAGE.UPDATESUCCESS;
@@ -970,7 +1001,7 @@ namespace Transport.Repository
             DateTime outputTime = DateTime.Parse(inputTimeString);
             return outputTime.ToString("HH:mm");
         }
-        
+
         public void SendMail(string ToAddress, string Content, string Subject)
         {
             //ReturnMessageModel ObjMessage = new ReturnMessageModel();
@@ -1005,7 +1036,7 @@ namespace Transport.Repository
 
                 //client.SendCompleted += new SendCompletedEventHandler(SendCompletedCallback);
                 client.Send(message);
-               
+
                 //clean up.
                 message.Dispose();
                 client.Dispose();
@@ -1018,6 +1049,13 @@ namespace Transport.Repository
             }
 
             //return ObjMessage;
+        }
+
+        // Optional helper method for connection string
+        private string Conn()
+        {
+            string path = System.Web.Hosting.HostingEnvironment.MapPath("~/ConnectionString.txt");
+            return System.IO.File.ReadAllText(path);
         }
 
         //static bool mailSent = false;
@@ -1044,4 +1082,3 @@ namespace Transport.Repository
         //}
     }
 }
-

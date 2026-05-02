@@ -55,7 +55,10 @@ namespace Transport.Repository
         private string Conn()
         {
             string path = System.Web.Hosting.HostingEnvironment.MapPath("~/ConnectionString.txt");
-            return File.ReadAllText(path);
+            string val = "";
+            using (var sr = new StreamReader(path))
+                while (sr.Peek() >= 0) val = sr.ReadLine();
+            return val;
         }
 
         // ════════════════════════════════════════════════════════════════════

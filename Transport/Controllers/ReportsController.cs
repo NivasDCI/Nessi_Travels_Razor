@@ -669,6 +669,26 @@ namespace Transport.Controllers
                     cmd.Parameters.AddWithValue("@Remarks", (object)Remarks ?? DBNull.Value);
                     cmd.Parameters.AddWithValue("@CreatedBy", SessionExpire.GetUserID());
                     long newPaymentId = Convert.ToInt64(cmd.ExecuteScalar());
+
+                    // ── NEW: Route payment to the correct wallet ─────────────────────────────
+                    // sp_frm_wallet_OnInvoicePayment reads the row we just inserted and
+                    // routes it: Cash → ReceivedByUserID's wallet, Account → Company Wallet
+                    try
+                    {
+                        var walletCmd = new SqlCommand("sp_frm_wallet_OnInvoicePayment", conn)
+                        {
+                            CommandType = System.Data.CommandType.StoredProcedure
+                        };
+                        walletCmd.Parameters.AddWithValue("@PaymentID", newPaymentId);
+                        walletCmd.ExecuteNonQuery();
+                    }
+                    catch (Exception walletEx)
+                    {
+                        // Log but do NOT break — payment is already saved successfully
+                        System.Diagnostics.Debug.WriteLine("Wallet credit error: " + walletEx.Message);
+                    }
+                    // ─────────────────────────────────────────────────────────────────────────
+
                     decimal newTotal = alreadyPaid + PaidAmount;
                     decimal newBal = totalAmount - newTotal;
                     return Json(new { success = true, paymentId = newPaymentId, totalPaid = newTotal, balance = newBal });

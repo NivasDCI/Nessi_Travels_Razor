@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.Linq;
 using System.Web.Mvc;
 using Transport.Model;
 using Transport.Repository;
@@ -185,13 +186,23 @@ namespace Transport.Controllers
         }
 
         [HttpGet]
-        public JsonResult MyCashHistory_FindAll(string FromDate, string ToDate)
+        public JsonResult MyCashHistory_FindAll(string FromDate, string ToDate,
+    int page = 1, int limit = 40)
         {
             try
             {
                 int uid = SessionExpire.GetUserID();
                 var list = _repo.GetDriverCashHistory(uid, Parse(FromDate), Parse(ToDate));
-                return Json(new { records = list, total = list.Count }, JsonRequestBehavior.AllowGet);
+
+                int total = list.Count;
+                // Server-side slice
+                var paged = list
+                    .Skip((page - 1) * limit)
+                    .Take(limit)
+                    .ToList();
+
+                return Json(new { records = paged, total = total },
+                            JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
             {
@@ -422,6 +433,188 @@ namespace Transport.Controllers
         public JsonResult CompanyExpense_Delete(long CompanyExpenseID)
         {
             return Json(new { success = _repo.DeleteCompanyExpense(CompanyExpenseID) });
+        }
+
+        // ════════════════════════════════════════════════════════════════════
+        // ADMIN MANUAL TOP-UP
+        // POST: /Wallet/Wallet_AdminTopup
+        // Body: { Type: "Company"|"User", UserID: 5, Amount: 100.00 }
+        // ════════════════════════════════════════════════════════════════════
+        [HttpPost]
+        public JsonResult Wallet_AdminTopup(string Type, int? UserID, decimal Amount)
+        {
+            try
+            {
+                if (Amount <= 0)
+                    return Json(new { success = false, message = "Amount must be greater than 0." });
+
+                if (Type == "User" && (!UserID.HasValue || UserID.Value <= 0))
+                    return Json(new { success = false, message = "Please select a user for User top-up." });
+
+                using (var conn = new System.Data.SqlClient.SqlConnection(Conn()))
+                {
+                    conn.Open();
+                    var cmd = new System.Data.SqlClient.SqlCommand(
+                        "sp_frm_wallet_AdminTopup", conn)
+                    {
+                        CommandType = System.Data.CommandType.StoredProcedure
+                    };
+                    cmd.Parameters.AddWithValue("@Type", Type ?? "Company");
+                    cmd.Parameters.AddWithValue("@UserID",
+                        (UserID.HasValue && UserID.Value > 0) ? (object)UserID.Value : DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Amount", Amount);
+                    cmd.ExecuteNonQuery();
+                }
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        // ════════════════════════════════════════════════════════════════════
+        // USER WALLET TRANSACTION HISTORY
+        // GET: /Wallet/WalletHistory_FindAll?UserID=5&FromDate=...&ToDate=...
+        // ════════════════════════════════════════════════════════════════════
+        [HttpGet]
+        public JsonResult WalletHistory_FindAll(int UserID, string FromDate, string ToDate)
+        {
+            try
+            {
+                var list = new System.Collections.Generic.List<object>();
+                decimal balance = 0;
+
+                using (var conn = new System.Data.SqlClient.SqlConnection(Conn()))
+                {
+                    conn.Open();
+
+                    // Current balance
+                    var balCmd = new System.Data.SqlClient.SqlCommand(
+                        "SELECT ISNULL(WalletBalance, 0) FROM UserWallet WHERE UserID = @UID", conn);
+                    balCmd.Parameters.AddWithValue("@UID", UserID);
+                    var balObj = balCmd.ExecuteScalar();
+                    balance = (balObj != null && balObj != DBNull.Value)
+                              ? Convert.ToDecimal(balObj) : 0;
+
+                    // Transaction history
+                    var cmd = new System.Data.SqlClient.SqlCommand(
+                        "sp_frm_get_WalletHistory", conn)
+                    {
+                        CommandType = System.Data.CommandType.StoredProcedure
+                    };
+                    cmd.Parameters.AddWithValue("@UserID", UserID);
+                    cmd.Parameters.AddWithValue("@FromDate",
+                        Parse(FromDate).HasValue ? (object)Parse(FromDate).Value.Date : DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ToDate",
+                        Parse(ToDate).HasValue ? (object)Parse(ToDate).Value.Date : DBNull.Value);
+
+                    using (var r = cmd.ExecuteReader())
+                    {
+                        while (r.Read())
+                        {
+                            list.Add(new
+                            {
+                                TransactionID = Convert.ToInt64(r["TransactionID"]),
+                                TxType = r["TxType"].ToString(),
+                                Amount = Convert.ToDecimal(r["Amount"]),
+                                BalanceAfter = Convert.ToDecimal(r["BalanceAfter"]),
+                                Source = r["Source"].ToString(),
+                                SourceID = r["SourceID"] == DBNull.Value
+                                        ? (long?)null : Convert.ToInt64(r["SourceID"]),
+                                Remarks = r["Remarks"] == DBNull.Value
+                                        ? "" : r["Remarks"].ToString(),
+                                DisplayDate = r["DisplayDate"].ToString()
+                            });
+                        }
+                    }
+                }
+
+                return Json(new { records = list, total = list.Count, balance = balance },
+                            JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { records = new object[0], total = 0, error = ex.Message },
+                            JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        // ════════════════════════════════════════════════════════════════════
+        // COMPANY WALLET TRANSACTION HISTORY
+        // GET: /Wallet/CompanyWalletHistory_FindAll?FromDate=...&ToDate=...
+        // ════════════════════════════════════════════════════════════════════
+        [HttpGet]
+        public JsonResult CompanyWalletHistory_FindAll(string FromDate, string ToDate)
+        {
+            try
+            {
+                var list = new System.Collections.Generic.List<object>();
+                decimal balance = 0;
+
+                using (var conn = new System.Data.SqlClient.SqlConnection(Conn()))
+                {
+                    conn.Open();
+
+                    // Company wallet balance
+                    var balCmd = new System.Data.SqlClient.SqlCommand(
+                        "SELECT ISNULL(Balance, 0) FROM CompanyWallet", conn);
+                    var balObj = balCmd.ExecuteScalar();
+                    balance = (balObj != null && balObj != DBNull.Value)
+                              ? Convert.ToDecimal(balObj) : 0;
+
+                    // Transaction history
+                    var cmd = new System.Data.SqlClient.SqlCommand(
+                        "sp_frm_get_CompanyWalletHistory", conn)
+                    {
+                        CommandType = System.Data.CommandType.StoredProcedure
+                    };
+                    cmd.Parameters.AddWithValue("@FromDate",
+                        Parse(FromDate).HasValue ? (object)Parse(FromDate).Value.Date : DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ToDate",
+                        Parse(ToDate).HasValue ? (object)Parse(ToDate).Value.Date : DBNull.Value);
+
+                    using (var r = cmd.ExecuteReader())
+                    {
+                        while (r.Read())
+                        {
+                            list.Add(new
+                            {
+                                TransactionID = Convert.ToInt64(r["TransactionID"]),
+                                TxType = r["TxType"].ToString(),
+                                Amount = Convert.ToDecimal(r["Amount"]),
+                                BalanceAfter = Convert.ToDecimal(r["BalanceAfter"]),
+                                Source = r["Source"].ToString(),
+                                SourceID = r["SourceID"] == DBNull.Value
+                                        ? (long?)null : Convert.ToInt64(r["SourceID"]),
+                                Remarks = r["Remarks"] == DBNull.Value
+                                        ? "" : r["Remarks"].ToString(),
+                                DisplayDate = r["DisplayDate"].ToString()
+                            });
+                        }
+                    }
+                }
+
+                return Json(new { records = list, total = list.Count, balance = balance },
+                            JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { records = new object[0], total = 0, error = ex.Message },
+                            JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        // ════════════════════════════════════════════════════════════════════
+        // PRIVATE HELPERS
+        // ════════════════════════════════════════════════════════════════════
+        private string Conn()
+        {
+            string path = System.Web.Hosting.HostingEnvironment.MapPath("~/ConnectionString.txt");
+            string val = "";
+            using (var sr = new System.IO.StreamReader(path))
+                while (sr.Peek() >= 0) val = sr.ReadLine();
+            return val; // ✅ Last line மட்டும்
         }
     }
 }
