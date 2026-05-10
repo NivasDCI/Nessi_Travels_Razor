@@ -15,7 +15,7 @@ namespace Transport.Repository
 
         // Driver wallet
         List<DriverWalletDayModel> GetDriverWalletSummary(int driverUserID, DateTime? from, DateTime? to);
-        DriverWalletBalanceModel GetDriverWalletBalance(int driverUserID);
+        DriverWalletBalanceModel GetDriverWalletBalance(int driverUserID, DateTime? from = null, DateTime? to = null);
         List<DriverCashHistoryModel> GetDriverCashHistory(int driverUserID, DateTime? from, DateTime? to);
 
         // Handover
@@ -33,8 +33,8 @@ namespace Transport.Repository
         AdminWalletBalanceModel GetAdminWalletBalance(int adminUserID);
 
         // Company wallet
-        CompanyWalletSummaryModel GetCompanyWalletSummary();
-        List<CompanyWalletDriverRowModel> GetCompanyWalletDriverBreakdown();
+        CompanyWalletSummaryModel GetCompanyWalletSummary(DateTime? from = null, DateTime? to = null);
+        List<CompanyWalletDriverRowModel> GetCompanyWalletDriverBreakdown(DateTime? from = null, DateTime? to = null);
         bool SaveCompanyExpense(CompanyExpenseModel model);
         List<CompanyExpenseModel> GetCompanyExpenses(DateTime? from, DateTime? to, string category);
         bool DeleteCompanyExpense(long companyExpenseID);
@@ -43,15 +43,6 @@ namespace Transport.Repository
     // ─── IMPLEMENTATION ───────────────────────────────────────────────────────
     public class WalletRepository : IWalletRepository
     {
-        //private string Conn()
-        //{
-        //    string path = System.Web.Hosting.HostingEnvironment.MapPath("~/ConnectionString.txt");
-        //    string val = "";
-        //    using (var sr = new StreamReader(path))
-        //        while (sr.Peek() >= 0) val = sr.ReadLine();
-        //    return val;
-        //}
-
         private string Conn()
         {
             string path = System.Web.Hosting.HostingEnvironment.MapPath("~/ConnectionString.txt");
@@ -111,7 +102,7 @@ namespace Transport.Repository
             return list;
         }
 
-        public DriverWalletBalanceModel GetDriverWalletBalance(int driverUserID)
+        public DriverWalletBalanceModel GetDriverWalletBalance(int driverUserID, DateTime? from = null, DateTime? to = null)
         {
             var m = new DriverWalletBalanceModel();
             using (var conn = new SqlConnection(Conn()))
@@ -120,6 +111,8 @@ namespace Transport.Repository
                 var cmd = new SqlCommand("sp_frm_get_DriverWallet_Balance", conn)
                 { CommandType = CommandType.StoredProcedure };
                 cmd.Parameters.AddWithValue("@DriverUserID", driverUserID);
+                cmd.Parameters.AddWithValue("@FromDate", from.HasValue ? (object)from.Value.Date : DBNull.Value);
+                cmd.Parameters.AddWithValue("@ToDate", to.HasValue ? (object)to.Value.Date : DBNull.Value);
                 using (var r = cmd.ExecuteReader())
                     if (r.Read())
                     {
@@ -174,19 +167,25 @@ namespace Transport.Repository
                 using (var conn = new SqlConnection(Conn()))
                 {
                     conn.Open();
-                    var cmd = new SqlCommand(
-                        "INSERT INTO DriverHandover(DriverUserID,HandoverDate,Amount,HandedToUserID,HandedToName,Remarks,CreatedBy)" +
-                        " VALUES(@DriverUserID,@HandoverDate,@Amount,@HandedToUserID,@HandedToName,@Remarks,@CreatedBy)", conn);
-                    cmd.Parameters.AddWithValue("@DriverUserID", model.DriverUserID);
+                    var cmd = new SqlCommand("sp_frm_handover_Save", conn)
+                    { CommandType = CommandType.StoredProcedure };
+                    cmd.Parameters.AddWithValue("@SenderUserID", model.DriverUserID);
                     cmd.Parameters.AddWithValue("@HandoverDate", model.HandoverDate.Date);
                     cmd.Parameters.AddWithValue("@Amount", model.Amount);
-                    cmd.Parameters.AddWithValue("@HandedToUserID", model.HandedToUserID.HasValue ? (object)model.HandedToUserID.Value : DBNull.Value);
-                    cmd.Parameters.AddWithValue("@HandedToName", string.IsNullOrEmpty(model.HandedToName) ? (object)DBNull.Value : model.HandedToName);
-                    cmd.Parameters.AddWithValue("@Remarks", string.IsNullOrEmpty(model.Remarks) ? (object)DBNull.Value : model.Remarks);
-                    cmd.Parameters.AddWithValue("@CreatedBy", model.CreatedBy.HasValue ? (object)model.CreatedBy.Value : DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ReceiverUserID", model.HandedToUserID.HasValue
+                                                                    ? (object)model.HandedToUserID.Value
+                                                                    : DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ReceiverName", string.IsNullOrEmpty(model.HandedToName)
+                                                                    ? (object)DBNull.Value
+                                                                    : model.HandedToName);
+                    cmd.Parameters.AddWithValue("@Remarks", string.IsNullOrEmpty(model.Remarks)
+                                                                    ? (object)DBNull.Value
+                                                                    : model.Remarks);
+                    cmd.Parameters.AddWithValue("@CreatedBy", model.CreatedBy.HasValue
+                                                                    ? (object)model.CreatedBy.Value
+                                                                    : DBNull.Value);
                     cmd.ExecuteNonQuery();
                 }
-                SyncDriverWallet(model.DriverUserID, model.HandoverDate.Date);
                 return true;
             }
             catch { return false; }
@@ -227,19 +226,15 @@ namespace Transport.Repository
         {
             try
             {
-                int driverID = 0; DateTime dt = DateTime.Today;
                 using (var conn = new SqlConnection(Conn()))
                 {
                     conn.Open();
-                    var read = new SqlCommand("SELECT DriverUserID,HandoverDate FROM DriverHandover WHERE HandoverID=@ID", conn);
-                    read.Parameters.AddWithValue("@ID", handoverID);
-                    using (var r = read.ExecuteReader())
-                        if (r.Read()) { driverID = Convert.ToInt32(r["DriverUserID"]); dt = Convert.ToDateTime(r["HandoverDate"]); }
-                    var del = new SqlCommand("DELETE FROM DriverHandover WHERE HandoverID=@ID", conn);
-                    del.Parameters.AddWithValue("@ID", handoverID);
-                    del.ExecuteNonQuery();
+                    var cmd = new SqlCommand("sp_frm_handover_Delete", conn)
+                    { CommandType = CommandType.StoredProcedure };
+                    cmd.Parameters.AddWithValue("@HandoverID", handoverID);
+                    cmd.Parameters.AddWithValue("@DeletedBy",  /* pass current user if available */ DBNull.Value);
+                    cmd.ExecuteNonQuery();
                 }
-                if (driverID > 0) SyncDriverWallet(driverID, dt);
                 return true;
             }
             catch { return false; }
@@ -308,14 +303,19 @@ namespace Transport.Repository
         {
             try
             {
-                int driverID = 0; DateTime dt = DateTime.Today;
+                int driverID = 0;
+                DateTime dt = DateTime.Today;
                 using (var conn = new SqlConnection(Conn()))
                 {
                     conn.Open();
                     var read = new SqlCommand("SELECT DriverUserID,ExpenseDate FROM DriverExpense WHERE DriverExpenseID=@ID", conn);
                     read.Parameters.AddWithValue("@ID", driverExpenseID);
                     using (var r = read.ExecuteReader())
-                        if (r.Read()) { driverID = Convert.ToInt32(r["DriverUserID"]); dt = Convert.ToDateTime(r["ExpenseDate"]); }
+                        if (r.Read())
+                        {
+                            driverID = Convert.ToInt32(r["DriverUserID"]);
+                            dt = Convert.ToDateTime(r["ExpenseDate"]);
+                        }
                     var del = new SqlCommand("DELETE FROM DriverExpense WHERE DriverExpenseID=@ID", conn);
                     del.Parameters.AddWithValue("@ID", driverExpenseID);
                     del.ExecuteNonQuery();
@@ -377,7 +377,7 @@ namespace Transport.Repository
         // ════════════════════════════════════════════════════════════════════
         // COMPANY WALLET
         // ════════════════════════════════════════════════════════════════════
-        public CompanyWalletSummaryModel GetCompanyWalletSummary()
+        public CompanyWalletSummaryModel GetCompanyWalletSummary(DateTime? from = null, DateTime? to = null)
         {
             var m = new CompanyWalletSummaryModel();
             using (var conn = new SqlConnection(Conn()))
@@ -385,6 +385,8 @@ namespace Transport.Repository
                 conn.Open();
                 var cmd = new SqlCommand("sp_frm_get_CompanyWallet_Summary", conn)
                 { CommandType = CommandType.StoredProcedure };
+                cmd.Parameters.AddWithValue("@FromDate", from.HasValue ? (object)from.Value.Date : DBNull.Value);
+                cmd.Parameters.AddWithValue("@ToDate", to.HasValue ? (object)to.Value.Date : DBNull.Value);
                 using (var r = cmd.ExecuteReader())
                     if (r.Read())
                     {
@@ -394,12 +396,13 @@ namespace Transport.Repository
                         m.TotalCompanyExpenses = Convert.ToDecimal(r["TotalCompanyExpenses"]);
                         m.WithDrivers = Convert.ToDecimal(r["WithDrivers"]);
                         m.CompanyBalance = Convert.ToDecimal(r["CompanyBalance"]);
+                        m.TotalAccountPayments = Convert.ToDecimal(r["TotalAccountPayments"]);
                     }
             }
             return m;
         }
 
-        public List<CompanyWalletDriverRowModel> GetCompanyWalletDriverBreakdown()
+        public List<CompanyWalletDriverRowModel> GetCompanyWalletDriverBreakdown(DateTime? from = null, DateTime? to = null)
         {
             var list = new List<CompanyWalletDriverRowModel>();
             using (var conn = new SqlConnection(Conn()))
@@ -407,6 +410,8 @@ namespace Transport.Repository
                 conn.Open();
                 var cmd = new SqlCommand("sp_frm_get_CompanyWallet_DriverBreakdown", conn)
                 { CommandType = CommandType.StoredProcedure };
+                cmd.Parameters.AddWithValue("@FromDate", from.HasValue ? (object)from.Value.Date : DBNull.Value);
+                cmd.Parameters.AddWithValue("@ToDate", to.HasValue ? (object)to.Value.Date : DBNull.Value);
                 using (var r = cmd.ExecuteReader())
                     while (r.Read())
                         list.Add(new CompanyWalletDriverRowModel

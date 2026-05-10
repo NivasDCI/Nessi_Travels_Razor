@@ -684,8 +684,13 @@ namespace Transport.Controllers
                     }
                     catch (Exception walletEx)
                     {
-                        // Log but do NOT break — payment is already saved successfully
-                        System.Diagnostics.Debug.WriteLine("Wallet credit error: " + walletEx.Message);
+                        // Error-ஐ response-ல் திருப்பி அனுப்புங்க — temporarily
+                        return Json(new
+                        {
+                            success = true,
+                            walletError = walletEx.Message,  // இதை UI-ல் console-ல் பாருங்க
+                            paymentId = newPaymentId
+                        });
                     }
                     // ─────────────────────────────────────────────────────────────────────────
 
@@ -705,11 +710,136 @@ namespace Transport.Controllers
                 using (var conn = GetRawConnection())
                 {
                     conn.Open();
-                    var cmd = new SqlCommand("DELETE FROM InvoicePayments WHERE PaymentID=@ID", conn);
-                    cmd.Parameters.AddWithValue("@ID", PaymentID);
-                    cmd.ExecuteNonQuery();
+                    using (var tran = conn.BeginTransaction())
+                    {
+                        try
+                        {
+                            // Step 1: Get payment details from InvoicePayments
+                            decimal paidAmount = 0;
+                            string paymentMode = "";
+                            int? receivedByUID = null;
+                            DateTime? paymentDate = null;
+
+                            var getCmd = new SqlCommand(
+                                "SELECT PaidAmount, PaymentMode, ReceivedByUserID, CAST(PaymentDate AS DATE) AS PaymentDate FROM InvoicePayments WHERE PaymentID=@ID",
+                                conn, tran);
+                            getCmd.Parameters.AddWithValue("@ID", PaymentID);
+                            using (var r = getCmd.ExecuteReader())
+                            {
+                                if (r.Read())
+                                {
+                                    paidAmount = Convert.ToDecimal(r["PaidAmount"]);
+                                    paymentMode = r["PaymentMode"] == DBNull.Value ? "" : r["PaymentMode"].ToString();
+                                    receivedByUID = r["ReceivedByUserID"] == DBNull.Value ? (int?)null : Convert.ToInt32(r["ReceivedByUserID"]);
+                                    paymentDate = r["PaymentDate"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(r["PaymentDate"]);
+                                }
+                            }
+
+                            // Step 1b: If ReceivedByUserID is null, find from WalletTransaction
+                            // (sp_frm_wallet_OnInvoicePayment may not have saved ReceivedByUserID)
+                            if (receivedByUID == null && paidAmount > 0)
+                            {
+                                bool isCashMode = string.Equals(paymentMode, "Cash", StringComparison.OrdinalIgnoreCase);
+                                if (isCashMode)
+                                {
+                                    var findCmd = new SqlCommand(
+                                        @"SELECT TOP 1 UserID, CAST(CreatedDate AS DATE) AS TxDate
+                                          FROM WalletTransaction
+                                          WHERE Source = 'Invoice' AND SourceID = @PayID
+                                            AND TransactionType = 'CREDIT'",
+                                        conn, tran);
+                                    findCmd.Parameters.AddWithValue("@PayID", PaymentID);
+                                    using (var fr = findCmd.ExecuteReader())
+                                    {
+                                        if (fr.Read())
+                                        {
+                                            receivedByUID = Convert.ToInt32(fr["UserID"]);
+                                            if (!paymentDate.HasValue && fr["TxDate"] != DBNull.Value)
+                                                paymentDate = Convert.ToDateTime(fr["TxDate"]);
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Step 2: Wallet reverse
+                            if (paidAmount > 0)
+                            {
+                                // Case-insensitive payment mode check
+                                bool isCash = string.Equals(paymentMode, "Cash", StringComparison.OrdinalIgnoreCase);
+                                bool isAccount = string.Equals(paymentMode, "Account", StringComparison.OrdinalIgnoreCase);
+
+                                if (isCash && receivedByUID.HasValue)
+                                {
+                                    // Step 2a: Update UserWallet balance first
+                                    new SqlCommand(
+                                        "UPDATE UserWallet SET WalletBalance = WalletBalance - @Amt, LastUpdated = GETDATE() WHERE UserID = @UID",
+                                        conn, tran)
+                                    {
+                                        Parameters = {
+                                            new SqlParameter("@Amt", paidAmount),
+                                            new SqlParameter("@UID", receivedByUID.Value)
+                                        }
+                                    }.ExecuteNonQuery();
+
+                                    // Step 2b: Insert WalletTransaction DEBIT (read balance AFTER update)
+                                    new SqlCommand(
+                                        @"INSERT INTO WalletTransaction
+                                            (UserID, TransactionType, Amount, BalanceAfter, Source, SourceID, Remarks, CreatedBy, CreatedDate)
+                                          SELECT @UID, 'DEBIT', @Amt,
+                                                 ISNULL(WalletBalance, 0),
+                                                 'Invoice', @PayID,
+                                                 'Payment Deleted - Reversed', @CreatedBy, GETDATE()
+                                          FROM   UserWallet WHERE UserID = @UID",
+                                        conn, tran)
+                                    {
+                                        Parameters = {
+                                            new SqlParameter("@UID",       receivedByUID.Value),
+                                            new SqlParameter("@Amt",       paidAmount),
+                                            new SqlParameter("@PayID",     PaymentID),
+                                            new SqlParameter("@CreatedBy", SessionExpire.GetUserID())
+                                        }
+                                    }.ExecuteNonQuery();
+
+                                    // Step 2c: Re-sync DriverWallet daily row via SP
+                                    if (paymentDate.HasValue)
+                                    {
+                                        var syncCmd = new SqlCommand("sp_frm_sync_DriverWallet", conn, tran)
+                                        { CommandType = System.Data.CommandType.StoredProcedure };
+                                        syncCmd.Parameters.AddWithValue("@UserID", receivedByUID.Value);
+                                        syncCmd.Parameters.AddWithValue("@WalletDate", paymentDate.Value.Date);
+                                        syncCmd.ExecuteNonQuery();
+                                    }
+                                }
+                                else if (isAccount)
+                                {
+                                    // Account payment reversed → use sp_frm_companyWallet_Debit
+                                    var debitCmd = new SqlCommand("sp_frm_companyWallet_Debit", conn, tran)
+                                    { CommandType = System.Data.CommandType.StoredProcedure };
+                                    debitCmd.Parameters.AddWithValue("@Amount", paidAmount);
+                                    debitCmd.Parameters.AddWithValue("@Source", "Invoice");
+                                    debitCmd.Parameters.AddWithValue("@SourceID", PaymentID);
+                                    debitCmd.Parameters.AddWithValue("@SourceRef", "Payment Deleted - Reversed");
+                                    debitCmd.Parameters.AddWithValue("@CreatedBy", SessionExpire.GetUserID());
+                                    debitCmd.ExecuteNonQuery();
+                                }
+                            }
+
+                            // Step 3: Payment delete
+                            new SqlCommand("DELETE FROM InvoicePayments WHERE PaymentID=@ID", conn, tran)
+                            {
+                                Parameters = { new SqlParameter("@ID", PaymentID) }
+                            }.ExecuteNonQuery();
+
+                            tran.Commit();
+                            return Json(new { success = true }, JsonRequestBehavior.AllowGet);
+                        }
+                        catch
+                        {
+                            tran.Rollback();
+                            throw;
+                        }
+                    }
                 }
-                return Json(new { success = true }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex) { return Json(new { success = false, message = ex.Message }); }
         }
@@ -877,6 +1007,28 @@ namespace Transport.Controllers
             ViewBag.Header = header;
             ViewBag.Details = details;
             return View();
+        }
+
+
+        // ── GET Invoice ID from Payment ID ──────────────────────────────────
+        [HttpGet]
+        public JsonResult GetInvoiceByPaymentID(long PaymentID)
+        {
+            try
+            {
+                using (var conn = GetRawConnection())
+                {
+                    conn.Open();
+                    var cmd = new System.Data.SqlClient.SqlCommand(
+                        "SELECT InvoiceID FROM InvoicePayments WHERE PaymentID = @ID", conn);
+                    cmd.Parameters.AddWithValue("@ID", PaymentID);
+                    var result = cmd.ExecuteScalar();
+                    if (result != null && result != DBNull.Value)
+                        return Json(new { invoiceId = Convert.ToInt64(result) }, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch { }
+            return Json(new { invoiceId = (long?)null }, JsonRequestBehavior.AllowGet);
         }
 
         public JsonResult DeleteInvoice(long invoiceId)

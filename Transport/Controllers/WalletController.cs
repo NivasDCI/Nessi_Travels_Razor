@@ -173,8 +173,10 @@ namespace Transport.Controllers
             try
             {
                 int uid = SessionExpire.GetUserID();
-                var list = _repo.GetDriverWalletSummary(uid, Parse(FromDate), Parse(ToDate));
-                var balance = _repo.GetDriverWalletBalance(uid);
+                var from = Parse(FromDate);
+                var to = Parse(ToDate);
+                var list = _repo.GetDriverWalletSummary(uid, from, to);
+                var balance = _repo.GetDriverWalletBalance(uid, from, to);  // ← pass dates
                 return Json(new { records = list, total = list.Count, balance = balance },
                             JsonRequestBehavior.AllowGet);
             }
@@ -220,8 +222,10 @@ namespace Transport.Controllers
         {
             try
             {
-                var list = _repo.GetDriverWalletSummary(DriverUserID, Parse(FromDate), Parse(ToDate));
-                var balance = _repo.GetDriverWalletBalance(DriverUserID);
+                var from = Parse(FromDate);
+                var to = Parse(ToDate);
+                var list = _repo.GetDriverWalletSummary(DriverUserID, from, to);
+                var balance = _repo.GetDriverWalletBalance(DriverUserID, from, to);  // ← pass dates
                 return Json(new { records = list, total = list.Count, balance = balance },
                             JsonRequestBehavior.AllowGet);
             }
@@ -233,11 +237,15 @@ namespace Transport.Controllers
         }
 
         [HttpGet]
-        public JsonResult DriverCashHistory_FindAll(int DriverUserID, string FromDate, string ToDate)
+        public JsonResult DriverCashHistory_FindAll(int? DriverUserID, string FromDate, string ToDate)
         {
             try
             {
-                var list = _repo.GetDriverCashHistory(DriverUserID, Parse(FromDate), Parse(ToDate));
+                // Return empty immediately if no driver selected
+                if (!DriverUserID.HasValue || DriverUserID.Value <= 0)
+                    return Json(new { records = new object[0], total = 0 }, JsonRequestBehavior.AllowGet);
+
+                var list = _repo.GetDriverCashHistory(DriverUserID.Value, Parse(FromDate), Parse(ToDate));
                 return Json(new { records = list, total = list.Count }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
@@ -295,7 +303,26 @@ namespace Transport.Controllers
         [HttpPost]
         public JsonResult Handover_Delete(long HandoverID)
         {
-            return Json(new { success = _repo.DeleteHandover(HandoverID) });
+            try
+            {
+                // Pass current user as DeletedBy for audit trail
+                int deletedBy = SessionExpire.GetUserID();
+
+                using (var conn = new System.Data.SqlClient.SqlConnection(Conn()))
+                {
+                    conn.Open();
+                    var cmd = new System.Data.SqlClient.SqlCommand("sp_frm_handover_Delete", conn)
+                    { CommandType = System.Data.CommandType.StoredProcedure };
+                    cmd.Parameters.AddWithValue("@HandoverID", HandoverID);
+                    cmd.Parameters.AddWithValue("@DeletedBy", deletedBy);
+                    cmd.ExecuteNonQuery();
+                }
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
         }
 
         // ════════════════════════════════════════════════════════════════════
@@ -377,12 +404,14 @@ namespace Transport.Controllers
         // ════════════════════════════════════════════════════════════════════
 
         [HttpGet]
-        public JsonResult CompanyWallet_FindAll()
+        public JsonResult CompanyWallet_FindAll(string FromDate, string ToDate)
         {
             try
             {
-                var summary = _repo.GetCompanyWalletSummary();
-                var breakdown = _repo.GetCompanyWalletDriverBreakdown();
+                var from = Parse(FromDate);
+                var to = Parse(ToDate);
+                var summary = _repo.GetCompanyWalletSummary(from, to);
+                var breakdown = _repo.GetCompanyWalletDriverBreakdown(from, to);
                 return Json(new { summary = summary, records = breakdown, total = breakdown.Count },
                             JsonRequestBehavior.AllowGet);
             }
@@ -516,7 +545,7 @@ namespace Transport.Controllers
                             list.Add(new
                             {
                                 TransactionID = Convert.ToInt64(r["TransactionID"]),
-                                TxType = r["TxType"].ToString(),
+                                TxType = r["TxType"].ToString().ToUpper(),
                                 Amount = Convert.ToDecimal(r["Amount"]),
                                 BalanceAfter = Convert.ToDecimal(r["BalanceAfter"]),
                                 Source = r["Source"].ToString(),
@@ -581,7 +610,7 @@ namespace Transport.Controllers
                             list.Add(new
                             {
                                 TransactionID = Convert.ToInt64(r["TransactionID"]),
-                                TxType = r["TxType"].ToString(),
+                                TxType = r["TxType"].ToString().ToUpper(),
                                 Amount = Convert.ToDecimal(r["Amount"]),
                                 BalanceAfter = Convert.ToDecimal(r["BalanceAfter"]),
                                 Source = r["Source"].ToString(),
@@ -617,4 +646,4 @@ namespace Transport.Controllers
             return val; // ✅ Last line மட்டும்
         }
     }
-}
+}  

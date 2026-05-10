@@ -58,7 +58,59 @@
         }
     </style>
     <script>
-    // ── Load company summary cards + driver breakdown ─────────────────────────
+        // ═══════════════════════════════════════════════════════
+        // WALLET START DATE FUNCTIONS (Admin only)
+        // ═══════════════════════════════════════════════════════
+
+        // Load current wallet start date
+        function LoadWalletStartDate() {
+            $.ajax({
+                url: BaseURL + 'Wallet/GetWalletStartDate',
+                type: 'GET', dataType: 'json',
+                success: function (r) {
+                    if (r.success) {
+                        $('#lblCurrentStartDate').text(r.DisplayStartDate || r.WalletStartDate);
+                        $('#TxtWalletStartDate').val(r.WalletStartDate);
+                    }
+                }
+            });
+        }
+
+        // Save new wallet start date
+        function SaveWalletStartDate() {
+            var dt = $('#TxtWalletStartDate').val();
+            if (!dt) { alert('Please select a date.'); return; }
+
+            if (!confirm('Change wallet start date to ' + dt + '?\n\nAll wallet balances will be recalculated from this date.\nData before this date will be ignored.')) return;
+
+            $.ajax({
+                url: BaseURL + 'Wallet/SetWalletStartDate',
+                type: 'POST', dataType: 'json',
+                data: { StartDate: dt },
+                success: function (r) {
+                    if (r.success) {
+                        $('#lblCurrentStartDate').text(dt);
+                        // Show success message
+                        var msg = $('<div>').css({
+                            position: 'fixed', bottom: '24px', right: '24px', zIndex: 9999,
+                            background: '#10b981', color: '#fff', padding: '12px 20px',
+                            borderRadius: '10px', fontSize: '13px', fontWeight: 500,
+                            boxShadow: '0 4px 16px rgba(0,0,0,.2)'
+                        }).text('✓ Wallet start date updated!');
+                        $('body').append(msg);
+                        setTimeout(function () { msg.fadeOut(300, function () { msg.remove(); }); }, 2500);
+
+                        // Optionally refresh all data on the page
+                        LoadCompanyData();
+                    } else {
+                        alert('Error: ' + (r.message || 'Failed.'));
+                    }
+                },
+                error: function () { alert('Server error.'); }
+            });
+        }
+
+        // ── Load company summary cards + driver breakdown ─────────────────────────
         function LoadCompanyData() {
             $.ajax({
                 url: BaseURL + 'Wallet/CompanyWallet_FindAll', type: 'GET', dataType: 'json',
@@ -73,6 +125,7 @@
                         var bal = parseFloat(s.CompanyBalance || 0);
                         $('#CardBal').text('$ ' + bal.toFixed(2));
                         if (bal < 0) $('#WcBal').css('background', 'linear-gradient(135deg,#c0392b,#e74c3c)');
+                        else $('#WcBal').css('background', 'linear-gradient(135deg,#6c3483,#8e44ad)');
                     }
                     // populate driver breakdown table
                     var tbody = $('#tblDriverBreakdown tbody');
@@ -102,6 +155,10 @@
         $('#TxtExpFrom').datepicker(dpOpts);
         $('#TxtExpTo').datepicker(dpOpts);
         $('#TxtCEDate').datepicker(dpOpts);
+
+        // Initialize datepicker for wallet start date
+        var dpOpts2 = { format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small' };
+        $('#TxtWalletStartDate').datepicker(dpOpts2);
 
         // optional: link an expense to a driver (e.g. salary)
         $.ajax({
@@ -191,11 +248,50 @@
             });
         }
 
-        $(document).ready(function () { LoadCompanyData(); });</script>
+        $(document).ready(function () {
+            LoadWalletStartDate();  // Load the wallet start date on page load
+            LoadCompanyData();
+        });
+    </script>
 </head>
 <body>
     <div class="content">
         <div class="container-fluid">
+
+            <!-- ═══════════════════════════════════════════════════════
+                 WALLET START DATE SETTING (Admin only)
+                 ═══════════════════════════════════════════════════════ -->
+            <div class="row mb-3">
+                <div class="col-lg-12">
+                    <div class="card" style="border:none;border-radius:12px;background:linear-gradient(135deg,#1e3a5f,#1e40af);box-shadow:0 4px 16px rgba(0,0,0,.12);">
+                        <div class="card-body" style="padding:16px 22px;">
+                            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+                                <div>
+                                    <div style="font-size:11px;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:1px;font-weight:600;">
+                                        <i class="fa fa-calendar-check"></i> &nbsp;Wallet Calculation Start Date
+                                    </div>
+                                    <div style="font-size:22px;font-weight:700;color:#fff;margin-top:2px;" id="lblCurrentStartDate">
+                                        Loading...
+                                    </div>
+                                    <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:2px;">
+                                        Jobs &amp; transactions before this date are excluded from all wallet calculations
+                                    </div>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:8px;">
+                                    <input type="text" id="TxtWalletStartDate"
+                                           style="border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:8px 12px;background:rgba(255,255,255,.12);color:#fff;font-size:13px;width:150px;"
+                                           placeholder="dd-MMM-yyyy" />
+                                    <button onclick="SaveWalletStartDate()"
+                                            style="padding:8px 18px;background:#fff;color:#1e40af;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;"
+                                            onmouseover="this.style.background='#dbeafe'" onmouseout="this.style.background='#fff'">
+                                        <i class="fa fa-save"></i> Update
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- SUMMARY CARDS -->
             <div class="row mb-3">

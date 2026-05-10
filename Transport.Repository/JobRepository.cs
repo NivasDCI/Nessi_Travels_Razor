@@ -493,8 +493,11 @@ namespace Transport.Repository
                     // Safe to call ─ sp_frm_wallet_OnJobComplete has an idempotency guard
                     try
                     {
+                        // Read LAST LINE only — same as WalletRepository.Conn()
                         string connPath = System.Web.Hosting.HostingEnvironment.MapPath("~/ConnectionString.txt");
-                        string connStr = System.IO.File.ReadAllText(connPath);
+                        string connStr = "";
+                        using (var sr = new System.IO.StreamReader(connPath))
+                            while (sr.Peek() >= 0) connStr = sr.ReadLine();
 
                         using (var conn = new System.Data.SqlClient.SqlConnection(connStr))
                         {
@@ -510,8 +513,6 @@ namespace Transport.Repository
                     }
                     catch (Exception walletEx)
                     {
-                        // Log but do NOT break the job status update
-                        // Use Console.WriteLine or your preferred logging method
                         System.Diagnostics.Debug.WriteLine("Wallet credit error: " + walletEx.Message);
                     }
                 }

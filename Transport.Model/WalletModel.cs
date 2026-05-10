@@ -280,6 +280,7 @@ namespace Transport.Model
         public decimal TotalCompanyExpenses { get; set; }
         public decimal WithDrivers { get; set; }
         public decimal CompanyBalance { get; set; }
+        public decimal TotalAccountPayments { get; set; } // Invoice account payments
     }
 
     // Per-driver row in company wallet breakdown grid
