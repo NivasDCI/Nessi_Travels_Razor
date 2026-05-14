@@ -140,7 +140,7 @@
               "RelativeDocumentMoniker": "Transport\\Views\\Wallet\\MyWallet.cshtml",
               "ToolTip": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Views\\Wallet\\MyWallet.cshtml",
               "RelativeToolTip": "Transport\\Views\\Wallet\\MyWallet.cshtml",
-              "ViewState": "AgIAAFgCAAAAAAAAAAAIwHICAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAEMAAAAAAAAAAAD4v00AAAAiAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2026-05-10T10:12:34.201Z",
               "EditorCaption": ""
@@ -239,8 +239,7 @@
               "RelativeToolTip": "Transport\\Controllers\\InvoiceController.cs",
               "ViewState": "AgIAACgCAAAAAAAAAAAqwDsCAAAyAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-01T23:52:21.447Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-01T23:52:21.447Z"
             },
             {
               "$type": "Document",

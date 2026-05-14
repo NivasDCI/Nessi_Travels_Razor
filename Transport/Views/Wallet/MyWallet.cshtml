@@ -61,10 +61,15 @@
                 success: function (r) {
                     if (r.balance) {
                         var b = r.balance;
-                        $('#CardEarned').text('$ ' + parseFloat(b.TotalEarned   || 0).toFixed(2));
-                        $('#CardHanded').text('$ ' + parseFloat(b.TotalHandedOver || 0).toFixed(2));
-                        $('#CardDExp'  ).text('$ ' + parseFloat(b.TotalExpenses  || 0).toFixed(2));
-                        var bal = parseFloat(b.WalletBalance || 0);
+                        var earned  = parseFloat(b.TotalEarned     || 0);
+                        var handed  = parseFloat(b.TotalHandedOver  || 0);
+                        var expense = parseFloat(b.TotalExpenses    || 0);
+                        // Calculate balance = earned - handed - expenses
+                        // (WalletBalance from UserWallet doesn't include expenses deduction)
+                        var bal = earned - handed - expense;
+                        $('#CardEarned').text('$ ' + earned.toFixed(2));
+                        $('#CardHanded').text('$ ' + handed.toFixed(2));
+                        $('#CardDExp'  ).text('$ ' + expense.toFixed(2));
                         $('#CardBal').text('$ ' + bal.toFixed(2));
                         if (bal < 0) $('#WcBal').css('background','linear-gradient(135deg,#c0392b,#e74c3c)');
                         else         $('#WcBal').css('background','linear-gradient(135deg,#6c3483,#8e44ad)');
@@ -73,7 +78,7 @@
                     tbody.empty();
                     if (r.records && r.records.length > 0) {
                         $.each(r.records, function (i, d) {
-                            var balColor = parseFloat(d.RunningBalance) >= 0 ? '#8e44ad' : '#e74c3c';
+                            var rows = r.records.slice().reverse(); var run = 0; var runMap = {}; $.each(rows, function(i,x){ run += parseFloat(x.TotalEarned)-parseFloat(x.TotalHandedOver)-parseFloat(x.TotalExpenses); runMap[x.DisplayWalletDate]=run; }); var balColor = runMap[d.DisplayWalletDate] >= 0 ? '#8e44ad' : '#e74c3c';
                             tbody.append(
                                 '<tr>' +
                                 '<td>' + d.DisplayWalletDate + '</td>' +
@@ -81,7 +86,7 @@
                                 '<td style="text-align:right;color:#27ae60;font-weight:bold;">$ ' + parseFloat(d.TotalEarned).toFixed(2) + '</td>' +
                                 '<td style="text-align:right;color:#2980b9;font-weight:bold;">$ ' + parseFloat(d.TotalHandedOver).toFixed(2) + '</td>' +
                                 '<td style="text-align:right;color:#f39c12;font-weight:bold;">$ ' + parseFloat(d.TotalExpenses).toFixed(2) + '</td>' +
-                                '<td style="text-align:right;color:' + balColor + ';font-weight:bold;">$ ' + parseFloat(d.RunningBalance).toFixed(2) + '</td>' +
+                                '<td style="text-align:right;color:' + balColor + ';font-weight:bold;">$ ' + runMap[d.DisplayWalletDate].toFixed(2) + '</td>' +
                                 '</tr>'
                             );
                         });
@@ -259,90 +264,6 @@
             });
         }
 
-
-        // ── 5. WALLET HISTORY GRID ───────────────────────────────────────────
-        var GrdHistory;
-        function InitHistoryGrid() {
-            GrdHistory = $('#GrdHistory').grid({
-                primaryKey: 'TransactionID', uiLibrary: 'bootstrap4', responsive: true,
-                dataSource: { url: BaseURL + 'Wallet/WalletHistory_FindAll', data: { UserID: CURRENT_UID } },
-                columns: [
-                    { field: 'DisplayDate', width: 130, title: 'DATE & TIME', sortable: false,
-                      renderer: function(v){ return '<span style="font-size:11px;color:#6b7280;">' + v + '</span>'; }
-                    },
-                    { field: 'TxType', width: 75, title: 'TYPE', sortable: false, align: 'center',
-                      renderer: function(v){
-                          var isCredit = v && v.toUpperCase() === 'CREDIT';
-                          var s = isCredit ? 'background:#d1fae5;color:#065f46;' : 'background:#fee2e2;color:#991b1b;';
-                          return '<span style="' + s + 'padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">' + (isCredit ? 'CREDIT' : 'DEBIT') + '</span>';
-                      }
-                    },
-                    { field: 'Amount', width: 110, title: 'AMOUNT (SGD)', sortable: false, align: 'right',
-                      renderer: function(v, rec){
-                          var isCredit = rec.TxType && rec.TxType.toUpperCase() === 'CREDIT';
-                          var c = isCredit ? '#10b981' : '#ef4444';
-                          var s = isCredit ? '+' : '-';
-                          return '<strong style="color:' + c + ';">' + s + ' $ ' + parseFloat(v).toFixed(2) + '</strong>';
-                      }
-                    },
-                    { field: 'BalanceAfter', width: 115, title: 'BALANCE AFTER', sortable: false, align: 'right',
-                      renderer: function(v){
-                          var val = parseFloat(v);
-                          return '<span style="font-family:monospace;color:' + (val >= 0 ? '#374151' : '#ef4444') + ';">$ ' + val.toFixed(2) + '</span>';
-                      }
-                    },
-                    { field: 'Source', width: 100, title: 'SOURCE', sortable: false, align: 'center',
-                      renderer: function(v){
-                          var labels = { Job:'Job', Invoice:'Invoice', Handover:'Handover', HandoverReverse:'Reversed' };
-                          var colors = {
-                              Job:             'background:#dbeafe;color:#1e40af;',
-                              Invoice:         'background:#fef3c7;color:#92400e;',
-                              Handover:        'background:#d1fae5;color:#065f46;',
-                              HandoverReverse: 'background:#fee2e2;color:#991b1b;'
-                          };
-                          var style = colors[v] || 'background:#f3f4f6;color:#374151;';
-                          return '<span style="' + style + 'padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">' + (labels[v] || v) + '</span>';
-                      }
-                    },
-                    { field: 'SourceID', width: 120, title: 'REFERENCE', sortable: false, align: 'center',
-                      renderer: function(v, rec){
-                          if (!v) return '<span style="color:#d1d5db;">&#8212;</span>';
-                          var src = rec.Source || '';
-                          if (src === 'Job')
-                              return '<a href="javascript:void(0)" onclick="ViewJob(' + v + ')" style="color:#3b82f6;font-weight:600;text-decoration:none;">Job #' + v + '</a>';
-                          if (src === 'Invoice')
-                              return '<a href="javascript:void(0)" onclick="ViewInvoiceByPay(' + v + ')" style="color:#f59e0b;font-weight:600;text-decoration:none;">Pay #' + v + '</a>';
-                          if (src === 'Handover')
-                              return '<span style="color:#065f46;font-weight:600;">HO #' + v + '</span>';
-                          return '<span style="color:#6b7280;">#' + v + '</span>';
-                      }
-                    },
-                    { field: 'Remarks', width: 200, title: 'DETAILS', sortable: false,
-                      renderer: function(v){
-                          return v && v.trim() ? '<span style="color:#6b7280;font-size:12px;">' + v + '</span>' : '<span style="color:#d1d5db;">&#8212;</span>';
-                      }
-                    }
-                ],
-                pager: { enable: true, limit: 25, sizes: ArrPaging }
-            });
-        }
-
-        function ViewJob(jobCode) {
-            window.open(BaseURL + 'Job/ListJobs?jobCode=' + jobCode, '_blank');
-        }
-
-        function ViewInvoiceByPay(paymentId) {
-            $.ajax({
-                url: BaseURL + 'Reports/GetInvoiceByPaymentID',
-                type: 'GET', dataType: 'json',
-                data: { PaymentID: paymentId },
-                success: function(r) {
-                    if (r.invoiceId) window.open(BaseURL + 'Reports/ViewInvoice?invoiceId=' + r.invoiceId, '_blank');
-                    else alert('Invoice not found.');
-                }
-            });
-        }
-
         $(document).ready(function () {
             $('#TxtWFrom,#TxtWTo').datepicker(dpOpts);
             // Load all users for handover receiver dropdown
@@ -361,7 +282,6 @@
             InitCashGrid();
             InitHandoverGrid();
             InitExpGrid();
-            InitHistoryGrid();
             LoadWallet();
         });
     </script>
@@ -407,7 +327,7 @@
                 <div class="col-lg-12">
                     <div class="card card-pd">
                         <div class="card-header">
-                            <i class="fa fa-calendar-alt"></i>&nbsp; My Wallet — Daily Summary
+                            <i class="fa fa-calendar-alt"></i>&nbsp; My Wallet &mdash; Daily Summary
                             <div style="float:right;">
                                 <input type="text" id="TxtWFrom" class="form-control form-control-sm d-inline-block" style="width:130px;" placeholder="From Date" />
                                 &nbsp;
@@ -434,23 +354,6 @@
                                         <tr><td colspan="6" style="text-align:center;padding:20px;color:#999;">Loading...</td></tr>
                                     </tbody>
                                 </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ── WALLET HISTORY ──────────────────────────────────────────── -->
-            <div class="row mb-3">
-                <div class="col-lg-12">
-                    <div class="card card-pd">
-                        <div class="card-header">
-                            <i class="fa fa-history"></i>&nbsp; Wallet Transaction History
-                            <small class="text-muted" style="margin-left:8px;font-size:11px;">All credits &amp; debits — click Job # or Pay # to view details</small>
-                        </div>
-                        <div class="card-body">
-                            <div class="box-body table-responsive no-padding">
-                                <table id="GrdHistory" class="table table-hover"></table>
                             </div>
                         </div>
                     </div>
