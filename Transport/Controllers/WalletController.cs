@@ -634,6 +634,21 @@ namespace Transport.Controllers
             }
         }
 
+
+        // ════════════════════════════════════════════════════════════════════
+        // REPORT PAGE ACTIONS (Wallet Menu)
+        // ════════════════════════════════════════════════════════════════════
+
+        public ActionResult VehiclesReport(string HeaderViewID, string DetailViewID)
+        {
+            return View();
+        }
+
+        public ActionResult ProfitLossReport(string HeaderViewID, string DetailViewID)
+        {
+            return View();
+        }
+
         // ════════════════════════════════════════════════════════════════════
         // PRIVATE HELPERS
         // ════════════════════════════════════════════════════════════════════
@@ -646,4 +661,4 @@ namespace Transport.Controllers
             return val; // ✅ Last line மட்டும்
         }
     }
-}  
+}

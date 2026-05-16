@@ -1186,5 +1186,289 @@ namespace Transport.Controllers
         }
 
         #endregion
+
+        #region "P&L and Vehicle Reports"
+
+        // ── GET: /Reports/ProfitLossReport ──────────────────────────────────────
+        public ActionResult ProfitLossReport(string HeaderViewID, string DetailViewID)
+        {
+            return View();
+        }
+
+        // ── API: /Reports/GetProfitLoss ──────────────────────────────────────────
+        [HttpGet]
+        public JsonResult GetProfitLoss(string FromDate, string ToDate)
+        {
+            try
+            {
+                DateTime? from = null, to = null;
+                string[] fmts = { "dd-MMM-yyyy", "dd-MM-yyyy", "MM/dd/yyyy", "yyyy-MM-dd" };
+                DateTime dt;
+                if (!string.IsNullOrEmpty(FromDate) && DateTime.TryParseExact(FromDate, fmts, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out dt)) from = dt;
+                if (!string.IsNullOrEmpty(ToDate) && DateTime.TryParseExact(ToDate, fmts, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out dt)) to = dt;
+
+                using (var conn = GetRawConnection())
+                {
+                    conn.Open();
+
+                    // Summary
+                    var cmd = new System.Data.SqlClient.SqlCommand("sp_frm_get_ProfitLoss", conn)
+                    { CommandType = System.Data.CommandType.StoredProcedure };
+                    cmd.Parameters.AddWithValue("@FromDate", from.HasValue ? (object)from.Value.Date : DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ToDate", to.HasValue ? (object)to.Value.Date : DBNull.Value);
+
+                    object summary = null;
+                    var monthly = new System.Collections.Generic.List<object>();
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        // First result set: summary
+                        if (reader.Read())
+                        {
+                            summary = new
+                            {
+                                FromDate = reader["FromDate"].ToString(),
+                                ToDate = reader["ToDate"].ToString(),
+                                JobCashRevenue = Convert.ToDecimal(reader["JobCashRevenue"]),
+                                JobCreditRevenue = Convert.ToDecimal(reader["JobCreditRevenue"]),
+                                InvoiceCashRevenue = Convert.ToDecimal(reader["InvoiceCashRevenue"]),
+                                InvoiceAccountRevenue = Convert.ToDecimal(reader["InvoiceAccountRevenue"]),
+                                TotalRevenue = Convert.ToDecimal(reader["TotalRevenue"]),
+                                DriverExpenses = Convert.ToDecimal(reader["DriverExpenses"]),
+                                CompanyExpenses = Convert.ToDecimal(reader["CompanyExpenses"]),
+                                VehicleExpenses = Convert.ToDecimal(reader["VehicleExpenses"]),
+                                OutsourceCosts = Convert.ToDecimal(reader["OutsourceCosts"]),
+                                TotalExpenses = Convert.ToDecimal(reader["TotalExpenses"]),
+                                NetProfit = Convert.ToDecimal(reader["NetProfit"]),
+                                ProfitOrLoss = reader["ProfitOrLoss"].ToString()
+                            };
+                        }
+
+                        // Second result set: monthly breakdown
+                        if (reader.NextResult())
+                        {
+                            while (reader.Read())
+                            {
+                                monthly.Add(new
+                                {
+                                    MonthLabel = reader["MonthLabel"].ToString(),
+                                    Revenue = Convert.ToDecimal(reader["Revenue"]),
+                                    Expenses = Convert.ToDecimal(reader["Expenses"])
+                                });
+                            }
+                        }
+                    }
+
+                    return Json(new { success = true, summary = summary, monthly = monthly },
+                                JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        // ── API: /Reports/GetVehicleReport ──────────────────────────────────────
+        [HttpGet]
+        public JsonResult GetVehicleReport(long? VehicleCode, string FromDate, string ToDate)
+        {
+            try
+            {
+                DateTime? from = null, to = null;
+                string[] fmts = { "dd-MMM-yyyy", "dd-MM-yyyy", "MM/dd/yyyy", "yyyy-MM-dd" };
+                DateTime dt;
+                if (!string.IsNullOrEmpty(FromDate) && DateTime.TryParseExact(FromDate, fmts, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out dt)) from = dt;
+                if (!string.IsNullOrEmpty(ToDate) && DateTime.TryParseExact(ToDate, fmts, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out dt)) to = dt;
+
+                using (var conn = GetRawConnection())
+                {
+                    conn.Open();
+                    var cmd = new System.Data.SqlClient.SqlCommand("sp_frm_get_VehicleReport", conn)
+                    { CommandType = System.Data.CommandType.StoredProcedure };
+                    cmd.Parameters.AddWithValue("@VehicleCode", VehicleCode.HasValue && VehicleCode.Value > 0 ? (object)VehicleCode.Value : DBNull.Value);
+                    cmd.Parameters.AddWithValue("@FromDate", from.HasValue ? (object)from.Value.Date : DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ToDate", to.HasValue ? (object)to.Value.Date : DBNull.Value);
+
+                    var list = new System.Collections.Generic.List<object>();
+                    using (var r = cmd.ExecuteReader())
+                    {
+                        while (r.Read())
+                        {
+                            list.Add(new
+                            {
+                                VehicleCode = Convert.ToInt64(r["VehicleCode"]),
+                                VehicleName = r["VehicleName"].ToString(),
+                                TotalJobs = Convert.ToInt32(r["TotalJobs"]),
+                                TotalCash = Convert.ToDecimal(r["TotalCash"]),
+                                TotalCredit = Convert.ToDecimal(r["TotalCredit"]),
+                                TotalRevenue = Convert.ToDecimal(r["TotalRevenue"]),
+                                TotalExpenses = Convert.ToDecimal(r["TotalExpenses"]),
+                                NetEarning = Convert.ToDecimal(r["NetEarning"])
+                            });
+                        }
+                    }
+                    return Json(new { success = true, records = list, total = list.Count },
+                                JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        // ── API: /Reports/GetVehicleMonthly ─────────────────────────────────────
+        [HttpGet]
+        public JsonResult GetVehicleMonthly(long VehicleCode, string FromDate, string ToDate)
+        {
+            try
+            {
+                DateTime? from = null, to = null;
+                string[] fmts = { "dd-MMM-yyyy", "dd-MM-yyyy", "MM/dd/yyyy", "yyyy-MM-dd" };
+                DateTime dt;
+                if (!string.IsNullOrEmpty(FromDate) && DateTime.TryParseExact(FromDate, fmts, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out dt)) from = dt;
+                if (!string.IsNullOrEmpty(ToDate) && DateTime.TryParseExact(ToDate, fmts, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out dt)) to = dt;
+
+                using (var conn = GetRawConnection())
+                {
+                    conn.Open();
+                    var cmd = new System.Data.SqlClient.SqlCommand("sp_frm_get_VehicleMonthly", conn)
+                    { CommandType = System.Data.CommandType.StoredProcedure };
+                    cmd.Parameters.AddWithValue("@VehicleCode", VehicleCode);
+                    cmd.Parameters.AddWithValue("@FromDate", from.HasValue ? (object)from.Value.Date : DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ToDate", to.HasValue ? (object)to.Value.Date : DBNull.Value);
+
+                    var list = new System.Collections.Generic.List<object>();
+                    using (var r = cmd.ExecuteReader())
+                    {
+                        while (r.Read())
+                        {
+                            list.Add(new
+                            {
+                                MonthLabel = r["MonthLabel"].ToString(),
+                                TotalJobs = Convert.ToInt32(r["TotalJobs"]),
+                                TotalCash = Convert.ToDecimal(r["TotalCash"]),
+                                TotalCredit = Convert.ToDecimal(r["TotalCredit"]),
+                                TotalRevenue = Convert.ToDecimal(r["TotalRevenue"]),
+                                TotalExpenses = Convert.ToDecimal(r["TotalExpenses"]),
+                                NetEarning = Convert.ToDecimal(r["NetEarning"])
+                            });
+                        }
+                    }
+                    return Json(new { success = true, records = list }, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        // ── API: /Reports/ExportProfitLoss ──────────────────────────────────────
+        // Excel export using MiniExcel
+        public FileStreamResult ExportProfitLoss(string FromDate, string ToDate)
+        {
+            var ms = new System.IO.MemoryStream();
+            try
+            {
+                DateTime? from = null, to = null;
+                string[] fmts = { "dd-MMM-yyyy", "dd-MM-yyyy", "MM/dd/yyyy", "yyyy-MM-dd" };
+                DateTime dt;
+                if (!string.IsNullOrEmpty(FromDate) && DateTime.TryParseExact(FromDate, fmts, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out dt)) from = dt;
+                if (!string.IsNullOrEmpty(ToDate) && DateTime.TryParseExact(ToDate, fmts, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out dt)) to = dt;
+
+                using (var conn = GetRawConnection())
+                {
+                    conn.Open();
+                    var cmd = new System.Data.SqlClient.SqlCommand("sp_frm_get_ProfitLoss", conn)
+                    { CommandType = System.Data.CommandType.StoredProcedure };
+                    cmd.Parameters.AddWithValue("@FromDate", from.HasValue ? (object)from.Value.Date : DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ToDate", to.HasValue ? (object)to.Value.Date : DBNull.Value);
+
+                    var rows = new System.Collections.Generic.List<System.Collections.Generic.Dictionary<string, object>>();
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            // Revenue section
+                            rows.Add(new System.Collections.Generic.Dictionary<string, object> { { "SECTION", "REVENUE" }, { "DESCRIPTION", "Job Cash Collections" }, { "AMOUNT (SGD)", Convert.ToDecimal(reader["JobCashRevenue"]) } });
+                            rows.Add(new System.Collections.Generic.Dictionary<string, object> { { "SECTION", "" }, { "DESCRIPTION", "Job Credit Collections" }, { "AMOUNT (SGD)", Convert.ToDecimal(reader["JobCreditRevenue"]) } });
+                            rows.Add(new System.Collections.Generic.Dictionary<string, object> { { "SECTION", "" }, { "DESCRIPTION", "Invoice Cash Payments" }, { "AMOUNT (SGD)", Convert.ToDecimal(reader["InvoiceCashRevenue"]) } });
+                            rows.Add(new System.Collections.Generic.Dictionary<string, object> { { "SECTION", "" }, { "DESCRIPTION", "Invoice Account Payments" }, { "AMOUNT (SGD)", Convert.ToDecimal(reader["InvoiceAccountRevenue"]) } });
+                            rows.Add(new System.Collections.Generic.Dictionary<string, object> { { "SECTION", "TOTAL REVENUE" }, { "DESCRIPTION", "" }, { "AMOUNT (SGD)", Convert.ToDecimal(reader["TotalRevenue"]) } });
+                            rows.Add(new System.Collections.Generic.Dictionary<string, object> { { "SECTION", "" }, { "DESCRIPTION", "" }, { "AMOUNT (SGD)", "" } });
+                            // Expense section
+                            rows.Add(new System.Collections.Generic.Dictionary<string, object> { { "SECTION", "EXPENSES" }, { "DESCRIPTION", "Driver Expenses (Fuel/Toll/Parking)" }, { "AMOUNT (SGD)", Convert.ToDecimal(reader["DriverExpenses"]) } });
+                            rows.Add(new System.Collections.Generic.Dictionary<string, object> { { "SECTION", "" }, { "DESCRIPTION", "Company Expenses (Salary/Ops)" }, { "AMOUNT (SGD)", Convert.ToDecimal(reader["CompanyExpenses"]) } });
+                            rows.Add(new System.Collections.Generic.Dictionary<string, object> { { "SECTION", "" }, { "DESCRIPTION", "Vehicle Maintenance" }, { "AMOUNT (SGD)", Convert.ToDecimal(reader["VehicleExpenses"]) } });
+                            rows.Add(new System.Collections.Generic.Dictionary<string, object> { { "SECTION", "" }, { "DESCRIPTION", "Outsource Costs" }, { "AMOUNT (SGD)", Convert.ToDecimal(reader["OutsourceCosts"]) } });
+                            rows.Add(new System.Collections.Generic.Dictionary<string, object> { { "SECTION", "TOTAL EXPENSES" }, { "DESCRIPTION", "" }, { "AMOUNT (SGD)", Convert.ToDecimal(reader["TotalExpenses"]) } });
+                            rows.Add(new System.Collections.Generic.Dictionary<string, object> { { "SECTION", "" }, { "DESCRIPTION", "" }, { "AMOUNT (SGD)", "" } });
+                            rows.Add(new System.Collections.Generic.Dictionary<string, object> { { "SECTION", "NET PROFIT / LOSS" }, { "DESCRIPTION", reader["ProfitOrLoss"].ToString() }, { "AMOUNT (SGD)", Convert.ToDecimal(reader["NetProfit"]) } });
+                        }
+                    }
+
+                    ms.SaveAs(rows);
+                    ms.Seek(0, System.IO.SeekOrigin.Begin);
+                }
+            }
+            catch { }
+
+            return new FileStreamResult(ms, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            { FileDownloadName = "ProfitLoss_" + DateTime.Now.ToString("yyyyMMdd") + ".xlsx" };
+        }
+
+        // ── API: /Reports/ExportVehicleReport ───────────────────────────────────
+        public FileStreamResult ExportVehicleReport(long? VehicleCode, string FromDate, string ToDate)
+        {
+            var ms = new System.IO.MemoryStream();
+            try
+            {
+                DateTime? from = null, to = null;
+                string[] fmts = { "dd-MMM-yyyy", "dd-MM-yyyy", "MM/dd/yyyy", "yyyy-MM-dd" };
+                DateTime dt;
+                if (!string.IsNullOrEmpty(FromDate) && DateTime.TryParseExact(FromDate, fmts, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out dt)) from = dt;
+                if (!string.IsNullOrEmpty(ToDate) && DateTime.TryParseExact(ToDate, fmts, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out dt)) to = dt;
+
+                using (var conn = GetRawConnection())
+                {
+                    conn.Open();
+                    var cmd = new System.Data.SqlClient.SqlCommand("sp_frm_get_VehicleReport", conn)
+                    { CommandType = System.Data.CommandType.StoredProcedure };
+                    cmd.Parameters.AddWithValue("@VehicleCode", VehicleCode.HasValue && VehicleCode.Value > 0 ? (object)VehicleCode.Value : DBNull.Value);
+                    cmd.Parameters.AddWithValue("@FromDate", from.HasValue ? (object)from.Value.Date : DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ToDate", to.HasValue ? (object)to.Value.Date : DBNull.Value);
+
+                    var rows = new System.Collections.Generic.List<System.Collections.Generic.Dictionary<string, object>>();
+                    using (var r = cmd.ExecuteReader())
+                    {
+                        while (r.Read())
+                        {
+                            rows.Add(new System.Collections.Generic.Dictionary<string, object>
+                            {
+                                { "VEHICLE", r["VehicleName"].ToString() },
+                                { "TOTAL JOBS", Convert.ToInt32(r["TotalJobs"]) },
+                                { "CASH (SGD)", Convert.ToDecimal(r["TotalCash"]) },
+                                { "CREDIT (SGD)", Convert.ToDecimal(r["TotalCredit"]) },
+                                { "REVENUE (SGD)", Convert.ToDecimal(r["TotalRevenue"]) },
+                                { "EXPENSES (SGD)", Convert.ToDecimal(r["TotalExpenses"]) },
+                                { "NET (SGD)", Convert.ToDecimal(r["NetEarning"]) }
+                            });
+                        }
+                    }
+
+                    ms.SaveAs(rows);
+                    ms.Seek(0, System.IO.SeekOrigin.Begin);
+                }
+            }
+            catch { }
+
+            return new FileStreamResult(ms, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            { FileDownloadName = "VehicleReport_" + DateTime.Now.ToString("yyyyMMdd") + ".xlsx" };
+        }
+
+        #endregion
     }
 }

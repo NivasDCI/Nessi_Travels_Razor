@@ -1,0 +1,443 @@
+@using Transport.Repository.Resource
+@{
+    Layout = "";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; background: transparent; }
+
+        /* ── Month Pills ── */
+        .month-strip { display: flex; flex-wrap: wrap; gap: 6px; padding: 12px 0 8px; }
+        .mpill {
+            padding: 5px 14px; border-radius: 20px;
+            border: 1px solid #dee2e6; cursor: pointer;
+            font-size: 12px; font-weight: 500;
+            background: #fff; color: #555; transition: all .15s;
+        }
+        .mpill:hover  { border-color: #8e44ad; color: #8e44ad; }
+        .mpill.active { background: #8e44ad; border-color: #8e44ad; color: #fff; }
+
+        /* ── Summary Cards ── */
+        .plcard { border-radius: 10px; color: #fff; padding: 14px 16px; margin-bottom: 10px; }
+        .plcard .pc-lbl { font-size: 10px; opacity: .8; text-transform: uppercase; letter-spacing: .5px; }
+        .plcard .pc-amt { font-size: 20px; font-weight: 700; margin-top: 3px; }
+        .pc-rev  { background: linear-gradient(135deg,#1a9e6e,#27ae60); }
+        .pc-exp  { background: linear-gradient(135deg,#a93226,#e74c3c); }
+        .pc-net  { background: linear-gradient(135deg,#6c3483,#8e44ad); }
+        .pc-marg { background: linear-gradient(135deg,#1a6fa3,#2980b9); }
+
+        /* ── P&L Table ── */
+        .pl-section-hdr {
+            background: #2c3e50; color: #fff;
+            font-weight: 700; font-size: 12px;
+            padding: 8px 14px;
+            letter-spacing: .5px;
+        }
+        .pl-row { display: flex; border-bottom: 1px solid #f0f0f0; }
+        .pl-row:hover { background: #fafafa; }
+        .pl-row .pl-label { flex: 1; padding: 9px 14px; color: #333; }
+        .pl-row .pl-amt   { width: 160px; padding: 9px 14px; text-align: right; font-weight: 600; }
+        .pl-subtotal {
+            background: #ecf0f1;
+            border-top: 2px solid #bdc3c7;
+            border-bottom: 2px solid #bdc3c7;
+        }
+        .pl-subtotal .pl-label { font-weight: 700; color: #2c3e50; }
+        .pl-subtotal .pl-amt   { font-weight: 700; }
+        .pl-total {
+            background: #2c3e50; color: #fff;
+            border-radius: 0 0 8px 8px;
+        }
+        .pl-total .pl-label { font-weight: 700; font-size: 15px; }
+        .pl-total .pl-amt   { font-weight: 700; font-size: 18px; }
+        .profit { color: #27ae60; }
+        .loss   { color: #e74c3c; }
+
+        /* ── Monthly Chart Area ── */
+        .chart-bar-wrap { padding: 14px; background: #fff; }
+        .chart-row { display: flex; align-items: center; margin-bottom: 8px; gap: 8px; }
+        .chart-month { width: 75px; font-size: 11px; color: #666; text-align: right; }
+        .chart-bars  { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+        .bar-rev  { height: 10px; background: #27ae60; border-radius: 3px; min-width: 2px; transition: width .5s; }
+        .bar-exp  { height: 10px; background: #e74c3c; border-radius: 3px; min-width: 2px; transition: width .5s; }
+        .chart-val { width: 90px; font-size: 11px; color: #555; }
+
+        /* ── Monthly Table ── */
+        .ml-tbl { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .ml-tbl th { background: #34495e; color: #fff; padding: 7px 10px; border: 1px solid #2c3e50; text-align: left; }
+        .ml-tbl td { padding: 7px 10px; border: 1px solid #e0e0e0; }
+        .ml-tbl tr:nth-child(even) td { background: #f8f9fa; }
+        .ml-tbl td.r { text-align: right; font-weight: 600; }
+        .ml-tbl tfoot td { background: #2c3e50; color: #fff; font-weight: 700; border: 1px solid #1a252f; }
+
+        /* ── Btn ── */
+        .btn-dl {
+            padding: 6px 14px; border: none; border-radius: 5px;
+            cursor: pointer; font-size: 12px; font-weight: 600;
+            display: inline-flex; align-items: center; gap: 5px;
+        }
+        .btn-xl  { background: #1e7e34; color: #fff; }
+        .btn-pdf { background: #c0392b; color: #fff; }
+        .btn-xl:hover  { background: #155724; }
+        .btn-pdf:hover { background: #922b21; }
+
+        /* ── Print ── */
+        @@media print {
+            .no-print { display: none !important; }
+            body { font-size: 11px; }
+            .plcard { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .pl-section-hdr { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .pl-total { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .ml-tbl th, .ml-tbl tfoot td { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .bar-rev, .bar-exp { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+<div class="content">
+    <div class="container-fluid">
+
+        <!-- Header -->
+        <div class="card card-pd mb-3">
+            <div class="card-header">
+                <span style="font-size:18px;"><i class="fa fa-chart-line"></i></span>
+                <span style="font-size:18px; border-left:1px solid #ccc; padding-left:10px;">
+                    Profit &amp; Loss Report
+                </span>
+                <div style="float:right;" class="no-print">
+                    <button class="btn-dl btn-xl" onclick="DownloadExcel()">
+                        <i class="fa fa-file-excel"></i> Download Excel
+                    </button>
+                    &nbsp;
+                    <button class="btn-dl btn-pdf" onclick="DownloadPDF()">
+                        <i class="fa fa-file-pdf"></i> Download PDF
+                    </button>
+                </div>
+            </div>
+            <div class="card-body no-print">
+                <div style="font-weight:600; font-size:13px; color:#2c3e50; margin-bottom:6px;">
+                    <i class="fa fa-calendar-alt"></i> Select Period
+                </div>
+                <div class="month-strip" id="monthStrip"></div>
+                <div class="row" style="margin-top:8px;">
+                    <div class="col-sm-2">
+                        <label style="font-size:11px;color:#666;">Custom From</label>
+                        <input type="text" id="TxtPLFrom" class="form-control form-control-sm" />
+                    </div>
+                    <div class="col-sm-2">
+                        <label style="font-size:11px;color:#666;">Custom To</label>
+                        <input type="text" id="TxtPLTo" class="form-control form-control-sm" />
+                    </div>
+                    <div class="col-sm-2" style="padding-top:18px;">
+                        <button class="btn btn-primary btn-sm btn-block" onclick="LoadPLReport()">
+                            <i class="fa fa-search"></i> Generate
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Print Title -->
+        <div id="printTitle" style="display:none; text-align:center; margin-bottom:16px;">
+            <h3 style="font-weight:700; color:#2c3e50;">NISSI TRANSPORT PTE. LTD.</h3>
+            <h4 style="color:#555;">Company Profit &amp; Loss Statement</h4>
+            <p id="printPeriod" style="color:#888; font-size:12px;"></p>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="row no-print" id="summaryCards" style="display:none;">
+            <div class="col-sm-3">
+                <div class="plcard pc-rev">
+                    <div class="pc-lbl"><i class="fa fa-arrow-up"></i> Total Revenue</div>
+                    <div class="pc-amt" id="sRevenue">$0.00</div>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="plcard pc-exp">
+                    <div class="pc-lbl"><i class="fa fa-arrow-down"></i> Total Expenses</div>
+                    <div class="pc-amt" id="sExpense">$0.00</div>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="plcard pc-net" id="netCard">
+                    <div class="pc-lbl"><i class="fa fa-landmark"></i> Net Profit / Loss</div>
+                    <div class="pc-amt" id="sNetProfit">$0.00</div>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="plcard pc-marg">
+                    <div class="pc-lbl"><i class="fa fa-percent"></i> Profit Margin</div>
+                    <div class="pc-amt" id="sMargin">0 %</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div id="loadingDiv" style="display:none; text-align:center; padding:50px; color:#888;">
+            <i class="fa fa-spinner fa-spin fa-2x"></i><br />Loading report...
+        </div>
+
+        <!-- Report Area -->
+        <div id="reportContainer"></div>
+
+    </div>
+</div>
+
+<script>
+var _plFromDate = '', _plToDate = '';
+
+// Datepickers
+var dpOpts = {
+    format: Common_Date_Format, autoclose: true,
+    uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small'
+};
+$('#TxtPLFrom').datepicker(dpOpts);
+$('#TxtPLTo').datepicker(dpOpts);
+
+// ── Build Month Pills ──────────────────────────────────────
+$(function() {
+    var mn = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var now = new Date();
+    var strip = $('#monthStrip');
+
+    strip.append('<div class="mpill" onclick="PickThis(this)">This Month</div>');
+    strip.append('<div class="mpill" onclick="PickQuarter(\'q\',this)">This Quarter</div>');
+    strip.append('<div class="mpill" onclick="PickQuarter(\'fy\',this)">This FY</div>');
+
+    for (var i = 0; i < 12; i++) {
+        var d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        var label = mn[d.getMonth()] + ' ' + d.getFullYear();
+        var from = '01-' + mn[d.getMonth()] + '-' + d.getFullYear();
+        var to   = pad(new Date(d.getFullYear(), d.getMonth()+1, 0).getDate()) +
+                   '-' + mn[d.getMonth()] + '-' + d.getFullYear();
+        strip.append('<div class="mpill" data-from="' + from + '" data-to="' + to + '" onclick="PickPill(this)">' + label + '</div>');
+    }
+
+    // Default: previous month
+    $(strip.find('.mpill')[3]).click();
+});
+
+function pad(n) { return n < 10 ? '0' + n : n; }
+function fmt(n)  { return '$' + parseFloat(n||0).toFixed(2); }
+function fmtN(n) { return parseFloat(n||0).toLocaleString('en-SG',{minimumFractionDigits:2}); }
+
+function PickThis(el) {
+    var mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var now = new Date();
+    setPeriod('01-'+mn[now.getMonth()]+'-'+now.getFullYear(),
+              pad(new Date(now.getFullYear(),now.getMonth()+1,0).getDate())+'-'+mn[now.getMonth()]+'-'+now.getFullYear(), el);
+}
+function PickQuarter(type, el) {
+    var mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var now = new Date(); var y = now.getFullYear(); var m = now.getMonth();
+    if (type === 'q') {
+        var qStart = Math.floor(m/3)*3;
+        setPeriod('01-'+mn[qStart]+'-'+y,
+                  pad(new Date(y,qStart+3,0).getDate())+'-'+mn[Math.min(qStart+2,11)]+'-'+y, el);
+    } else {
+        // FY: Apr–Mar (Singapore)
+        var fyStart = m >= 3 ? y : y-1;
+        setPeriod('01-Apr-'+fyStart, '31-Mar-'+(fyStart+1), el);
+    }
+}
+function PickPill(el) {
+    setPeriod($(el).data('from'), $(el).data('to'), el);
+}
+function setPeriod(from, to, el) {
+    $('.mpill').removeClass('active');
+    $(el).addClass('active');
+    _plFromDate = from; _plToDate = to;
+    $('#TxtPLFrom').val(from);
+    $('#TxtPLTo').val(to);
+    LoadPLReport();
+}
+
+// ── Load P&L ───────────────────────────────────────────────
+function LoadPLReport() {
+    var from = $('#TxtPLFrom').val() || _plFromDate;
+    var to   = $('#TxtPLTo').val()   || _plToDate;
+    _plFromDate = from; _plToDate = to;
+
+    $('#reportContainer').empty();
+    $('#summaryCards').hide();
+    $('#loadingDiv').show();
+    $('#printTitle').hide();
+
+    $.ajax({
+        url: BaseURL + 'Reports/GetProfitLoss',
+        type: 'GET',
+        data: { FromDate: from, ToDate: to },
+        dataType: 'json',
+        success: function(r) {
+            $('#loadingDiv').hide();
+            if (!r.success || !r.summary) {
+                $('#reportContainer').html('<div style="text-align:center;padding:40px;color:#999;"><i class="fa fa-exclamation-circle fa-2x"></i><br />No data found for selected period.</div>');
+                return;
+            }
+            RenderPL(r.summary, r.monthly || [], from, to);
+        },
+        error: function(xhr) {
+            $('#loadingDiv').hide();
+            $('#reportContainer').html('<div style="text-align:center;padding:40px;color:#e74c3c;">Error: ' + (xhr.responseText || 'Server error') + '</div>');
+        }
+    });
+}
+
+function RenderPL(s, monthly, from, to) {
+    var rev  = parseFloat(s.TotalRevenue  || 0);
+    var exp  = parseFloat(s.TotalExpenses || 0);
+    var net  = parseFloat(s.NetProfit     || 0);
+    var marg = rev > 0 ? ((net / rev) * 100).toFixed(1) : 0;
+    var isProfit = s.ProfitOrLoss === 'Profit';
+
+    // Cards
+    $('#sRevenue').text(fmt(rev));
+    $('#sExpense').text(fmt(exp));
+    $('#sNetProfit').text(fmt(Math.abs(net)) + (isProfit ? '' : ' (Loss)'));
+    $('#sMargin').text(marg + ' %');
+    if (!isProfit) $('#netCard').css('background','linear-gradient(135deg,#a93226,#e74c3c)');
+    else           $('#netCard').css('background','linear-gradient(135deg,#6c3483,#8e44ad)');
+    $('#summaryCards').show();
+
+    // Print title
+    $('#printPeriod').text('Period: ' + from + ' to ' + to + '   |   Generated: ' + new Date().toLocaleDateString('en-SG'));
+    $('#printTitle').show();
+
+    var html = '<div class="row"><div class="col-sm-7">';
+
+    // ── P&L Statement ──────────────────────────────────────
+    html += '<div class="card card-pd mb-3">';
+    html += '<div class="card-header"><i class="fa fa-list-alt"></i>&nbsp; Profit &amp; Loss Statement</div>';
+    html += '<div class="card-body p-0">';
+
+    // Revenue
+    html += '<div class="pl-section-hdr">REVENUE</div>';
+    html += plRow('Job Cash Collections',    s.JobCashRevenue);
+    html += plRow('Job Credit Collections',  s.JobCreditRevenue);
+    html += plRow('Invoice Cash Payments',   s.InvoiceCashRevenue);
+    html += plRow('Invoice Account Payments',s.InvoiceAccountRevenue);
+    html += plSubtotal('Total Revenue', rev, '#27ae60');
+
+    html += '<div style="height:8px;"></div>';
+
+    // Expenses
+    html += '<div class="pl-section-hdr">EXPENSES</div>';
+    html += plRow('Driver Expenses (Fuel / Toll / Parking)', s.DriverExpenses,  '#e74c3c');
+    html += plRow('Company Expenses (Salary / Office / Ops)', s.CompanyExpenses, '#e74c3c');
+    html += plRow('Vehicle Maintenance',                       s.VehicleExpenses, '#e74c3c');
+    html += plRow('Outsource Costs',                           s.OutsourceCosts,  '#e74c3c');
+    html += plSubtotal('Total Expenses', exp, '#e74c3c');
+
+    html += '<div style="height:8px;"></div>';
+
+    // Net
+    html += '<div class="pl-row pl-total">';
+    html +=   '<div class="pl-label">NET ' + s.ProfitOrLoss.toUpperCase() + ' &nbsp;';
+    html +=   (isProfit ? '<i class="fa fa-arrow-up"></i>' : '<i class="fa fa-arrow-down"></i>') + '</div>';
+    html +=   '<div class="pl-amt">' + fmt(Math.abs(net)) + '</div>';
+    html += '</div>';
+
+    html += '</div></div>'; // card-body + card
+
+    // ── Margin Note ───────────────────────────────────────
+    html += '<div class="card card-pd mb-3">';
+    html += '<div class="card-body" style="font-size:12px; color:#555; background:#f8f9fa; border-radius:6px;">';
+    html += '<strong>Profit Margin:</strong> ' + marg + '% &nbsp;|&nbsp; ';
+    html += '<strong>Period:</strong> ' + from + ' to ' + to + '<br />';
+    html += '<span style="font-size:11px; color:#888;">Revenue = Job cash/credit collections + Invoice payments received in this period.</span>';
+    html += '</div></div>';
+
+    html += '</div>'; // col-sm-7
+
+    // ── Right: Monthly Chart ───────────────────────────────
+    html += '<div class="col-sm-5">';
+    html += '<div class="card card-pd mb-3">';
+    html += '<div class="card-header"><i class="fa fa-chart-bar"></i>&nbsp; Monthly Breakdown</div>';
+
+    if (!monthly || monthly.length === 0) {
+        html += '<div class="card-body" style="color:#aaa;text-align:center;padding:30px;">No monthly data.</div>';
+    } else {
+        var maxVal = 0;
+        $.each(monthly, function(i, m) {
+            maxVal = Math.max(maxVal, parseFloat(m.Revenue||0), parseFloat(m.Expenses||0));
+        });
+
+        html += '<div class="chart-bar-wrap">';
+        html += '<div style="font-size:10px;color:#aaa;margin-bottom:8px;">■ <span style="color:#27ae60;">Revenue</span> &nbsp; ■ <span style="color:#e74c3c;">Expenses</span></div>';
+        $.each(monthly, function(i, m) {
+            var rw = maxVal > 0 ? (parseFloat(m.Revenue||0)/maxVal*100) : 0;
+            var ew = maxVal > 0 ? (parseFloat(m.Expenses||0)/maxVal*100) : 0;
+            html += '<div class="chart-row">';
+            html +=   '<div class="chart-month">' + m.MonthLabel + '</div>';
+            html +=   '<div class="chart-bars">';
+            html +=     '<div class="bar-rev" style="width:' + rw + '%"></div>';
+            html +=     '<div class="bar-exp" style="width:' + ew + '%"></div>';
+            html +=   '</div>';
+            html +=   '<div class="chart-val">$' + fmtN(m.Revenue) + '</div>';
+            html += '</div>';
+        });
+        html += '</div>';
+
+        // Monthly Table
+        html += '<div class="card-body p-0">';
+        html += '<table class="ml-tbl">';
+        html += '<thead><tr><th>Month</th><th class="r">Revenue</th><th class="r">Expenses</th><th class="r">Net</th></tr></thead>';
+        html += '<tbody>';
+        var gtRev=0, gtExp=0, gtNet=0;
+        $.each(monthly, function(i, m) {
+            var r=parseFloat(m.Revenue||0), e=parseFloat(m.Expenses||0), n=r-e;
+            gtRev+=r; gtExp+=e; gtNet+=n;
+            html += '<tr>';
+            html += '<td><strong>' + m.MonthLabel + '</strong></td>';
+            html += '<td class="r" style="color:#27ae60;">$' + fmtN(r) + '</td>';
+            html += '<td class="r" style="color:#e74c3c;">$' + fmtN(e) + '</td>';
+            html += '<td class="r ' + (n>=0?'profit':'loss') + '">$' + fmtN(n) + '</td>';
+            html += '</tr>';
+        });
+        html += '</tbody>';
+        html += '<tfoot><tr>';
+        html += '<td><strong>TOTAL</strong></td>';
+        html += '<td class="r"><strong>$' + fmtN(gtRev) + '</strong></td>';
+        html += '<td class="r"><strong>$' + fmtN(gtExp) + '</strong></td>';
+        html += '<td class="r ' + (gtNet>=0?'profit':'loss') + '"><strong>$' + fmtN(gtNet) + '</strong></td>';
+        html += '</tr></tfoot>';
+        html += '</table></div>';
+    }
+
+    html += '</div></div>'; // card + col
+
+    html += '</div>'; // row
+
+    $('#reportContainer').html(html);
+}
+
+function plRow(label, amt, color) {
+    color = color || '#333';
+    return '<div class="pl-row"><div class="pl-label">' + label + '</div>' +
+           '<div class="pl-amt" style="color:' + color + ';">$' + fmtN(amt) + '</div></div>';
+}
+function plSubtotal(label, amt, color) {
+    return '<div class="pl-row pl-subtotal"><div class="pl-label">' + label + '</div>' +
+           '<div class="pl-amt" style="color:' + color + ';">$' + fmtN(amt) + '</div></div>';
+}
+
+// ── Excel Download ────────────────────────────────────────
+function DownloadExcel() {
+    var from = $('#TxtPLFrom').val() || _plFromDate;
+    var to   = $('#TxtPLTo').val()   || _plToDate;
+    window.location.href = BaseURL + 'Reports/ExportProfitLoss?FromDate=' +
+        encodeURIComponent(from) + '&ToDate=' + encodeURIComponent(to);
+}
+
+// ── PDF (Browser Print) ────────────────────────────────────
+function DownloadPDF() {
+    $('#printTitle').show();
+    window.print();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,500 @@
+@using Transport.Repository.Resource
+@{
+    Layout = "";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <style>
+        /* ── Base ── */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; background: transparent; }
+
+        /* ── Month Pill Selector ── */
+        .month-strip {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 14px 0 10px;
+        }
+        .mpill {
+            padding: 5px 14px;
+            border-radius: 20px;
+            border: 1px solid #dee2e6;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            background: #fff;
+            color: #555;
+            transition: all .15s;
+            white-space: nowrap;
+        }
+        .mpill:hover { border-color: #17a2b8; color: #17a2b8; }
+        .mpill.active { background: #17a2b8; border-color: #17a2b8; color: #fff; }
+
+        /* ── Summary Cards ── */
+        .vcard {
+            border-radius: 10px;
+            color: #fff;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+        }
+        .vcard .vc-lbl { font-size: 10px; opacity: .8; text-transform: uppercase; letter-spacing: .5px; }
+        .vcard .vc-amt { font-size: 20px; font-weight: 700; margin-top: 3px; }
+        .vc-rev  { background: linear-gradient(135deg,#1a9e6e,#27ae60); }
+        .vc-exp  { background: linear-gradient(135deg,#a93226,#e74c3c); }
+        .vc-net  { background: linear-gradient(135deg,#6c3483,#8e44ad); }
+        .vc-jobs { background: linear-gradient(135deg,#1a6fa3,#2980b9); }
+
+        /* ── Vehicle Card ── */
+        .veh-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            background: #fff;
+            box-shadow: 0 2px 6px rgba(0,0,0,.06);
+        }
+        .veh-header {
+            background: #2c3e50;
+            color: #fff;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .veh-header .veh-name { font-weight: 700; font-size: 15px; letter-spacing: .5px; }
+        .veh-header .veh-badge {
+            background: rgba(255,255,255,.2);
+            border-radius: 12px;
+            padding: 2px 10px;
+            font-size: 11px;
+        }
+        .veh-summary {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .veh-summary .vs-item {
+            flex: 1;
+            padding: 10px 14px;
+            border-right: 1px solid #e0e0e0;
+            text-align: center;
+        }
+        .veh-summary .vs-item:last-child { border-right: none; }
+        .vs-item .vs-lbl { font-size: 10px; color: #888; text-transform: uppercase; }
+        .vs-item .vs-val { font-size: 16px; font-weight: 700; margin-top: 2px; }
+
+        /* ── Monthly Table ── */
+        .month-tbl { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .month-tbl th {
+            background: #34495e; color: #fff;
+            padding: 7px 10px; text-align: left;
+            border: 1px solid #2c3e50;
+            white-space: nowrap;
+        }
+        .month-tbl td {
+            padding: 7px 10px;
+            border: 1px solid #e0e0e0;
+        }
+        .month-tbl tr:nth-child(even) td { background: #f8f9fa; }
+        .month-tbl td.r { text-align: right; font-weight: 600; }
+        .month-tbl tfoot td {
+            background: #2c3e50; color: #fff;
+            font-weight: 700;
+            border: 1px solid #1a252f;
+        }
+        .profit  { color: #27ae60; }
+        .loss    { color: #e74c3c; }
+
+        /* ── Toolbar ── */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+        .tb-label { font-weight: 600; font-size: 13px; color: #2c3e50; }
+        .btn-dl {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-xl  { background: #1e7e34; color: #fff; }
+        .btn-pdf { background: #c0392b; color: #fff; }
+        .btn-xl:hover  { background: #155724; }
+        .btn-pdf:hover { background: #922b21; }
+
+        /* ── Loading ── */
+        #loadingDiv {
+            text-align: center;
+            padding: 50px;
+            color: #888;
+            font-size: 14px;
+        }
+
+        /* ── Print styles ── */
+        @@media print {
+            .no-print { display: none !important; }
+            .veh-card { break-inside: avoid; }
+            body { font-size: 11px; }
+            .vcard { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .veh-header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .month-tbl th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .month-tbl tfoot td { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+<div class="content">
+    <div class="container-fluid">
+
+        <!-- Header Card -->
+        <div class="card card-pd mb-3">
+            <div class="card-header">
+                <span style="font-size:18px;"><i class="fa fa-car"></i></span>
+                <span style="font-size:18px; border-left:1px solid #ccc; padding-left:10px;">
+                    Vehicle Monthly Report
+                </span>
+                <div style="float:right;" class="no-print">
+                    <button class="btn-dl btn-xl" onclick="DownloadExcel()">
+                        <i class="fa fa-file-excel"></i> Download Excel
+                    </button>
+                    &nbsp;
+                    <button class="btn-dl btn-pdf" onclick="DownloadPDF()">
+                        <i class="fa fa-file-pdf"></i> Download PDF
+                    </button>
+                </div>
+            </div>
+            <div class="card-body no-print">
+                <!-- Month Pills -->
+                <div class="tb-label" style="margin-bottom:6px;">
+                    <i class="fa fa-calendar-alt"></i> Select Period
+                </div>
+                <div class="month-strip" id="monthStrip"></div>
+
+                <!-- Custom Range -->
+                <div class="row" style="margin-top:8px;">
+                    <div class="col-sm-2">
+                        <label style="font-size:11px;color:#666;">Custom From</label>
+                        <input type="text" id="TxtVFrom" class="form-control form-control-sm" placeholder="dd-MMM-yyyy" />
+                    </div>
+                    <div class="col-sm-2">
+                        <label style="font-size:11px;color:#666;">Custom To</label>
+                        <input type="text" id="TxtVTo" class="form-control form-control-sm" placeholder="dd-MMM-yyyy" />
+                    </div>
+                    <div class="col-sm-2">
+                        <label style="font-size:11px;color:#666;">Vehicle</label>
+                        <select id="ddlVehicle" class="form-control form-control-sm">
+                            <option value="">All Vehicles</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-2" style="padding-top:18px;">
+                        <button class="btn btn-primary btn-sm btn-block" onclick="LoadVehicleReport()">
+                            <i class="fa fa-search"></i> Generate
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Report Title (visible in print) -->
+        <div id="printTitle" style="display:none; text-align:center; margin-bottom:16px;">
+            <h3 style="font-weight:700; color:#2c3e50;">NISSI TRANSPORT PTE. LTD.</h3>
+            <h4 style="color:#555;">Vehicle Monthly Performance Report</h4>
+            <p id="printPeriod" style="color:#888; font-size:12px;"></p>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="row no-print" id="summaryCards" style="display:none;">
+            <div class="col-sm-3">
+                <div class="vcard vc-jobs">
+                    <div class="vc-lbl"><i class="fa fa-car"></i> Total Jobs</div>
+                    <div class="vc-amt" id="sTotalJobs">0</div>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="vcard vc-rev">
+                    <div class="vc-lbl"><i class="fa fa-dollar-sign"></i> Total Revenue</div>
+                    <div class="vc-amt" id="sTotalRev">$0.00</div>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="vcard vc-exp">
+                    <div class="vc-lbl"><i class="fa fa-receipt"></i> Total Expenses</div>
+                    <div class="vc-amt" id="sTotalExp">$0.00</div>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="vcard vc-net">
+                    <div class="vc-lbl"><i class="fa fa-landmark"></i> Net Earning</div>
+                    <div class="vc-amt" id="sTotalNet">$0.00</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div id="loadingDiv" style="display:none;">
+            <i class="fa fa-spinner fa-spin fa-2x"></i><br />Loading report...
+        </div>
+
+        <!-- Report Container -->
+        <div id="reportContainer"></div>
+
+    </div>
+</div>
+
+<script>
+// ── State ──────────────────────────────────────────────────
+var _allData    = {};
+var _fromDate   = '';
+var _toDate     = '';
+var _monthPills = [];
+
+// ── Init Datepickers ───────────────────────────────────────
+var dpOpts = {
+    format: Common_Date_Format,
+    autoclose: true,
+    uiLibrary: 'bootstrap4',
+    iconsLibrary: 'fontawesome',
+    size: 'small'
+};
+$('#TxtVFrom').datepicker(dpOpts);
+$('#TxtVTo').datepicker(dpOpts);
+
+// ── Build last 12 month pills ──────────────────────────────
+$(function() {
+    var mn = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var now = new Date();
+    var strip = $('#monthStrip');
+    // "This Month" pill
+    strip.append('<div class="mpill" onclick="PickMonth(\'this\',this)">This Month</div>');
+
+    for (var i = 0; i < 12; i++) {
+        var d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        var label = mn[d.getMonth()] + ' ' + d.getFullYear();
+        var val = {
+            from: '01-' + mn[d.getMonth()] + '-' + d.getFullYear(),
+            to:   pad(new Date(d.getFullYear(), d.getMonth()+1, 0).getDate()) +
+                  '-' + mn[d.getMonth()] + '-' + d.getFullYear()
+        };
+        _monthPills.push({label: label, val: val});
+        strip.append('<div class="mpill" data-from="' + val.from + '" data-to="' + val.to + '" onclick="PickPill(this)">' + label + '</div>');
+    }
+
+    // Auto-select previous month
+    var pills = strip.find('.mpill');
+    $(pills[2]).click();   // index 2 = last month (index 0 = "This Month", 1 = current)
+
+    // Load vehicles dropdown
+    $.ajax({ type: 'GET', url: BaseURL + 'Common/Load_Vehicles', dataType: 'json',
+        success: function(data) {
+            $.each(data, function(i, v) {
+                if (v.ID > 0) $('#ddlVehicle').append('<option value="' + v.ID + '">' + v.Name + '</option>');
+            });
+        }
+    });
+});
+
+function pad(n) { return n < 10 ? '0' + n : n; }
+
+function PickMonth(type, el) {
+    $('.mpill').removeClass('active');
+    $(el).addClass('active');
+    var mn = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var now = new Date();
+    if (type === 'this') {
+        _fromDate = '01-' + mn[now.getMonth()] + '-' + now.getFullYear();
+        _toDate   = pad(new Date(now.getFullYear(), now.getMonth()+1, 0).getDate()) +
+                    '-' + mn[now.getMonth()] + '-' + now.getFullYear();
+    }
+    $('#TxtVFrom').val(_fromDate);
+    $('#TxtVTo').val(_toDate);
+    LoadVehicleReport();
+}
+
+function PickPill(el) {
+    $('.mpill').removeClass('active');
+    $(el).addClass('active');
+    _fromDate = $(el).data('from');
+    _toDate   = $(el).data('to');
+    $('#TxtVFrom').val(_fromDate);
+    $('#TxtVTo').val(_toDate);
+    LoadVehicleReport();
+}
+
+// ── Load Report ────────────────────────────────────────────
+function LoadVehicleReport() {
+    var from = $('#TxtVFrom').val() || _fromDate;
+    var to   = $('#TxtVTo').val()   || _toDate;
+    var vc   = $('#ddlVehicle').val() || null;
+
+    $('#reportContainer').empty();
+    $('#summaryCards').hide();
+    $('#loadingDiv').show();
+    $('#printTitle').hide();
+
+    $.ajax({
+        url: BaseURL + 'Reports/GetVehicleReport',
+        type: 'GET',
+        data: { VehicleCode: vc, FromDate: from, ToDate: to },
+        dataType: 'json',
+        success: function(r) {
+            $('#loadingDiv').hide();
+            if (!r.success || !r.records || r.records.length === 0) {
+                $('#reportContainer').html('<div style="text-align:center;padding:40px;color:#999;"><i class="fa fa-exclamation-circle fa-2x"></i><br />No data found for selected period.</div>');
+                return;
+            }
+            _allData = r;
+            _fromDate = from; _toDate = to;
+            RenderVehicleReport(r, from, to);
+        },
+        error: function() {
+            $('#loadingDiv').hide();
+            $('#reportContainer').html('<div style="text-align:center;padding:40px;color:#e74c3c;">Error loading report.</div>');
+        }
+    });
+}
+
+function fmt(n) { return '$' + parseFloat(n||0).toFixed(2); }
+function fmtN(n) { return parseFloat(n||0).toLocaleString('en-SG', {minimumFractionDigits:2}); }
+
+function RenderVehicleReport(r, from, to) {
+    var records  = r.records  || [];
+    var monthly  = r.monthly  || [];   // if API returns monthly, else we fetch per vehicle
+
+    var totJobs = 0, totRev = 0, totExp = 0, totNet = 0;
+    $.each(records, function(i, v) {
+        totJobs += parseInt(v.TotalJobs || 0);
+        totRev  += parseFloat(v.TotalRevenue || 0);
+        totExp  += parseFloat(v.TotalExpenses || 0);
+        totNet  += parseFloat(v.NetEarning || 0);
+    });
+
+    // Summary cards
+    $('#sTotalJobs').text(totJobs);
+    $('#sTotalRev').text(fmt(totRev));
+    $('#sTotalExp').text(fmt(totExp));
+    var netEl = $('#sTotalNet');
+    netEl.text(fmt(totNet));
+    if (totNet < 0) netEl.css('color','#ffcdd2'); else netEl.css('color','#fff');
+    $('#summaryCards').show();
+
+    // Print title
+    $('#printPeriod').text('Period: ' + from + ' to ' + to + '   |   Generated: ' + new Date().toLocaleDateString('en-SG'));
+    $('#printTitle').show();
+
+    var html = '';
+
+    $.each(records, function(i, v) {
+        var netColor = parseFloat(v.NetEarning) >= 0 ? '#27ae60' : '#e74c3c';
+        var totRows  = v.TotalJobs;
+
+        html += '<div class="veh-card">';
+        html += '<div class="veh-header">';
+        html +=   '<span class="veh-name"><i class="fa fa-car"></i> &nbsp;' + v.VehicleName + '</span>';
+        html +=   '<span class="veh-badge">' + v.TotalJobs + ' jobs</span>';
+        html += '</div>';
+
+        // Summary strip
+        html += '<div class="veh-summary">';
+        html +=   '<div class="vs-item"><div class="vs-lbl">Cash</div><div class="vs-val" style="color:#2980b9;">' + fmt(v.TotalCash) + '</div></div>';
+        html +=   '<div class="vs-item"><div class="vs-lbl">Credit</div><div class="vs-val" style="color:#e74c3c;">' + fmt(v.TotalCredit) + '</div></div>';
+        html +=   '<div class="vs-item"><div class="vs-lbl">Revenue</div><div class="vs-val" style="color:#27ae60;">' + fmt(v.TotalRevenue) + '</div></div>';
+        html +=   '<div class="vs-item"><div class="vs-lbl">Expenses</div><div class="vs-val" style="color:#e74c3c;">' + fmt(v.TotalExpenses) + '</div></div>';
+        html +=   '<div class="vs-item"><div class="vs-lbl">Net Earning</div><div class="vs-val" style="color:' + netColor + ';">' + fmt(v.NetEarning) + '</div></div>';
+        html += '</div>';
+
+        // Monthly breakdown — fetch separately
+        html += '<div id="monthly_' + v.VehicleCode + '" style="padding:0;">';
+        html +=   '<div style="text-align:center;padding:14px;color:#aaa;"><i class="fa fa-spinner fa-spin"></i> Loading monthly...</div>';
+        html += '</div>';
+        html += '</div>';
+
+        // Fetch monthly for this vehicle
+        (function(vc, vcName) {
+            $.ajax({
+                url: BaseURL + 'Reports/GetVehicleMonthly',
+                type: 'GET',
+                data: { VehicleCode: vc, FromDate: from, ToDate: to },
+                dataType: 'json',
+                success: function(mr) {
+                    var mhtml = '';
+                    if (!mr.success || !mr.records || mr.records.length === 0) {
+                        mhtml = '<div style="text-align:center;padding:12px;color:#aaa;">No monthly data.</div>';
+                    } else {
+                        mhtml += '<table class="month-tbl">';
+                        mhtml += '<thead><tr>';
+                        mhtml += '<th>Month</th><th class="r">Jobs</th>';
+                        mhtml += '<th class="r">Cash</th><th class="r">Credit</th>';
+                        mhtml += '<th class="r">Revenue</th><th class="r">Expenses</th><th class="r">Net Earning</th>';
+                        mhtml += '</tr></thead><tbody>';
+
+                        var gJobs=0,gCash=0,gCred=0,gRev=0,gExp=0,gNet=0;
+                        $.each(mr.records, function(i, m) {
+                            var nc = parseFloat(m.NetEarning||0) >= 0 ? 'profit' : 'loss';
+                            gJobs+=parseInt(m.TotalJobs||0);
+                            gCash+=parseFloat(m.TotalCash||0);
+                            gCred+=parseFloat(m.TotalCredit||0);
+                            gRev +=parseFloat(m.TotalRevenue||0);
+                            gExp +=parseFloat(m.TotalExpenses||0);
+                            gNet +=parseFloat(m.NetEarning||0);
+                            mhtml += '<tr>';
+                            mhtml += '<td><strong>' + m.MonthLabel + '</strong></td>';
+                            mhtml += '<td class="r">' + m.TotalJobs + '</td>';
+                            mhtml += '<td class="r">$' + fmtN(m.TotalCash) + '</td>';
+                            mhtml += '<td class="r" style="color:#e74c3c;">$' + fmtN(m.TotalCredit) + '</td>';
+                            mhtml += '<td class="r" style="color:#27ae60;font-weight:700;">$' + fmtN(m.TotalRevenue) + '</td>';
+                            mhtml += '<td class="r" style="color:#e74c3c;">$' + fmtN(m.TotalExpenses) + '</td>';
+                            mhtml += '<td class="r ' + nc + '">$' + fmtN(m.NetEarning) + '</td>';
+                            mhtml += '</tr>';
+                        });
+                        // Footer total
+                        var fc = gNet >= 0 ? 'profit' : 'loss';
+                        mhtml += '</tbody><tfoot><tr>';
+                        mhtml += '<td><strong>TOTAL</strong></td>';
+                        mhtml += '<td class="r"><strong>' + gJobs + '</strong></td>';
+                        mhtml += '<td class="r"><strong>$' + fmtN(gCash) + '</strong></td>';
+                        mhtml += '<td class="r"><strong>$' + fmtN(gCred) + '</strong></td>';
+                        mhtml += '<td class="r"><strong>$' + fmtN(gRev) + '</strong></td>';
+                        mhtml += '<td class="r"><strong>$' + fmtN(gExp) + '</strong></td>';
+                        mhtml += '<td class="r ' + fc + '"><strong>$' + fmtN(gNet) + '</strong></td>';
+                        mhtml += '</tr></tfoot></table>';
+                    }
+                    $('#monthly_' + vc).html(mhtml);
+                }
+            });
+        })(v.VehicleCode, v.VehicleName);
+    });
+
+    $('#reportContainer').html(html);
+}
+
+// ── Excel Download ─────────────────────────────────────────
+function DownloadExcel() {
+    var from = $('#TxtVFrom').val() || _fromDate;
+    var to   = $('#TxtVTo').val()   || _toDate;
+    var vc   = $('#ddlVehicle').val() || '';
+    var url  = BaseURL + 'Reports/ExportVehicleReport?VehicleCode=' + vc +
+               '&FromDate=' + encodeURIComponent(from) +
+               '&ToDate='   + encodeURIComponent(to);
+    window.location.href = url;
+}
+
+// ── PDF Download (Browser Print) ────────────────────────────
+function DownloadPDF() {
+    // Show print title, hide no-print elements, print, restore
+    $('#printTitle').show();
+    window.print();
+}
+</script>
+</body>
+</html>
