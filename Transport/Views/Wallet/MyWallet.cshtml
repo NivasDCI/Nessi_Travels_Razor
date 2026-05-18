@@ -28,6 +28,10 @@
             background: linear-gradient(135deg,#6c3483,#8e44ad);
         }
 
+        .wc-recv {
+            background: linear-gradient(135deg,#117a8b,#17a2b8);
+        }
+
         .wcard .wc-lbl {
             font-size: 11px;
             opacity: .85;
@@ -45,11 +49,70 @@
             font-size: 11px;
             opacity: .7;
         }
+
+        /* Transaction History */
+        .tx-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+            .tx-table th {
+                background: #2c3e50;
+                color: #fff;
+                padding: 8px 10px;
+                text-align: left;
+            }
+
+            .tx-table td {
+                padding: 8px 10px;
+                border-bottom: 1px solid #f0f0f0;
+            }
+
+            .tx-table tr:hover td {
+                background: #fafafa;
+            }
+
+        .tx-credit {
+            color: #27ae60;
+            font-weight: 700;
+        }
+
+        .tx-debit {
+            color: #e74c3c;
+            font-weight: 700;
+        }
+
+        .tx-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .tx-badge-credit {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .tx-badge-debit {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .tx-source {
+            font-size: 11px;
+            color: #888;
+        }
     </style>
 
     <script>
         var CURRENT_UID = @uidStr;
         var dpOpts = { format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small' };
+
+        // Modal datepicker options — zIndex modal (1050) விட அதிகமா வேணும்
+        var dpOptsModal = $.extend({}, dpOpts, { zIndex: 1100 });
 
         // ── 1. WALLET SUMMARY CARDS + DAILY TABLE ─────────────────────────────
         function LoadWallet() {
@@ -60,17 +123,15 @@
                 dataType: 'json',
                 success: function (r) {
                     if (r.balance) {
-                        var b = r.balance;
-                        var earned  = parseFloat(b.TotalEarned     || 0);
-                        var handed  = parseFloat(b.TotalHandedOver  || 0);
-                        var expense = parseFloat(b.TotalExpenses    || 0);
-                        // Calculate balance = earned - handed - expenses
-                        // (WalletBalance from UserWallet doesn't include expenses deduction)
-                        var bal = earned - handed - expense;
+                        var b       = r.balance;
+                        var earned  = parseFloat(b.TotalEarned    || 0);
+                        var handed  = parseFloat(b.TotalHandedOver || 0);
+                        var expense = parseFloat(b.TotalExpenses   || 0);
+                        var bal     = earned - handed - expense;
                         $('#CardEarned').text('$ ' + earned.toFixed(2));
                         $('#CardHanded').text('$ ' + handed.toFixed(2));
                         $('#CardDExp'  ).text('$ ' + expense.toFixed(2));
-                        $('#CardBal').text('$ ' + bal.toFixed(2));
+                        $('#CardBal'   ).text('$ ' + bal.toFixed(2));
                         if (bal < 0) $('#WcBal').css('background','linear-gradient(135deg,#c0392b,#e74c3c)');
                         else         $('#WcBal').css('background','linear-gradient(135deg,#6c3483,#8e44ad)');
                     }
@@ -78,7 +139,13 @@
                     tbody.empty();
                     if (r.records && r.records.length > 0) {
                         $.each(r.records, function (i, d) {
-                            var rows = r.records.slice().reverse(); var run = 0; var runMap = {}; $.each(rows, function(i,x){ run += parseFloat(x.TotalEarned)-parseFloat(x.TotalHandedOver)-parseFloat(x.TotalExpenses); runMap[x.DisplayWalletDate]=run; }); var balColor = runMap[d.DisplayWalletDate] >= 0 ? '#8e44ad' : '#e74c3c';
+                            var rows = r.records.slice().reverse();
+                            var run = 0; var runMap = {};
+                            $.each(rows, function(i, x) {
+                                run += parseFloat(x.TotalEarned) - parseFloat(x.TotalHandedOver) - parseFloat(x.TotalExpenses);
+                                runMap[x.DisplayWalletDate] = run;
+                            });
+                            var balColor = runMap[d.DisplayWalletDate] >= 0 ? '#8e44ad' : '#e74c3c';
                             tbody.append(
                                 '<tr>' +
                                 '<td>' + d.DisplayWalletDate + '</td>' +
@@ -97,79 +164,176 @@
             });
         }
 
-        // ── 2. CASH HISTORY GRID ──────────────────────────────────────────────
+        // ── 2. WALLET TRANSACTION HISTORY ─────────────────────────────────────
+        function todayStr() {
+            var d = new Date();
+            var mn = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            return ('0'+d.getDate()).slice(-2) + '-' + mn[d.getMonth()] + '-' + d.getFullYear();
+        }
+
+        function LoadTxHistory(from, to) {
+            from = from || todayStr();
+            to   = to   || todayStr();
+
+            if (from === to) {
+                $('#TxDateLabel').text(from === todayStr() ? 'Today' : from);
+            } else {
+                $('#TxDateLabel').html(from + ' &rarr; ' + to);
+            }
+
+            $('#tblTxBody').html(
+                '<tr><td colspan="5" style="text-align:center;padding:20px;color:#aaa;">' +
+                '<i class="fa fa-spinner fa-spin"></i> Loading...</td></tr>'
+            );
+
+            $.ajax({
+                url: BaseURL + 'Wallet/WalletHistory_FindAll',
+                type: 'GET',
+                data: { UserID: CURRENT_UID, FromDate: from, ToDate: to },
+                dataType: 'json',
+                success: function (r) {
+                    var tbody = $('#tblTxBody');
+                    tbody.empty();
+                    if (!r.records || r.records.length === 0) {
+                        tbody.html(
+                            '<tr><td colspan="5" style="text-align:center;padding:30px;color:#999;">' +
+                            '<i class="fa fa-inbox fa-2x"></i><br/>No transactions for this period.</td></tr>'
+                        );
+                        return;
+                    }
+                    $.each(r.records, function (i, t) {
+                        var isCredit = (t.TxType || '').toUpperCase() === 'CREDIT';
+                        var badge    = isCredit
+                            ? '<span class="tx-badge tx-badge-credit"><i class="fa fa-arrow-up"></i> CREDIT</span>'
+                            : '<span class="tx-badge tx-badge-debit"><i class="fa fa-arrow-down"></i> DEBIT</span>';
+                        var amtCls = isCredit ? 'tx-credit' : 'tx-debit';
+                        var sign   = isCredit ? '+' : '&minus;';
+
+                        var srcDetail = '<strong>' + (t.SourceLabel || t.Source || '') + '</strong>';
+                        if (t.Source === 'Job' && t.JobFrom) {
+                            srcDetail += '<br><span class="tx-source"><i class="fa fa-map-marker-alt"></i> ' +
+                                t.JobFrom + ' → ' + (t.JobTo || '') +
+                                (t.CustomerName ? ' &nbsp;|&nbsp; ' + t.CustomerName : '') + '</span>';
+                        }
+                        if (t.Remarks && t.Remarks.trim()) {
+                            srcDetail += '<br><span class="tx-source" style="color:#bbb;"><i class="fa fa-comment"></i> ' + t.Remarks + '</span>';
+                        }
+
+                        tbody.append(
+                            '<tr>' +
+                            '<td style="white-space:nowrap;color:#666;font-size:11px;">' + (t.DisplayDate || '') + '</td>' +
+                            '<td>' + badge + '</td>' +
+                            '<td>' + srcDetail + '</td>' +
+                            '<td style="text-align:right;" class="' + amtCls + '">' + sign + ' $' + parseFloat(t.Amount).toFixed(2) + '</td>' +
+                            '<td style="text-align:right;color:#555;font-weight:600;font-size:12px;">$' + parseFloat(t.BalanceAfter).toFixed(2) + '</td>' +
+                            '</tr>'
+                        );
+                    });
+                },
+                error: function () {
+                    $('#tblTxBody').html(
+                        '<tr><td colspan="5" style="text-align:center;padding:20px;color:#e74c3c;">' +
+                        '<i class="fa fa-exclamation-circle"></i> Error loading history.</td></tr>'
+                    );
+                }
+            });
+        }
+
+        function ApplyTxFilter() {
+            var from = $('#TxtTxModalFrom').val();
+            var to   = $('#TxtTxModalTo').val();
+            if (!from || !to) { alert('Please select both dates.'); return; }
+            $('#modalTxFilter').modal('hide');
+            LoadTxHistory(from, to);
+        }
+
+        function TxPill(type) {
+            var mn = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            var now = new Date();
+            var from, to;
+            if (type === 'today') {
+                from = to = todayStr();
+            } else if (type === 'week') {
+                var start = new Date(now); start.setDate(now.getDate() - 6);
+                from = ('0'+start.getDate()).slice(-2)+'-'+mn[start.getMonth()]+'-'+start.getFullYear();
+                to   = todayStr();
+            } else if (type === 'month') {
+                from = '01-' + mn[now.getMonth()] + '-' + now.getFullYear();
+                to   = todayStr();
+            }
+            $('#modalTxFilter').modal('hide');
+            LoadTxHistory(from, to);
+        }
+
+        // ── 3. CASH HISTORY GRID ──────────────────────────────────────────────
         var GrdCash;
         function InitCashGrid() {
             GrdCash = $('#GrdCash').grid({
                 primaryKey: 'JobCode', uiLibrary: 'bootstrap4', responsive: true,
                 dataSource: BaseURL + 'Wallet/MyCashHistory_FindAll',
                 columns: [
-                    { field: 'DisplayJobDate', width: 100, title: 'DATE',     sortable: false },
-                    { field: 'JobTime',        width: 80,  title: 'TIME',     sortable: false },
-                    { field: 'CustomerName',   width: 140, title: 'CUSTOMER', sortable: false },
-                    { field: 'JobFrom',        width: 130, title: 'FROM',     sortable: false },
-                    { field: 'JobTo',          width: 130, title: 'TO',       sortable: false },
-                    { field: 'VehicleName',    width: 100, title: 'VEHICLE',  sortable: false },
-                    {
-                        field: 'Cash', width: 100, title: 'CASH (SGD)', sortable: false, align: 'right',
-                        renderer: function (v) { return '<strong style="color:#27ae60;">$ ' + parseFloat(v).toFixed(2) + '</strong>'; }
+                    { field: 'DisplayJobDate', width:100, title:'DATE',     sortable:false },
+                    { field: 'JobTime',        width:80,  title:'TIME',     sortable:false },
+                    { field: 'CustomerName',   width:140, title:'CUSTOMER', sortable:false },
+                    { field: 'JobFrom',        width:130, title:'FROM',     sortable:false },
+                    { field: 'JobTo',          width:130, title:'TO',       sortable:false },
+                    { field: 'VehicleName',    width:100, title:'VEHICLE',  sortable:false },
+                    { field: 'Cash', width:100, title:'CASH (SGD)', sortable:false, align:'right',
+                      renderer: function(v) { return '<strong style="color:#27ae60;">$ ' + parseFloat(v).toFixed(2) + '</strong>'; }
                     },
-                    { field: 'JobStatus', width: 110, title: 'STATUS', sortable: false,
-                      renderer: function (v) { return '<span class="badge badge-success">' + v + '</span>'; }
+                    { field: 'JobStatus', width:110, title:'STATUS', sortable:false,
+                      renderer: function(v) { return '<span class="badge badge-success">' + v + '</span>'; }
                     }
                 ],
-                pager: { enable: true, limit: 25, sizes: ArrPaging }
+                pager: { enable:true, limit:25, sizes:ArrPaging }
             });
         }
 
-        // ── 3. HANDOVER HISTORY GRID ──────────────────────────────────────────
+        // ── 4. HANDOVER HISTORY GRID ──────────────────────────────────────────
         var GrdHandover;
         function InitHandoverGrid() {
             GrdHandover = $('#GrdHandover').grid({
                 primaryKey: 'HandoverID', uiLibrary: 'bootstrap4', responsive: true,
                 dataSource: BaseURL + 'Wallet/Handover_FindAll?DriverUserID=' + CURRENT_UID,
                 columns: [
-                    { field: 'DisplayHandoverDate', width: 110, title: 'DATE',      sortable: false },
-                    { field: 'HandedToName',        width: 140, title: 'HANDED TO', sortable: false },
-                    {
-                        field: 'Amount', width: 110, title: 'AMOUNT (SGD)', sortable: false, align: 'right',
-                        renderer: function (v) { return '<strong style="color:#2980b9;">$ ' + parseFloat(v).toFixed(2) + '</strong>'; }
+                    { field: 'DisplayHandoverDate', width:110, title:'DATE',      sortable:false },
+                    { field: 'HandedToName',        width:140, title:'HANDED TO', sortable:false },
+                    { field: 'Amount', width:110, title:'AMOUNT (SGD)', sortable:false, align:'right',
+                      renderer: function(v) { return '<strong style="color:#2980b9;">$ ' + parseFloat(v).toFixed(2) + '</strong>'; }
                     },
-                    { field: 'Remarks',            width: 180, title: 'REMARKS',   sortable: false,
-                      renderer: function (v) { return v && v.trim() ? v : '&mdash;'; }
+                    { field: 'Remarks', width:180, title:'REMARKS', sortable:false,
+                      renderer: function(v) { return v && v.trim() ? v : '&mdash;'; }
                     },
-                    { field: 'DisplayCreatedDate', width: 120, title: 'RECORDED',  sortable: false }
+                    { field: 'DisplayCreatedDate', width:120, title:'RECORDED', sortable:false }
                 ],
-                pager: { enable: true, limit: 25, sizes: ArrPaging }
+                pager: { enable:true, limit:25, sizes:ArrPaging }
             });
         }
 
-        // ── 4. MY EXPENSES GRID ───────────────────────────────────────────────
+        // ── 5. MY EXPENSES GRID ───────────────────────────────────────────────
         var GrdExp;
         function InitExpGrid() {
             GrdExp = $('#GrdExp').grid({
                 primaryKey: 'DriverExpenseID', uiLibrary: 'bootstrap4', responsive: true,
                 dataSource: BaseURL + 'Wallet/DriverExpense_FindAll?DriverUserID=' + CURRENT_UID,
                 columns: [
-                    { field: 'DisplayExpenseDate', width: 100, title: 'DATE',     sortable: false },
-                    { field: 'Category',           width: 120, title: 'CATEGORY', sortable: false },
-                    {
-                        field: 'Amount', width: 110, title: 'AMOUNT (SGD)', sortable: false, align: 'right',
-                        renderer: function (v) { return '<strong style="color:#e74c3c;">$ ' + parseFloat(v).toFixed(2) + '</strong>'; }
+                    { field: 'DisplayExpenseDate', width:100, title:'DATE',     sortable:false },
+                    { field: 'Category',           width:120, title:'CATEGORY', sortable:false },
+                    { field: 'Amount', width:110, title:'AMOUNT (SGD)', sortable:false, align:'right',
+                      renderer: function(v) { return '<strong style="color:#e74c3c;">$ ' + parseFloat(v).toFixed(2) + '</strong>'; }
                     },
-                    { field: 'JobCode', width: 70, title: 'JOB #', sortable: false,
-                      renderer: function (v) { return v ? '#' + v : '&mdash;'; }
+                    { field: 'JobCode', width:70, title:'JOB #', sortable:false,
+                      renderer: function(v) { return v ? '#' + v : '&mdash;'; }
                     },
-                    { field: 'Remarks',            width: 180, title: 'REMARKS',  sortable: false },
-                    { field: 'DisplayCreatedDate', width: 120, title: 'RECORDED', sortable: false },
-                    {
-                        field: 'DriverExpenseID', width: 55, title: '', sortable: false, align: 'center',
-                        renderer: function (v) {
-                            return '<button onclick="DelExp(' + v + ')" class="badge badge-danger" style="cursor:pointer;border:none;padding:4px 8px;"><i class="fa fa-trash"></i></button>';
-                        }
+                    { field: 'Remarks',            width:180, title:'REMARKS',  sortable:false },
+                    { field: 'DisplayCreatedDate', width:120, title:'RECORDED', sortable:false },
+                    { field: 'DriverExpenseID', width:55, title:'', sortable:false, align:'center',
+                      renderer: function(v) {
+                          return '<button onclick="DelExp(' + v + ')" class="badge badge-danger" style="cursor:pointer;border:none;padding:4px 8px;"><i class="fa fa-trash"></i></button>';
+                      }
                     }
                 ],
-                pager: { enable: true, limit: 25, sizes: ArrPaging }
+                pager: { enable:true, limit:25, sizes:ArrPaging }
             });
         }
 
@@ -198,7 +362,7 @@
                     $('#btnSaveExp').prop('disabled', false).text('Save Expense');
                     if (r.success) {
                         $('#modalExp').modal('hide');
-                        LoadWallet();
+                        LoadWallet(); LoadTxHistory();
                         GrdExp.reload({ DriverUserID: CURRENT_UID });
                         $('#TxtExpDate,#TxtExpAmount,#TxtExpRemarks,#TxtExpJobCode').val('');
                         $('#ddlExpCat').val('');
@@ -218,7 +382,7 @@
                 type: 'POST', dataType: 'json', contentType: 'application/json',
                 data: JSON.stringify({ DriverExpenseID: id }),
                 success: function (r) {
-                    if (r.success) { LoadWallet(); GrdExp.reload({ DriverUserID: CURRENT_UID }); }
+                    if (r.success) { LoadWallet(); LoadTxHistory(); GrdExp.reload({ DriverUserID: CURRENT_UID }); }
                     else alert('Failed to delete.');
                 }
             });
@@ -233,8 +397,9 @@
             if (!sel)             { alert('Please select who receives cash.'); return; }
             if (!amt || amt <= 0) { alert('Please enter a valid amount.');     return; }
 
-            var parts = sel.split('|');
-            var rcvID = parseInt(parts[0]); var rcvName = parts[1];
+            var parts   = sel.split('|');
+            var rcvID   = parseInt(parts[0]);
+            var rcvName = parts[1];
 
             $('#btnSaveHO').prop('disabled', true).text('Saving...');
             $.ajax({
@@ -252,9 +417,10 @@
                     $('#btnSaveHO').prop('disabled', false).text('Save Handover');
                     if (r.success) {
                         $('#modalHO').modal('hide');
-                        LoadWallet();
+                        LoadWallet(); LoadTxHistory();
                         GrdHandover.reload({ DriverUserID: CURRENT_UID });
-                        $('#TxtHODate,#TxtHOAmount,#TxtHORemarks').val(''); $('#ddlHOReceiver').val('');
+                        $('#TxtHODate,#TxtHOAmount,#TxtHORemarks').val('');
+                        $('#ddlHOReceiver').val('');
                     } else { alert('Error: ' + (r.message || 'Failed.')); }
                 },
                 error: function () {
@@ -265,9 +431,30 @@
         }
 
         $(document).ready(function () {
-            $('#TxtWFrom,#TxtWTo').datepicker(dpOpts);
+
+            // ── Non-modal datepickers (wallet filter + tx filter modal inputs)
+            $('#TxtWFrom,#TxtWTo,#TxtTxModalFrom,#TxtTxModalTo').datepicker(dpOpts);
+
+            // ── FIX: Modal datepickers — shown.bs.modal event-ல init பண்ணு
+            // Bootstrap modal focus trap-ஆல் calendar உடனே hide ஆகுது.
+            // zIndex: 1100 → modal (1050) மேல காட்டும்; flag → ஒருமுறை மட்டும் init.
+
+            $('#modalHO').on('shown.bs.modal', function () {
+                if (!$('#TxtHODate').data('dp-ready')) {
+                    $('#TxtHODate').datepicker(dpOptsModal);
+                    $('#TxtHODate').data('dp-ready', true);
+                }
+            });
+
+            $('#modalExp').on('shown.bs.modal', function () {
+                if (!$('#TxtExpDate').data('dp-ready')) {
+                    $('#TxtExpDate').datepicker(dpOptsModal);
+                    $('#TxtExpDate').data('dp-ready', true);
+                }
+            });
+
             // Load all users for handover receiver dropdown
-            $.ajax({ type: 'GET', url: BaseURL + 'Common/Load_SystemUserDetail', dataType: 'json',
+            $.ajax({ type:'GET', url: BaseURL + 'Common/Load_SystemUserDetail', dataType:'json',
                 success: function(data) {
                     $('#ddlHOReceiver').empty().append('<option value="">-- Select Receiver --</option>');
                     $.each(data, function(i, v) {
@@ -276,13 +463,12 @@
                     });
                 }
             });
-            $('#TxtExpDate').datepicker(dpOpts);
-            $('#TxtHODate').datepicker(dpOpts);
 
             InitCashGrid();
             InitHandoverGrid();
             InitExpGrid();
             LoadWallet();
+            LoadTxHistory(); // Today only by default
         });
     </script>
 </head>
@@ -303,7 +489,7 @@
                     <div class="wcard wc-hand">
                         <div class="wc-lbl"><i class="fa fa-hand-holding-usd"></i> Handed Over</div>
                         <div class="wc-amt" id="CardHanded">$ 0.00</div>
-                        <div class="wc-sub">submitted to admin</div>
+                        <div class="wc-sub">submitted to admin / company</div>
                     </div>
                 </div>
                 <div class="col-sm-3">
@@ -318,6 +504,46 @@
                         <div class="wc-lbl"><i class="fa fa-wallet"></i> Balance With Me</div>
                         <div class="wc-amt" id="CardBal">$ 0.00</div>
                         <div class="wc-sub">earned &minus; handed &minus; expenses</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── WALLET TRANSACTION HISTORY ───────────────────────────── -->
+            <div class="row mb-3">
+                <div class="col-lg-12">
+                    <div class="card card-pd">
+                        <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
+                            <span>
+                                <i class="fa fa-history"></i>&nbsp; Wallet Transaction History
+                                &nbsp;<span class="badge badge-secondary" id="TxDateLabel" style="font-size:12px;font-weight:500;">Today</span>
+                            </span>
+                            <div style="display:flex;align-items:center;gap:6px;">
+                                <button class="btn btn-sm btn-outline-primary" onclick="TxPill('today')" style="font-size:11px;padding:3px 10px;">Today</button>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="TxPill('week')" style="font-size:11px;padding:3px 10px;">This Week</button>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="TxPill('month')" style="font-size:11px;padding:3px 10px;">This Month</button>
+                                <button class="btn btn-sm btn-outline-dark" onclick="$('#modalTxFilter').modal('show')" title="Custom date range" style="font-size:11px;padding:3px 10px;">
+                                    <i class="fa fa-calendar-alt"></i> Custom
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive" style="max-height:350px;overflow-y:auto;">
+                                <table class="tx-table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:140px;">DATE</th>
+                                            <th style="width:80px;">TYPE</th>
+                                            <th>SOURCE / DETAILS</th>
+                                            <th style="width:120px;text-align:right;">AMOUNT (SGD)</th>
+                                            <th style="width:130px;text-align:right;">BALANCE AFTER</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tblTxBody">
+                                        <tr><td colspan="5" style="text-align:center;padding:20px;color:#999;">Loading...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -364,9 +590,7 @@
             <div class="row mb-3">
                 <div class="col-lg-12">
                     <div class="card card-pd">
-                        <div class="card-header">
-                            <i class="fa fa-money-bill-wave"></i>&nbsp; Cash Job History
-                        </div>
+                        <div class="card-header"><i class="fa fa-money-bill-wave"></i>&nbsp; Cash Job History</div>
                         <div class="card-body">
                             <div class="box-body table-responsive no-padding">
                                 <table id="GrdCash" class="table table-hover"></table>
@@ -383,8 +607,7 @@
                         <div class="card-header">
                             <i class="fa fa-hand-holding-usd"></i>&nbsp; My Handover History
                             <div style="float:right;">
-                                <button type="button" class="btn btn-primary btn-sm"
-                                        data-toggle="modal" data-target="#modalHO">
+                                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalHO">
                                     <i class="fa fa-plus"></i> Add Handover
                                 </button>
                             </div>
@@ -405,8 +628,7 @@
                         <div class="card-header">
                             <i class="fa fa-receipt"></i>&nbsp; My Expenses
                             <div style="float:right;">
-                                <button type="button" class="btn btn-warning btn-sm"
-                                        data-toggle="modal" data-target="#modalExp">
+                                <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#modalExp">
                                     <i class="fa fa-plus"></i> Add Expense
                                 </button>
                             </div>
@@ -420,6 +642,39 @@
                 </div>
             </div>
 
+        </div>
+    </div>
+
+    <!-- ── MODAL: Tx Date Filter ────────────────────────────────────────── -->
+    <div class="modal fade" id="modalTxFilter" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-sm" role="document" style="margin-top:80px;">
+            <div class="modal-content">
+                <div class="modal-header" style="background:#2c3e50;color:#fff;padding:10px 16px;">
+                    <h6 class="modal-title mb-0"><i class="fa fa-calendar-alt"></i> Select Date Range</h6>
+                    <button type="button" class="close text-white" data-dismiss="modal" style="font-size:18px;">&times;</button>
+                </div>
+                <div class="modal-body" style="padding:16px;">
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">
+                        <button class="btn btn-sm btn-primary" onclick="TxPill('today')" style="font-size:11px;">Today</button>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="TxPill('week')" style="font-size:11px;">This Week</button>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="TxPill('month')" style="font-size:11px;">This Month</button>
+                    </div>
+                    <hr style="margin:8px 0;" />
+                    <div class="form-group mb-2">
+                        <label style="font-size:12px;font-weight:600;color:#555;">From Date</label>
+                        <input type="text" id="TxtTxModalFrom" class="form-control form-control-sm" placeholder="dd-MMM-yyyy" />
+                    </div>
+                    <div class="form-group mb-0">
+                        <label style="font-size:12px;font-weight:600;color:#555;">To Date</label>
+                        <input type="text" id="TxtTxModalTo" class="form-control form-control-sm" placeholder="dd-MMM-yyyy" />
+                    </div>
+                </div>
+                <div class="modal-footer" style="padding:10px 16px;">
+                    <button class="btn btn-primary btn-sm btn-block" onclick="ApplyTxFilter()">
+                        <i class="fa fa-search"></i> Show Transactions
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -451,7 +706,11 @@
                         <select id="ddlHOReceiver" class="form-control">
                             <option value="">-- Select Receiver --</option>
                         </select>
-                        <small class="text-muted">Admin → Admin wallet | Staff → Company wallet | Driver → Driver wallet</small>
+                        <small class="text-muted">
+                            Admin &rarr; Admin wallet &nbsp;|&nbsp;
+                            Staff &rarr; Company wallet &nbsp;|&nbsp;
+                            Driver &rarr; Driver wallet
+                        </small>
                     </div>
                     <div class="form-group">
                         <label>Remarks</label>

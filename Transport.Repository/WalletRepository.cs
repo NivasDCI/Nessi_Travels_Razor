@@ -162,33 +162,36 @@ namespace Transport.Repository
         // ════════════════════════════════════════════════════════════════════
         public bool SaveHandover(DriverHandoverModel model)
         {
-            try
+            // ── FIX: Parameter names must exactly match sp_frm_handover_Save ──
+            // Old (wrong): @SenderUserID, @ReceiverUserID, @ReceiverName
+            // New (correct): @DriverUserID, @HandedToUserID, @HandedToName
+            using (var conn = new SqlConnection(Conn()))
             {
-                using (var conn = new SqlConnection(Conn()))
-                {
-                    conn.Open();
-                    var cmd = new SqlCommand("sp_frm_handover_Save", conn)
-                    { CommandType = CommandType.StoredProcedure };
-                    cmd.Parameters.AddWithValue("@SenderUserID", model.DriverUserID);
-                    cmd.Parameters.AddWithValue("@HandoverDate", model.HandoverDate.Date);
-                    cmd.Parameters.AddWithValue("@Amount", model.Amount);
-                    cmd.Parameters.AddWithValue("@ReceiverUserID", model.HandedToUserID.HasValue
-                                                                    ? (object)model.HandedToUserID.Value
-                                                                    : DBNull.Value);
-                    cmd.Parameters.AddWithValue("@ReceiverName", string.IsNullOrEmpty(model.HandedToName)
-                                                                    ? (object)DBNull.Value
-                                                                    : model.HandedToName);
-                    cmd.Parameters.AddWithValue("@Remarks", string.IsNullOrEmpty(model.Remarks)
-                                                                    ? (object)DBNull.Value
-                                                                    : model.Remarks);
-                    cmd.Parameters.AddWithValue("@CreatedBy", model.CreatedBy.HasValue
-                                                                    ? (object)model.CreatedBy.Value
-                                                                    : DBNull.Value);
-                    cmd.ExecuteNonQuery();
-                }
-                return true;
+                conn.Open();
+                var cmd = new SqlCommand("sp_frm_handover_Save", conn)
+                { CommandType = CommandType.StoredProcedure };
+
+                cmd.Parameters.AddWithValue("@DriverUserID", model.DriverUserID);
+                cmd.Parameters.AddWithValue("@HandoverDate", model.HandoverDate.Date);
+                cmd.Parameters.AddWithValue("@Amount", model.Amount);
+                cmd.Parameters.AddWithValue("@HandedToUserID", model.HandedToUserID.HasValue
+                                                                ? (object)model.HandedToUserID.Value
+                                                                : DBNull.Value);
+                cmd.Parameters.AddWithValue("@HandedToName", string.IsNullOrEmpty(model.HandedToName)
+                                                                ? (object)DBNull.Value
+                                                                : model.HandedToName);
+                cmd.Parameters.AddWithValue("@Remarks", string.IsNullOrEmpty(model.Remarks)
+                                                                ? (object)DBNull.Value
+                                                                : model.Remarks);
+                cmd.Parameters.AddWithValue("@CreatedBy", model.CreatedBy.HasValue
+                                                                ? (object)model.CreatedBy.Value
+                                                                : DBNull.Value);
+                // ExecuteNonQuery — SP uses RAISERROR on failure so exception bubbles up
+                cmd.ExecuteNonQuery();
             }
-            catch { return false; }
+            return true;
+            // Note: No catch{return false} here — let WalletController catch and
+            // return the real error message to the UI
         }
 
         public List<DriverHandoverModel> GetHandovers(int? driverUserID, DateTime? from, DateTime? to)
@@ -224,6 +227,8 @@ namespace Transport.Repository
 
         public bool DeleteHandover(long handoverID)
         {
+            // Note: WalletController.Handover_Delete calls SP directly with DeletedBy.
+            // This method is kept for interface compatibility only.
             try
             {
                 using (var conn = new SqlConnection(Conn()))
@@ -232,7 +237,7 @@ namespace Transport.Repository
                     var cmd = new SqlCommand("sp_frm_handover_Delete", conn)
                     { CommandType = CommandType.StoredProcedure };
                     cmd.Parameters.AddWithValue("@HandoverID", handoverID);
-                    cmd.Parameters.AddWithValue("@DeletedBy",  /* pass current user if available */ DBNull.Value);
+                    cmd.Parameters.AddWithValue("@DeletedBy", DBNull.Value);
                     cmd.ExecuteNonQuery();
                 }
                 return true;
@@ -245,27 +250,26 @@ namespace Transport.Repository
         // ════════════════════════════════════════════════════════════════════
         public bool SaveDriverExpense(DriverExpenseModel model)
         {
-            try
+            // Uses sp_frm_driverExpense_Save which:
+            // 1. Inserts DriverExpense
+            // 2. DEBITs UserWallet
+            // 3. Logs WalletTransaction
+            // 4. Syncs DriverWallet daily summary
+            using (var conn = new SqlConnection(Conn()))
             {
-                using (var conn = new SqlConnection(Conn()))
-                {
-                    conn.Open();
-                    var cmd = new SqlCommand(
-                        "INSERT INTO DriverExpense(DriverUserID,ExpenseDate,Category,Amount,Remarks,JobCode,CreatedBy)" +
-                        " VALUES(@DriverUserID,@ExpenseDate,@Category,@Amount,@Remarks,@JobCode,@CreatedBy)", conn);
-                    cmd.Parameters.AddWithValue("@DriverUserID", model.DriverUserID);
-                    cmd.Parameters.AddWithValue("@ExpenseDate", model.ExpenseDate.Date);
-                    cmd.Parameters.AddWithValue("@Category", string.IsNullOrEmpty(model.Category) ? (object)DBNull.Value : model.Category);
-                    cmd.Parameters.AddWithValue("@Amount", model.Amount);
-                    cmd.Parameters.AddWithValue("@Remarks", string.IsNullOrEmpty(model.Remarks) ? (object)DBNull.Value : model.Remarks);
-                    cmd.Parameters.AddWithValue("@JobCode", model.JobCode.HasValue ? (object)model.JobCode.Value : DBNull.Value);
-                    cmd.Parameters.AddWithValue("@CreatedBy", model.CreatedBy.HasValue ? (object)model.CreatedBy.Value : DBNull.Value);
-                    cmd.ExecuteNonQuery();
-                }
-                SyncDriverWallet(model.DriverUserID, model.ExpenseDate.Date);
-                return true;
+                conn.Open();
+                var cmd = new SqlCommand("sp_frm_driverExpense_Save", conn)
+                { CommandType = CommandType.StoredProcedure };
+                cmd.Parameters.AddWithValue("@DriverUserID", model.DriverUserID);
+                cmd.Parameters.AddWithValue("@ExpenseDate", model.ExpenseDate.Date);
+                cmd.Parameters.AddWithValue("@Category", string.IsNullOrEmpty(model.Category) ? (object)DBNull.Value : model.Category);
+                cmd.Parameters.AddWithValue("@Amount", model.Amount);
+                cmd.Parameters.AddWithValue("@Remarks", string.IsNullOrEmpty(model.Remarks) ? (object)DBNull.Value : model.Remarks);
+                cmd.Parameters.AddWithValue("@JobCode", model.JobCode.HasValue ? (object)model.JobCode.Value : DBNull.Value);
+                cmd.Parameters.AddWithValue("@CreatedBy", model.CreatedBy.HasValue ? (object)model.CreatedBy.Value : DBNull.Value);
+                cmd.ExecuteNonQuery();
             }
-            catch { return false; }
+            return true;
         }
 
         public List<DriverExpenseModel> GetDriverExpenses(int? driverUserID, DateTime? from, DateTime? to)
@@ -301,26 +305,22 @@ namespace Transport.Repository
 
         public bool DeleteDriverExpense(long driverExpenseID)
         {
+            // Uses sp_frm_driverExpense_Delete which:
+            // 1. CREDITs back UserWallet (reversal)
+            // 2. Logs WalletTransaction CREDIT (reversal)
+            // 3. Deletes DriverExpense
+            // 4. Syncs DriverWallet daily summary
             try
             {
-                int driverID = 0;
-                DateTime dt = DateTime.Today;
                 using (var conn = new SqlConnection(Conn()))
                 {
                     conn.Open();
-                    var read = new SqlCommand("SELECT DriverUserID,ExpenseDate FROM DriverExpense WHERE DriverExpenseID=@ID", conn);
-                    read.Parameters.AddWithValue("@ID", driverExpenseID);
-                    using (var r = read.ExecuteReader())
-                        if (r.Read())
-                        {
-                            driverID = Convert.ToInt32(r["DriverUserID"]);
-                            dt = Convert.ToDateTime(r["ExpenseDate"]);
-                        }
-                    var del = new SqlCommand("DELETE FROM DriverExpense WHERE DriverExpenseID=@ID", conn);
-                    del.Parameters.AddWithValue("@ID", driverExpenseID);
-                    del.ExecuteNonQuery();
+                    var cmd = new SqlCommand("sp_frm_driverExpense_Delete", conn)
+                    { CommandType = CommandType.StoredProcedure };
+                    cmd.Parameters.AddWithValue("@DriverExpenseID", driverExpenseID);
+                    cmd.Parameters.AddWithValue("@DeletedBy", DBNull.Value);
+                    cmd.ExecuteNonQuery();
                 }
-                if (driverID > 0) SyncDriverWallet(driverID, dt);
                 return true;
             }
             catch { return false; }

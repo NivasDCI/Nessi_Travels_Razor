@@ -283,9 +283,13 @@ namespace Transport.Controllers
         {
             try
             {
+                if (Amount <= 0)
+                    return Json(new { success = false, message = "Amount must be greater than 0." });
+
                 int duid = DriverUserID > 0 ? DriverUserID : SessionExpire.GetUserID();
                 var dt = Parse(HandoverDate) ?? DateTime.Today;
-                bool ok = _repo.SaveHandover(new DriverHandoverModel
+
+                _repo.SaveHandover(new DriverHandoverModel
                 {
                     DriverUserID = duid,
                     HandoverDate = dt,
@@ -295,9 +299,13 @@ namespace Transport.Controllers
                     Remarks = Remarks,
                     CreatedBy = SessionExpire.GetUserID()
                 });
-                return Json(new { success = ok, message = ok ? "" : "Failed to save handover." });
+                return Json(new { success = true, message = "" });
             }
-            catch (Exception ex) { return Json(new { success = false, message = ex.Message }); }
+            catch (Exception ex)
+            {
+                // Surface the real DB error to the UI
+                return Json(new { success = false, message = ex.Message });
+            }
         }
 
         [HttpPost]

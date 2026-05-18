@@ -4,6 +4,7 @@
 }
 <head>
     <style>
+        /* ── Summary Cards ── */
         .wcard {
             border-radius: 10px;
             color: #fff;
@@ -53,16 +54,444 @@
             opacity: .7;
         }
 
-        .tbl-driver-row td {
+        /* ── Driver table ── */
+        .driver-row {
+            cursor: pointer;
+            transition: background .15s;
+        }
+
+            .driver-row:hover td {
+                background: #eaf4fb !important;
+            }
+
+        /* ── Transaction table ── */
+        .tx-tbl {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+            .tx-tbl th {
+                background: #2c3e50;
+                color: #fff;
+                padding: 7px 10px;
+                text-align: left;
+                white-space: nowrap;
+            }
+
+            .tx-tbl td {
+                padding: 7px 10px;
+                border-bottom: 1px solid #f0f0f0;
+                vertical-align: top;
+            }
+
+            .tx-tbl tr:hover td {
+                background: #fafafa;
+            }
+
+        .tx-credit {
+            color: #27ae60;
+            font-weight: 700;
+        }
+
+        .tx-debit {
+            color: #e74c3c;
+            font-weight: 700;
+        }
+
+        .tx-badge {
+            display: inline-block;
+            padding: 2px 7px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .tx-badge-c {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .tx-badge-d {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .tx-src {
+            font-size: 11px;
+            color: #999;
+        }
+
+        /* ── Company History table ── */
+        .ch-tbl {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+            .ch-tbl th {
+                background: #34495e;
+                color: #fff;
+                padding: 7px 10px;
+                text-align: left;
+            }
+
+            .ch-tbl td {
+                padding: 7px 10px;
+                border-bottom: 1px solid #f0f0f0;
+            }
+
+            .ch-tbl tr:hover td {
+                background: #fafafa;
+            }
+
+        /* ── Custom Date Input ── */
+        .dp-wrap {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+
+            .dp-wrap input[type="text"] {
+                padding-right: 30px;
+            }
+
+            .dp-wrap .dp-cal-icon {
+                position: absolute;
+                right: 8px;
+                color: #888;
+                pointer-events: none;
+                font-size: 13px;
+            }
+
+        /* ── Date picker popup ── */
+        .dp-popup {
+            display: none;
+            position: absolute;
+            z-index: 9999;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,.15);
+            padding: 0;
+            min-width: 260px;
+            top: 100%;
+            left: 0;
+            margin-top: 4px;
+            overflow: hidden;
+        }
+
+            .dp-popup.open {
+                display: block;
+            }
+
+        .dp-header {
+            background: #2c3e50;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
             font-size: 13px;
+            font-weight: 500;
+        }
+
+        .dp-nav-btn {
+            background: transparent;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 0 6px;
+            line-height: 1;
+        }
+
+            .dp-nav-btn:hover {
+                opacity: .7;
+            }
+
+        .dp-month-label {
+            cursor: pointer;
+        }
+
+            .dp-month-label:hover {
+                text-decoration: underline;
+            }
+
+        .dp-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            background: #f0f0f0;
+        }
+
+            .dp-weekdays span {
+                text-align: center;
+                font-size: 10px;
+                font-weight: 600;
+                color: #666;
+                padding: 5px 0;
+            }
+
+        .dp-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            padding: 4px;
+            gap: 2px;
+        }
+
+        .dp-day {
+            text-align: center;
+            padding: 5px 2px;
+            font-size: 12px;
+            cursor: pointer;
+            border-radius: 5px;
+            border: none;
+            background: transparent;
+            color: #2c2c2a;
+        }
+
+            .dp-day:hover {
+                background: #eaf4fb;
+            }
+
+            .dp-day.today {
+                font-weight: 700;
+                color: #2980b9;
+            }
+
+            .dp-day.selected {
+                background: #2980b9;
+                color: #fff;
+            }
+
+            .dp-day.other-month {
+                color: #ccc;
+            }
+
+            .dp-day.disabled {
+                color: #ddd;
+                pointer-events: none;
+            }
+
+        .dp-months-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            padding: 8px;
+            gap: 4px;
+        }
+
+        .dp-month-btn {
+            padding: 7px 4px;
+            font-size: 12px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 5px;
+            border: none;
+            background: transparent;
+        }
+
+            .dp-month-btn:hover {
+                background: #eaf4fb;
+            }
+
+            .dp-month-btn.selected {
+                background: #2980b9;
+                color: #fff;
+            }
+
+        .dp-footer {
+            padding: 6px 10px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dp-today-btn {
+            font-size: 11px;
+            color: #2980b9;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            text-decoration: underline;
+        }
+
+        .dp-clear-btn {
+            font-size: 11px;
+            color: #e74c3c;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            text-decoration: underline;
+        }
+
+        ul.ui-autocomplete {
+            z-index: 1100;
         }
     </style>
+
     <script>
-        // ── Load company summary cards + driver breakdown ─────────────────────────
+        /* ════════════════════════════════
+           CUSTOM DATEPICKER
+        ════════════════════════════════ */
+        (function () {
+            var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            var MON_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            var DAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+
+            /* Parse "dd-Mon-yyyy" → Date */
+            function parseDisplay(str) {
+                if (!str) return null;
+                var p = str.split('-');
+                if (p.length !== 3) return null;
+                var d = parseInt(p[0]), m = MON_SHORT.indexOf(p[1]), y = parseInt(p[2]);
+                if (m < 0 || isNaN(d) || isNaN(y)) return null;
+                return new Date(y, m, d);
+            }
+
+            /* Format Date → "dd-Mon-yyyy" */
+            function fmtDisplay(dt) {
+                if (!dt) return '';
+                var d = dt.getDate(), m = dt.getMonth(), y = dt.getFullYear();
+                return (d < 10 ? '0' + d : d) + '-' + MON_SHORT[m] + '-' + y;
+            }
+
+            function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+            function buildPicker(inputEl, popup) {
+                var viewDate = new Date();
+                var selectedDate = null;
+                var showMonths = false;
+
+                var parsed = parseDisplay(inputEl.value);
+                if (parsed) { selectedDate = parsed; viewDate = new Date(parsed.getFullYear(), parsed.getMonth(), 1); }
+                else { viewDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1); }
+
+                function render() {
+                    if (showMonths) { renderMonths(); return; }
+                    var y = viewDate.getFullYear(), m = viewDate.getMonth();
+                    var today = new Date(); today.setHours(0, 0, 0, 0);
+                    var firstDay = new Date(y, m, 1).getDay();
+                    var daysInMonth = new Date(y, m + 1, 0).getDate();
+                    var daysInPrev = new Date(y, m, 0).getDate();
+
+                    var html = '<div class="dp-header">'
+                        + '<button class="dp-nav-btn" id="dpPrev">&#8249;</button>'
+                        + '<span class="dp-month-label" id="dpMonthLbl">' + MONTHS[m] + ' ' + y + '</span>'
+                        + '<button class="dp-nav-btn" id="dpNext">&#8250;</button>'
+                        + '</div>'
+                        + '<div class="dp-weekdays">' + DAYS.map(function (d) { return '<span>' + d + '</span>' }).join('') + '</div>'
+                        + '<div class="dp-days">';
+
+                    /* Prev month trailing days */
+                    for (var i = firstDay - 1; i >= 0; i--) {
+                        html += '<button class="dp-day other-month" data-d="' + (daysInPrev - i) + '" data-m="' + (m === 0 ? 11 : m - 1) + '" data-y="' + (m === 0 ? y - 1 : y) + '">' + (daysInPrev - i) + '</button>';
+                    }
+                    for (var d = 1; d <= daysInMonth; d++) {
+                        var dt = new Date(y, m, d); dt.setHours(0, 0, 0, 0);
+                        var cls = 'dp-day';
+                        if (dt.getTime() === today.getTime()) cls += ' today';
+                        if (selectedDate && dt.getTime() === selectedDate.getTime()) cls += ' selected';
+                        html += '<button class="' + cls + '" data-d="' + d + '" data-m="' + m + '" data-y="' + y + '">' + d + '</button>';
+                    }
+                    /* Next month leading days */
+                    var total = firstDay + daysInMonth;
+                    var remaining = total % 7 === 0 ? 0 : 7 - (total % 7);
+                    for (var nd = 1; nd <= remaining; nd++) {
+                        html += '<button class="dp-day other-month" data-d="' + nd + '" data-m="' + (m === 11 ? 0 : m + 1) + '" data-y="' + (m === 11 ? y + 1 : y) + '">' + nd + '</button>';
+                    }
+                    html += '</div>';
+                    html += '<div class="dp-footer"><button class="dp-today-btn" id="dpTodayBtn">Today</button><button class="dp-clear-btn" id="dpClearBtn">Clear</button></div>';
+                    popup.innerHTML = html;
+
+                    popup.querySelector('#dpPrev').onclick = function (e) { e.stopPropagation(); viewDate = new Date(y, m - 1, 1); render(); };
+                    popup.querySelector('#dpNext').onclick = function (e) { e.stopPropagation(); viewDate = new Date(y, m + 1, 1); render(); };
+                    popup.querySelector('#dpMonthLbl').onclick = function (e) { e.stopPropagation(); showMonths = true; render(); };
+                    popup.querySelector('#dpTodayBtn').onclick = function (e) { e.stopPropagation(); selectDate(new Date()); };
+                    popup.querySelector('#dpClearBtn').onclick = function (e) { e.stopPropagation(); selectedDate = null; inputEl.value = ''; popup.classList.remove('open'); };
+
+                    popup.querySelectorAll('.dp-day').forEach(function (btn) {
+                        btn.onclick = function (e) {
+                            e.stopPropagation();
+                            selectDate(new Date(parseInt(this.dataset.y), parseInt(this.dataset.m), parseInt(this.dataset.d)));
+                        };
+                    });
+                }
+
+                function renderMonths() {
+                    var y = viewDate.getFullYear();
+                    var curM = selectedDate ? selectedDate.getMonth() : -1;
+                    var html = '<div class="dp-header">'
+                        + '<button class="dp-nav-btn" id="dpYPrev">&#8249;</button>'
+                        + '<span>' + y + '</span>'
+                        + '<button class="dp-nav-btn" id="dpYNext">&#8250;</button>'
+                        + '</div><div class="dp-months-grid">';
+                    MON_SHORT.forEach(function (mn, i) {
+                        html += '<button class="dp-month-btn' + (i === curM ? ' selected' : '') + '" data-m="' + i + '">' + mn + '</button>';
+                    });
+                    html += '</div>';
+                    popup.innerHTML = html;
+                    popup.querySelector('#dpYPrev').onclick = function (e) { e.stopPropagation(); viewDate = new Date(y - 1, viewDate.getMonth(), 1); renderMonths(); };
+                    popup.querySelector('#dpYNext').onclick = function (e) { e.stopPropagation(); viewDate = new Date(y + 1, viewDate.getMonth(), 1); renderMonths(); };
+                    popup.querySelectorAll('.dp-month-btn').forEach(function (btn) {
+                        btn.onclick = function (e) {
+                            e.stopPropagation();
+                            viewDate = new Date(y, parseInt(this.dataset.m), 1);
+                            showMonths = false; render();
+                        };
+                    });
+                }
+
+                function selectDate(dt) {
+                    selectedDate = dt; dt.setHours(0, 0, 0, 0);
+                    viewDate = new Date(dt.getFullYear(), dt.getMonth(), 1);
+                    inputEl.value = fmtDisplay(dt);
+                    popup.classList.remove('open');
+                    render();
+                    /* Fire change event so any listeners know */
+                    var ev = document.createEvent('Event'); ev.initEvent('change', true, true); inputEl.dispatchEvent(ev);
+                }
+
+                inputEl.addEventListener('click', function (e) { e.stopPropagation(); render(); popup.classList.toggle('open'); });
+                inputEl.addEventListener('keydown', function (e) { if (e.key === 'Escape') popup.classList.remove('open'); });
+                render();
+                return { getDate: function () { return selectedDate; }, setDate: function (dt) { if (dt) { selectedDate = new Date(dt); inputEl.value = fmtDisplay(selectedDate); render(); } }, clear: function () { selectedDate = null; inputEl.value = ''; } };
+            }
+
+            /* Auto-init all inputs with data-datepicker */
+            window.initDatepickers = function () {
+                document.querySelectorAll('input[data-datepicker]').forEach(function (inp) {
+                    if (inp._dp) return;
+                    var popup = document.createElement('div');
+                    popup.className = 'dp-popup';
+                    inp.parentNode.style.position = 'relative';
+                    inp.parentNode.appendChild(popup);
+                    inp._dp = buildPicker(inp, popup);
+                });
+            };
+
+            window.getDPValue = function (id) { var el = document.getElementById(id); return el ? el.value : ''; };
+            window.setDPValue = function (id, dateOrStr) {
+                var el = document.getElementById(id);
+                if (!el) return;
+                if (typeof dateOrStr === 'string') { el.value = dateOrStr; }
+                else if (dateOrStr instanceof Date) { el.value = fmtDisplay(dateOrStr); }
+            };
+
+            /* Close all popups on outside click */
+            document.addEventListener('click', function () {
+                document.querySelectorAll('.dp-popup.open').forEach(function (p) { p.classList.remove('open'); });
+            });
+        })();
+
+        /* ════════════════════════════════
+           WALLET FUNCTIONS
+        ════════════════════════════════ */
         function LoadCompanyData() {
             $.ajax({
                 url: BaseURL + 'Wallet/CompanyWallet_FindAll', type: 'GET', dataType: 'json',
-                data: { FromDate: $('#TxtCWFrom').val(), ToDate: $('#TxtCWTo').val() },
+                data: { FromDate: getDPValue('TxtCWFrom'), ToDate: getDPValue('TxtCWTo') },
                 success: function (r) {
                     if (r.summary) {
                         var s = r.summary;
@@ -74,16 +503,17 @@
                         var bal = parseFloat(s.CompanyBalance || 0);
                         $('#CardBal').text('$ ' + bal.toFixed(2));
                         if (bal < 0) $('#WcBal').css('background', 'linear-gradient(135deg,#c0392b,#e74c3c)');
+                        else $('#WcBal').css('background', 'linear-gradient(135deg,#6c3483,#8e44ad)');
                     }
-                    // populate driver breakdown table
                     var tbody = $('#tblDriverBreakdown');
                     tbody.empty();
                     if (r.records && r.records.length > 0) {
                         $.each(r.records, function (i, d) {
                             var balColor = parseFloat(d.Balance) >= 0 ? '#8e44ad' : '#e74c3c';
                             tbody.append(
-                                '<tr class="tbl-driver-row">' +
-                                '<td>' + d.DriverName + '</td>' +
+                                '<tr class="driver-row" onclick="LoadDriverHistory(' + d.DriverUserID + ',\'' + (d.DriverName || '').trim().replace(/'/g, "\\'") + '\')" title="Click to view history">' +
+                                '<td><i class="fa fa-user-circle" style="color:#2980b9;margin-right:5px;"></i>' + d.DriverName +
+                                ' <small style="color:#aaa;font-size:10px;"><i class="fa fa-mouse-pointer"></i> history</small></td>' +
                                 '<td style="text-align:right;color:#27ae60;font-weight:bold;">$ ' + parseFloat(d.TotalEarned).toFixed(2) + '</td>' +
                                 '<td style="text-align:right;color:#2980b9;font-weight:bold;">$ ' + parseFloat(d.TotalHandedOver).toFixed(2) + '</td>' +
                                 '<td style="text-align:right;color:#e74c3c;font-weight:bold;">$ ' + parseFloat(d.TotalExpenses).toFixed(2) + '</td>' +
@@ -98,116 +528,209 @@
             });
         }
 
-        // ── Company Expense Grid ──────────────────────────────────────────────────
-        var dpOpts = { format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small' };
-        $('#TxtExpFrom').datepicker(dpOpts);
-        $('#TxtExpTo').datepicker(dpOpts);
-        $('#TxtCEDate').datepicker(dpOpts);
-
-        // optional: link an expense to a driver (e.g. salary)
-        $.ajax({
-            type: 'GET', url: BaseURL + 'Common/Load_SystemUserDetail', datatype: 'Json',
-            success: function (data) {
-                $('#ddlCEDriver').empty();
-                $('#ddlCEDriver').append('<option value="0">-- None / N/A --</option>');
-                $.each(data, function (i, v) {
-                    if (v.ID > 0) $('#ddlCEDriver').append('<option value="' + v.ID + '">' + v.Name + '</option>');
-                });
-            }
-        });
-
-        var GrdCmpExp = $('#GrdCmpExp').grid({
-            primaryKey: 'CompanyExpenseID', uiLibrary: 'bootstrap4', responsive: true,
-            dataSource: BaseURL + 'Wallet/CompanyExpense_FindAll',
-            columns: [
-                { field: 'DisplayExpenseDate', width: 100, title: 'DATE', sortable: false },
-                { field: 'Category', width: 130, title: 'CATEGORY', sortable: false },
-                {
-                    field: 'Amount', width: 105, title: 'AMOUNT (SGD)', sortable: false, align: 'right',
-                    renderer: function (v) { return '<strong style="color:#e74c3c;">$ ' + parseFloat(v).toFixed(2) + '</strong>'; }
-                },
-                {
-                    field: 'DriverName', width: 110, title: 'DRIVER', sortable: false,
-                    renderer: function (v) { return v && v.trim() ? v : '&mdash;'; }
-                },
-                { field: 'Remarks', width: 160, title: 'REMARKS', sortable: false },
-                { field: 'CreatedByName', width: 110, title: 'ADDED BY', sortable: false },
-                { field: 'DisplayCreatedDate', width: 110, title: 'RECORDED', sortable: false },
-                {
-                    field: 'CompanyExpenseID', width: 55, title: '', sortable: false, align: 'center',
-                    renderer: function (v) { return '<button onclick="DelCE(' + v + ')" class="badge badge-danger" style="cursor:pointer;border:none;padding:4px 8px;"><i class="fa fa-trash"></i></button>'; }
-                }
-            ],
-            pager: { enable: true, limit: 25, sizes: ArrPaging }
-        });
-
-        function CESearch() {
-            GrdCmpExp.reload({ FromDate: $('#TxtExpFrom').val(), ToDate: $('#TxtExpTo').val(), Category: $('#ddlCEFilter').val() });
-        }
-        function CEClear() {
-            $('#TxtExpFrom,#TxtExpTo').val(''); $('#ddlCEFilter').val('');
-            GrdCmpExp.reload({});
-        }
-
-        $('#btnSaveCE').click(function () {
-            var amt = parseFloat($('#TxtCEAmount').val());
-            var dt = $('#TxtCEDate').val();
-            var cat = $('#ddlCECategory').val();
-            if (!dt) { alert('Please select a date.'); return; }
-            if (!cat) { alert('Please select a category.'); return; }
-            if (!amt || amt <= 0) { alert('Please enter a valid amount.'); return; }
-
-            $(this).prop('disabled', true).text('Saving...');
+        function LoadDriverHistory(uid, name) {
+            $('#modalDrvHistTitle').text(name + ' — Transaction History');
+            $('#drvHistBalance').html('');
+            $('#tblDrvHistBody').html('<tr><td colspan="5" style="text-align:center;padding:24px;color:#aaa;"><i class="fa fa-spinner fa-spin"></i> Loading...</td></tr>');
+            $('#modalDrvHist').modal('show');
             $.ajax({
-                url: BaseURL + 'Wallet/CompanyExpense_Save', type: 'POST',
-                dataType: 'json', contentType: 'application/json',
-                data: JSON.stringify({
-                    ExpenseDate: dt,
-                    Category: cat,
-                    Amount: amt,
-                    Remarks: $('#TxtCERemarks').val(),
-                    DriverUserID: parseInt($('#ddlCEDriver').val()) || 0
-                }),
+                url: BaseURL + 'Wallet/WalletHistory_FindAll',
+                type: 'GET', dataType: 'json',
+                data: { UserID: uid, FromDate: getDPValue('TxtCWFrom'), ToDate: getDPValue('TxtCWTo') },
                 success: function (r) {
-                    $('#btnSaveCE').prop('disabled', false).text('Save');
+                    var tbody = $('#tblDrvHistBody');
+                    tbody.empty();
+                    if (!r.records || r.records.length === 0) {
+                        tbody.html('<tr><td colspan="5" style="text-align:center;padding:24px;color:#999;"><i class="fa fa-inbox fa-2x"></i><br/>No transactions for this period.</td></tr>');
+                        return;
+                    }
+                    var tc = 0, td2 = 0;
+                    $.each(r.records, function (i, t) {
+                        if ((t.TxType || '').toUpperCase() === 'CREDIT') tc += parseFloat(t.Amount || 0);
+                        else td2 += parseFloat(t.Amount || 0);
+                    });
+                    $('#drvHistBalance').html('<span class="tx-credit">+$' + tc.toFixed(2) + ' CREDIT</span>&nbsp;&nbsp;<span class="tx-debit">&minus;$' + td2.toFixed(2) + ' DEBIT</span>&nbsp;&nbsp;<strong>Net: $' + (tc - td2).toFixed(2) + '</strong>');
+                    $.each(r.records, function (i, t) {
+                        var isC = (t.TxType || '').toUpperCase() === 'CREDIT';
+                        var badge = isC ? '<span class="tx-badge tx-badge-c"><i class="fa fa-arrow-up"></i> CREDIT</span>'
+                            : '<span class="tx-badge tx-badge-d"><i class="fa fa-arrow-down"></i> DEBIT</span>';
+                        var cls = isC ? 'tx-credit' : 'tx-debit';
+                        var src = '<strong>' + (t.SourceLabel || t.Source || '') + '</strong>';
+                        if (t.Source === 'Job' && t.JobFrom) src += '<br><span class="tx-src">' + t.JobFrom + ' &rarr; ' + (t.JobTo || '') + (t.CustomerName ? ' | ' + t.CustomerName : '') + '</span>';
+                        if (t.Remarks && t.Remarks.trim()) src += '<br><span class="tx-src" style="color:#bbb;">' + t.Remarks + '</span>';
+                        tbody.append('<tr><td style="white-space:nowrap;font-size:11px;color:#666;">' + (t.DisplayDate || '') + '</td><td>' + badge + '</td><td>' + src + '</td><td style="text-align:right;" class="' + cls + '">' + (isC ? '+' : '&minus;') + ' $' + parseFloat(t.Amount).toFixed(2) + '</td><td style="text-align:right;font-weight:600;font-size:12px;">$' + parseFloat(t.BalanceAfter).toFixed(2) + '</td></tr>');
+                    });
+                }
+            });
+        }
+
+        function SaveCompanyTransfer() {
+            var uid = parseInt($('#ddlTransferDriver').val());
+            var amt = parseFloat($('#TxtTransferAmt').val());
+            var dt = getDPValue('TxtTransferDate');
+            if (!uid || uid <= 0) { alert('Please select a driver.'); return; }
+            if (!amt || amt <= 0) { alert('Please enter a valid amount.'); return; }
+            if (!dt) { alert('Please select a date.'); return; }
+            $('#btnSaveTransfer').prop('disabled', true).text('Transferring...');
+            $.ajax({
+                url: BaseURL + 'Wallet/CompanyToDriver_Transfer',
+                type: 'POST', dataType: 'json', contentType: 'application/json',
+                data: JSON.stringify({ DriverUserID: uid, Amount: amt, Remarks: $('#TxtTransferRemarks').val(), TransferDate: dt }),
+                success: function (r) {
+                    $('#btnSaveTransfer').prop('disabled', false).text('Transfer Cash');
                     if (r.success) {
-                        $('#modalCE').modal('hide');
-                        LoadCompanyData();
-                        GrdCmpExp.reload({});
-                        $('#TxtCEDate,#TxtCEAmount,#TxtCERemarks').val('');
-                        $('#ddlCECategory,#ddlCEDriver').val('0');
+                        $('#modalTransfer').modal('hide');
+                        LoadCompanyData(); LoadCompanyHistory();
+                        $('#TxtTransferAmt,#TxtTransferRemarks').val('');
+                        $('#ddlTransferDriver').val('0');
+                        setDPValue('TxtTransferDate', '');
                     } else { alert('Error: ' + (r.message || 'Failed.')); }
                 },
-                error: function () { $('#btnSaveCE').prop('disabled', false).text('Save'); alert('Server error.'); }
+                error: function (xhr) {
+                    $('#btnSaveTransfer').prop('disabled', false).text('Transfer Cash');
+                    alert('Error: ' + (xhr.responseText || 'Server error.'));
+                }
             });
-        });
+        }
+
+        function LoadCompanyHistory() {
+            $('#tblChBody').html('<tr><td colspan="5" style="text-align:center;padding:24px;color:#aaa;"><i class="fa fa-spinner fa-spin"></i> Loading...</td></tr>');
+            $.ajax({
+                url: BaseURL + 'Wallet/CompanyWalletHistory_FindAll',
+                type: 'GET', dataType: 'json',
+                data: { FromDate: getDPValue('TxtChFrom'), ToDate: getDPValue('TxtChTo') },
+                success: function (r) {
+                    var tbody = $('#tblChBody');
+                    tbody.empty();
+                    if (!r.records || r.records.length === 0) {
+                        tbody.html('<tr><td colspan="5" style="text-align:center;padding:24px;color:#999;"><i class="fa fa-inbox fa-2x"></i><br/>No company transactions for this period.</td></tr>');
+                        return;
+                    }
+                    var tc = 0, td2 = 0;
+                    $.each(r.records, function (i, t) {
+                        var isC = (t.TxType || '').toUpperCase() === 'CREDIT';
+                        if (isC) tc += parseFloat(t.Amount || 0); else td2 += parseFloat(t.Amount || 0);
+                        var badge = isC ? '<span class="tx-badge tx-badge-c"><i class="fa fa-arrow-up"></i> IN</span>'
+                            : '<span class="tx-badge tx-badge-d"><i class="fa fa-arrow-down"></i> OUT</span>';
+                        var cls = isC ? 'tx-credit' : 'tx-debit';
+                        var src = '<strong>' + (t.SourceLabel || t.Source || '') + '</strong>';
+                        if (t.Remarks && t.Remarks.trim()) src += '<br><span class="tx-src">' + t.Remarks + '</span>';
+                        tbody.append('<tr><td style="white-space:nowrap;font-size:11px;color:#666;">' + (t.DisplayDate || '') + '</td><td>' + badge + '</td><td>' + src + '</td><td style="text-align:right;" class="' + cls + '">' + (isC ? '+' : '&minus;') + ' $' + parseFloat(t.Amount).toFixed(2) + '</td><td style="text-align:right;font-weight:600;font-size:12px;">$' + parseFloat(t.BalanceAfter).toFixed(2) + '</td></tr>');
+                    });
+                    $('#chSummary').html('<span class="tx-credit">+$' + tc.toFixed(2) + ' IN</span>&nbsp;&nbsp;<span class="tx-debit">&minus;$' + td2.toFixed(2) + ' OUT</span>&nbsp;&nbsp;<strong>Net: $' + (tc - td2).toFixed(2) + '</strong>');
+                }
+            });
+        }
+
+        function CESearch() { GrdCmpExp.reload({ FromDate: getDPValue('TxtExpFrom'), ToDate: getDPValue('TxtExpTo'), Category: $('#ddlCEFilter').val() }); }
+        function CEClear() { setDPValue('TxtExpFrom', ''); setDPValue('TxtExpTo', ''); $('#ddlCEFilter').val(''); GrdCmpExp.reload({}); }
 
         function DelCE(id) {
             if (!confirm('Delete this company expense?')) return;
             $.ajax({
-                url: BaseURL + 'Wallet/CompanyExpense_Delete', type: 'POST',
-                dataType: 'json', contentType: 'application/json',
+                url: BaseURL + 'Wallet/CompanyExpense_Delete', type: 'POST', dataType: 'json', contentType: 'application/json',
                 data: JSON.stringify({ CompanyExpenseID: id }),
                 success: function (r) { if (r.success) { LoadCompanyData(); GrdCmpExp.reload({}); } else alert('Failed.'); }
             });
         }
 
         $(document).ready(function () {
-            var dpCW = { format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small' };
-            $('#TxtCWFrom').datepicker(dpCW);
-            $('#TxtCWTo').datepicker(dpCW);
-            var now = new Date(), mn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+            /* Init all datepickers */
+            initDatepickers();
+
+            /* Set default dates */
+            var now = new Date();
+            var mn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
             function p(n) { return n < 10 ? '0' + n : n; }
-            $('#TxtCWFrom').val('01-' + mn[now.getMonth()] + '-' + now.getFullYear());
-            $('#TxtCWTo').val(p(new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()) + '-' + mn[now.getMonth()] + '-' + now.getFullYear());
+            var firstDay = '01-' + mn[now.getMonth()] + '-' + now.getFullYear();
+            var lastDay = p(new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()) + '-' + mn[now.getMonth()] + '-' + now.getFullYear();
+            var today = p(now.getDate()) + '-' + mn[now.getMonth()] + '-' + now.getFullYear();
+
+            setDPValue('TxtCWFrom', firstDay); setDPValue('TxtCWTo', lastDay);
+            setDPValue('TxtChFrom', firstDay); setDPValue('TxtChTo', lastDay);
+            setDPValue('TxtTransferDate', today);
+
+            /* Load drivers for dropdowns */
+            $.ajax({
+                type: 'GET', url: BaseURL + 'Common/Load_SystemUserDetail', dataType: 'json',
+                success: function (data) {
+                    $('#ddlCEDriver, #ddlTransferDriver').empty().append('<option value="0">-- None / N/A --</option>');
+                    $.each(data, function (i, v) {
+                        if (v.ID > 0) {
+                            /* CE dropdown — all users */
+                            $('#ddlCEDriver').append('<option value="' + v.ID + '">' + v.Name + '</option>');
+                            /* Transfer dropdown — all users (backend API decides who qualifies) */
+                            $('#ddlTransferDriver').append('<option value="' + v.ID + '">' + v.Name + '</option>');
+                        }
+                    });
+                }
+            });
+
+            /* Company Expense Grid */
+            window.GrdCmpExp = $('#GrdCmpExp').grid({
+                primaryKey: 'CompanyExpenseID', uiLibrary: 'bootstrap4', responsive: true,
+                dataSource: BaseURL + 'Wallet/CompanyExpense_FindAll',
+                columns: [
+                    { field: 'DisplayExpenseDate', width: 100, title: 'DATE', sortable: false },
+                    { field: 'Category', width: 130, title: 'CATEGORY', sortable: false },
+                    {
+                        field: 'Amount', width: 105, title: 'AMOUNT (SGD)', sortable: false, align: 'right',
+                        renderer: function (v) { return '<strong style="color:#e74c3c;">$ ' + parseFloat(v).toFixed(2) + '</strong>'; }
+                    },
+                    {
+                        field: 'DriverName', width: 110, title: 'DRIVER', sortable: false,
+                        renderer: function (v) { return v && v.trim() ? v : '&mdash;'; }
+                    },
+                    { field: 'Remarks', width: 160, title: 'REMARKS', sortable: false },
+                    { field: 'CreatedByName', width: 110, title: 'ADDED BY', sortable: false },
+                    { field: 'DisplayCreatedDate', width: 110, title: 'RECORDED', sortable: false },
+                    {
+                        field: 'CompanyExpenseID', width: 55, title: '', sortable: false, align: 'center',
+                        renderer: function (v) { return '<button onclick="DelCE(' + v + ')" class="badge badge-danger" style="cursor:pointer;border:none;padding:4px 8px;"><i class="fa fa-trash"></i></button>'; }
+                    }
+                ],
+                pager: { enable: true, limit: 25, sizes: ArrPaging }
+            });
+
+            /* Save Company Expense */
+            $('#btnSaveCE').click(function () {
+                var amt = parseFloat($('#TxtCEAmount').val()), dt = getDPValue('TxtCEDate'), cat = $('#ddlCECategory').val();
+                if (!dt) { alert('Please select a date.'); return; }
+                if (!cat) { alert('Please select a category.'); return; }
+                if (!amt || amt <= 0) { alert('Please enter a valid amount.'); return; }
+                $(this).prop('disabled', true).text('Saving...');
+                $.ajax({
+                    url: BaseURL + 'Wallet/CompanyExpense_Save', type: 'POST', dataType: 'json', contentType: 'application/json',
+                    data: JSON.stringify({ ExpenseDate: dt, Category: cat, Amount: amt, Remarks: $('#TxtCERemarks').val(), DriverUserID: parseInt($('#ddlCEDriver').val()) || 0 }),
+                    success: function (r) {
+                        $('#btnSaveCE').prop('disabled', false).text('Save');
+                        if (r.success) {
+                            $('#modalCE').modal('hide');
+                            LoadCompanyData(); GrdCmpExp.reload({});
+                            setDPValue('TxtCEDate', ''); $('#TxtCEAmount,#TxtCERemarks').val('');
+                            $('#ddlCECategory,#ddlCEDriver').val('0');
+                        } else { alert('Error: ' + (r.message || 'Failed.')); }
+                    },
+                    error: function () { $('#btnSaveCE').prop('disabled', false).text('Save'); alert('Server error.'); }
+                });
+            });
+
+            /* Re-init datepickers when modals open (they're hidden initially) */
+            $('#modalTransfer, #modalCE').on('shown.bs.modal', function () {
+                initDatepickers();
+            });
+
             LoadCompanyData();
-        });</script>
+            LoadCompanyHistory();
+        });
+    </script>
 </head>
 <body>
     <div class="content">
         <div class="container-fluid">
 
-            <!-- SUMMARY CARDS -->
+            <!-- ═══ SUMMARY CARDS ═══ -->
             <div class="row mb-3">
                 <div class="col-sm-2">
                     <div class="wcard wc-earn">
@@ -253,25 +776,27 @@
                 </div>
             </div>
 
-            <!-- DRIVER BREAKDOWN TABLE -->
+            <!-- ═══ DRIVER BREAKDOWN ═══ -->
             <div class="row mb-3">
                 <div class="col-lg-12">
                     <div class="card card-pd">
-                        <div class="card-header">
-                            <i class="fa fa-users"></i>&nbsp; Per-Driver Breakdown
-                            <div style="float:right;display:flex;align-items:center;gap:6px;">
-                                <input type="text" id="TxtCWFrom" class="form-control form-control-sm" style="width:120px;" placeholder="From Date" />
-                                <input type="text" id="TxtCWTo" class="form-control form-control-sm" style="width:120px;" placeholder="To Date" />
+                        <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
+                            <span>
+                                <i class="fa fa-users"></i>&nbsp; Per-Driver Breakdown
+                                <small class="text-muted" style="font-size:11px;"><i class="fa fa-mouse-pointer"></i> Click row for history</small>
+                            </span>
+                            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                                <div class="dp-wrap"><input type="text" id="TxtCWFrom" data-datepicker class="form-control form-control-sm" style="width:130px;" placeholder="From Date" readonly /></div>
+                                <div class="dp-wrap"><input type="text" id="TxtCWTo" data-datepicker class="form-control form-control-sm" style="width:130px;" placeholder="To Date" readonly /></div>
                                 <button class="btn btn-primary btn-sm" onclick="LoadCompanyData()"><i class="fa fa-search"></i></button>
-                                <button class="btn btn-secondary btn-sm" onclick="$('#TxtCWFrom,#TxtCWTo').val('');LoadCompanyData();"><i class="fa fa-times"></i></button>
-                                <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#modalCE">
-                                    <i class="fa fa-plus"></i> Add Company Expense
-                                </button>
+                                <button class="btn btn-secondary btn-sm" onclick="setDPValue('TxtCWFrom','');setDPValue('TxtCWTo','');LoadCompanyData();"><i class="fa fa-times"></i></button>
+                                <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#modalTransfer"><i class="fa fa-exchange-alt"></i> Give Cash to Driver</button>
+                                <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#modalCE"><i class="fa fa-plus"></i> Add Company Expense</button>
                             </div>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body p-0">
                             <div class="table-responsive">
-                                <table class="table table-hover table-bordered" style="font-size:13px;">
+                                <table class="table table-hover table-bordered mb-0" style="font-size:13px;">
                                     <thead style="background:#2c3e50;color:#fff;">
                                         <tr>
                                             <th>DRIVER</th>
@@ -291,19 +816,53 @@
                 </div>
             </div>
 
-            <!-- COMPANY EXPENSE GRID -->
+            <!-- ═══ COMPANY WALLET HISTORY ═══ -->
+            <div class="row mb-3">
+                <div class="col-lg-12">
+                    <div class="card card-pd">
+                        <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
+                            <span>
+                                <i class="fa fa-history"></i>&nbsp; Company Wallet History
+                                <span id="chSummary" style="font-size:12px;margin-left:10px;"></span>
+                            </span>
+                            <div style="display:flex;align-items:center;gap:6px;">
+                                <div class="dp-wrap"><input type="text" id="TxtChFrom" data-datepicker class="form-control form-control-sm" style="width:130px;" placeholder="From" readonly /></div>
+                                <div class="dp-wrap"><input type="text" id="TxtChTo" data-datepicker class="form-control form-control-sm" style="width:130px;" placeholder="To" readonly /></div>
+                                <button class="btn btn-primary btn-sm" onclick="LoadCompanyHistory()"><i class="fa fa-search"></i></button>
+                                <button class="btn btn-secondary btn-sm" onclick="setDPValue('TxtChFrom','');setDPValue('TxtChTo','');LoadCompanyHistory();"><i class="fa fa-times"></i></button>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive" style="max-height:340px;overflow-y:auto;">
+                                <table class="ch-tbl">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:140px;">DATE</th>
+                                            <th style="width:70px;">TYPE</th>
+                                            <th>SOURCE / DETAILS</th>
+                                            <th style="width:120px;text-align:right;">AMOUNT (SGD)</th>
+                                            <th style="width:130px;text-align:right;">BALANCE AFTER</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tblChBody">
+                                        <tr><td colspan="5" style="text-align:center;padding:20px;color:#999;">Loading...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══ COMPANY EXPENSE GRID ═══ -->
             <div class="row mb-3">
                 <div class="col-lg-12">
                     <div class="card card-pd">
                         <div class="card-header">
                             <i class="fa fa-receipt"></i>&nbsp; Company Expense Records
                             <div style="float:right;">
-                                <span style="border-left:1px solid #ccc; padding-left:15px; padding-right:15px;">
-                                    <a href="#" onclick="showForm()"><i class="fas fa-caret-square-down"></i></a>
-                                </span>
-                                <span style="border-left:1px solid #ccc; padding-left:15px; padding-right:15px;">
-                                    <a href="#" onclick="hideForm()"><i class="fas fa-caret-square-up"></i></a>
-                                </span>
+                                <span style="border-left:1px solid #ccc;padding-left:15px;padding-right:15px;"><a href="#" onclick="showForm()"><i class="fas fa-caret-square-down"></i></a></span>
+                                <span style="border-left:1px solid #ccc;padding-left:15px;padding-right:15px;"><a href="#" onclick="hideForm()"><i class="fas fa-caret-square-up"></i></a></span>
                             </div>
                         </div>
                         <div class="card-body">
@@ -312,13 +871,13 @@
                                     <div class="col-sm-2">
                                         <div class="form-group">
                                             <label>From Date</label>
-                                            <input type="text" id="TxtExpFrom" class="form-control" />
+                                            <div class="dp-wrap"><input type="text" id="TxtExpFrom" data-datepicker class="form-control" readonly /></div>
                                         </div>
                                     </div>
                                     <div class="col-sm-2">
                                         <div class="form-group">
                                             <label>To Date</label>
-                                            <input type="text" id="TxtExpTo" class="form-control" />
+                                            <div class="dp-wrap"><input type="text" id="TxtExpTo" data-datepicker class="form-control" readonly /></div>
                                         </div>
                                     </div>
                                     <div class="col-sm-2">
@@ -354,7 +913,88 @@
         </div>
     </div>
 
-    <!-- MODAL: Add Company Expense -->
+    <!-- ═══ MODAL: Driver History ═══ -->
+    <div class="modal fade" id="modalDrvHist" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="background:#2c3e50;color:#fff;padding:12px 18px;">
+                    <h6 class="modal-title mb-0"><i class="fa fa-history"></i> <span id="modalDrvHistTitle"></span></h6>
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body p-0">
+                    <div style="padding:10px 16px;background:#f8f9fa;border-bottom:1px solid #eee;font-size:12px;" id="drvHistBalance"></div>
+                    <div style="max-height:420px;overflow-y:auto;">
+                        <table class="tx-tbl">
+                            <thead>
+                                <tr>
+                                    <th style="width:140px;">DATE</th>
+                                    <th style="width:80px;">TYPE</th>
+                                    <th>SOURCE / DETAILS</th>
+                                    <th style="width:110px;text-align:right;">AMOUNT</th>
+                                    <th style="width:120px;text-align:right;">BALANCE AFTER</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tblDrvHistBody">
+                                <tr><td colspan="5" style="text-align:center;padding:24px;color:#999;">Select a driver to view history.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer" style="padding:10px 16px;">
+                    <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ MODAL: Give Cash to Driver ═══ -->
+    <div class="modal fade" id="modalTransfer" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="background:#27ae60;color:#fff;">
+                    <h5 class="modal-title"><i class="fa fa-exchange-alt"></i> Give Cash to Driver</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info" style="font-size:12px;padding:8px 12px;">
+                        <i class="fa fa-info-circle"></i> Company Wallet DEBIT &rarr; Driver Wallet CREDIT. Use for cash advance or salary payments.
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Date <span class="text-danger">*</span></label>
+                                <div class="dp-wrap" style="width:100%;">
+                                    <input type="text" id="TxtTransferDate" data-datepicker class="form-control" placeholder="Select date" readonly style="width:100%;" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Amount (SGD) <span class="text-danger">*</span></label>
+                                <input type="number" id="TxtTransferAmt" class="form-control" placeholder="0.00" step="0.01" min="0" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Driver <span class="text-danger">*</span></label>
+                        <select id="ddlTransferDriver" class="form-control">
+                            <option value="0">-- Select Driver --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Remarks</label>
+                        <textarea id="TxtTransferRemarks" class="form-control" rows="2" placeholder="e.g. Cash advance for May, Salary payment"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnSaveTransfer" class="btn btn-success" onclick="SaveCompanyTransfer()"><i class="fa fa-paper-plane"></i> Transfer Cash</button>
+                    <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ MODAL: Add Company Expense ═══ -->
     <div class="modal fade" id="modalCE" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -367,7 +1007,9 @@
                         <div class="col-sm-6">
                             <div class="form-group">
                                 <label>Date <span class="text-danger">*</span></label>
-                                <input type="text" id="TxtCEDate" class="form-control" />
+                                <div class="dp-wrap" style="width:100%;">
+                                    <input type="text" id="TxtCEDate" data-datepicker class="form-control" placeholder="Select date" readonly style="width:100%;" />
+                                </div>
                             </div>
                         </div>
                         <div class="col-sm-6">
@@ -395,13 +1037,15 @@
                         <div class="col-sm-6">
                             <div class="form-group">
                                 <label>Linked Driver <small class="text-muted">(for salary)</small></label>
-                                @Html.DropDownList("ddlCEDriver", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @id = "ddlCEDriver" })
+                                <select id="ddlCEDriver" class="form-control">
+                                    <option value="0">-- None / N/A --</option>
+                                </select>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label>Remarks</label>
-                        <textarea id="TxtCERemarks" class="form-control" rows="2" placeholder="e.g. May salary for John, Quarterly insurance premium"></textarea>
+                        <textarea id="TxtCERemarks" class="form-control" rows="2" placeholder="e.g. May salary for John"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -411,4 +1055,5 @@
             </div>
         </div>
     </div>
+
 </body>
