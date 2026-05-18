@@ -642,6 +642,40 @@ namespace Transport.Controllers
             }
         }
 
+        [HttpPost]
+        public JsonResult CompanyToDriver_Transfer(int DriverUserID, decimal Amount,
+    string TransferDate, string Remarks)
+        {
+            try
+            {
+                if (Amount <= 0)
+                    return Json(new { success = false, message = "Amount must be greater than 0." });
+                if (DriverUserID <= 0)
+                    return Json(new { success = false, message = "Please select a driver." });
+
+                var dt = Parse(TransferDate) ?? DateTime.Today;
+
+                using (var conn = new System.Data.SqlClient.SqlConnection(Conn()))
+                {
+                    conn.Open();
+                    var cmd = new System.Data.SqlClient.SqlCommand(
+                        "sp_frm_companyToDriver_Transfer", conn)
+                    { CommandType = System.Data.CommandType.StoredProcedure };
+                    cmd.Parameters.AddWithValue("@DriverUserID", DriverUserID);
+                    cmd.Parameters.AddWithValue("@Amount", Amount);
+                    cmd.Parameters.AddWithValue("@Remarks", string.IsNullOrEmpty(Remarks) ? (object)DBNull.Value : Remarks);
+                    cmd.Parameters.AddWithValue("@CreatedBy", SessionExpire.GetUserID());
+                    cmd.Parameters.AddWithValue("@TransferDate", dt.Date);
+                    cmd.ExecuteNonQuery();
+                }
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
 
         // ════════════════════════════════════════════════════════════════════
         // REPORT PAGE ACTIONS (Wallet Menu)
