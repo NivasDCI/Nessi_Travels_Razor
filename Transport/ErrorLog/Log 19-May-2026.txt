@@ -1,0 +1,35 @@
+Page Name          :GetPasswordAttemptCount
+Date and Time      :19 May 2026 6:28 AM
+Error Message      :The underlying provider failed on Open.
+Stack Trace        :   at System.Data.Entity.Core.EntityClient.EntityConnection.Open()
+   at System.Data.Entity.Core.Objects.ObjectContext.EnsureConnection(Boolean shouldMonitorTransactions)
+   at System.Data.Entity.Core.Objects.ObjectContext.ExecuteInTransaction[T](Func`1 func, IDbExecutionStrategy executionStrategy, Boolean startLocalTransaction, Boolean releaseConnectionOnSuccess)
+   at System.Data.Entity.Core.Objects.ObjectQuery`1.<>c__DisplayClass3.<GetResults>b__1()
+   at System.Data.Entity.SqlServer.DefaultSqlExecutionStrategy.Execute[TResult](Func`1 operation)
+   at System.Data.Entity.Core.Objects.ObjectQuery`1.GetResults(Nullable`1 forMergeOption)
+   at System.Data.Entity.Core.Objects.ObjectQuery`1.<System.Collections.Generic.IEnumerable<T>.GetEnumerator>b__0()
+   at System.Data.Entity.Internal.LazyEnumerator`1.MoveNext()
+   at System.Collections.Generic.List`1..ctor(IEnumerable`1 collection)
+   at System.Linq.Enumerable.ToList[TSource](IEnumerable`1 source)
+   at Transport.Repository.CommonRepository.GetPasswordAttemptCount(String LoginName) in C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Nessi_Travels_Razor\Transport.Repository\CommonRepository.cs:line 599
+Error Source       :EntityFramework
+Target Site        :Void Open()
+
+----------------------------------------------------------------
+Page Name          :IsRoleMapInvalidPassword
+Date and Time      :19 May 2026 6:28 AM
+Error Message      :The underlying provider failed on Open.
+Stack Trace        :   at System.Data.Entity.Core.EntityClient.EntityConnection.Open()
+   at System.Data.Entity.Core.Objects.ObjectContext.EnsureConnection(Boolean shouldMonitorTransactions)
+   at System.Data.Entity.Core.Objects.ObjectContext.ExecuteInTransaction[T](Func`1 func, IDbExecutionStrategy executionStrategy, Boolean startLocalTransaction, Boolean releaseConnectionOnSuccess)
+   at System.Data.Entity.Core.Objects.ObjectQuery`1.<>c__DisplayClass3.<GetResults>b__1()
+   at System.Data.Entity.SqlServer.DefaultSqlExecutionStrategy.Execute[TResult](Func`1 operation)
+   at System.Data.Entity.Core.Objects.ObjectQuery`1.GetResults(Nullable`1 forMergeOption)
+   at System.Data.Entity.Core.Objects.ObjectQuery`1.<System.Collections.Generic.IEnumerable<T>.GetEnumerator>b__0()
+   at System.Data.Entity.Internal.LazyEnumerator`1.MoveNext()
+   at System.Linq.Enumerable.FirstOrDefault[TSource](IEnumerable`1 source)
+   at Transport.Repository.CommonRepository.IsRoleMapInvalidPassword(String LoginName, String Password) in C:\Users\DELL\Desktop\Project-Folder\JJK_Info\Nessi\Nessi_Travels_Razor\Transport.Repository\CommonRepository.cs:line 632
+Error Source       :EntityFramework
+Target Site        :Void Open()
+
+----------------------------------------------------------------
