@@ -40,33 +40,70 @@ namespace Transport.Controllers
             return Json(new { records = list, total = list.Count }, JsonRequestBehavior.AllowGet);
         }
 
+        // ── SECTION 2 ─────────────────────────────────────────────────────────────
+        // Add this action BEFORE the existing GenerateInvoice action
+
+        [HttpGet]
+        public ActionResult PreviewInvoice(string CustomerName, string StartDate, string EndDate,
+            int? JobVendorCode, int? DrivingBy, int? VehicleCode, string CreditCash, int? CashInHand)
+        {
+            string[] fmts = { "dd-MMM-yyyy", "dd-MM-yyyy", "MM/dd/yyyy", "yyyy-MM-dd" };
+            DateTime? parsedStart = null, parsedEnd = null;
+
+            DateTime d;
+            if (!string.IsNullOrEmpty(StartDate) &&
+                DateTime.TryParseExact(StartDate, fmts, CultureInfo.InvariantCulture, DateTimeStyles.None, out d))
+                parsedStart = d;
+
+            if (!string.IsNullOrEmpty(EndDate) &&
+                DateTime.TryParseExact(EndDate, fmts, CultureInfo.InvariantCulture, DateTimeStyles.None, out d))
+                parsedEnd = d;
+
+            if (parsedStart == null) parsedStart = CommonRepository.GetTimeZoneDate();
+            if (parsedEnd == null) parsedEnd = CommonRepository.GetTimeZoneDate();
+
+            if (JobVendorCode == 0) JobVendorCode = null;
+            if (DrivingBy == 0) DrivingBy = null;
+            if (VehicleCode == 0) VehicleCode = null;
+            if (CashInHand == 0) CashInHand = null;
+            if (string.IsNullOrWhiteSpace(CustomerName)) CustomerName = null;
+
+            int totalCount = 0;
+            var jobs = _reportsRepo.Job_FindAll(
+                1, parsedStart, parsedEnd, VehicleCode, JobVendorCode,
+                CustomerName, null, DrivingBy, CashInHand, 500, null, null, out totalCount);
+
+            // Apply credit/cash filter
+            if (!string.IsNullOrEmpty(CreditCash))
+            {
+                if (CreditCash == "Credit") jobs = jobs.Where(o => o.Credit.HasValue && o.Credit > 0).ToList();
+                else if (CreditCash == "Cash") jobs = jobs.Where(o => o.Cash.HasValue && o.Cash > 0).ToList();
+            }
+
+            // Pass everything to view via ViewBag
+            ViewBag.Jobs = jobs;
+            ViewBag.CustomerName = CustomerName;
+            ViewBag.StartDate = parsedStart?.ToString("dd-MMM-yyyy");
+            ViewBag.EndDate = parsedEnd?.ToString("dd-MMM-yyyy");
+            ViewBag.CreditCash = CreditCash;
+            ViewBag.JobVendorCode = JobVendorCode;
+            ViewBag.DrivingBy = DrivingBy;
+            ViewBag.VehicleCode = VehicleCode;
+            ViewBag.CashInHand = CashInHand;
+            ViewBag.TotalAmount = jobs.Sum(o => o.Credit ?? o.Cash ?? 0);
+
+            return View();
+        }
+
         // ─── Generate & Save Invoice from JobsReport ───────────────────────────
         [HttpPost]
         public JsonResult GenerateInvoice(string CustomerName, string StartDate, string EndDate,
-            int? JobVendorCode, int? DrivingBy, int? VehicleCode, string CreditCash, int? CashInHand)
+           int? JobVendorCode, int? DrivingBy, int? VehicleCode, string CreditCash, int? CashInHand,
+           string SelectedJobCodes)  // ← new param add பண்ணுங்க
         {
             try
             {
-                DateTime? parsedStart = null, parsedEnd = null;
-                string[] fmts = { "dd-MMM-yyyy", "dd-MM-yyyy", "MM/dd/yyyy", "yyyy-MM-dd" };
-
-                if (!string.IsNullOrEmpty(StartDate))
-                {
-                    DateTime d; if (DateTime.TryParseExact(StartDate, fmts, CultureInfo.InvariantCulture, DateTimeStyles.None, out d)) parsedStart = d;
-                }
-                if (!string.IsNullOrEmpty(EndDate))
-                {
-                    DateTime d; if (DateTime.TryParseExact(EndDate, fmts, CultureInfo.InvariantCulture, DateTimeStyles.None, out d)) parsedEnd = d;
-                }
-
-                if (parsedStart == null) parsedStart = CommonRepository.GetTimeZoneDate();
-                if (parsedEnd == null) parsedEnd = CommonRepository.GetTimeZoneDate();
-
-                if (JobVendorCode == 0) JobVendorCode = null;
-                if (DrivingBy == 0) DrivingBy = null;
-                if (VehicleCode == 0) VehicleCode = null;
-                if (CashInHand == 0) CashInHand = null;
-                if (string.IsNullOrWhiteSpace(CustomerName)) CustomerName = null;
+                // ... existing date parse + null check code same ...
 
                 int totalCount = 0;
                 var jobs = _reportsRepo.Job_FindAll(1, parsedStart, parsedEnd, VehicleCode, JobVendorCode,
@@ -74,14 +111,22 @@ namespace Transport.Controllers
 
                 if (!string.IsNullOrEmpty(CreditCash))
                 {
-                    if (CreditCash == "Credit") jobs = jobs.Where(o => o.Credit.HasValue).ToList();
-                    else if (CreditCash == "Cash") jobs = jobs.Where(o => o.Cash.HasValue).ToList();
+                    if (CreditCash == "Credit") jobs = jobs.Where(o => o.Credit.HasValue && o.Credit > 0).ToList();
+                    else if (CreditCash == "Cash") jobs = jobs.Where(o => o.Cash.HasValue && o.Cash > 0).ToList();
+                }
+
+                // ← இதை add பண்ணுங்க (preview-ல uncheck பண்ணின jobs skip ஆகும்)
+                if (!string.IsNullOrEmpty(SelectedJobCodes))
+                {
+                    var codes = SelectedJobCodes.Split(',')
+                        .Select(s => { long v; return long.TryParse(s.Trim(), out v) ? v : 0; })
+                        .Where(v => v > 0).ToList();
+                    jobs = jobs.Where(j => codes.Contains(j.JobCode)).ToList();
                 }
 
                 if (jobs == null || !jobs.Any())
-                    return Json(new { success = false, message = "No jobs found for the selected filters." });
+                    return Json(new { success = false, message = "No jobs found." });
 
-                // Build header
                 var firstJob = jobs.First();
                 var header = new InvoiceHeaderModel
                 {
@@ -98,11 +143,10 @@ namespace Transport.Controllers
                     EndDate = parsedEnd,
                     CreditCash = CreditCash,
                     TotalAmount = jobs.Sum(o => o.Credit ?? o.Cash ?? 0),
-                    IsCredit = jobs.Any(o => o.Credit.HasValue),
+                    IsCredit = jobs.Any(o => o.Credit.HasValue && o.Credit > 0),
                     CreatedBy = SessionExpire.GetUserID()
                 };
 
-                // Build details
                 var details = jobs.Select(o => new InvoiceDetailModel
                 {
                     JobCode = o.JobCode,

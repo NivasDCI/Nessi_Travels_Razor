@@ -54,6 +54,54 @@ namespace Transport.Controllers
         }
 
         [HttpGet]
+        public ActionResult PreviewInvoice(string CustomerName, string StartDate, string EndDate,
+    int? JobVendorCode, int? DrivingBy, int? VehicleCode, string CreditCash, int? CashInHand)
+        {
+            string[] fmts = { "dd-MMM-yyyy", "dd-MM-yyyy", "MM/dd/yyyy", "yyyy-MM-dd" };
+            DateTime? parsedStart = null, parsedEnd = null;
+            DateTime d;
+
+            if (!string.IsNullOrEmpty(StartDate) &&
+                DateTime.TryParseExact(StartDate, fmts, CultureInfo.InvariantCulture, DateTimeStyles.None, out d))
+                parsedStart = d;
+            if (!string.IsNullOrEmpty(EndDate) &&
+                DateTime.TryParseExact(EndDate, fmts, CultureInfo.InvariantCulture, DateTimeStyles.None, out d))
+                parsedEnd = d;
+
+            if (parsedStart == null) parsedStart = CommonRepository.GetTimeZoneDate();
+            if (parsedEnd == null) parsedEnd = CommonRepository.GetTimeZoneDate();
+            if (JobVendorCode == 0) JobVendorCode = null;
+            if (DrivingBy == 0) DrivingBy = null;
+            if (VehicleCode == 0) VehicleCode = null;
+            if (CashInHand == 0) CashInHand = null;
+            if (string.IsNullOrWhiteSpace(CustomerName)) CustomerName = null;
+
+            int totalCount = 0;
+            var jobs = _objReportsRepository.Job_FindAll(
+                1, parsedStart, parsedEnd, VehicleCode, JobVendorCode,
+                CustomerName, null, DrivingBy, CashInHand, 500, null, null, out totalCount);
+
+            if (!string.IsNullOrEmpty(CreditCash))
+            {
+                if (CreditCash == "Credit") jobs = jobs.Where(o => o.Credit.HasValue && o.Credit > 0).ToList();
+                else if (CreditCash == "Cash") jobs = jobs.Where(o => o.Cash.HasValue && o.Cash > 0).ToList();
+            }
+
+            ViewBag.Jobs = jobs;
+            ViewBag.CustomerName = CustomerName;
+            ViewBag.StartDate = parsedStart?.ToString("dd-MMM-yyyy");
+            ViewBag.EndDate = parsedEnd?.ToString("dd-MMM-yyyy");
+            ViewBag.CreditCash = CreditCash;
+            ViewBag.JobVendorCode = JobVendorCode;
+            ViewBag.DrivingBy = DrivingBy;
+            ViewBag.VehicleCode = VehicleCode;
+            ViewBag.CashInHand = CashInHand;
+            ViewBag.TotalAmount = jobs.Sum(o => o.Credit ?? o.Cash ?? 0);
+
+            return View();
+        }
+
+        [HttpGet]
         public ActionResult Trxn_FindAll(int? page, DateTime? StartDate, DateTime? EndDate, int? UserID, int? limit, string sortBy, string direction)
         {
             int TotalCount = 0;
@@ -700,6 +748,148 @@ namespace Transport.Controllers
                 }
             }
             catch (Exception ex) { return Json(new { success = false, message = ex.Message }); }
+        }
+
+        [HttpPost]
+        public JsonResult GenerateCreditJobInvoice(string CustomerName, string StartDate, string EndDate,
+    int? JobVendorCode, int? DrivingBy, int? VehicleCode, string CreditCash, int? CashInHand,
+    string SelectedJobCodes)
+        {
+            try
+            {
+                string[] fmts = { "dd-MMM-yyyy", "dd-MM-yyyy", "MM/dd/yyyy", "yyyy-MM-dd" };
+                DateTime? pStart = null, pEnd = null;
+                DateTime dt;
+
+                if (!string.IsNullOrEmpty(StartDate) &&
+                    DateTime.TryParseExact(StartDate, fmts, CultureInfo.InvariantCulture, DateTimeStyles.None, out dt))
+                    pStart = dt;
+                if (!string.IsNullOrEmpty(EndDate) &&
+                    DateTime.TryParseExact(EndDate, fmts, CultureInfo.InvariantCulture, DateTimeStyles.None, out dt))
+                    pEnd = dt;
+
+                if (pStart == null) pStart = CommonRepository.GetTimeZoneDate();
+                if (pEnd == null) pEnd = CommonRepository.GetTimeZoneDate();
+                if (JobVendorCode == 0) JobVendorCode = null;
+                if (DrivingBy == 0) DrivingBy = null;
+                if (VehicleCode == 0) VehicleCode = null;
+                if (CashInHand == 0) CashInHand = null;
+                if (string.IsNullOrWhiteSpace(CustomerName)) CustomerName = null;
+
+                int tc = 0;
+                var jobs = _objReportsRepository.Job_FindAll(
+                    1, pStart, pEnd, VehicleCode, JobVendorCode,
+                    CustomerName, null, DrivingBy, CashInHand, 500, null, null, out tc);
+
+                // CreditCash filter
+                if (!string.IsNullOrEmpty(CreditCash))
+                {
+                    if (CreditCash == "Credit") jobs = jobs.Where(o => o.Credit.HasValue && o.Credit > 0).ToList();
+                    else if (CreditCash == "Cash") jobs = jobs.Where(o => o.Cash.HasValue && o.Cash > 0).ToList();
+                }
+
+                // Preview-ல user select பண்ணின jobs மட்டும்
+                if (!string.IsNullOrEmpty(SelectedJobCodes))
+                {
+                    var codes = SelectedJobCodes.Split(',')
+                        .Select(s => { long v; return long.TryParse(s.Trim(), out v) ? v : 0; })
+                        .Where(v => v > 0).ToList();
+                    jobs = jobs.Where(j => codes.Contains(j.JobCode)).ToList();
+                }
+
+                if (jobs == null || !jobs.Any())
+                    return Json(new { success = false, message = "No jobs found." });
+
+                var first = jobs.First();
+                decimal total = jobs.Sum(o => o.Credit ?? o.Cash ?? 0);
+                long invoiceId = 0;
+
+                using (var conn = GetRawConnection())
+                {
+                    conn.Open();
+                    using (var tran = conn.BeginTransaction())
+                    {
+                        try
+                        {
+                            string invNo = GenerateInvoiceNo(conn, tran);
+
+                            var hCmd = new SqlCommand(@"
+                        INSERT INTO InvoiceHeaders
+                            (InvoiceNo, InvoiceDate, CustomerName, JobVendorCode, JobVendorName,
+                             DrivingBy, DrivingByName, VehicleCode, VehicleName,
+                             CashInHand, CashInHandName, StartDate, EndDate,
+                             CreditCash, TotalAmount, IsCredit, CreatedBy, CreatedDate,
+                             BillToName, BillToAddress, IsManual)
+                        VALUES
+                            (@InvoiceNo, @InvoiceDate, @CustomerName, @JobVendorCode, @JobVendorName,
+                             @DrivingBy, @DrivingByName, @VehicleCode, @VehicleName,
+                             @CashInHand, @CashInHandName, @StartDate, @EndDate,
+                             @CreditCash, @TotalAmount, @IsCredit, @CreatedBy, GETDATE(),
+                             @BillToName, @BillToAddress, 0);
+                        SELECT SCOPE_IDENTITY();", conn, tran);
+
+                            hCmd.Parameters.AddWithValue("@InvoiceNo", invNo);
+                            hCmd.Parameters.AddWithValue("@InvoiceDate", DateTime.Now);
+                            hCmd.Parameters.AddWithValue("@CustomerName", (object)(string.IsNullOrEmpty(CustomerName) ? first.CustomerName : CustomerName) ?? DBNull.Value);
+                            hCmd.Parameters.AddWithValue("@JobVendorCode", (object)JobVendorCode ?? DBNull.Value);
+                            hCmd.Parameters.AddWithValue("@JobVendorName", (object)first.JobVendorName ?? DBNull.Value);
+                            hCmd.Parameters.AddWithValue("@DrivingBy", (object)DrivingBy ?? DBNull.Value);
+                            hCmd.Parameters.AddWithValue("@DrivingByName", (object)first.DrivingByName ?? DBNull.Value);
+                            hCmd.Parameters.AddWithValue("@VehicleCode", (object)VehicleCode ?? DBNull.Value);
+                            hCmd.Parameters.AddWithValue("@VehicleName", (object)first.VehicleName ?? DBNull.Value);
+                            hCmd.Parameters.AddWithValue("@CashInHand", (object)CashInHand ?? DBNull.Value);
+                            hCmd.Parameters.AddWithValue("@CashInHandName", (object)first.CashInHandName ?? DBNull.Value);
+                            hCmd.Parameters.AddWithValue("@StartDate", (object)pStart ?? DBNull.Value);
+                            hCmd.Parameters.AddWithValue("@EndDate", (object)pEnd ?? DBNull.Value);
+                            hCmd.Parameters.AddWithValue("@CreditCash", (object)CreditCash ?? DBNull.Value);
+                            hCmd.Parameters.AddWithValue("@TotalAmount", total);
+                            hCmd.Parameters.AddWithValue("@IsCredit", jobs.Any(o => o.Credit.HasValue && o.Credit > 0));
+                            hCmd.Parameters.AddWithValue("@CreatedBy", SessionExpire.GetUserID());
+                            hCmd.Parameters.AddWithValue("@BillToName", (object)first.JobVendorName ?? DBNull.Value);
+                            hCmd.Parameters.AddWithValue("@BillToAddress", DBNull.Value);
+
+                            invoiceId = Convert.ToInt64(hCmd.ExecuteScalar());
+
+                            foreach (var job in jobs)
+                            {
+                                var dCmd = new SqlCommand(@"
+                            INSERT INTO InvoiceDetails
+                                (InvoiceID, JobCode, JobDate, JobTime, JobFrom, JobTo,
+                                 CustomerName, VehicleName, DrivingByName, JobVendorName,
+                                 Credit, Cash, Amount)
+                            VALUES
+                                (@IID, @JC, @JD, @JT, @JF, @JTO,
+                                 @CN, @VN, @DB, @JV,
+                                 @CR, @CA, @AM)", conn, tran);
+
+                                dCmd.Parameters.AddWithValue("@IID", invoiceId);
+                                dCmd.Parameters.AddWithValue("@JC", job.JobCode);
+                                dCmd.Parameters.AddWithValue("@JD", (object)job.JobDate ?? DBNull.Value);
+                                dCmd.Parameters.AddWithValue("@JT", (object)job.JobTime ?? DBNull.Value);
+                                dCmd.Parameters.AddWithValue("@JF", (object)job.JobFrom ?? DBNull.Value);
+                                dCmd.Parameters.AddWithValue("@JTO", (object)job.JobTo ?? DBNull.Value);
+                                dCmd.Parameters.AddWithValue("@CN", (object)job.CustomerName ?? DBNull.Value);
+                                dCmd.Parameters.AddWithValue("@VN", (object)job.VehicleName ?? DBNull.Value);
+                                dCmd.Parameters.AddWithValue("@DB", (object)job.DrivingByName ?? DBNull.Value);
+                                dCmd.Parameters.AddWithValue("@JV", (object)job.JobVendorName ?? DBNull.Value);
+                                dCmd.Parameters.AddWithValue("@CR", (object)job.Credit ?? DBNull.Value);
+                                dCmd.Parameters.AddWithValue("@CA", (object)job.Cash ?? DBNull.Value);
+                                dCmd.Parameters.AddWithValue("@AM", (object)(job.Credit ?? job.Cash) ?? DBNull.Value);
+                                dCmd.ExecuteNonQuery();
+                            }
+
+                            tran.Commit();
+                        }
+                        catch { tran.Rollback(); throw; }
+                    }
+                }
+
+                return Json(new { success = true, invoiceId = invoiceId });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
         }
 
         [HttpPost]

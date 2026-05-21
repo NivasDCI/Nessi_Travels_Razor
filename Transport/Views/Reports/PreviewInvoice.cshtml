@@ -1,0 +1,278 @@
+@using Transport.Model
+@{
+    Layout = "";
+    var jobs      = ViewBag.Jobs as List<Transport.Model.JobModel> ?? new List<Transport.Model.JobModel>();
+    string custName  = ViewBag.CustomerName ?? "";
+    string startDate = ViewBag.StartDate    ?? "";
+    string endDate   = ViewBag.EndDate      ?? "";
+    string creditCash= ViewBag.CreditCash   ?? "";
+    int?   jvCode    = ViewBag.JobVendorCode as int?;
+    int?   drvBy     = ViewBag.DrivingBy    as int?;
+    int?   vehCode   = ViewBag.VehicleCode  as int?;
+    int?   cashHand  = ViewBag.CashInHand   as int?;
+    decimal totalAmt = ViewBag.TotalAmount  is decimal ? (decimal)ViewBag.TotalAmount : 0m;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Preview Invoice</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; background: #f4f6f9; }
+
+        .preview-card {
+            max-width: 1080px; margin: 28px auto 40px;
+            background: #fff; border: 1px solid #dee2e6;
+            border-radius: 6px; padding: 28px 32px;
+            box-shadow: 0 2px 12px rgba(0,0,0,.08);
+        }
+
+        .preview-header {
+            display: flex; align-items: center;
+            justify-content: space-between; margin-bottom: 22px;
+            border-bottom: 2px solid #333; padding-bottom: 12px;
+        }
+        .preview-title { font-size: 20px; font-weight: 700; letter-spacing: .8px; }
+
+        .info-band {
+            background: #f8f9fa; border: 1px solid #dee2e6;
+            border-radius: 4px; padding: 10px 16px; margin-bottom: 18px;
+        }
+        .info-band .lbl { font-weight: 700; min-width: 90px; display: inline-block; }
+
+        .job-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .job-table th {
+            background: #343a40; color: #fff;
+            padding: 8px 10px; text-align: center; white-space: nowrap;
+        }
+        .job-table td { border: 1px solid #dee2e6; padding: 7px 10px; vertical-align: middle; }
+        .job-table tr:nth-child(even) td { background: #f9f9f9; }
+        .job-table tr.unchecked td { opacity: .4; text-decoration: line-through; }
+
+        .col-amt    { text-align: right; font-weight: 600; }
+        .col-center { text-align: center; }
+
+        .total-band {
+            display: flex; justify-content: flex-end; align-items: center;
+            gap: 24px; margin-top: 14px; padding: 10px 14px;
+            background: #f1f3f5; border-radius: 4px; font-weight: 700;
+        }
+        .total-val { font-size: 16px; color: #1a5276; }
+
+        .action-bar { margin-top: 22px; display: flex; gap: 12px; justify-content: flex-end; }
+        .empty-msg  { text-align: center; padding: 40px; color: #888; }
+        #spinner    { display: none; }
+    </style>
+</head>
+<body>
+<div class="preview-card">
+
+    @* ── Header ── *@
+    <div class="preview-header">
+        <div class="preview-title">
+            <i class="fas fa-file-invoice" style="color:#c0392b;"></i>
+            &nbsp; Invoice Preview
+        </div>
+        <button class="btn btn-outline-secondary btn-sm" onclick="history.back()">
+            <i class="fas fa-arrow-left"></i> Back to Jobs
+        </button>
+    </div>
+
+    @* ── Filter info band ── *@
+    <div class="info-band row">
+        <div class="col-md-4">
+            <span class="lbl">Customer</span>: &nbsp;<strong>@(string.IsNullOrEmpty(custName) ? "-" : custName)</strong>
+        </div>
+        <div class="col-md-3">
+            <span class="lbl">From</span>: &nbsp;@startDate
+        </div>
+        <div class="col-md-3">
+            <span class="lbl">To</span>: &nbsp;@endDate
+        </div>
+        <div class="col-md-2">
+            <span class="lbl">Type</span>: &nbsp;
+            <span class="badge @(creditCash == "Credit" ? "badge-danger" : "badge-success")">
+                @(string.IsNullOrEmpty(creditCash) ? "All" : creditCash)
+            </span>
+        </div>
+    </div>
+
+    @* ── Jobs table ── *@
+    @if (!jobs.Any())
+    {
+        <div class="empty-msg">
+            <i class="fas fa-search fa-2x"></i><br /><br />
+            No jobs found for the selected filters. Please go back and adjust your search.
+        </div>
+    }
+    else
+    {
+        <p class="text-muted mb-2">
+            <i class="fas fa-info-circle"></i>
+            &nbsp;Uncheck any jobs you want to <strong>exclude</strong> from this invoice.
+            Total updates automatically.
+        </p>
+
+        <table class="job-table">
+            <thead>
+                <tr>
+                    <th style="width:36px;">
+                        <input type="checkbox" id="chkAll" checked title="Select / Deselect all" />
+                    </th>
+                    <th style="width:55px;">Code</th>
+                    <th style="width:90px;">Date</th>
+                    <th style="width:55px;">Time</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th style="width:115px;">Customer</th>
+                    <th style="width:85px;">Vehicle</th>
+                    <th style="width:90px;">Driver</th>
+                    <th style="width:75px;">Credit (&#8377;)</th>
+                    <th style="width:75px;">Cash (&#8377;)</th>
+                    <th style="width:80px;">Amount (&#8377;)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var job in jobs)
+                {
+                    decimal amount = job.Credit ?? job.Cash ?? 0;
+                    <tr class="job-row" data-amount="@amount" data-jobcode="@job.JobCode">
+                        <td class="col-center">
+                            <input type="checkbox" class="chk-job" checked />
+                        </td>
+                        <td class="col-center">@job.JobCode</td>
+                        <td class="col-center">@(job.JobDate.HasValue ? job.JobDate.Value.ToString("dd-MMM-yy") : "")</td>
+                        <td class="col-center">@job.JobTime</td>
+                        <td>@job.JobFrom</td>
+                        <td>@job.JobTo</td>
+                        <td>@job.CustomerName</td>
+                        <td class="col-center">@job.VehicleName</td>
+                        <td>@job.DrivingByName</td>
+                        <td class="col-amt" style="color:#c0392b;">
+                            @(job.Credit.HasValue && job.Credit > 0 ? job.Credit.Value.ToString("N2") : "")
+                        </td>
+                        <td class="col-amt" style="color:#1a7a4a;">
+                            @(job.Cash.HasValue && job.Cash > 0 ? job.Cash.Value.ToString("N2") : "")
+                        </td>
+                        <td class="col-amt">@amount.ToString("N2")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        @* ── Total band ── *@
+        <div class="total-band">
+            <span>Selected Jobs: <strong id="selCount">@jobs.Count</strong></span>
+            <span>Total Amount: &#8377; <span class="total-val" id="lblTotal">@totalAmt.ToString("N2")</span></span>
+        </div>
+
+        @* ── Action buttons ── *@
+        <div class="action-bar">
+            <span id="spinner" class="text-muted">
+                <i class="fas fa-spinner fa-spin"></i> Saving invoice&hellip;
+            </span>
+            <button class="btn btn-secondary" onclick="history.back()">
+                <i class="fas fa-times"></i> Cancel
+            </button>
+            <button class="btn btn-success btn-lg" id="btnConfirm">
+                <i class="fas fa-check-circle"></i> &nbsp;Confirm &amp; Save Invoice
+            </button>
+        </div>
+
+        @* ── Hidden params ── *@
+        <input type="hidden" id="hCustomerName"  value="@custName" />
+        <input type="hidden" id="hStartDate"     value="@startDate" />
+        <input type="hidden" id="hEndDate"       value="@endDate" />
+        <input type="hidden" id="hCreditCash"    value="@creditCash" />
+        <input type="hidden" id="hJobVendorCode" value="@(jvCode.HasValue   ? jvCode.Value.ToString()   : "0")" />
+        <input type="hidden" id="hDrivingBy"     value="@(drvBy.HasValue    ? drvBy.Value.ToString()    : "0")" />
+        <input type="hidden" id="hVehicleCode"   value="@(vehCode.HasValue  ? vehCode.Value.ToString()  : "0")" />
+        <input type="hidden" id="hCashInHand"    value="@(cashHand.HasValue ? cashHand.Value.ToString() : "0")" />
+    }
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+
+    // ── Select-all ───────────────────────────────────────────────────────────
+    $('#chkAll').on('change', function () {
+        $('.chk-job').prop('checked', this.checked).trigger('change');
+    });
+
+    // ── Per-row checkbox ─────────────────────────────────────────────────────
+    $(document).on('change', '.chk-job', function () {
+        $(this).closest('tr').toggleClass('unchecked', !this.checked);
+        updateTotal();
+    });
+
+    function updateTotal() {
+        var total = 0, count = 0;
+        $('.job-row').each(function () {
+            if ($(this).find('.chk-job').is(':checked')) {
+                total += parseFloat($(this).data('amount')) || 0;
+                count++;
+            }
+        });
+        $('#lblTotal').text(total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','));
+        $('#selCount').text(count);
+        $('#btnConfirm').prop('disabled', count === 0);
+    }
+
+    // ── Confirm & Save ───────────────────────────────────────────────────────
+    $('#btnConfirm').on('click', function () {
+
+        var selectedCodes = [];
+        $('.job-row').each(function () {
+            if ($(this).find('.chk-job').is(':checked'))
+                selectedCodes.push($(this).data('jobcode'));
+        });
+
+        if (selectedCodes.length === 0) {
+            alert('Please select at least one job.');
+            return;
+        }
+
+        $('#btnConfirm').prop('disabled', true);
+        $('#spinner').show();
+
+        var payload = {
+            CustomerName     : $('#hCustomerName').val(),
+            StartDate        : $('#hStartDate').val(),
+            EndDate          : $('#hEndDate').val(),
+            CreditCash       : $('#hCreditCash').val(),
+            JobVendorCode    : $('#hJobVendorCode').val() || 0,
+            DrivingBy        : $('#hDrivingBy').val()     || 0,
+            VehicleCode      : $('#hVehicleCode').val()   || 0,
+            CashInHand       : $('#hCashInHand').val()    || 0,
+            SelectedJobCodes : selectedCodes.join(',')
+        };
+
+        $.ajax({
+            url     : '@Url.Action("GenerateCreditJobInvoice", "Reports")',
+            type    : 'POST',
+            data    : payload,
+            dataType: 'json',
+            success : function (result) {
+                if (result.success) {
+                    window.location.href =
+                        '@Url.Action("ViewInvoice", "Reports")' + '?invoiceId=' + result.invoiceId;
+                } else {
+                    alert('Error: ' + (result.message || 'Could not save invoice.'));
+                    $('#btnConfirm').prop('disabled', false);
+                    $('#spinner').hide();
+                }
+            },
+            error: function () {
+                alert('Server error. Please try again.');
+                $('#btnConfirm').prop('disabled', false);
+                $('#spinner').hide();
+            }
+        });
+    });
+
+</script>
+</body>
+</html>

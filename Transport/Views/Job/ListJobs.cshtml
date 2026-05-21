@@ -356,21 +356,32 @@
         // =============================================
         // CUSTOMER INVOICE - Combined invoice button
         // =============================================
-        $("#btnCustomerInvoice").click(function () {
+$("#btnCustomerInvoice").click(function () {
+
+    var customerName = $("#txtCustomerName").val().trim();
+    var creditCash = $("#ddlCreditCash").val();
+    var jobVendorCode = $("#ddlJobVendorCode").val();
+
+
+    // Guard: customer name is required
+    if (!customerName && (!jobVendorCode || jobVendorCode === "0")) {
+        alert("Please enter a Customer Name OR select a Job Vendor to generate an invoice.");
+        return;
+    }
 
     var data = {
-        CustomerName: $("#txtCustomerName").val(),
-        StartDate: $("#TxtFromDate").val(),
-        EndDate: $("#TxtToDate").val(),
-        VehicleCode: $("#ddlVehicle").val(),
-        JobVendorCode: $("#ddlVendor").val(),
-        DrivingBy: $("#ddlDriver").val(),
-        CreditCash: $("#ddlCreditCash").val(),
-        CashInHand: $("#ddlCashInHand").val()
+        CustomerName  : customerName,
+        StartDate     : $("#TxtFromDate").val(),
+        EndDate       : $("#TxtToDate").val(),
+        VehicleCode   : $("#ddlVehicleCode").val(),     // ← was ddlVehicle  (FIXED)
+        JobVendorCode : $("#ddlJobVendorCode").val(),   // ← was ddlVendor   (FIXED)
+        DrivingBy     : $("#ddlDrivingBy").val(),       // ← was ddlDriver   (FIXED)
+        CreditCash    : creditCash,
+        CashInHand    : $("#ddlCashInHand").val()
     };
 
-    var url = '/Job/CustomerInvoiceAll?' + $.param(data);
-
+    // Navigate to Preview page using your existing GetMenu()
+    var url = '@Url.Action("PreviewInvoice", "Reports")' + '?' + $.param(data);
     window.open(url, '_blank');
 });
 
