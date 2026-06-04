@@ -1555,6 +1555,53 @@ namespace Transport.Controllers
             }
         }
 
+        [HttpGet]
+        public JsonResult GetVehicleExpenseDetails(int? VehicleCode, string FromDate, string ToDate)
+        {
+            try
+            {
+                DateTime? from = null, to = null;
+                string[] fmts = { "dd-MMM-yyyy", "dd-MM-yyyy", "MM/dd/yyyy", "yyyy-MM-dd" };
+                DateTime dt;
+                if (!string.IsNullOrEmpty(FromDate) && DateTime.TryParseExact(FromDate, fmts, CultureInfo.InvariantCulture, DateTimeStyles.None, out dt)) from = dt;
+                if (!string.IsNullOrEmpty(ToDate) && DateTime.TryParseExact(ToDate, fmts, CultureInfo.InvariantCulture, DateTimeStyles.None, out dt)) to = dt;
+
+                var list = new List<object>();
+
+                using (var conn = GetRawConnection())
+                {
+                    conn.Open();
+                    var cmd = new SqlCommand("sp_frm_get_VehicleExpenseDetails", conn)
+                    { CommandType = CommandType.StoredProcedure };
+                    cmd.Parameters.AddWithValue("@VehicleCode", VehicleCode.HasValue && VehicleCode.Value > 0 ? (object)VehicleCode.Value : DBNull.Value);
+                    cmd.Parameters.AddWithValue("@FromDate", from.HasValue ? (object)from.Value.Date : DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ToDate", to.HasValue ? (object)to.Value.Date : DBNull.Value);
+
+                    using (var r = cmd.ExecuteReader())
+                    {
+                        while (r.Read())
+                        {
+                            list.Add(new
+                            {
+                                ExpenseType = r["ExpenseType"].ToString(),
+                                DisplayExpenseDate = r["DisplayExpenseDate"].ToString(),
+                                Category = r["Category"].ToString(),
+                                PersonName = r["PersonName"].ToString(),
+                                Remarks = r["Remarks"].ToString(),
+                                Amount = Convert.ToDecimal(r["Amount"])
+                            });
+                        }
+                    }
+                }
+
+                return Json(new { success = true, records = list }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
         // ── API: /Reports/ExportProfitLoss ──────────────────────────────────────
         // Excel export using MiniExcel
         public FileStreamResult ExportProfitLoss(string FromDate, string ToDate)
@@ -1659,6 +1706,73 @@ namespace Transport.Controllers
             { FileDownloadName = "VehicleReport_" + DateTime.Now.ToString("yyyyMMdd") + ".xlsx" };
         }
 
+        public FileStreamResult ExportVehicleDetails(long? VehicleCode, string FromDate, string ToDate)
+        {
+            var ms = new System.IO.MemoryStream();
+            try
+            {
+                DateTime? from = null, to = null;
+                string[] fmts = { "dd-MMM-yyyy", "dd-MM-yyyy", "MM/dd/yyyy", "yyyy-MM-dd" };
+                DateTime dt;
+                if (!string.IsNullOrEmpty(FromDate) && DateTime.TryParseExact(FromDate, fmts, CultureInfo.InvariantCulture, DateTimeStyles.None, out dt)) from = dt;
+                if (!string.IsNullOrEmpty(ToDate) && DateTime.TryParseExact(ToDate, fmts, CultureInfo.InvariantCulture, DateTimeStyles.None, out dt)) to = dt;
+
+                int tc = 0;
+                // ── Sheet 1: Job List ────────────────────────────────────────────────
+                var jobs = _objReportsRepository.Job_FindAll(
+                    1, from, to, (int?)VehicleCode, null, null, null, null, null, 5000, null, null, out tc);
+
+                var jobRows = jobs.Select(o => new System.Collections.Generic.Dictionary<string, object>
+        {
+            { "Job Code",    o.JobCode },
+            { "Date",        o.JobDate.HasValue ? o.JobDate.Value.ToString("dd-MMM-yyyy") : "" },
+            { "Time",        o.JobTime ?? "" },
+            { "Vehicle",     o.VehicleName ?? "" },
+            { "Driver",      o.DrivingByName ?? "" },
+            { "From",        o.JobFrom ?? "" },
+            { "To",          o.JobTo ?? "" },
+            { "Customer",    o.CustomerName ?? "" },
+            { "Credit",      o.Credit ?? 0 },
+            { "Cash",        o.Cash ?? 0 },
+            { "Job Vendor",  o.JobVendorName ?? "" },
+            { "Status",      o.JobStatus ?? "" }
+        }).ToList();
+
+                // ── Sheet 2: Expense List ────────────────────────────────────────────
+                var expenses = _objReportsRepository.VehicleExpenseReport((int?)VehicleCode, from, to);
+
+                var expRows = expenses.Select(e => new System.Collections.Generic.Dictionary<string, object>
+        {
+            { "Vehicle",      e.VehicleName ?? "" },
+            { "Service Type", e.ServiceTypeName ?? "" },
+            { "Charge",       e.Charge ?? 0 },
+            { "Date",         e.ExpenseDate.HasValue ? e.ExpenseDate.Value.ToString("dd-MMM-yyyy") : "" }
+        }).ToList();
+
+                // ── Write to Excel with 2 sheets using MiniExcel ───────────────────
+                var sheets = new System.Collections.Generic.Dictionary<string, object>
+        {
+            { "Jobs",     jobRows },
+            { "Expenses", expRows }
+        };
+                ms.SaveAs(sheets, excelType: MiniExcelLibs.ExcelType.XLSX);
+                ms.Seek(0, System.IO.SeekOrigin.Begin);
+            }
+            catch { }
+
+            string vehicleLabel = VehicleCode.HasValue && VehicleCode > 0
+                ? "Vehicle_" + VehicleCode.Value.ToString()
+                : "AllVehicles";
+
+            return new FileStreamResult(ms, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            {
+                FileDownloadName = vehicleLabel + "_Details_" + DateTime.Now.ToString("yyyyMMdd") + ".xlsx"
+            };
+        }
+
         #endregion
+
     }
+
+
 }

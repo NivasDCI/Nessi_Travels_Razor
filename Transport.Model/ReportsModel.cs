@@ -71,4 +71,14 @@ namespace Transport.Model
         public string ServiceName { get; set; }
 
     }
+
+    public class VehicleExpenseDetailModel
+    {
+        public string ExpenseType { get; set; }  // "Driver" or "Company"
+        public string DisplayExpenseDate { get; set; }
+        public string Category { get; set; }
+        public string PersonName { get; set; }
+        public string Remarks { get; set; }
+        public decimal Amount { get; set; }
+    }
 }

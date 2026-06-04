@@ -11,6 +11,20 @@
     $('#TxtETo').datepicker(dpOpts);
     $('#TxtExpDate').datepicker(dpOpts);
 
+    // ── Load Vehicles dropdown ────────────────────────────────────────────────
+    $.ajax({
+        type: 'GET', url: BaseURL + 'Common/Load_Vehicles', dataType: 'json',
+        success: function (data) {
+            $('#ddlExpVehicle,#ddlExpVehicleFilter').empty().append('<option value="0">-- All --</option>');
+            $.each(data, function (i, v) {
+                if (v.ID > 0) {
+                    $('#ddlExpVehicle').append('<option value="' + v.ID + '">' + v.Name + '</option>');
+                    $('#ddlExpVehicleFilter').append('<option value="' + v.ID + '">' + v.Name + '</option>');
+                }
+            });
+        }
+    });
+
     // ── Expense Grid ──────────────────────────────────────────────────────────
     var GrdExp = $('#GrdExp').grid({
         primaryKey: 'DriverExpenseID', uiLibrary: 'bootstrap4', responsive: true,
@@ -18,6 +32,8 @@
         columns: [
             { field: 'DisplayExpenseDate', width: 100, title: 'DATE',         sortable: false },
             { field: 'Category',           width: 120, title: 'CATEGORY',     sortable: false },
+            { field: 'VehicleName', width: 100, title: 'VEHICLE', sortable: false,
+              renderer: function (v) { return v && v.trim() ? '<span class="badge badge-info">' + v + '</span>' : '&mdash;'; } },
             { field: 'Amount', width: 100, title: 'AMOUNT (SGD)', sortable: false, align: 'right',
               renderer: function (v) { return '<strong style="color:#e74c3c;">$ ' + parseFloat(v).toFixed(2) + '</strong>'; } },
             { field: 'Remarks',            width: 180, title: 'REMARKS',      sortable: false },
@@ -31,10 +47,16 @@
     });
 
     function ExpSearch() {
-        GrdExp.reload({ DriverUserID: CURRENT_UID, FromDate: $('#TxtEFrom').val(), ToDate: $('#TxtETo').val() });
+        GrdExp.reload({
+            DriverUserID: CURRENT_UID,
+            FromDate: $('#TxtEFrom').val(),
+            ToDate: $('#TxtETo').val(),
+            VehicleCode: parseInt($('#ddlExpVehicleFilter').val()) || null
+        });
     }
     function ExpClear() {
         $('#TxtEFrom,#TxtETo').val('');
+        $('#ddlExpVehicleFilter').val('0');
         GrdExp.reload({ DriverUserID: CURRENT_UID });
     }
 
@@ -57,7 +79,8 @@
                 Category:     cat,
                 Amount:       amt,
                 Remarks:      $('#TxtExpRemarks').val(),
-                JobCode:      parseInt($('#TxtExpJobCode').val()) || 0
+                JobCode:      parseInt($('#TxtExpJobCode').val()) || 0,
+                VehicleCode:  parseInt($('#ddlExpVehicle').val()) || 0
             }),
             success: function (r) {
                 $('#btnSaveExp').prop('disabled', false).text('Save Expense');
@@ -65,7 +88,7 @@
                     $('#modalExp').modal('hide');
                     GrdExp.reload({ DriverUserID: CURRENT_UID });
                     $('#TxtExpDate,#TxtExpAmount,#TxtExpRemarks,#TxtExpJobCode').val('');
-                    $('#ddlExpCat').val('');
+                    $('#ddlExpCat,#ddlExpVehicle').val('0');
                 } else { alert('Error: ' + (r.message || 'Failed.')); }
             },
             error: function () {
@@ -126,6 +149,14 @@
                                             <input type="text" id="TxtETo" class="form-control" />
                                         </div>
                                     </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>Vehicle</label>
+                                            <select id="ddlExpVehicleFilter" class="form-control">
+                                                <option value="0">-- All --</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                     <div class="col-sm-2 pdt-25">
                                         <button type="button" class="btn btn-primary btn-block" onclick="ExpSearch()">
                                             <i class="fa fa-search"></i> Search
@@ -181,11 +212,21 @@
                     <div class="row">
                         <div class="col-sm-6">
                             <div class="form-group">
+                                <label>Vehicle <small class="text-muted">(optional)</small></label>
+                                <select id="ddlExpVehicle" class="form-control">
+                                    <option value="0">-- None --</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
                                 <label>Amount (SGD) <span class="text-danger">*</span></label>
                                 <input type="number" id="TxtExpAmount" class="form-control"
                                        placeholder="0.00" step="0.01" min="0" />
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-sm-6">
                             <div class="form-group">
                                 <label>Job Code <small class="text-muted">(optional)</small></label>

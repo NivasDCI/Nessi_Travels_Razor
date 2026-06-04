@@ -372,6 +372,41 @@ namespace Transport.Repository
         }
         #endregion
 
+        public List<VehicleExpenseDetailModel> GetVehicleExpenseDetails(int? VehicleCode, DateTime? FromDate, DateTime? ToDate)
+        {
+            var result = new List<VehicleExpenseDetailModel>();
+            try
+            {
+                using (var conn = new SqlConnection(db.Database.Connection.ConnectionString))
+                {
+                    conn.Open();
+                    var cmd = new SqlCommand("sp_frm_get_VehicleExpenseDetails", conn)
+                    { CommandType = CommandType.StoredProcedure };
+                    cmd.Parameters.AddWithValue("@VehicleCode", VehicleCode.HasValue ? (object)VehicleCode.Value : DBNull.Value);
+                    cmd.Parameters.AddWithValue("@FromDate", FromDate.HasValue ? (object)FromDate.Value.Date : DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ToDate", ToDate.HasValue ? (object)ToDate.Value.Date : DBNull.Value);
+
+                    using (var dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            result.Add(new VehicleExpenseDetailModel
+                            {
+                                ExpenseType = dr["ExpenseType"].ToString(),
+                                DisplayExpenseDate = dr["DisplayExpenseDate"].ToString(),
+                                Category = dr["Category"].ToString(),
+                                PersonName = dr["PersonName"].ToString(),
+                                Remarks = dr["Remarks"].ToString(),
+                                Amount = Convert.ToDecimal(dr["Amount"])
+                            });
+                        }
+                    }
+                }
+            }
+            catch { }
+            return result;
+        }
+
     }
 }
 

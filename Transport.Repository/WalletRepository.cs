@@ -25,7 +25,7 @@ namespace Transport.Repository
 
         // Driver expense
         bool SaveDriverExpense(DriverExpenseModel model);
-        List<DriverExpenseModel> GetDriverExpenses(int? driverUserID, DateTime? from, DateTime? to);
+        List<DriverExpenseModel> GetDriverExpenses(int? driverUserID, DateTime? from, DateTime? to, int? vehicleCode = null);
         bool DeleteDriverExpense(long driverExpenseID);
 
         // Admin wallet
@@ -36,7 +36,7 @@ namespace Transport.Repository
         CompanyWalletSummaryModel GetCompanyWalletSummary(DateTime? from = null, DateTime? to = null);
         List<CompanyWalletDriverRowModel> GetCompanyWalletDriverBreakdown(DateTime? from = null, DateTime? to = null);
         bool SaveCompanyExpense(CompanyExpenseModel model);
-        List<CompanyExpenseModel> GetCompanyExpenses(DateTime? from, DateTime? to, string category);
+        List<CompanyExpenseModel> GetCompanyExpenses(DateTime? from, DateTime? to, string category, int? vehicleCode = null);
         bool DeleteCompanyExpense(long companyExpenseID);
     }
 
@@ -246,12 +246,12 @@ namespace Transport.Repository
         }
 
         // ════════════════════════════════════════════════════════════════════
-        // DRIVER EXPENSE
+        // DRIVER EXPENSE - UPDATED with VehicleCode support
         // ════════════════════════════════════════════════════════════════════
         public bool SaveDriverExpense(DriverExpenseModel model)
         {
             // Uses sp_frm_driverExpense_Save which:
-            // 1. Inserts DriverExpense
+            // 1. Inserts DriverExpense (with VehicleCode)
             // 2. DEBITs UserWallet
             // 3. Logs WalletTransaction
             // 4. Syncs DriverWallet daily summary
@@ -266,13 +266,14 @@ namespace Transport.Repository
                 cmd.Parameters.AddWithValue("@Amount", model.Amount);
                 cmd.Parameters.AddWithValue("@Remarks", string.IsNullOrEmpty(model.Remarks) ? (object)DBNull.Value : model.Remarks);
                 cmd.Parameters.AddWithValue("@JobCode", model.JobCode.HasValue ? (object)model.JobCode.Value : DBNull.Value);
+                cmd.Parameters.AddWithValue("@VehicleCode", model.VehicleCode.HasValue ? (object)model.VehicleCode.Value : DBNull.Value);
                 cmd.Parameters.AddWithValue("@CreatedBy", model.CreatedBy.HasValue ? (object)model.CreatedBy.Value : DBNull.Value);
                 cmd.ExecuteNonQuery();
             }
             return true;
         }
 
-        public List<DriverExpenseModel> GetDriverExpenses(int? driverUserID, DateTime? from, DateTime? to)
+        public List<DriverExpenseModel> GetDriverExpenses(int? driverUserID, DateTime? from, DateTime? to, int? vehicleCode = null)
         {
             var list = new List<DriverExpenseModel>();
             using (var conn = new SqlConnection(Conn()))
@@ -283,6 +284,7 @@ namespace Transport.Repository
                 cmd.Parameters.AddWithValue("@DriverUserID", driverUserID.HasValue ? (object)driverUserID.Value : DBNull.Value);
                 cmd.Parameters.AddWithValue("@FromDate", from.HasValue ? (object)from.Value.Date : DBNull.Value);
                 cmd.Parameters.AddWithValue("@ToDate", to.HasValue ? (object)to.Value.Date : DBNull.Value);
+                cmd.Parameters.AddWithValue("@VehicleCode", vehicleCode.HasValue ? (object)vehicleCode.Value : DBNull.Value);
                 using (var r = cmd.ExecuteReader())
                     while (r.Read())
                         list.Add(new DriverExpenseModel
@@ -296,6 +298,8 @@ namespace Transport.Repository
                             Amount = Convert.ToDecimal(r["Amount"]),
                             Remarks = r["Remarks"].ToString(),
                             JobCode = r["JobCode"] == DBNull.Value ? (long?)null : Convert.ToInt64(r["JobCode"]),
+                            VehicleCode = r["VehicleCode"] == DBNull.Value ? (int?)null : Convert.ToInt32(r["VehicleCode"]),
+                            VehicleName = r["VehicleName"].ToString(),
                             CreatedDate = Convert.ToDateTime(r["CreatedDate"]),
                             DisplayCreatedDate = r["DisplayCreatedDate"].ToString()
                         });
@@ -427,6 +431,7 @@ namespace Transport.Repository
             return list;
         }
 
+        // UPDATED: SaveCompanyExpense with VehicleCode support
         public bool SaveCompanyExpense(CompanyExpenseModel model)
         {
             try
@@ -434,14 +439,14 @@ namespace Transport.Repository
                 using (var conn = new SqlConnection(Conn()))
                 {
                     conn.Open();
-                    var cmd = new SqlCommand(
-                        "INSERT INTO CompanyExpense(ExpenseDate,Category,Amount,Remarks,DriverUserID,CreatedBy)" +
-                        " VALUES(@ExpenseDate,@Category,@Amount,@Remarks,@DriverUserID,@CreatedBy)", conn);
+                    var cmd = new SqlCommand("sp_frm_save_CompanyExpense", conn)
+                    { CommandType = CommandType.StoredProcedure };
                     cmd.Parameters.AddWithValue("@ExpenseDate", model.ExpenseDate.Date);
                     cmd.Parameters.AddWithValue("@Category", model.Category);
                     cmd.Parameters.AddWithValue("@Amount", model.Amount);
                     cmd.Parameters.AddWithValue("@Remarks", string.IsNullOrEmpty(model.Remarks) ? (object)DBNull.Value : model.Remarks);
                     cmd.Parameters.AddWithValue("@DriverUserID", model.DriverUserID.HasValue ? (object)model.DriverUserID.Value : DBNull.Value);
+                    cmd.Parameters.AddWithValue("@VehicleCode", model.VehicleCode.HasValue ? (object)model.VehicleCode.Value : DBNull.Value);
                     cmd.Parameters.AddWithValue("@CreatedBy", model.CreatedBy.HasValue ? (object)model.CreatedBy.Value : DBNull.Value);
                     cmd.ExecuteNonQuery();
                 }
@@ -450,7 +455,8 @@ namespace Transport.Repository
             catch { return false; }
         }
 
-        public List<CompanyExpenseModel> GetCompanyExpenses(DateTime? from, DateTime? to, string category)
+        // UPDATED: GetCompanyExpenses with VehicleCode filter
+        public List<CompanyExpenseModel> GetCompanyExpenses(DateTime? from, DateTime? to, string category, int? vehicleCode = null)
         {
             var list = new List<CompanyExpenseModel>();
             using (var conn = new SqlConnection(Conn()))
@@ -461,6 +467,7 @@ namespace Transport.Repository
                 cmd.Parameters.AddWithValue("@FromDate", from.HasValue ? (object)from.Value.Date : DBNull.Value);
                 cmd.Parameters.AddWithValue("@ToDate", to.HasValue ? (object)to.Value.Date : DBNull.Value);
                 cmd.Parameters.AddWithValue("@Category", string.IsNullOrEmpty(category) ? (object)DBNull.Value : category);
+                cmd.Parameters.AddWithValue("@VehicleCode", vehicleCode.HasValue ? (object)vehicleCode.Value : DBNull.Value);
                 using (var r = cmd.ExecuteReader())
                     while (r.Read())
                         list.Add(new CompanyExpenseModel
@@ -473,6 +480,8 @@ namespace Transport.Repository
                             Remarks = r["Remarks"].ToString(),
                             DriverUserID = r["DriverUserID"] == DBNull.Value ? (int?)null : Convert.ToInt32(r["DriverUserID"]),
                             DriverName = r["DriverName"].ToString(),
+                            VehicleCode = r["VehicleCode"] == DBNull.Value ? (int?)null : Convert.ToInt32(r["VehicleCode"]),
+                            VehicleName = r["VehicleName"].ToString(),
                             CreatedBy = r["CreatedBy"] == DBNull.Value ? (int?)null : Convert.ToInt32(r["CreatedBy"]),
                             CreatedByName = r["CreatedByName"].ToString(),
                             CreatedDate = Convert.ToDateTime(r["CreatedDate"]),

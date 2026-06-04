@@ -20,169 +20,230 @@
             font-weight: 600;
         }
     </style>
-    <script>var dpOpts = { format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small' };
-    $('#TxtDrvDate').datepicker(dpOpts);
-    $('#TxtCmpDate').datepicker(dpOpts);
-    $('#TxtDrvFrom').datepicker(dpOpts);
-    $('#TxtDrvTo').datepicker(dpOpts);
-    $('#TxtCmpFrom').datepicker(dpOpts);
-    $('#TxtCmpTo').datepicker(dpOpts);
+    <script>
+        var dpOpts = { format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small' };
+        $('#TxtDrvDate').datepicker(dpOpts);
+        $('#TxtCmpDate').datepicker(dpOpts);
+        $('#TxtDrvFrom').datepicker(dpOpts);
+        $('#TxtDrvTo').datepicker(dpOpts);
+        $('#TxtCmpFrom').datepicker(dpOpts);
+        $('#TxtCmpTo').datepicker(dpOpts);
 
-    // Load user dropdowns
-    $.ajax({ type: 'GET', url: BaseURL + 'Common/Load_SystemUserDetail', datatype: 'Json',
-        success: function (data) {
-            ['ddlDrvDriver', 'ddlDrvFilter', 'ddlCmpDriver'].forEach(function (id) {
-                var $el = $('#' + id);
-                $el.empty();
-                if (id === 'ddlDrvFilter') $el.append('<option value="0">-- All Drivers --</option>');
-                else $el.append('<option value="0">-- Select --</option>');
-                $.each(data, function (i, v) {
-                    if (v.ID > 0) $el.append('<option value="' + v.ID + '">' + v.Name + '</option>');
+        // Load user dropdowns
+        $.ajax({
+            type: 'GET', url: BaseURL + 'Common/Load_SystemUserDetail', datatype: 'Json',
+            success: function (data) {
+                ['ddlDrvDriver', 'ddlDrvFilter', 'ddlCmpDriver'].forEach(function (id) {
+                    var $el = $('#' + id);
+                    $el.empty();
+                    if (id === 'ddlDrvFilter') $el.append('<option value="0">-- All Drivers --</option>');
+                    else $el.append('<option value="0">-- Select --</option>');
+                    $.each(data, function (i, v) {
+                        if (v.ID > 0) $el.append('<option value="' + v.ID + '">' + v.Name + '</option>');
+                    });
                 });
+            }
+        });
+
+        // ── Load Vehicles dropdown (NEW) ─────────────────────────────────────
+        $.ajax({
+            type: 'GET', url: BaseURL + 'Common/Load_Vehicles', datatype: 'Json',
+            success: function (data) {
+                ['ddlDrvVehicle', 'ddlCmpVehicle', 'ddlDrvVehicleFilter', 'ddlCmpVehicleFilter'].forEach(function (id) {
+                    var $el = $('#' + id);
+                    $el.empty().append('<option value="0">-- All Vehicles --</option>');
+                    $.each(data, function (i, v) {
+                        if (v.ID > 0) $el.append('<option value="' + v.ID + '">' + v.Name + '</option>');
+                    });
+                });
+            }
+        });
+
+        // Tab switching
+        function showTab(tab) {
+            $('.tab-section').removeClass('active');
+            $('.exp-tab-btn').removeClass('btn-primary').addClass('btn-outline-secondary');
+            $('#sec_' + tab).addClass('active');
+            $('#tab_' + tab).removeClass('btn-outline-secondary').addClass('btn-primary');
+        }
+
+        // ══ DRIVER EXPENSE GRID ══════════════════════════════════════════════
+        var GrdDrv = $('#GrdDrv').grid({
+            primaryKey: 'DriverExpenseID', uiLibrary: 'bootstrap4', responsive: true,
+            dataSource: BaseURL + 'Wallet/DriverExpense_FindAll',
+            columns: [
+                { field: 'DisplayExpenseDate', width: 95, title: 'DATE', sortable: false },
+                { field: 'DriverName', width: 110, title: 'DRIVER', sortable: false },
+                {
+                    field: 'VehicleName', width: 90, title: 'VEHICLE', sortable: false,
+                    renderer: function (v) { return v && v.trim() ? '<span class="badge badge-info">' + v + '</span>' : '&mdash;'; }
+                },
+                { field: 'Category', width: 100, title: 'CATEGORY', sortable: false },
+                {
+                    field: 'Amount', width: 100, title: 'AMOUNT (SGD)', sortable: false, align: 'right',
+                    renderer: function (v) { return '<strong style="color:#e74c3c;">$ ' + parseFloat(v).toFixed(2) + '</strong>'; }
+                },
+                { field: 'Remarks', width: 150, title: 'REMARKS', sortable: false },
+                {
+                    field: 'JobCode', width: 60, title: 'JOB #', sortable: false,
+                    renderer: function (v) { return v ? '#' + v : '&mdash;'; }
+                },
+                { field: 'DisplayCreatedDate', width: 105, title: 'RECORDED', sortable: false },
+                {
+                    field: 'DriverExpenseID', width: 50, title: '', sortable: false, align: 'center',
+                    renderer: function (v) { return '<button onclick="DelDrv(' + v + ')" class="badge badge-danger" style="cursor:pointer;border:none;padding:4px 8px;"><i class="fa fa-trash"></i></button>'; }
+                }
+            ],
+            pager: { enable: true, limit: 25, sizes: ArrPaging }
+        });
+
+        function DrvSearch() {
+            GrdDrv.reload({
+                DriverUserID: parseInt($('#ddlDrvFilter').val()) || null,
+                VehicleCode: parseInt($('#ddlDrvVehicleFilter').val()) || null,
+                FromDate: $('#TxtDrvFrom').val(),
+                ToDate: $('#TxtDrvTo').val()
             });
         }
-    });
+        function DrvClear() {
+            $('#TxtDrvFrom,#TxtDrvTo').val('');
+            $('#ddlDrvFilter,#ddlDrvVehicleFilter').val('0');
+            GrdDrv.reload({});
+        }
 
-    // Tab switching
-    function showTab(tab) {
-        $('.tab-section').removeClass('active');
-        $('.exp-tab-btn').removeClass('btn-primary').addClass('btn-outline-secondary');
-        $('#sec_' + tab).addClass('active');
-        $('#tab_' + tab).removeClass('btn-outline-secondary').addClass('btn-primary');
-    }
+        $('#btnSaveDrv').click(function () {
+            var duid = parseInt($('#ddlDrvDriver').val()) || 0;
+            var amt = parseFloat($('#TxtDrvAmount').val());
+            var dt = $('#TxtDrvDate').val();
+            var cat = $('#ddlDrvCat').val();
+            if (duid <= 0) { alert('Please select a driver.'); return; }
+            if (!dt) { alert('Please select a date.'); return; }
+            if (!cat) { alert('Please select a category.'); return; }
+            if (!amt || amt <= 0) { alert('Please enter a valid amount.'); return; }
 
-    // ══ DRIVER EXPENSE GRID ══════════════════════════════════════════════════
-    var GrdDrv = $('#GrdDrv').grid({
-        primaryKey: 'DriverExpenseID', uiLibrary: 'bootstrap4', responsive: true,
-        dataSource: BaseURL + 'Wallet/DriverExpense_FindAll',
-        columns: [
-            { field: 'DisplayExpenseDate', width: 100, title: 'DATE',     sortable: false },
-            { field: 'DriverName',         width: 110, title: 'DRIVER',   sortable: false },
-            { field: 'Category',           width: 110, title: 'CATEGORY', sortable: false },
-            { field: 'Amount', width: 100, title: 'AMOUNT (SGD)', sortable: false, align: 'right',
-              renderer: function (v) { return '<strong style="color:#e74c3c;">$ ' + parseFloat(v).toFixed(2) + '</strong>'; } },
-            { field: 'Remarks',            width: 160, title: 'REMARKS',  sortable: false },
-            { field: 'JobCode',            width: 65,  title: 'JOB #',    sortable: false,
-              renderer: function (v) { return v ? '#' + v : '&mdash;'; } },
-            { field: 'DisplayCreatedDate', width: 110, title: 'RECORDED', sortable: false },
-            { field: 'DriverExpenseID', width: 55, title: '', sortable: false, align: 'center',
-              renderer: function (v) { return '<button onclick="DelDrv(' + v + ')" class="badge badge-danger" style="cursor:pointer;border:none;padding:4px 8px;"><i class="fa fa-trash"></i></button>'; } }
-        ],
-        pager: { enable: true, limit: 25, sizes: ArrPaging }
-    });
-
-    function DrvSearch() {
-        GrdDrv.reload({ DriverUserID: parseInt($('#ddlDrvFilter').val()) || null, FromDate: $('#TxtDrvFrom').val(), ToDate: $('#TxtDrvTo').val() });
-    }
-    function DrvClear() {
-        $('#TxtDrvFrom,#TxtDrvTo').val(''); $('#ddlDrvFilter').val('0');
-        GrdDrv.reload({});
-    }
-
-    $('#btnSaveDrv').click(function () {
-        var duid = parseInt($('#ddlDrvDriver').val()) || 0;
-        var amt  = parseFloat($('#TxtDrvAmount').val());
-        var dt   = $('#TxtDrvDate').val();
-        var cat  = $('#ddlDrvCat').val();
-        if (duid <= 0)         { alert('Please select a driver.'); return; }
-        if (!dt)               { alert('Please select a date.');   return; }
-        if (!cat)              { alert('Please select a category.'); return; }
-        if (!amt || amt <= 0)  { alert('Please enter a valid amount.'); return; }
-
-        $(this).prop('disabled', true).text('Saving...');
-        $.ajax({
-            url: BaseURL + 'Wallet/DriverExpense_Save', type: 'POST',
-            dataType: 'json', contentType: 'application/json',
-            data: JSON.stringify({ DriverUserID: duid, ExpenseDate: dt, Category: cat, Amount: amt,
-                Remarks: $('#TxtDrvRemarks').val(), JobCode: parseInt($('#TxtDrvJobCode').val()) || 0 }),
-            success: function (r) {
-                $('#btnSaveDrv').prop('disabled', false).text('Save Driver Expense');
-                if (r.success) {
-                    GrdDrv.reload({});
-                    $('#TxtDrvDate,#TxtDrvAmount,#TxtDrvRemarks,#TxtDrvJobCode').val('');
-                    $('#ddlDrvDriver,#ddlDrvCat').val('0');
-                    alert('Driver expense saved successfully.');
-                } else { alert('Error: ' + (r.message || 'Failed.')); }
-            },
-            error: function () { $('#btnSaveDrv').prop('disabled', false).text('Save Driver Expense'); alert('Server error.'); }
+            $(this).prop('disabled', true).text('Saving...');
+            $.ajax({
+                url: BaseURL + 'Wallet/DriverExpense_Save', type: 'POST',
+                dataType: 'json', contentType: 'application/json',
+                data: JSON.stringify({
+                    DriverUserID: duid,
+                    ExpenseDate: dt,
+                    Category: cat,
+                    Amount: amt,
+                    Remarks: $('#TxtDrvRemarks').val(),
+                    JobCode: parseInt($('#TxtDrvJobCode').val()) || 0,
+                    VehicleCode: parseInt($('#ddlDrvVehicle').val()) || 0   // ← NEW
+                }),
+                success: function (r) {
+                    $('#btnSaveDrv').prop('disabled', false).text('Save Driver Expense');
+                    if (r.success) {
+                        GrdDrv.reload({});
+                        $('#TxtDrvDate,#TxtDrvAmount,#TxtDrvRemarks,#TxtDrvJobCode').val('');
+                        $('#ddlDrvDriver,#ddlDrvCat,#ddlDrvVehicle').val('0');
+                        alert('Driver expense saved successfully.');
+                    } else { alert('Error: ' + (r.message || 'Failed.')); }
+                },
+                error: function () { $('#btnSaveDrv').prop('disabled', false).text('Save Driver Expense'); alert('Server error.'); }
+            });
         });
-    });
 
-    function DelDrv(id) {
-        if (!confirm('Delete this driver expense?')) return;
-        $.ajax({
-            url: BaseURL + 'Wallet/DriverExpense_Delete', type: 'POST',
-            dataType: 'json', contentType: 'application/json',
-            data: JSON.stringify({ DriverExpenseID: id }),
-            success: function (r) { if (r.success) GrdDrv.reload({}); else alert('Failed.'); }
+        function DelDrv(id) {
+            if (!confirm('Delete this driver expense?')) return;
+            $.ajax({
+                url: BaseURL + 'Wallet/DriverExpense_Delete', type: 'POST',
+                dataType: 'json', contentType: 'application/json',
+                data: JSON.stringify({ DriverExpenseID: id }),
+                success: function (r) { if (r.success) GrdDrv.reload({}); else alert('Failed.'); }
+            });
+        }
+
+        // ══ COMPANY EXPENSE GRID ═════════════════════════════════════════════
+        var GrdCmp = $('#GrdCmp').grid({
+            primaryKey: 'CompanyExpenseID', uiLibrary: 'bootstrap4', responsive: true,
+            dataSource: BaseURL + 'Wallet/CompanyExpense_FindAll',
+            columns: [
+                { field: 'DisplayExpenseDate', width: 95, title: 'DATE', sortable: false },
+                {
+                    field: 'VehicleName', width: 90, title: 'VEHICLE', sortable: false,
+                    renderer: function (v) { return v && v.trim() ? '<span class="badge badge-info">' + v + '</span>' : '&mdash;'; }
+                },
+                { field: 'Category', width: 120, title: 'CATEGORY', sortable: false },
+                {
+                    field: 'Amount', width: 105, title: 'AMOUNT (SGD)', sortable: false, align: 'right',
+                    renderer: function (v) { return '<strong style="color:#e74c3c;">$ ' + parseFloat(v).toFixed(2) + '</strong>'; }
+                },
+                {
+                    field: 'DriverName', width: 105, title: 'DRIVER', sortable: false,
+                    renderer: function (v) { return v && v.trim() ? v : '&mdash;'; }
+                },
+                { field: 'Remarks', width: 150, title: 'REMARKS', sortable: false },
+                { field: 'CreatedByName', width: 100, title: 'ADDED BY', sortable: false },
+                { field: 'DisplayCreatedDate', width: 105, title: 'RECORDED', sortable: false },
+                {
+                    field: 'CompanyExpenseID', width: 50, title: '', sortable: false, align: 'center',
+                    renderer: function (v) { return '<button onclick="DelCmp(' + v + ')" class="badge badge-danger" style="cursor:pointer;border:none;padding:4px 8px;"><i class="fa fa-trash"></i></button>'; }
+                }
+            ],
+            pager: { enable: true, limit: 25, sizes: ArrPaging }
         });
-    }
 
-    // ══ COMPANY EXPENSE GRID ═════════════════════════════════════════════════
-    var GrdCmp = $('#GrdCmp').grid({
-        primaryKey: 'CompanyExpenseID', uiLibrary: 'bootstrap4', responsive: true,
-        dataSource: BaseURL + 'Wallet/CompanyExpense_FindAll',
-        columns: [
-            { field: 'DisplayExpenseDate', width: 100, title: 'DATE',      sortable: false },
-            { field: 'Category',           width: 130, title: 'CATEGORY',  sortable: false },
-            { field: 'Amount', width: 105, title: 'AMOUNT (SGD)', sortable: false, align: 'right',
-              renderer: function (v) { return '<strong style="color:#e74c3c;">$ ' + parseFloat(v).toFixed(2) + '</strong>'; } },
-            { field: 'DriverName',         width: 110, title: 'DRIVER',    sortable: false,
-              renderer: function (v) { return v && v.trim() ? v : '&mdash;'; } },
-            { field: 'Remarks',            width: 160, title: 'REMARKS',   sortable: false },
-            { field: 'CreatedByName',      width: 110, title: 'ADDED BY',  sortable: false },
-            { field: 'DisplayCreatedDate', width: 110, title: 'RECORDED',  sortable: false },
-            { field: 'CompanyExpenseID', width: 55, title: '', sortable: false, align: 'center',
-              renderer: function (v) { return '<button onclick="DelCmp(' + v + ')" class="badge badge-danger" style="cursor:pointer;border:none;padding:4px 8px;"><i class="fa fa-trash"></i></button>'; } }
-        ],
-        pager: { enable: true, limit: 25, sizes: ArrPaging }
-    });
+        function CmpSearch() {
+            GrdCmp.reload({
+                FromDate: $('#TxtCmpFrom').val(),
+                ToDate: $('#TxtCmpTo').val(),
+                Category: $('#ddlCmpCatFilter').val(),
+                VehicleCode: parseInt($('#ddlCmpVehicleFilter').val()) || null   // ← NEW
+            });
+        }
+        function CmpClear() {
+            $('#TxtCmpFrom,#TxtCmpTo').val('');
+            $('#ddlCmpCatFilter,#ddlCmpVehicleFilter').val('0');
+            GrdCmp.reload({});
+        }
 
-    function CmpSearch() {
-        GrdCmp.reload({ FromDate: $('#TxtCmpFrom').val(), ToDate: $('#TxtCmpTo').val(), Category: $('#ddlCmpCatFilter').val() });
-    }
-    function CmpClear() {
-        $('#TxtCmpFrom,#TxtCmpTo').val(''); $('#ddlCmpCatFilter').val('');
-        GrdCmp.reload({});
-    }
+        $('#btnSaveCmp').click(function () {
+            var amt = parseFloat($('#TxtCmpAmount').val());
+            var dt = $('#TxtCmpDate').val();
+            var cat = $('#ddlCmpCat').val();
+            if (!dt) { alert('Please select a date.'); return; }
+            if (!cat) { alert('Please select a category.'); return; }
+            if (!amt || amt <= 0) { alert('Please enter a valid amount.'); return; }
 
-    $('#btnSaveCmp').click(function () {
-        var amt = parseFloat($('#TxtCmpAmount').val());
-        var dt  = $('#TxtCmpDate').val();
-        var cat = $('#ddlCmpCat').val();
-        if (!dt)              { alert('Please select a date.');     return; }
-        if (!cat)             { alert('Please select a category.'); return; }
-        if (!amt || amt <= 0) { alert('Please enter a valid amount.'); return; }
-
-        $(this).prop('disabled', true).text('Saving...');
-        $.ajax({
-            url: BaseURL + 'Wallet/CompanyExpense_Save', type: 'POST',
-            dataType: 'json', contentType: 'application/json',
-            data: JSON.stringify({ ExpenseDate: dt, Category: cat, Amount: amt,
-                Remarks: $('#TxtCmpRemarks').val(),
-                DriverUserID: parseInt($('#ddlCmpDriver').val()) || 0 }),
-            success: function (r) {
-                $('#btnSaveCmp').prop('disabled', false).text('Save Company Expense');
-                if (r.success) {
-                    GrdCmp.reload({});
-                    $('#TxtCmpDate,#TxtCmpAmount,#TxtCmpRemarks').val('');
-                    $('#ddlCmpCat,#ddlCmpDriver').val('0');
-                    alert('Company expense saved successfully.');
-                } else { alert('Error: ' + (r.message || 'Failed.')); }
-            },
-            error: function () { $('#btnSaveCmp').prop('disabled', false).text('Save Company Expense'); alert('Server error.'); }
+            $(this).prop('disabled', true).text('Saving...');
+            $.ajax({
+                url: BaseURL + 'Wallet/CompanyExpense_Save', type: 'POST',
+                dataType: 'json', contentType: 'application/json',
+                data: JSON.stringify({
+                    ExpenseDate: dt,
+                    Category: cat,
+                    Amount: amt,
+                    Remarks: $('#TxtCmpRemarks').val(),
+                    DriverUserID: parseInt($('#ddlCmpDriver').val()) || 0,
+                    VehicleCode: parseInt($('#ddlCmpVehicle').val()) || 0   // ← NEW
+                }),
+                success: function (r) {
+                    $('#btnSaveCmp').prop('disabled', false).text('Save Company Expense');
+                    if (r.success) {
+                        GrdCmp.reload({});
+                        $('#TxtCmpDate,#TxtCmpAmount,#TxtCmpRemarks').val('');
+                        $('#ddlCmpCat,#ddlCmpDriver,#ddlCmpVehicle').val('0');
+                        alert('Company expense saved successfully.');
+                    } else { alert('Error: ' + (r.message || 'Failed.')); }
+                },
+                error: function () { $('#btnSaveCmp').prop('disabled', false).text('Save Company Expense'); alert('Server error.'); }
+            });
         });
-    });
 
-    function DelCmp(id) {
-        if (!confirm('Delete this company expense?')) return;
-        $.ajax({
-            url: BaseURL + 'Wallet/CompanyExpense_Delete', type: 'POST',
-            dataType: 'json', contentType: 'application/json',
-            data: JSON.stringify({ CompanyExpenseID: id }),
-            success: function (r) { if (r.success) GrdCmp.reload({}); else alert('Failed.'); }
-        });
-    }</script>
+        function DelCmp(id) {
+            if (!confirm('Delete this company expense?')) return;
+            $.ajax({
+                url: BaseURL + 'Wallet/CompanyExpense_Delete', type: 'POST',
+                dataType: 'json', contentType: 'application/json',
+                data: JSON.stringify({ CompanyExpenseID: id }),
+                success: function (r) { if (r.success) GrdCmp.reload({}); else alert('Failed.'); }
+            });
+        }
+    </script>
 </head>
 <body>
     <div class="content">
@@ -198,20 +259,25 @@
                 </button>
             </div>
 
-            <!-- ══ TAB: DRIVER EXPENSES ══════════════════════════════════════════════ -->
+            <!-- ══ TAB: DRIVER EXPENSES ══════════════════════════════════════ -->
             <div id="sec_drv" class="tab-section active">
 
-                <!-- ADD FORM CARD -->
                 <div class="card card-pd mb-3" style="border-left:4px solid #e74c3c;">
                     <div class="card-header" style="background:#e74c3c;color:#fff;">
                         <i class="fa fa-plus-circle"></i>&nbsp; Add Driver Expense
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-sm-3">
+                            <div class="col-sm-2">
                                 <div class="form-group">
                                     <label>Driver <span class="text-danger">*</span></label>
                                     @Html.DropDownList("ddlDrvDriver", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @id = "ddlDrvDriver" })
+                                </div>
+                            </div>
+                            <div class="col-sm-2">
+                                <div class="form-group">
+                                    <label>Vehicle <small class="text-muted">(optional)</small></label>
+                                    @Html.DropDownList("ddlDrvVehicle", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @id = "ddlDrvVehicle" })
                                 </div>
                             </div>
                             <div class="col-sm-2">
@@ -254,7 +320,9 @@
                                 </div>
                             </div>
                             <div class="col-sm-2 pdt-25">
-                                <button type="button" id="btnSaveDrv" class="btn btn-danger btn-block"><i class="fa fa-save"></i> Save Driver Expense</button>
+                                <button type="button" id="btnSaveDrv" class="btn btn-danger btn-block">
+                                    <i class="fa fa-save"></i> Save Driver Expense
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -265,10 +333,10 @@
                     <div class="card-header">
                         <i class="fa fa-list"></i>&nbsp; Driver Expense Records
                         <div style="float:right;">
-                            <span style="border-left:1px solid #ccc; padding-left:15px; padding-right:15px;">
+                            <span style="border-left:1px solid #ccc; padding:0 15px;">
                                 <a href="#" onclick="showForm()"><i class="fas fa-caret-square-down"></i></a>
                             </span>
-                            <span style="border-left:1px solid #ccc; padding-left:15px; padding-right:15px;">
+                            <span style="border-left:1px solid #ccc; padding:0 15px;">
                                 <a href="#" onclick="hideForm()"><i class="fas fa-caret-square-up"></i></a>
                             </span>
                         </div>
@@ -276,10 +344,16 @@
                     <div class="card-body">
                         <div id="hidden-form">
                             <div class="row mb-2">
-                                <div class="col-sm-3">
+                                <div class="col-sm-2">
                                     <div class="form-group">
                                         <label>Driver</label>
                                         @Html.DropDownList("ddlDrvFilter", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @id = "ddlDrvFilter" })
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label>Vehicle</label>
+                                        @Html.DropDownList("ddlDrvVehicleFilter", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @id = "ddlDrvVehicleFilter" })
                                     </div>
                                 </div>
                                 <div class="col-sm-2">
@@ -295,10 +369,14 @@
                                     </div>
                                 </div>
                                 <div class="col-sm-2 pdt-25">
-                                    <button type="button" class="btn btn-secondary btn-block" onclick="DrvSearch()"><i class="fa fa-search"></i> Filter</button>
+                                    <button type="button" class="btn btn-secondary btn-block" onclick="DrvSearch()">
+                                        <i class="fa fa-search"></i> Filter
+                                    </button>
                                 </div>
                                 <div class="col-sm-2 pdt-25">
-                                    <button type="button" class="btn btn-secondary btn-block" onclick="DrvClear()"><i class="fa fa-paint-brush"></i> Clear</button>
+                                    <button type="button" class="btn btn-secondary btn-block" onclick="DrvClear()">
+                                        <i class="fa fa-paint-brush"></i> Clear
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -309,10 +387,9 @@
                 </div>
             </div>
 
-            <!-- ══ TAB: COMPANY EXPENSES ══════════════════════════════════════════════ -->
+            <!-- ══ TAB: COMPANY EXPENSES ═════════════════════════════════════ -->
             <div id="sec_cmp" class="tab-section">
 
-                <!-- ADD FORM CARD -->
                 <div class="card card-pd mb-3" style="border-left:4px solid #8e44ad;">
                     <div class="card-header" style="background:#8e44ad;color:#fff;">
                         <i class="fa fa-plus-circle"></i>&nbsp; Add Company Expense
@@ -325,7 +402,13 @@
                                     <input type="text" id="TxtCmpDate" class="form-control" />
                                 </div>
                             </div>
-                            <div class="col-sm-3">
+                            <div class="col-sm-2">
+                                <div class="form-group">
+                                    <label>Vehicle <small class="text-muted">(optional)</small></label>
+                                    @Html.DropDownList("ddlCmpVehicle", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @id = "ddlCmpVehicle" })
+                                </div>
+                            </div>
+                            <div class="col-sm-2">
                                 <div class="form-group">
                                     <label>Category <span class="text-danger">*</span></label>
                                     <select id="ddlCmpCat" class="form-control">
@@ -345,9 +428,9 @@
                                     <input type="number" id="TxtCmpAmount" class="form-control" placeholder="0.00" step="0.01" min="0" />
                                 </div>
                             </div>
-                            <div class="col-sm-3">
+                            <div class="col-sm-2">
                                 <div class="form-group">
-                                    <label>Linked Driver <small class="text-muted">(for salary)</small></label>
+                                    <label>Linked Driver <small class="text-muted">(salary)</small></label>
                                     @Html.DropDownList("ddlCmpDriver", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @id = "ddlCmpDriver" })
                                 </div>
                             </div>
@@ -360,7 +443,9 @@
                                 </div>
                             </div>
                             <div class="col-sm-2 pdt-25">
-                                <button type="button" id="btnSaveCmp" class="btn btn-block" style="background:#8e44ad;color:#fff;"><i class="fa fa-save"></i> Save Company Expense</button>
+                                <button type="button" id="btnSaveCmp" class="btn btn-block" style="background:#8e44ad;color:#fff;">
+                                    <i class="fa fa-save"></i> Save Company Expense
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -371,10 +456,10 @@
                     <div class="card-header">
                         <i class="fa fa-list"></i>&nbsp; Company Expense Records
                         <div style="float:right;">
-                            <span style="border-left:1px solid #ccc; padding-left:15px; padding-right:15px;">
+                            <span style="border-left:1px solid #ccc; padding:0 15px;">
                                 <a href="#" onclick="showForm()"><i class="fas fa-caret-square-down"></i></a>
                             </span>
-                            <span style="border-left:1px solid #ccc; padding-left:15px; padding-right:15px;">
+                            <span style="border-left:1px solid #ccc; padding:0 15px;">
                                 <a href="#" onclick="hideForm()"><i class="fas fa-caret-square-up"></i></a>
                             </span>
                         </div>
@@ -382,6 +467,12 @@
                     <div class="card-body">
                         <div id="hidden-form">
                             <div class="row mb-2">
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label>Vehicle</label>
+                                        @Html.DropDownList("ddlCmpVehicleFilter", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @id = "ddlCmpVehicleFilter" })
+                                    </div>
+                                </div>
                                 <div class="col-sm-2">
                                     <div class="form-group">
                                         <label>From</label>
@@ -409,10 +500,14 @@
                                     </div>
                                 </div>
                                 <div class="col-sm-2 pdt-25">
-                                    <button type="button" class="btn btn-secondary btn-block" onclick="CmpSearch()"><i class="fa fa-search"></i> Filter</button>
+                                    <button type="button" class="btn btn-secondary btn-block" onclick="CmpSearch()">
+                                        <i class="fa fa-search"></i> Filter
+                                    </button>
                                 </div>
                                 <div class="col-sm-2 pdt-25">
-                                    <button type="button" class="btn btn-secondary btn-block" onclick="CmpClear()"><i class="fa fa-paint-brush"></i> Clear</button>
+                                    <button type="button" class="btn btn-secondary btn-block" onclick="CmpClear()">
+                                        <i class="fa fa-paint-brush"></i> Clear
+                                    </button>
                                 </div>
                             </div>
                         </div>

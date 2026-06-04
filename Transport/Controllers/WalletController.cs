@@ -1,7 +1,10 @@
 using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Globalization;
 using System.Linq;
 using System.Web.Mvc;
+using System.Web.Hosting;
 using Transport.Model;
 using Transport.Repository;
 
@@ -74,7 +77,7 @@ namespace Transport.Controllers
             try
             {
                 // Test 1: read connection string
-                string path = System.Web.Hosting.HostingEnvironment.MapPath("~/ConnectionString.txt");
+                string path = HostingEnvironment.MapPath("~/ConnectionString.txt");
                 using (var sr = new System.IO.StreamReader(path))
                     while (sr.Peek() >= 0) connStr = sr.ReadLine();
                 results.Add(new { test = "ConnectionString", status = "OK", detail = connStr.Substring(0, 30) + "..." });
@@ -98,12 +101,12 @@ namespace Transport.Controllers
 
             try
             {
-                using (var conn = new System.Data.SqlClient.SqlConnection(connStr))
+                using (var conn = new SqlConnection(connStr))
                 {
                     conn.Open();
                     foreach (var proc in procs)
                     {
-                        var cmd = new System.Data.SqlClient.SqlCommand(
+                        var cmd = new SqlCommand(
                             "SELECT COUNT(1) FROM sys.objects WHERE type='P' AND name=@n", conn);
                         cmd.Parameters.AddWithValue("@n", proc);
                         int exists = (int)cmd.ExecuteScalar();
@@ -114,7 +117,7 @@ namespace Transport.Controllers
                     string[] tables = { "DriverWallet", "DriverHandover", "DriverExpense", "CompanyExpense" };
                     foreach (var tbl in tables)
                     {
-                        var cmd = new System.Data.SqlClient.SqlCommand(
+                        var cmd = new SqlCommand(
                             "SELECT COUNT(1) FROM sysobjects WHERE xtype='U' AND name=@n", conn);
                         cmd.Parameters.AddWithValue("@n", tbl);
                         int exists = (int)cmd.ExecuteScalar();
@@ -176,7 +179,7 @@ namespace Transport.Controllers
                 var from = Parse(FromDate);
                 var to = Parse(ToDate);
                 var list = _repo.GetDriverWalletSummary(uid, from, to);
-                var balance = _repo.GetDriverWalletBalance(uid, from, to);  // ← pass dates
+                var balance = _repo.GetDriverWalletBalance(uid, from, to);
                 return Json(new { records = list, total = list.Count, balance = balance },
                             JsonRequestBehavior.AllowGet);
             }
@@ -225,7 +228,7 @@ namespace Transport.Controllers
                 var from = Parse(FromDate);
                 var to = Parse(ToDate);
                 var list = _repo.GetDriverWalletSummary(DriverUserID, from, to);
-                var balance = _repo.GetDriverWalletBalance(DriverUserID, from, to);  // ← pass dates
+                var balance = _repo.GetDriverWalletBalance(DriverUserID, from, to);
                 return Json(new { records = list, total = list.Count, balance = balance },
                             JsonRequestBehavior.AllowGet);
             }
@@ -316,10 +319,10 @@ namespace Transport.Controllers
                 // Pass current user as DeletedBy for audit trail
                 int deletedBy = SessionExpire.GetUserID();
 
-                using (var conn = new System.Data.SqlClient.SqlConnection(Conn()))
+                using (var conn = new SqlConnection(Conn()))
                 {
                     conn.Open();
-                    var cmd = new System.Data.SqlClient.SqlCommand("sp_frm_handover_Delete", conn)
+                    var cmd = new SqlCommand("sp_frm_handover_Delete", conn)
                     { CommandType = System.Data.CommandType.StoredProcedure };
                     cmd.Parameters.AddWithValue("@HandoverID", HandoverID);
                     cmd.Parameters.AddWithValue("@DeletedBy", deletedBy);
@@ -334,18 +337,19 @@ namespace Transport.Controllers
         }
 
         // ════════════════════════════════════════════════════════════════════
-        // DRIVER EXPENSE
+        // DRIVER EXPENSE with VehicleCode support
         // ════════════════════════════════════════════════════════════════════
 
         [HttpGet]
-        public JsonResult DriverExpense_FindAll(int? DriverUserID, string FromDate, string ToDate)
+        public JsonResult DriverExpense_FindAll(int? DriverUserID, string FromDate, string ToDate, int? VehicleCode)
         {
             try
             {
                 int? uid = (DriverUserID.HasValue && DriverUserID.Value > 0)
                            ? DriverUserID : (int?)null;
                 if (uid == null) { var self = SessionExpire.GetUserID(); if (self > 0) uid = self; }
-                var list = _repo.GetDriverExpenses(uid, Parse(FromDate), Parse(ToDate));
+                var list = _repo.GetDriverExpenses(uid, Parse(FromDate), Parse(ToDate),
+                               (VehicleCode.HasValue && VehicleCode.Value > 0) ? VehicleCode : null);
                 return Json(new { records = list, total = list.Count }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
@@ -357,7 +361,7 @@ namespace Transport.Controllers
 
         [HttpPost]
         public JsonResult DriverExpense_Save(int DriverUserID, string ExpenseDate,
-            string Category, decimal Amount, string Remarks, long? JobCode)
+            string Category, decimal Amount, string Remarks, long? JobCode, int? VehicleCode)
         {
             try
             {
@@ -371,6 +375,7 @@ namespace Transport.Controllers
                     Amount = Amount,
                     Remarks = Remarks,
                     JobCode = (JobCode.HasValue && JobCode.Value > 0) ? JobCode : null,
+                    VehicleCode = (VehicleCode.HasValue && VehicleCode.Value > 0) ? VehicleCode : null,
                     CreatedBy = SessionExpire.GetUserID()
                 });
                 return Json(new { success = ok, message = ok ? "" : "Failed to save expense." });
@@ -430,12 +435,17 @@ namespace Transport.Controllers
             }
         }
 
+        // ════════════════════════════════════════════════════════════════════
+        // COMPANY EXPENSE with VehicleCode support
+        // ════════════════════════════════════════════════════════════════════
+
         [HttpGet]
-        public JsonResult CompanyExpense_FindAll(string FromDate, string ToDate, string Category)
+        public JsonResult CompanyExpense_FindAll(string FromDate, string ToDate, string Category, int? VehicleCode)
         {
             try
             {
-                var list = _repo.GetCompanyExpenses(Parse(FromDate), Parse(ToDate), Category);
+                var list = _repo.GetCompanyExpenses(Parse(FromDate), Parse(ToDate), Category,
+                               (VehicleCode.HasValue && VehicleCode.Value > 0) ? VehicleCode : null);
                 return Json(new { records = list, total = list.Count }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
@@ -447,7 +457,7 @@ namespace Transport.Controllers
 
         [HttpPost]
         public JsonResult CompanyExpense_Save(string ExpenseDate, string Category,
-            decimal Amount, string Remarks, int? DriverUserID)
+            decimal Amount, string Remarks, int? DriverUserID, int? VehicleCode)
         {
             try
             {
@@ -459,6 +469,7 @@ namespace Transport.Controllers
                     Amount = Amount,
                     Remarks = Remarks,
                     DriverUserID = (DriverUserID.HasValue && DriverUserID.Value > 0) ? DriverUserID : null,
+                    VehicleCode = (VehicleCode.HasValue && VehicleCode.Value > 0) ? VehicleCode : null,
                     CreatedBy = SessionExpire.GetUserID()
                 });
                 return Json(new { success = ok, message = ok ? "" : "Failed to save." });
@@ -488,10 +499,10 @@ namespace Transport.Controllers
                 if (Type == "User" && (!UserID.HasValue || UserID.Value <= 0))
                     return Json(new { success = false, message = "Please select a user for User top-up." });
 
-                using (var conn = new System.Data.SqlClient.SqlConnection(Conn()))
+                using (var conn = new SqlConnection(Conn()))
                 {
                     conn.Open();
-                    var cmd = new System.Data.SqlClient.SqlCommand(
+                    var cmd = new SqlCommand(
                         "sp_frm_wallet_AdminTopup", conn)
                     {
                         CommandType = System.Data.CommandType.StoredProcedure
@@ -519,15 +530,15 @@ namespace Transport.Controllers
         {
             try
             {
-                var list = new System.Collections.Generic.List<object>();
+                var list = new List<object>();
                 decimal balance = 0;
 
-                using (var conn = new System.Data.SqlClient.SqlConnection(Conn()))
+                using (var conn = new SqlConnection(Conn()))
                 {
                     conn.Open();
 
                     // Current balance
-                    var balCmd = new System.Data.SqlClient.SqlCommand(
+                    var balCmd = new SqlCommand(
                         "SELECT ISNULL(WalletBalance, 0) FROM UserWallet WHERE UserID = @UID", conn);
                     balCmd.Parameters.AddWithValue("@UID", UserID);
                     var balObj = balCmd.ExecuteScalar();
@@ -535,7 +546,7 @@ namespace Transport.Controllers
                               ? Convert.ToDecimal(balObj) : 0;
 
                     // Transaction history
-                    var cmd = new System.Data.SqlClient.SqlCommand(
+                    var cmd = new SqlCommand(
                         "sp_frm_get_WalletHistory", conn)
                     {
                         CommandType = System.Data.CommandType.StoredProcedure
@@ -586,22 +597,22 @@ namespace Transport.Controllers
         {
             try
             {
-                var list = new System.Collections.Generic.List<object>();
+                var list = new List<object>();
                 decimal balance = 0;
 
-                using (var conn = new System.Data.SqlClient.SqlConnection(Conn()))
+                using (var conn = new SqlConnection(Conn()))
                 {
                     conn.Open();
 
                     // Company wallet balance
-                    var balCmd = new System.Data.SqlClient.SqlCommand(
+                    var balCmd = new SqlCommand(
                         "SELECT ISNULL(Balance, 0) FROM CompanyWallet", conn);
                     var balObj = balCmd.ExecuteScalar();
                     balance = (balObj != null && balObj != DBNull.Value)
                               ? Convert.ToDecimal(balObj) : 0;
 
                     // Transaction history
-                    var cmd = new System.Data.SqlClient.SqlCommand(
+                    var cmd = new SqlCommand(
                         "sp_frm_get_CompanyWalletHistory", conn)
                     {
                         CommandType = System.Data.CommandType.StoredProcedure
@@ -655,10 +666,10 @@ namespace Transport.Controllers
 
                 var dt = Parse(TransferDate) ?? DateTime.Today;
 
-                using (var conn = new System.Data.SqlClient.SqlConnection(Conn()))
+                using (var conn = new SqlConnection(Conn()))
                 {
                     conn.Open();
-                    var cmd = new System.Data.SqlClient.SqlCommand(
+                    var cmd = new SqlCommand(
                         "sp_frm_companyToDriver_Transfer", conn)
                     { CommandType = System.Data.CommandType.StoredProcedure };
                     cmd.Parameters.AddWithValue("@DriverUserID", DriverUserID);
@@ -675,7 +686,6 @@ namespace Transport.Controllers
                 return Json(new { success = false, message = ex.Message });
             }
         }
-
 
         // ════════════════════════════════════════════════════════════════════
         // REPORT PAGE ACTIONS (Wallet Menu)
@@ -696,11 +706,11 @@ namespace Transport.Controllers
         // ════════════════════════════════════════════════════════════════════
         private string Conn()
         {
-            string path = System.Web.Hosting.HostingEnvironment.MapPath("~/ConnectionString.txt");
+            string path = HostingEnvironment.MapPath("~/ConnectionString.txt");
             string val = "";
             using (var sr = new System.IO.StreamReader(path))
                 while (sr.Peek() >= 0) val = sr.ReadLine();
-            return val; // ✅ Last line மட்டும்
+            return val;
         }
     }
 }
