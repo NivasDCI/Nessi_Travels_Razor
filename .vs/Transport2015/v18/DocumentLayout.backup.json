@@ -3,7 +3,27 @@
   "WorkspaceRootPath": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{2ED5E85A-48D0-4792-9218-68E6C0781A51}|Transport\\Transport.csproj|c:\\users\\dell\\desktop\\project-folder\\jjk_info\\nessi\\nessi_travels_razor\\transport\\views\\wallet\\profitlossreport.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "AbsoluteMoniker": "D:0:0:{2ED5E85A-48D0-4792-9218-68E6C0781A51}|Transport\\Transport.csproj|C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\transport\\views\\job\\listjobs.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{2ED5E85A-48D0-4792-9218-68E6C0781A51}|Transport\\Transport.csproj|solutionrelative:transport\\views\\job\\listjobs.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2ED5E85A-48D0-4792-9218-68E6C0781A51}|Transport\\Transport.csproj|C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\transport\\controllers\\jobcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2ED5E85A-48D0-4792-9218-68E6C0781A51}|Transport\\Transport.csproj|solutionrelative:transport\\controllers\\jobcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2ED5E85A-48D0-4792-9218-68E6C0781A51}|Transport\\Transport.csproj|C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\transport\\controllers\\walletcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2ED5E85A-48D0-4792-9218-68E6C0781A51}|Transport\\Transport.csproj|solutionrelative:transport\\controllers\\walletcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2ED5E85A-48D0-4792-9218-68E6C0781A51}|Transport\\Transport.csproj|c:\\users\\dell\\desktop\\project-folder\\jjk_info\\nessi\\nessi_travels_razor\\transport\\views\\wallet\\vehiclesreport.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{2ED5E85A-48D0-4792-9218-68E6C0781A51}|Transport\\Transport.csproj|solutionrelative:transport\\views\\wallet\\vehiclesreport.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{57CB428B-00C2-46A5-9D11-7D6F1268058F}|Transport.Repository\\Transport.Repository.csproj|C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\transport.repository\\reportsrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{57CB428B-00C2-46A5-9D11-7D6F1268058F}|Transport.Repository\\Transport.Repository.csproj|solutionrelative:transport.repository\\reportsrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2ED5E85A-48D0-4792-9218-68E6C0781A51}|Transport\\Transport.csproj|C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\transport\\views\\wallet\\profitlossreport.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{2ED5E85A-48D0-4792-9218-68E6C0781A51}|Transport\\Transport.csproj|solutionrelative:transport\\views\\wallet\\profitlossreport.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
@@ -11,28 +31,16 @@
       "RelativeMoniker": "D:0:0:{2ED5E85A-48D0-4792-9218-68E6C0781A51}|Transport\\Transport.csproj|solutionrelative:transport\\controllers\\reportscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{57CB428B-00C2-46A5-9D11-7D6F1268058F}|Transport.Repository\\Transport.Repository.csproj|c:\\users\\dell\\desktop\\project-folder\\jjk_info\\nessi\\nessi_travels_razor\\transport.repository\\reportsrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{57CB428B-00C2-46A5-9D11-7D6F1268058F}|Transport.Repository\\Transport.Repository.csproj|solutionrelative:transport.repository\\reportsrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2ED5E85A-48D0-4792-9218-68E6C0781A51}|Transport\\Transport.csproj|c:\\users\\dell\\desktop\\project-folder\\jjk_info\\nessi\\nessi_travels_razor\\transport\\views\\wallet\\vehiclesreport.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{2ED5E85A-48D0-4792-9218-68E6C0781A51}|Transport\\Transport.csproj|solutionrelative:transport\\views\\wallet\\vehiclesreport.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{CADE0411-3610-412E-822C-BB7948A069F4}|Transport.Model\\Transport.Model.csproj|c:\\users\\dell\\desktop\\project-folder\\jjk_info\\nessi\\nessi_travels_razor\\transport.model\\reportsmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{CADE0411-3610-412E-822C-BB7948A069F4}|Transport.Model\\Transport.Model.csproj|C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\transport.model\\reportsmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{CADE0411-3610-412E-822C-BB7948A069F4}|Transport.Model\\Transport.Model.csproj|solutionrelative:transport.model\\reportsmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{57CB428B-00C2-46A5-9D11-7D6F1268058F}|Transport.Repository\\Transport.Repository.csproj|c:\\users\\dell\\desktop\\project-folder\\jjk_info\\nessi\\nessi_travels_razor\\transport.repository\\walletrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{57CB428B-00C2-46A5-9D11-7D6F1268058F}|Transport.Repository\\Transport.Repository.csproj|C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\transport.repository\\walletrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{57CB428B-00C2-46A5-9D11-7D6F1268058F}|Transport.Repository\\Transport.Repository.csproj|solutionrelative:transport.repository\\walletrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{2ED5E85A-48D0-4792-9218-68E6C0781A51}|Transport\\Transport.csproj|C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\transport\\views\\wallet\\addexpenses.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{2ED5E85A-48D0-4792-9218-68E6C0781A51}|Transport\\Transport.csproj|solutionrelative:transport\\views\\wallet\\addexpenses.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2ED5E85A-48D0-4792-9218-68E6C0781A51}|Transport\\Transport.csproj|C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\transport\\controllers\\walletcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2ED5E85A-48D0-4792-9218-68E6C0781A51}|Transport\\Transport.csproj|solutionrelative:transport\\controllers\\walletcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{CADE0411-3610-412E-822C-BB7948A069F4}|Transport.Model\\Transport.Model.csproj|C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\transport.model\\walletmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -41,10 +49,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{2ED5E85A-48D0-4792-9218-68E6C0781A51}|Transport\\Transport.csproj|C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\transport\\views\\reports\\vehiclesreport.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{2ED5E85A-48D0-4792-9218-68E6C0781A51}|Transport\\Transport.csproj|solutionrelative:transport\\views\\reports\\vehiclesreport.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2ED5E85A-48D0-4792-9218-68E6C0781A51}|Transport\\Transport.csproj|C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\transport\\views\\job\\listjobs.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{2ED5E85A-48D0-4792-9218-68E6C0781A51}|Transport\\Transport.csproj|solutionrelative:transport\\views\\job\\listjobs.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{2ED5E85A-48D0-4792-9218-68E6C0781A51}|Transport\\Transport.csproj|C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\transport\\views\\reports\\invoicelist.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
@@ -75,10 +79,6 @@
       "RelativeMoniker": "D:0:0:{2ED5E85A-48D0-4792-9218-68E6C0781A51}|Transport\\Transport.csproj|solutionrelative:transport\\views\\wallet\\myaddexpenses.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2ED5E85A-48D0-4792-9218-68E6C0781A51}|Transport\\Transport.csproj|C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\transport\\controllers\\jobcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2ED5E85A-48D0-4792-9218-68E6C0781A51}|Transport\\Transport.csproj|solutionrelative:transport\\controllers\\jobcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{2ED5E85A-48D0-4792-9218-68E6C0781A51}|Transport\\Transport.csproj|C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\transport\\connectionstring.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{2ED5E85A-48D0-4792-9218-68E6C0781A51}|Transport\\Transport.csproj|solutionrelative:transport\\connectionstring.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
@@ -98,7 +98,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 7,
           "Children": [
             {
               "$type": "Bookmark",
@@ -110,59 +110,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "ProfitLossReport.cshtml",
-              "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Views\\Wallet\\ProfitLossReport.cshtml",
-              "RelativeDocumentMoniker": "Transport\\Views\\Wallet\\ProfitLossReport.cshtml",
-              "ToolTip": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Views\\Wallet\\ProfitLossReport.cshtml",
-              "RelativeToolTip": "Transport\\Views\\Wallet\\ProfitLossReport.cshtml",
-              "ViewState": "AgIAAJoBAAAAAAAAAAAAALABAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-05-24T03:14:14.534Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "ReportsModel.cs",
-              "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport.Model\\ReportsModel.cs",
-              "RelativeDocumentMoniker": "Transport.Model\\ReportsModel.cs",
-              "ToolTip": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport.Model\\ReportsModel.cs",
-              "RelativeToolTip": "Transport.Model\\ReportsModel.cs",
-              "ViewState": "AgIAAEIAAAAAAAAAAAAuwFIAAAAFAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-24T02:59:48.278Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "ReportsRepository.cs",
-              "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport.Repository\\ReportsRepository.cs",
-              "RelativeDocumentMoniker": "Transport.Repository\\ReportsRepository.cs",
-              "ToolTip": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport.Repository\\ReportsRepository.cs",
-              "RelativeToolTip": "Transport.Repository\\ReportsRepository.cs",
-              "ViewState": "AgIAAGwBAAAAAAAAAAAuwHoBAAANAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-24T02:58:24.225Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 3,
               "Title": "VehiclesReport.cshtml",
               "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Views\\Wallet\\VehiclesReport.cshtml",
               "RelativeDocumentMoniker": "Transport\\Views\\Wallet\\VehiclesReport.cshtml",
               "ToolTip": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Views\\Wallet\\VehiclesReport.cshtml",
               "RelativeToolTip": "Transport\\Views\\Wallet\\VehiclesReport.cshtml",
-              "ViewState": "AgIAAN0BAAAAAAAAAAAmwPUBAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAN0BAAAAAAAAAAAmwOcBAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2026-05-24T02:53:15.045Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 9,
               "Title": "AddExpenses.cshtml",
               "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Views\\Wallet\\AddExpenses.cshtml",
               "RelativeDocumentMoniker": "Transport\\Views\\Wallet\\AddExpenses.cshtml",
@@ -174,7 +135,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 10,
               "Title": "WalletModel.cs",
               "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport.Model\\WalletModel.cs",
               "RelativeDocumentMoniker": "Transport.Model\\WalletModel.cs",
@@ -186,7 +147,82 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "WalletController.cs",
+              "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Controllers\\WalletController.cs",
+              "RelativeDocumentMoniker": "Transport\\Controllers\\WalletController.cs",
+              "ToolTip": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Controllers\\WalletController.cs",
+              "RelativeToolTip": "Transport\\Controllers\\WalletController.cs",
+              "ViewState": "AgIAAKYAAAAAAAAAAADwv6wAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-10T10:12:34.227Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "JobController.cs",
+              "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Controllers\\JobController.cs",
+              "RelativeDocumentMoniker": "Transport\\Controllers\\JobController.cs",
+              "ToolTip": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Controllers\\JobController.cs",
+              "RelativeToolTip": "Transport\\Controllers\\JobController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAI0BAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-10T10:12:34.261Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "ListJobs.cshtml",
+              "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Views\\Job\\ListJobs.cshtml",
+              "RelativeDocumentMoniker": "Transport\\Views\\Job\\ListJobs.cshtml",
+              "ToolTip": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Views\\Job\\ListJobs.cshtml",
+              "RelativeToolTip": "Transport\\Views\\Job\\ListJobs.cshtml",
+              "ViewState": "AgIAACMBAAAAAAAAAAAAAH8BAABPAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-05-20T01:35:45.797Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "ReportsRepository.cs",
+              "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport.Repository\\ReportsRepository.cs",
+              "RelativeDocumentMoniker": "Transport.Repository\\ReportsRepository.cs",
+              "ToolTip": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport.Repository\\ReportsRepository.cs",
+              "RelativeToolTip": "Transport.Repository\\ReportsRepository.cs",
+              "ViewState": "AgIAAGMBAAAAAAAAAAAcwGkBAABDAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-24T02:58:24.225Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "ReportsModel.cs",
+              "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport.Model\\ReportsModel.cs",
+              "RelativeDocumentMoniker": "Transport.Model\\ReportsModel.cs",
+              "ToolTip": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport.Model\\ReportsModel.cs",
+              "RelativeToolTip": "Transport.Model\\ReportsModel.cs",
+              "ViewState": "AgIAAEIAAAAAAAAAAAAuwFIAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-24T02:59:48.278Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "ProfitLossReport.cshtml",
+              "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Views\\Wallet\\ProfitLossReport.cshtml",
+              "RelativeDocumentMoniker": "Transport\\Views\\Wallet\\ProfitLossReport.cshtml",
+              "ToolTip": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Views\\Wallet\\ProfitLossReport.cshtml",
+              "RelativeToolTip": "Transport\\Views\\Wallet\\ProfitLossReport.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAcAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-05-24T03:14:14.534Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
               "Title": "ReportsController.cs",
               "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Controllers\\ReportsController.cs",
               "RelativeDocumentMoniker": "Transport\\Controllers\\ReportsController.cs",
@@ -194,12 +230,11 @@
               "RelativeToolTip": "Transport\\Controllers\\ReportsController.cs",
               "ViewState": "AgIAACwGAAAAAAAAAAAAAEIGAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-10T10:12:34.235Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-10T10:12:34.235Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 14,
               "Title": "DriverWallet.cshtml",
               "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Views\\Wallet\\DriverWallet.cshtml",
               "RelativeDocumentMoniker": "Transport\\Views\\Wallet\\DriverWallet.cshtml",
@@ -211,7 +246,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 8,
               "Title": "WalletRepository.cs",
               "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport.Repository\\WalletRepository.cs",
               "RelativeDocumentMoniker": "Transport.Repository\\WalletRepository.cs",
@@ -219,24 +254,11 @@
               "RelativeToolTip": "Transport.Repository\\WalletRepository.cs",
               "ViewState": "AgIAALEBAAAAAAAAAAAuwMIBAAAqAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-10T10:12:34.234Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-10T10:12:34.234Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "WalletController.cs",
-              "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Controllers\\WalletController.cs",
-              "RelativeDocumentMoniker": "Transport\\Controllers\\WalletController.cs",
-              "ToolTip": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Controllers\\WalletController.cs",
-              "RelativeToolTip": "Transport\\Controllers\\WalletController.cs",
-              "ViewState": "AgIAAMoBAAAAAAAAAAA1wNQBAAAkAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-10T10:12:34.227Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 11,
               "Title": "VehiclesReport.cshtml",
               "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Views\\Reports\\VehiclesReport.cshtml",
               "RelativeDocumentMoniker": "Transport\\Views\\Reports\\VehiclesReport.cshtml",
@@ -248,7 +270,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 13,
               "Title": "CompanyWallet.cshtml",
               "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Views\\Wallet\\CompanyWallet.cshtml",
               "RelativeDocumentMoniker": "Transport\\Views\\Wallet\\CompanyWallet.cshtml",
@@ -260,19 +282,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "ListJobs.cshtml",
-              "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Views\\Job\\ListJobs.cshtml",
-              "RelativeDocumentMoniker": "Transport\\Views\\Job\\ListJobs.cshtml",
-              "ToolTip": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Views\\Job\\ListJobs.cshtml",
-              "RelativeToolTip": "Transport\\Views\\Job\\ListJobs.cshtml",
-              "ViewState": "AgIAAA0CAAAAAAAAAAAAAH8BAABPAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-05-20T01:35:45.797Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 12,
               "Title": "InvoiceList.cshtml",
               "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Views\\Reports\\InvoiceList.cshtml",
               "RelativeDocumentMoniker": "Transport\\Views\\Reports\\InvoiceList.cshtml",
@@ -284,7 +294,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 15,
               "Title": "MyWallet.cshtml",
               "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Views\\Wallet\\MyWallet.cshtml",
               "RelativeDocumentMoniker": "Transport\\Views\\Wallet\\MyWallet.cshtml",
@@ -296,7 +306,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 16,
               "Title": "JobRepository.cs",
               "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport.Repository\\JobRepository.cs",
               "RelativeDocumentMoniker": "Transport.Repository\\JobRepository.cs",
@@ -320,7 +330,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 17,
               "Title": "AdminWallet.cshtml",
               "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Views\\Wallet\\AdminWallet.cshtml",
               "RelativeDocumentMoniker": "Transport\\Views\\Wallet\\AdminWallet.cshtml",
@@ -332,7 +342,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 17,
+              "DocumentIndex": 18,
               "Title": "MyAddExpenses.cshtml",
               "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Views\\Wallet\\MyAddExpenses.cshtml",
               "RelativeDocumentMoniker": "Transport\\Views\\Wallet\\MyAddExpenses.cshtml",
@@ -341,18 +351,6 @@
               "ViewState": "AgIAALsAAAAAAAAAAAAYwMoAAAAqAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2026-05-10T10:12:34.24Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 18,
-              "Title": "JobController.cs",
-              "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Controllers\\JobController.cs",
-              "RelativeDocumentMoniker": "Transport\\Controllers\\JobController.cs",
-              "ToolTip": "C:\\Users\\DELL\\Desktop\\Project-Folder\\JJK_Info\\Nessi\\Nessi_Travels_Razor\\Transport\\Controllers\\JobController.cs",
-              "RelativeToolTip": "Transport\\Controllers\\JobController.cs",
-              "ViewState": "AgIAADABAAAAAAAAAAAmwHEBAAASAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-10T10:12:34.261Z"
             },
             {
               "$type": "Document",

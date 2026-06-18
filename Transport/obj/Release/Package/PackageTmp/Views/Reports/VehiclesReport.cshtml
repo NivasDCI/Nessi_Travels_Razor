@@ -1,315 +1,386 @@
-﻿
-@using Transport.Repository.Resource;
-
+﻿@using Transport.Repository.Resource;
 @{
     Layout = "";
 }
- 
+
 <head>
-    
     <script>
-        var GrdVehicleTotalReport; var GrdVehicleExpenseReport;
-
-        $("#TxtFromDate").datepicker({
-            format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small'
-        });
-
-        $("#TxtToDate").datepicker({
-            format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small'
-        });
+        var GrdVehicleTotalReport;
+        var GrdVehicleExpenseReport;
+        var GrdModalJobs;
+        var GrdModalExpenses;
+        var _selectedVehicleCode = 0;
+        var _selectedVehicleName = '';
 
         function TodayDateRange() {
-            let monthNames = ["Jan", "Feb", "Mar", "Apr",
-                "May", "Jun", "Jul", "Aug",
-                "Sep", "Oct", "Nov", "Dec"];
-
-            var today = new Date();
-            var dd = today.getDate();
-            var mm = today.getMonth(); //January is 0!
-            var yyyy = today.getFullYear();
-
-            if (dd < 10) {
-                dd = '0' + dd
-            }
-
-            let monthName = monthNames[mm];
-
-            return dd + '-' + monthName + '-' + yyyy;
+            var mn = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+            var t = new Date();
+            var dd = t.getDate(); if (dd < 10) dd = '0' + dd;
+            return dd + '-' + mn[t.getMonth()] + '-' + t.getFullYear();
         }
 
+        $("#TxtFromDate").datepicker({ format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small' });
+        $("#TxtToDate").datepicker({   format: Common_Date_Format, autoclose: true, uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome', size: 'small' });
+
         $(document).ready(function () {
-            $('input[id="TxtFromDate"]').val(TodayDateRange);
-            $('input[id="TxtToDate"]').val(TodayDateRange);
+            $('#TxtFromDate').val(TodayDateRange);
+            $('#TxtToDate').val(TodayDateRange);
         });
 
-        $.ajax({
-            type: "GET",
-            url: BaseURL + "Common/Load_Vehicles",
-            datatype: "Json",
-            success: function (data) {
+        $.ajax({ type:"GET", url: BaseURL+"Common/Load_Vehicles", datatype:"Json",
+            success: function(data) {
                 $("#ddlVehicleCode option").remove();
-                $.each(data, function (index, value) {
-                    $('#ddlVehicleCode').append('<option value="' + value.ID + '">' + value.Name + '</option>');
-                });
+                $.each(data, function(i,v){ $('#ddlVehicleCode').append('<option value="'+v.ID+'">'+v.Name+'</option>'); });
             }
-        })
+        });
 
+        // ── Main Order Grid ──────────────────────────────────────────────────
         GrdVehicleTotalReport = $("#GrdVehicleTotalReport").grid({
-            //primaryKey: "JobCode",
             uiLibrary: "bootstrap4",
             resizableColumns: true,
             dataSource: '@Url.Action("VehicleTotalReport", "Reports")',
             columns: [
                 {
-                    field: "VehicleName", width: 70, title: "VEHICLE", sortable: true, align: "center", renderer: function (value, record) {
-                        var _class = (record.VehicleName == "PC5148U") ? 'badge badge-primary' : (record.VehicleName == "PC7219K") ? 'badge badge-info' : (record.VehicleName == "PD5148P") ? 'badge badge-warning' : 'badge badge-dark';
-                        return '<div class="text-center" ><span class= ' + "'" + _class + "'" + '>' + record.VehicleName + '</span></div >';
+                    field: "VehicleName", width: 90, title: "VEHICLE", sortable: true, align: "center",
+                    renderer: function(value, record) {
+                        var c = (record.VehicleName=="PC5148U") ? 'badge badge-primary'
+                              : (record.VehicleName=="PC7219K") ? 'badge badge-info'
+                              : (record.VehicleName=="PD5148P") ? 'badge badge-warning' : 'badge badge-dark';
+                        return '<div class="text-center"><span class="'+c+'">'+record.VehicleName+'</span></div>';
                     }
                 },
                 {
-                    field: "CashOrder", width: 70, title: "Cash Order", sortable: false, align: "center", renderer: function (value, record) {
-                        if (intVal(value).toFixed(2) == 0.00) {
-                            return '';
-                        }
-                        else {
-                            return intVal(value).toFixed(2);
-                        }
-                    }
+                    field: "CashOrder", width: 80, title: "Cash Order", align: "center",
+                    renderer: function(v){ return intVal(v)==0 ? '' : '<span style="color:#1a7a4a;font-weight:600;">'+intVal(v).toFixed(2)+'</span>'; }
                 },
                 {
-                    field: "CreditJob", width: 70, title: "Credit Job", sortable: false, align: "center", renderer: function (value, record) {
-                        if (intVal(value).toFixed(2) == 0.00) {
-                            return '';
-                        }
-                        else {
-                            return intVal(value).toFixed(2);
-                        }
-                    }
+                    field: "CreditJob", width: 80, title: "Credit Job", align: "center",
+                    renderer: function(v){ return intVal(v)==0 ? '' : '<span style="color:#c0392b;font-weight:600;">'+intVal(v).toFixed(2)+'</span>'; }
                 },
                 {
-                    field: "TotalOrder", width: 70, title: "Total Order", sortable: false, align: "center", renderer: function (value, record) {
-                        if (intVal(value).toFixed(2) == 0.00) {
-                            return '';
-                        }
-                        else {
-                            return intVal(value).toFixed(2);
-                        }
+                    field: "TotalOrder", width: 80, title: "Total Order", align: "center",
+                    renderer: function(v){ return intVal(v)==0 ? '' : '<strong>'+intVal(v).toFixed(2)+'</strong>'; }
+                },
+                {
+                    field: "VehicleName", width: 70, title: "Details", align: "center",
+                    renderer: function(value, record) {
+                        return '<div class="text-center">'
+                            +'<button onclick="OpenDetails(\''+record.VehicleName+'\',\''+record.VehicleCode+'\')" '
+                            +'class="btn btn-info btn-xs" style="font-size:11px;padding:2px 8px;">'
+                            +'<i class="fas fa-list"></i> Details</button></div>';
                     }
                 }
             ],
             pager: { enable: true, limit: GridRowsDisplayLimit, sizes: ArrPaging }
         });
 
-        GrdVehicleTotalReport.on('dataBound', function (e, records, totalRecords) {
-            var cashamt = 0, creditamt = 0, totamt = 0, $tfoot;
-            // Remove the formatting to get integer data for summation
-            var intVal = function (i) {
-                return typeof i === 'string' ?
-                    i.replace(/[\$,]/g, '') * 1 :
-                    typeof i === 'number' ?
-                        i : 0;
-            };
-
-            $.each(records, function () {
-                cashamt += intVal(this.CashOrder);
-                creditamt += intVal(this.CreditJob);
-                totamt += intVal(this.TotalOrder);
-            });
-            $("#txtOrderTotal").text(totamt.toFixed(2));
-            $tfoot = GrdVehicleTotalReport.children('tfoot');
-            $tfoot.children('tr[data-role="summary"]').remove();
-            $tfoot.prepend('<tr data-role="summary" style="text-align:center"><th>Total</th><th>$' + cashamt.toFixed(2) + '</th><th>$' + creditamt.toFixed(2) + '</th><th>$' + totamt.toFixed(2) + '</th></tr >');
+        GrdVehicleTotalReport.on('dataBound', function(e, records) {
+            var cash=0, credit=0, tot=0;
+            $.each(records, function(){ cash+=intVal(this.CashOrder); credit+=intVal(this.CreditJob); tot+=intVal(this.TotalOrder); });
+            $("#txtOrderTotal").text(tot.toFixed(2));
+            var $tf = GrdVehicleTotalReport.children('tfoot');
+            $tf.children('tr[data-role="summary"]').remove();
+            $tf.prepend('<tr data-role="summary" style="text-align:center"><th>Total</th><th>$'+cash.toFixed(2)+'</th><th>$'+credit.toFixed(2)+'</th><th>$'+tot.toFixed(2)+'</th><th></th></tr>');
         });
 
+        // ── Main Expense Grid ────────────────────────────────────────────────
         GrdVehicleExpenseReport = $("#GrdVehicleExpenseReport").grid({
-            //primaryKey: "ExpenseCode",
             uiLibrary: "bootstrap4",
             responsive: true,
             resizableColumns: true,
             dataSource: '@Url.Action("VehicleExpenseReport", "Reports")',
             columns: [
                 {
-                    field: "VehicleName", width: 70, title: "VEHICLE", sortable: true, align: "center", renderer: function (value, record) {
-                        var _class = (record.VehicleName == "PC5148U") ? 'badge badge-primary' : (record.VehicleName == "PC7219K") ? 'badge badge-info' : (record.VehicleName == "PD5148P") ? 'badge badge-warning' : 'badge badge-dark';
-                        return '<div class="text-center" ><span class= ' + "'" + _class + "'" + '>' + record.VehicleName + '</span></div >';
+                    field: "VehicleName", width: 90, title: "VEHICLE", sortable: true, align: "center",
+                    renderer: function(value, record) {
+                        var c = (record.VehicleName=="PC5148U") ? 'badge badge-primary'
+                              : (record.VehicleName=="PC7219K") ? 'badge badge-info'
+                              : (record.VehicleName=="PD5148P") ? 'badge badge-warning' : 'badge badge-dark';
+                        return '<div class="text-center"><span class="'+c+'">'+record.VehicleName+'</span></div>';
                     }
                 },
-                { field: "ServiceTypeName", width: 96, title: "SERVICE TYPE", sortable: false, align: "left" },
-                //{ field: "Charge", width: 34, title: "Charge", sortable: false, align: "right" },
+                { field: "ServiceTypeName", width: 120, title: "SERVICE TYPE", align: "left" },
                 {
-                    field: "Charge", width: 35, title: "Charge", sortable: false, align: "right", renderer: function (value, record) {
-                        if (intVal(value).toFixed(2) == 0.00) {
-                            return '';
-                        }
-                        else {
-                            return intVal(value).toFixed(2);
-                        }
-                    }
+                    field: "Charge", width: 70, title: "Charge", align: "right",
+                    renderer: function(v){ return intVal(v)==0 ? '' : intVal(v).toFixed(2); }
                 },
-                { field: "ExpenseDate", width: 70, title: "DATE", type: "date", format: Common_Date_Format, sortable: false, align: "left" },
-                //{ field: "DisplayCreatedDate", width: 125, title: "Created Date", sortable: false, align: "center" }               
+                { field: "ExpenseDate", width: 80, title: "DATE", type:"date", format: Common_Date_Format, align:"left" }
             ],
             pager: { enable: true, limit: 50, sizes: ArrPaging }
         });
 
-        GrdVehicleExpenseReport.on('dataBound', function (e, records, totalRecords) {
-            var chargeamt = 0,$tfoot;
-            // Remove the formatting to get integer data for summation
-            var intVal = function (i) {
-                return typeof i === 'string' ?
-                    i.replace(/[\$,]/g, '') * 1 :
-                    typeof i === 'number' ?
-                        i : 0;
-            };
+        GrdVehicleExpenseReport.on('dataBound', function(e, records) {
+            var charge=0;
+            $.each(records, function(){ charge+=intVal(this.Charge); });
+            $("#txtExpenseTotal").text(charge.toFixed(2));
+            var ord = intVal($("#txtOrderTotal").text());
+            $("#txtBalanceTotal").text((ord - charge).toFixed(2));
+            var $tf = GrdVehicleExpenseReport.children('tfoot');
+            $tf.children('tr[data-role="summary"]').remove();
+            $tf.prepend('<tr data-role="summary" style="text-align:center"><th></th><th>Total</th><th>$'+charge.toFixed(2)+'</th><th></th></tr>');
+        });
 
-            $.each(records, function () {
-                chargeamt += intVal(this.Charge);
-            });
-            
-            $("#txtExpenseTotal").text(chargeamt.toFixed(2));
-            var _ordertotal = intVal($("#txtOrderTotal").text());
-            
-            var _balance = _ordertotal - chargeamt;
-            $("#txtBalanceTotal").text(intVal(_balance).toFixed(2));
+        // ── Details modal grids ──────────────────────────────────────────────
+        GrdModalJobs = $("#GrdModalJobs").grid({
+            uiLibrary: "bootstrap4",
+            dataSource: { type:"GET", url:'@Url.Action("Job_FindAll", "Reports")' },
+            columns: [
+                { field:"JobCode",    width:55,  title:"Code",     align:"center" },
+                { field:"JobDate",    width:80,  title:"Date",     type:"date", format: Common_Date_Format },
+                { field:"JobTime",    width:50,  title:"Time",     align:"center" },
+                { field:"CustomerName",width:110,title:"Customer", align:"left" },
+                { field:"JobFrom",    width:130, title:"From",     align:"left" },
+                { field:"JobTo",      width:130, title:"To",       align:"left" },
+                { field:"DrivingByName",width:90,title:"Driver",  align:"left" },
+                {
+                    field:"Credit", width:65, title:"Credit", align:"right",
+                    renderer: function(v){ return intVal(v)==0 ? '' : '<span style="color:#c0392b;font-weight:600;">'+intVal(v).toFixed(2)+'</span>'; }
+                },
+                {
+                    field:"Cash",   width:65, title:"Cash",   align:"right",
+                    renderer: function(v){ return intVal(v)==0 ? '' : '<span style="color:#1a7a4a;font-weight:600;">'+intVal(v).toFixed(2)+'</span>'; }
+                }
+            ],
+            pager: { enable: true, limit: 50, sizes: ArrPaging }
+        });
 
-            $tfoot = GrdVehicleExpenseReport.children('tfoot');
-            $tfoot.children('tr[data-role="summary"]').remove();
-            $tfoot.prepend('<tr data-role="summary" style="text-align:center"><th></th><th>Total</th><th>$' + chargeamt.toFixed(2) + '</th></tr >');
-        });       
+        GrdModalJobs.on('dataBound', function(e, records) {
+            var credit=0, cash=0;
+            $.each(records, function(){ credit+=intVal(this.Credit); cash+=intVal(this.Cash); });
+            $('#modalJobCredit').text(credit.toFixed(2));
+            $('#modalJobCash').text(cash.toFixed(2));
+            $('#modalJobTotal').text((credit+cash).toFixed(2));
+            var $tf = GrdModalJobs.children('tfoot');
+            $tf.children('tr[data-role="summary"]').remove();
+            $tf.prepend('<tr data-role="summary"><th></th><th></th><th></th><th></th><th></th><th></th><th>Total</th><th><span style="color:#c0392b;font-weight:600;">$'+credit.toFixed(2)+'</span></th><th><span style="color:#1a7a4a;font-weight:600;">$'+cash.toFixed(2)+'</span></th></tr>');
+        });
 
-        function Search() {
-            var searchFromDate = '';
-            var searchToDate = '';
+        GrdModalExpenses = $("#GrdModalExpenses").grid({
+            uiLibrary: "bootstrap4",
+            dataSource: { type:"GET", url:'@Url.Action("VehicleExpenseReport", "Reports")' },
+            columns: [
+                { field:"ServiceTypeName", width:140, title:"Service Type", align:"left" },
+                {
+                    field:"Charge", width:80, title:"Charge", align:"right",
+                    renderer: function(v){ return intVal(v)==0?'':intVal(v).toFixed(2); }
+                },
+                { field:"ExpenseDate", width:90, title:"Date", type:"date", format: Common_Date_Format }
+            ],
+            pager: { enable: true, limit: 50, sizes: ArrPaging }
+        });
 
-            if ($("#TxtFromDate").val() != 0) {
-                searchFromDate = $('#TxtFromDate').val();
-            }
+        GrdModalExpenses.on('dataBound', function(e, records) {
+            var tot=0;
+            $.each(records, function(){ tot+=intVal(this.Charge); });
+            $('#modalExpTotal').text(tot.toFixed(2));
+            var $tf = GrdModalExpenses.children('tfoot');
+            $tf.children('tr[data-role="summary"]').remove();
+            $tf.prepend('<tr data-role="summary"><th>Total</th><th>$'+tot.toFixed(2)+'</th><th></th></tr>');
+        });
 
-            if ($("#TxtToDate").val() != "") {
-                searchToDate = $('#TxtToDate').val();
-            }
+        // ── Open Details modal ───────────────────────────────────────────────
+        function OpenDetails(vehicleName, vehicleCode) {
+            _selectedVehicleCode = vehicleCode;
+            _selectedVehicleName = vehicleName;
 
-            GrdVehicleTotalReport.clear();
-            GrdVehicleTotalReport.reload({ VehicleCode: $('#ddlVehicleCode').val(), StartDate: searchFromDate, EndDate: searchToDate });
-            GrdVehicleExpenseReport.clear();
-            GrdVehicleExpenseReport.reload({ VehicleCode: $('#ddlVehicleCode').val(), StartDate: searchFromDate, EndDate: searchToDate });
+            var from = $('#TxtFromDate').val();
+            var to   = $('#TxtToDate').val();
+
+            $('#modalVehicleName').text(vehicleName);
+            $('#modalDateRange').text(from + ' → ' + to);
+
+            // Reload both grids
+            GrdModalJobs.reload({ VehicleCode: vehicleCode, StartDate: from, EndDate: to });
+            GrdModalExpenses.reload({ VehicleCode: vehicleCode, StartDate: from, EndDate: to });
+
+            $('#vehicleDetailModal').modal('show');
+            $('#tabJobs').tab('show');
         }
 
-        //Search filter methods
-        $('#btnSearch').click(function () {
+        // ── Export vehicle details (jobs + expenses) ─────────────────────────
+        function ExportVehicleDetails() {
+            var from = $('#TxtFromDate').val();
+            var to   = $('#TxtToDate').val();
+            var url  = '@Url.Action("ExportVehicleDetails", "Reports")'
+                     + '?VehicleCode=' + _selectedVehicleCode
+                     + '&FromDate='   + encodeURIComponent(from)
+                     + '&ToDate='     + encodeURIComponent(to);
+            window.open(url, '_blank');
+        }
+
+        // ── Search / Clear ───────────────────────────────────────────────────
+        function Search() {
+            var from = $('#TxtFromDate').val(), to = $('#TxtToDate').val();
+            GrdVehicleTotalReport.reload({ VehicleCode: $('#ddlVehicleCode').val(), StartDate: from, EndDate: to });
+            GrdVehicleExpenseReport.reload({ VehicleCode: $('#ddlVehicleCode').val(), StartDate: from, EndDate: to });
+        }
+
+        $('#btnSearch').click(function(){ Search(); });
+        $('#btnSearchClear').click(function(){
+            $('#TxtFromDate').val(TodayDateRange); $('#TxtToDate').val(TodayDateRange);
             Search();
         });
 
-        $('#btnSearchClear').click(function () {
-            $('input[id="TxtFromDate"]').val(TodayDateRange);
-            $('input[id="TxtToDate"]').val(TodayDateRange);
-            GrdVehicleTotalReport.reload({ VehicleCode: $('#ddlVehicleCode').val(), StartDate: $('#TxtFromDate').val(), EndDate: $('#TxtToDate').val() });
-            GrdVehicleExpenseReport.reload({ VehicleCode: $('#ddlVehicleCode').val(), StartDate: $('#TxtFromDate').val(), EndDate: $('#TxtToDate').val() });
-        });
-
         function intVal(i) {
-            return typeof i === 'string' ?
-                i.replace(/[\$,]/g, '') * 1 :
-                typeof i === 'number' ?
-                    i : 0;
-        };
+            return typeof i === 'string' ? i.replace(/[\$,]/g,'')*1 : typeof i === 'number' ? i : 0;
+        }
     </script>
 </head>
-<body>   
-    <!-- Content Wrapper. Contains page content -->
+<body>
+
+    <!-- ── Vehicle Detail Modal ──────────────────────────────────────────────── -->
+    <div class="modal fade" id="vehicleDetailModal" tabindex="-1" role="dialog" style="z-index:9999;">
+        <div class="modal-dialog modal-xl" role="document" style="max-width:92%;">
+            <div class="modal-content">
+                <div class="modal-header" style="background:#343a40; color:#fff; padding:10px 16px;">
+                    <h5 class="modal-title">
+                        <i class="fas fa-car"></i>
+                        &nbsp;<span id="modalVehicleName"></span>
+                        &nbsp;<small id="modalDateRange" style="font-size:13px; opacity:.8;"></small>
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" style="color:#fff;">
+                        <span>&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body" style="padding:12px 16px;">
+
+                    <!-- Tabs -->
+                    <ul class="nav nav-tabs" id="detailTabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="tabJobs" data-toggle="tab" href="#panelJobs">
+                                <i class="fas fa-briefcase"></i> Job History
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="tabExpenses" data-toggle="tab" href="#panelExpenses">
+                                <i class="fas fa-receipt"></i> Expenses
+                            </a>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" style="padding-top:12px;">
+
+                        <!-- Jobs Tab -->
+                        <div class="tab-pane fade show active" id="panelJobs">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div style="font-size:13px;">
+                                    Credit: <strong id="modalJobCredit" style="color:#c0392b;">0.00</strong>
+                                    &nbsp;|&nbsp;
+                                    Cash: <strong id="modalJobCash" style="color:#1a7a4a;">0.00</strong>
+                                    &nbsp;|&nbsp;
+                                    Total: <strong id="modalJobTotal">0.00</strong>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table id="GrdModalJobs" class="table table-hover table-sm"></table>
+                            </div>
+                        </div>
+
+                        <!-- Expenses Tab -->
+                        <div class="tab-pane fade" id="panelExpenses">
+                            <div class="mb-2" style="font-size:13px;">
+                                Total Expenses: <strong id="modalExpTotal" style="color:#c0392b;">0.00</strong>
+                            </div>
+                            <div class="table-responsive">
+                                <table id="GrdModalExpenses" class="table table-hover table-sm"></table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="modal-footer" style="padding:8px 16px;">
+                    <button class="btn btn-success btn-sm" onclick="ExportVehicleDetails()">
+                        <i class="fas fa-file-excel"></i> Export Excel (Jobs + Expenses)
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Main Page ─────────────────────────────────────────────────────────── -->
     <div class="content">
-        <!-- Content Header (Page header) -->
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-12">
                     <div class="card card-pd">
+
                         <div class="card-header">
-                            <span style="font-size: 18px;" class="m-0"><i class="fa fa-random"></i></span>
-                            <span style="font-size: 18px; border-left: 1px solid #ccc; padding-left: 10px;"> Vehicles Report</span>
-                            <div style="float: right;">
-                                <span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px; ">
-                                    <a href="#" data-toggle="tooltip" data-placement="bottom" title="Show Form" onclick="showForm()"><i class="fas fa-caret-square-down"></i></a>
-                                </span><span style="border-left: 1px solid #ccc; padding-left: 15px; padding-right: 15px;">
-                                    <a href="#" data-toggle="tooltip" data-placement="bottom" title="Hide Form" onclick="hideForm()"><i class="fas fa-caret-square-up"></i></a>
+                            <span style="font-size:18px;" class="m-0"><i class="fa fa-car"></i></span>
+                            <span style="font-size:18px; border-left:1px solid #ccc; padding-left:10px;"> Vehicles Report</span>
+                            <div style="float:right;">
+                                <span style="border-left:1px solid #ccc; padding:0 15px;">
+                                    <a href="#" onclick="showForm()" title="Show Form"><i class="fas fa-caret-square-down"></i></a>
+                                </span>
+                                <span style="border-left:1px solid #ccc; padding:0 15px;">
+                                    <a href="#" onclick="hideForm()" title="Hide Form"><i class="fas fa-caret-square-up"></i></a>
                                 </span>
                             </div>
                         </div>
-                       
+
                         <div class="card-body">
-                            <div>
-                                <div class="row">
-
-                                    <div class="col-sm-2">
-                                        <div class="form-group">
-                                            <label class="control-label">Vehicle</label>
-                                            <div>
-                                                @Html.DropDownList("ddlVehicleCode", new SelectList(string.Empty, "Value", "Text"), new { @tabindex = 1, @class = "form-control select2", @width = "100%" })
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-sm-2">
-                                        <div class="form-group">
-                                            <label class="control-label">From</label>
-                                            <div>
-                                                <input type="text" id="TxtFromDate" class="form-control">
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-sm-2">
-                                        <div class="form-group">
-                                            <label>To</label>
-                                            <div>
-                                                <input type="text" id="TxtToDate" class="form-control">
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-sm-4">
-                                        <div class="pdt-25">
-                                            <div class="row">
-                                                <div class="col-sm-6">
-                                                    <button type="button" id="btnSearch" class="btn btn-primary btn-block"><i class="fa fa-search"></i> @Transport.Repository.WEBPAGEBUTTON.SEARCH</button>
-                                                </div>
-                                                <div class="col-sm-6">
-                                                    <button type="button" id="btnSearchClear" class="btn btn-primary btn-block"><i class="fa fa-paint-brush"></i> @Transport.Repository.WEBPAGEBUTTON.CLEAR</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
+                            <!-- Filters -->
+                            <div class="row mb-3">
+                                <div class="col-sm-2">
+                                    <label class="control-label">Vehicle</label>
+                                    @Html.DropDownList("ddlVehicleCode", new SelectList(string.Empty, "Value", "Text"), new { @class = "form-control select2", @width = "100%" })
                                 </div>
-
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-6" style="border: 1px solid;">
-                                    <div>
-                                        <h4 align="center">Order</h4>
+                                <div class="col-sm-2">
+                                    <label class="control-label">From</label>
+                                    <input type="text" id="TxtFromDate" class="form-control" />
+                                </div>
+                                <div class="col-sm-2">
+                                    <label>To</label>
+                                    <input type="text" id="TxtToDate" class="form-control" />
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="pdt-25">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <button type="button" id="btnSearch" class="btn btn-primary btn-block">
+                                                    <i class="fa fa-search"></i> Search
+                                                </button>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <button type="button" id="btnSearchClear" class="btn btn-primary btn-block">
+                                                    <i class="fa fa-paint-brush"></i> Clear
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="box-body table-responsive no-padding">
+                                </div>
+                            </div>
+
+                            <!-- Grids -->
+                            <div class="row">
+                                <div class="col-sm-6" style="border:1px solid #dee2e6; border-radius:4px; padding:10px;">
+                                    <h5 class="text-center mb-2">
+                                        <i class="fas fa-briefcase"></i> Orders
+                                        <small class="text-muted" style="font-size:12px;">(click Details for breakdown)</small>
+                                    </h5>
+                                    <div class="table-responsive">
                                         <table id="GrdVehicleTotalReport" class="table table-hover"></table>
                                     </div>
                                 </div>
-                                <div class="col-sm-6" style="border: 1px solid;">
-                                    <div>
-                                        <h4 align="center">Expense</h4>
-                                    </div>
-                                    <div class="box-body table-responsive no-padding">
+                                <div class="col-sm-6" style="border:1px solid #dee2e6; border-radius:4px; padding:10px;">
+                                    <h5 class="text-center mb-2"><i class="fas fa-receipt"></i> Expenses</h5>
+                                    <div class="table-responsive">
                                         <table id="GrdVehicleExpenseReport" class="table table-hover"></table>
                                     </div>
                                 </div>
                             </div>
-                            <hr>
-                            <div id="bottom-total" class="well well-sm" style="margin-bottom: 0px; position: static; bottom: 0px; width:100%; z-index: 2;">
-                                <table class="table table-bordered table-condensed totals" style="margin-bottom:0;">
+
+                            <!-- Totals bar -->
+                            <hr />
+                            <div class="well well-sm" style="margin-bottom:0;">
+                                <table class="table table-bordered table-condensed mb-0">
                                     <tbody>
-                                        <tr class="TotalView">
-                                            <td>Total Order $ <span class="totals_val pull-right" style="font-weight: bold;" id="txtOrderTotal">0.00</span></td>
-
-                                            <td>Total Expense $ <span class="totals_val pull-right" style="font-weight: bold;" id="txtExpenseTotal">0.00</span></td>
-
-                                            <td>Balance  $ <span class="totals_val pull-right" style="font-weight: bold;" id="txtBalanceTotal">0.00</span></td>
+                                        <tr>
+                                            <td>Total Order &nbsp;<strong id="txtOrderTotal">0.00</strong></td>
+                                            <td>Total Expense &nbsp;<strong id="txtExpenseTotal">0.00</strong></td>
+                                            <td>Balance &nbsp;<strong id="txtBalanceTotal">0.00</strong></td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -318,10 +389,8 @@
 
                     </div>
                 </div>
-            </div><!-- /.content-wrapper -->
+            </div>
         </div>
     </div>
 
 </body>
-
-    
